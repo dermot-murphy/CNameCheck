@@ -271,7 +271,7 @@ class TestSpellDictCLI(unittest.TestCase):
             # via subprocess — test that the tool accepts the flag
             rc, out = _subprocess("--spell-dict", str(sd), "--version")
         self.assertEqual(rc, 0)
-        self.assertIn("CNameCheck", out)
+        self.assertIn("CStyleCheck", out)
 
     def test_custom_spell_dict_replaces_builtin(self):
         """If custom dict has only one word, other builtin words are unknown."""

@@ -38,7 +38,7 @@ class TestVersionAndHelp(unittest.TestCase):
 
     def test_version_prints_tool_name(self):
         _, out = _run("--version")
-        self.assertIn("CNameCheck", out)
+        self.assertIn("CStyleCheck", out)
 
     def test_help_exits_zero(self):
         rc, _ = _run("--help")

@@ -1,12 +1,12 @@
 # .pre-commit-hooks.yaml
 # =============================================================================
-# CNameCheck — Embedded C naming-convention linter
+# CStyleCheck — Embedded C naming-convention linter
 # =============================================================================
 #
 # Add to your project's .pre-commit-config.yaml:
 #
 #   repos:
-#     - repo: https://github.com/dermot-murphy/CNameCheck
+#     - repo: https://github.com/dermot-murphy/CStyleCheck
 #       rev: v1.0.0            # pin to a release tag
 #       hooks:
 #         - id: cnamecheck
@@ -26,7 +26,7 @@
 # =============================================================================
 
 - id: cnamecheck
-  name: CNameCheck
+  name: CStyleCheck
   description: >-
     Embedded C naming-convention linter (Barr-C / MISRA-C complementary).
     Enforces variable, function, type, macro, and include-guard naming rules

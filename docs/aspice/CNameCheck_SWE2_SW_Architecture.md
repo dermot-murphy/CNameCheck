@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SWE2-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SWE.2 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CNameCheck v1.0.0**. It refines the system architecture (CNC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
+This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.0.0**. It refines the system architecture (CNC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Architectural Design**.
 
@@ -34,16 +34,16 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE1-001 | CNameCheck Software Requirements Specification | 1.0 |
-| CNC-SYS3-001 | CNameCheck System Architecture Description | 1.0 |
-| CNC-SWE3-001 | CNameCheck Software Detailed Design | 1.0 |
-| CNC-SUP8-001 | CNameCheck Configuration Management Plan | 1.1 |
+| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CNC-SWE3-001 | CStyleCheck Software Detailed Design | 1.0 |
+| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ---
 
 ## 4. Architectural Overview
 
-CNameCheck is implemented as a **single Python module** (`cnamecheck.py`) with supporting data files. The module is structured into distinct functional components that map directly to the system-level subsystems defined in CNC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
+CStyleCheck is implemented as a **single Python module** (`cnamecheck.py`) with supporting data files. The module is structured into distinct functional components that map directly to the system-level subsystems defined in CNC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
 
 ```
 cnamecheck.py
@@ -307,7 +307,7 @@ main()
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

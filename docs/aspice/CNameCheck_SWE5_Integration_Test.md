@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SWE5-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SWE.5 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SWE.5 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This document defines the software integration test specification for **CNameCheck v1.0.0**, verifying that the software components integrate correctly across the interfaces defined in CNC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
+This document defines the software integration test specification for **CStyleCheck v1.0.0**, verifying that the software components integrate correctly across the interfaces defined in CNC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
 
 Integration tests operate at a higher level than unit tests (SWE.4): they exercise data flows **across component boundaries** — primarily the path from COMP-01 (CLI) through COMP-04 (Parser) into COMP-05 (Rule Engine) and COMP-07 (Output Formatter) — rather than individual method logic.
 
@@ -36,10 +36,10 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cnamec
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE2-001 | CNameCheck Software Architecture Description | 1.0 |
-| CNC-SWE4-001 | CNameCheck Unit Verification Specification | 1.0 |
-| CNC-SWE6-001 | CNameCheck Software Qualification Test Specification | 1.0 |
-| CNC-SYS4-001 | CNameCheck System Integration Test Specification | 1.0 |
+| CNC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
+| CNC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
+| CNC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.0 |
+| CNC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
 
 ### 3.2 Test Environment
 
@@ -227,7 +227,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
 | 1 | `--output-format sarif` with violation source | Subprocess | stdout is valid JSON with `$schema` field |
-| 2 | Validate SARIF structure | Parsed JSON | `runs[0].tool.driver.name == "CNameCheck"`; `runs[0].results` non-empty |
+| 2 | Validate SARIF structure | Parsed JSON | `runs[0].tool.driver.name == "CStyleCheck"`; `runs[0].results` non-empty |
 | 3 | Verify location data | Each result | `physicalLocation.artifactLocation.uri` and `region.startLine` present |
 
 | Date | Tester | Python | Result | Deviation |
@@ -412,7 +412,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

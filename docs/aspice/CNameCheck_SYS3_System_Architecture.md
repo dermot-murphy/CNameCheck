@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SYS3-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SYS.3 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SYS.3 |
 
 ---
 
@@ -20,7 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
@@ -28,22 +28,22 @@
 
 ### 3.1 Purpose
 
-This System Architecture Description defines the top-level structural and behavioural design of **CNameCheck v1.0.0**, decomposing the system into its major functional subsystems, defining their interfaces, and establishing the basis for software-level design. It satisfies **Automotive SPICE® PAM v4.0, SYS.3 — System Architectural Design**.
+This System Architecture Description defines the top-level structural and behavioural design of **CStyleCheck v1.0.0**, decomposing the system into its major functional subsystems, defining their interfaces, and establishing the basis for software-level design. It satisfies **Automotive SPICE® PAM v4.0, SYS.3 — System Architectural Design**.
 
 ### 3.2 Referenced Documents
 
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CNC-SYS2-001 | CNameCheck System Requirements Specification | 1.0 |
-| CNC-SYS4-001 | CNameCheck System Integration Test Specification | 1.0 |
-| CNC-SUP8-001 | CNameCheck Configuration Management Plan | 1.1 |
+| CNC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
+| CNC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
+| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ---
 
 ## 4. System Context
 
-CNameCheck is a software-only system with no hardware dependencies. It is deployed on a host execution environment (Linux, macOS, or Windows) with Python 3.10+ and PyYAML. External systems interact with CNameCheck through three integration boundaries:
+CStyleCheck is a software-only system with no hardware dependencies. It is deployed on a host execution environment (Linux, macOS, or Windows) with Python 3.10+ and PyYAML. External systems interact with CStyleCheck through three integration boundaries:
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -58,7 +58,7 @@ CNameCheck is a software-only system with no hardware dependencies. It is deploy
           │  CLI invocation  │                │
           ▼                  ▼                ▼
 ┌─────────────────────────────────────────────────────┐
-│                   CNameCheck System                  │
+│                   CStyleCheck System                  │
 │                                                     │
 │   Inputs:  .c / .h files, naming_convention.yaml,   │
 │            options, dictionaries, exclusions         │
@@ -72,7 +72,7 @@ CNameCheck is a software-only system with no hardware dependencies. It is deploy
 
 ## 5. System Decomposition — Static View
 
-CNameCheck is decomposed into six functional subsystems, all implemented within the single `cnamecheck.py` module and its supporting configuration and data files.
+CStyleCheck is decomposed into six functional subsystems, all implemented within the single `cnamecheck.py` module and its supporting configuration and data files.
 
 ### 5.1 Subsystem Overview
 
@@ -231,7 +231,7 @@ If any configuration or invocation error is detected during steps 1 or 2:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

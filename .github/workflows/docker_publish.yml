@@ -1,6 +1,6 @@
 # .github/workflows/docker_publish.yml
 # =============================================================================
-# Build and publish the CNameCheck Docker image
+# Build and publish the CStyleCheck Docker image
 # =============================================================================
 #
 # Triggers:

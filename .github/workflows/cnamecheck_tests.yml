@@ -1,4 +1,4 @@
-name: CNameCheck Tests
+name: CStyleCheck Tests
 
 on:
   push:

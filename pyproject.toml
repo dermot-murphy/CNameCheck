@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 # =============================================================================
-# CNameCheck — Embedded C naming-convention linter
+# CStyleCheck — Embedded C naming-convention linter
 # =============================================================================
 
 [project]
@@ -17,9 +17,9 @@ dependencies    = ["pyyaml>=6.0,<7.0"]
 keywords        = ["c", "linter", "naming-convention", "barr-c", "misra", "embedded"]
 
 [project.urls]
-Homepage      = "https://github.com/dermot-murphy/CNameCheck"
-Repository    = "https://github.com/dermot-murphy/CNameCheck"
-"Bug Tracker" = "https://github.com/dermot-murphy/CNameCheck/issues"
+Homepage      = "https://github.com/dermot-murphy/CStyleCheck"
+Repository    = "https://github.com/dermot-murphy/CStyleCheck"
+"Bug Tracker" = "https://github.com/dermot-murphy/CStyleCheck/issues"
 
 # `cnamecheck` is available as a command after `pip install .` or `pipx install .`
 [project.scripts]

@@ -1,4 +1,4 @@
-# CNameCheck — Python dependencies
+# CStyleCheck — Python dependencies
 # Install with: pip install -r requirements.txt
 
 # Runtime

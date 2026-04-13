@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SWE3-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SWE.3 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SWE.3 |
 
 ---
 
@@ -20,21 +20,21 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This document defines the detailed design of each software unit in **CNameCheck v1.0.0**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
+This document defines the detailed design of each software unit in **CStyleCheck v1.0.0**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
 
 ### 3.1 Referenced Documents
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE1-001 | CNameCheck Software Requirements Specification | 1.0 |
-| CNC-SWE2-001 | CNameCheck Software Architecture Description | 1.0 |
-| CNC-SWE4-001 | CNameCheck Unit Verification Specification | 1.0 |
+| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CNC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
+| CNC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
 
 ---
 
@@ -316,7 +316,7 @@ This document defines the detailed design of each software unit in **CNameCheck 
 **Purpose:** Serialise violations to SARIF 2.1.0 JSON.
 
 **Algorithm:**
-1. Build SARIF `tool` object with `driver.name = "CNameCheck"`, `driver.version = tool_version`
+1. Build SARIF `tool` object with `driver.name = "CStyleCheck"`, `driver.version = tool_version`
 2. For each violation: build a SARIF `result` object with `ruleId`, `level`, `message.text`, `locations[0].physicalLocation`
 3. Return complete SARIF document as `json.dumps(..., indent=2)`
 
@@ -414,7 +414,7 @@ Violation:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

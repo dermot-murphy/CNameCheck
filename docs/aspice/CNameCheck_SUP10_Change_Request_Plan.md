@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SUP10-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SUP.10 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SUP.10 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Change Request Management Plan defines the process for requesting, evaluating, approving, implementing, and verifying changes to any controlled configuration item of **CNameCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.10 — Change Request Management**.
+This Change Request Management Plan defines the process for requesting, evaluating, approving, implementing, and verifying changes to any controlled configuration item of **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.10 — Change Request Management**.
 
 A **change request (CR)** covers any planned modification to a baselined work product that is not a defect fix — including new features, new rules, configuration changes, documentation updates, and process improvements. Defect fixes are handled under SUP.9 but also follow this plan for their change-control steps once the fix has been accepted.
 
@@ -82,7 +82,7 @@ Minimum required fields when raising a CR Issue:
 
 ### 5.2 Change Evaluation
 
-1. Issue assigned to Dermot Murphy for evaluation
+1. Issue assigned to Claude for evaluation
 2. Assess: technical feasibility, effort estimate, impact on existing requirements, impact on test suite, version number implications (patch/minor/major)
 3. Check for conflicts with open Issues or other planned changes
 4. Evaluate impact on ASPICE documents — identify which WPs need revision
@@ -152,7 +152,7 @@ All affected CIs must be updated within the same Git Flow branch as the implemen
 
 ## 7. Change Request Register
 
-The GitHub Issues board at `https://github.com/dermot-murphy/CNameCheck/issues` serves as the CR register. Filter by enhancement/improvement/documentation/config-change/process-change labels.
+The GitHub Issues board at `https://github.com/dermot-murphy/CStyleCheck/issues` serves as the CR register. Filter by enhancement/improvement/documentation/config-change/process-change labels.
 
 Summary view:
 
@@ -177,7 +177,7 @@ Summary view:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

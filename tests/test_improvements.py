@@ -460,7 +460,7 @@ class TestSarifOutput(unittest.TestCase):
 
     def test_tool_driver_name(self):
         _, out = self._sr("void mod_Init(void){}\n")
-        self.assertEqual(json.loads(out)["runs"][0]["tool"]["driver"]["name"], "CNameCheck")
+        self.assertEqual(json.loads(out)["runs"][0]["tool"]["driver"]["name"], "CStyleCheck")
 
     def test_result_fields(self):
         _, out = self._sr("void BadFunc(void){}\n")

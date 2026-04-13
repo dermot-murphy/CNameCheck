@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-MAN5-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | MAN.5 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | MAN.5 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Risk Management Plan defines the risk identification, analysis, treatment, and monitoring approach for **CNameCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, MAN.5 — Risk Management**.
+This Risk Management Plan defines the risk identification, analysis, treatment, and monitoring approach for **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, MAN.5 — Risk Management**.
 
 ### 3.1 Referenced Documents
 
@@ -99,7 +99,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 2 |
 | **Residual Impact** | 2 |
 | **Residual RPN** | 4 (Low) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Per release |
 | **Status** | Active — monitored via CI |
 
@@ -120,7 +120,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 1 |
 | **Residual Impact** | 2 |
 | **Residual RPN** | 2 (Low) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Per Python minor release |
 | **Status** | Active — monitored via CI matrix |
 
@@ -141,7 +141,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 2 |
 | **Residual Impact** | 2 |
 | **Residual RPN** | 4 (Low) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Monthly |
 | **Status** | Active |
 
@@ -162,7 +162,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 1 |
 | **Residual Impact** | 3 |
 | **Residual RPN** | 3 (Low) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Quarterly |
 | **Status** | Accepted |
 
@@ -183,7 +183,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 2 |
 | **Residual Impact** | 3 |
 | **Residual RPN** | 6 (Medium) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Per milestone |
 | **Status** | Active |
 
@@ -195,7 +195,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 |---|---|
 | **Risk ID** | RISK-006 |
 | **Source** | Technical — normative standard interpretation |
-| **Undesirable Event** | CNameCheck's interpretation of a Barr-C or MISRA-C rule differs from user expectation, causing adoption friction |
+| **Undesirable Event** | CStyleCheck's interpretation of a Barr-C or MISRA-C rule differs from user expectation, causing adoption friction |
 | **Likelihood** | 3 (Possible) |
 | **Impact** | 2 (Minor) — user confusion; support burden |
 | **RPN** | 6 (Medium) |
@@ -204,7 +204,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 2 |
 | **Residual Impact** | 1 |
 | **Residual RPN** | 2 (Low) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Per major release |
 | **Status** | Active |
 
@@ -225,7 +225,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 1 |
 | **Residual Impact** | 3 |
 | **Residual RPN** | 3 (Low) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Pre-assessment |
 | **Status** | Active |
 
@@ -246,7 +246,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual Likelihood** | 1 |
 | **Residual Impact** | 3 |
 | **Residual RPN** | 3 (Low) |
-| **Owner** | Dermot Murphy |
+| **Owner** | Claude |
 | **Review Date** | Per Docker build |
 | **Status** | Active |
 
@@ -273,11 +273,11 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 
 | Activity | Frequency | Owner |
 |---|---|---|
-| Review open GitHub Issues for new risk indicators | Weekly | Dermot Murphy |
-| Check PyYAML CVE advisories | Monthly | Dermot Murphy |
-| Update risk register residual scores | Per milestone | Dermot Murphy |
-| Review RISK-005 (resource) | Per milestone | Dermot Murphy |
-| Pre-assessment risk review | Before ASPICE assessment | Dermot Murphy |
+| Review open GitHub Issues for new risk indicators | Weekly | Claude |
+| Check PyYAML CVE advisories | Monthly | Claude |
+| Update risk register residual scores | Per milestone | Claude |
+| Review RISK-005 (resource) | Per milestone | Claude |
+| Pre-assessment risk review | Before ASPICE assessment | Claude |
 
 ---
 
@@ -285,7 +285,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

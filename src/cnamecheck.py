@@ -131,7 +131,7 @@ except ImportError:
 #
 # If _version.py is absent (e.g. during development without a git tag) the
 # fallback string "1.0.0.dev" is used instead.
-_TOOL_NAME = "CNameCheck"
+_TOOL_NAME = "CStyleCheck"
 
 try:
     from _version import __version__ as _VERSION

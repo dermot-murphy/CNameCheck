@@ -1,13 +1,13 @@
-# CNameCheck
+# CStyleCheck
 
-![Logo](https://github.com/dermot-murphy/CNameCheck/blob/main/Logo/cnamechecker.png)
+![Logo](https://github.com/dermot-murphy/CStyleCheck/blob/main/Logo/cnamechecker.png)
 
 Embedded C naming-convention linter for GitHub Actions / pre-commit hooks.
 Implements **Barr-C:2018** and MISRA-C complementary rules across **50 rule IDs**.
 
-[![Tests](https://github.com/dermot-murphy/CNameCheck/actions/workflows/cnamecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CNameCheck/actions/workflows/cnamecheck_tests.yml)
-[![Naming Convention](https://github.com/dermot-murphy/CNameCheck/actions/workflows/naming_convention.yml/badge.svg)](https://github.com/dermot-murphy/CNameCheck/actions/workflows/naming_convention.yml)
-[![Docker](https://github.com/dermot-murphy/CNameCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CNameCheck/actions/workflows/docker_publish.yml)
+[![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cnamecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cnamecheck_tests.yml)
+[![Naming Convention](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/naming_convention.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/naming_convention.yml)
+[![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 ---
 
@@ -175,7 +175,7 @@ annotations without a custom action parsing step:
 
 ```yaml
 # .github/workflows/namecheck.yml
-- name: Run CNameCheck
+- name: Run CStyleCheck
   run: |
     python src/cnamecheck.py \
       --output-format sarif \
@@ -373,7 +373,7 @@ concatenate: `cat src/c_keywords.txt extra.txt > combined.txt`
 
 ## pre-commit
 
-CNameCheck ships a `.pre-commit-hooks.yaml` so you can add it to any repo
+CStyleCheck ships a `.pre-commit-hooks.yaml` so you can add it to any repo
 with two lines in `.pre-commit-config.yaml`.
 
 ### Installation
@@ -381,7 +381,7 @@ with two lines in `.pre-commit-config.yaml`.
 ```yaml
 # .pre-commit-config.yaml
 repos:
-  - repo: https://github.com/dermot-murphy/CNameCheck
+  - repo: https://github.com/dermot-murphy/CStyleCheck
     rev: v1.0.0        # pin to a release tag
     hooks:
       - id: cnamecheck
@@ -390,12 +390,12 @@ repos:
           - naming_convention.yaml    # path to your config inside the repo
 ```
 
-Run `pre-commit install` once, then on every `git commit` CNameCheck will
+Run `pre-commit install` once, then on every `git commit` CStyleCheck will
 check the staged `.c` and `.h` files automatically.
 
 ### Passing extra options
 
-All CNameCheck CLI flags work via `args`:
+All CStyleCheck CLI flags work via `args`:
 
 ```yaml
 hooks:
@@ -423,7 +423,7 @@ hooks:
 | `--summary` table | optional via `args` | ✓ recommended |
 | Baseline suppression | ✓ via `args` | ✓ |
 
-For the cross-file sign-compatibility check to be reliable, run CNameCheck
+For the cross-file sign-compatibility check to be reliable, run CStyleCheck
 over the full source tree in your CI pipeline alongside the pre-commit hook.
 
 ### pip / pipx install
@@ -443,11 +443,11 @@ cnamecheck --config naming_convention.yaml source/**/*.c source/**/*.h
 ## Docker
 
 ```bash
-docker pull ghcr.io/<owner>/CNameCheck:latest
+docker pull ghcr.io/<owner>/CStyleCheck:latest
 
 docker run --rm \
   -v "$(pwd):/repo" \
-  ghcr.io/<owner>/CNameCheck:latest \
+  ghcr.io/<owner>/CStyleCheck:latest \
   --verbose \
   --config /app/naming_convention.yaml \
   /repo/source/**/*.c /repo/source/**/*.h
@@ -455,7 +455,7 @@ docker run --rm \
 
 **Windows CMD** (note forward slashes and drive letter):
 ```cmd
-docker run --rm -v "C:/MyProject:/repo" ghcr.io/<owner>/CNameCheck:latest ^
+docker run --rm -v "C:/MyProject:/repo" ghcr.io/<owner>/CStyleCheck:latest ^
   --config /app/naming_convention.yaml ^
   --include "/repo/source/**/*.c" --include "/repo/source/**/*.h"
 ```
@@ -467,14 +467,14 @@ inside the container, correctly handling all files regardless of host OS.
 
 ## GitHub Action
 
-CNameCheck is available as a GitHub Action via `action.yml` at the repository
+CStyleCheck is available as a GitHub Action via `action.yml` at the repository
 root.
 
 ### Minimal usage
 
 ```yaml
 # .github/workflows/naming_convention.yml
-- uses: dermot-murphy/CNameCheck@v1
+- uses: dermot-murphy/CStyleCheck@v1
   with:
     config: src/naming_convention.yaml
 ```
@@ -490,9 +490,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run CNameCheck
+      - name: Run CStyleCheck
         id: namecheck
-        uses: dermot-murphy/CNameCheck@v1
+        uses: dermot-murphy/CStyleCheck@v1
         with:
           config: src/naming_convention.yaml
           include: |
@@ -574,7 +574,7 @@ jobs:
 
 3. **Create a release** on GitHub (Releases → Draft a new release):
    - Tag: `v1.0.0` (create on publish, targeting `main`)
-   - Title: `CNameCheck v1.0.0`
+   - Title: `CStyleCheck v1.0.0`
    - Tick **"Publish this Action to the GitHub Marketplace"**
    - Select a primary category — **Code Quality** is the best fit;
      optionally add **Testing** as a secondary category.
@@ -585,7 +585,7 @@ jobs:
    on first publish).
 
 5. **Publish the release.**  The action is immediately available at
-   `dermot-murphy/CNameCheck@v1.0.0`.
+   `dermot-murphy/CStyleCheck@v1.0.0`.
 
 6. **Create a floating major-version tag** so callers can pin `@v1` and
    automatically receive patch/minor updates:

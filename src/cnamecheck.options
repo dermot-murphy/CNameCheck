@@ -1,6 +1,6 @@
 # cnamecheck.options — used with --options-file FILE
 # =====================================================================
-# Project-level command-line options for CNameCheck.
+# Project-level command-line options for CStyleCheck.
 #
 # Format:
 #   - One option (or option + value) per line

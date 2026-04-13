@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-PA2-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | PA 2.1, PA 2.2 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | PA 2.1, PA 2.2 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose
 
-This document records the generic practices evidence for **Automotive SPICE® PAM v4.0 Capability Level 2** across all assessed processes. It provides a single consolidated reference for assessors to verify PA 2.1 (Process Performance Management) and PA 2.2 (Work Product Management) achievement for CNameCheck v1.0.0.
+This document records the generic practices evidence for **Automotive SPICE® PAM v4.0 Capability Level 2** across all assessed processes. It provides a single consolidated reference for assessors to verify PA 2.1 (Process Performance Management) and PA 2.2 (Work Product Management) achievement for CStyleCheck v1.0.0.
 
 **PA 2.1** requires that each process is planned, monitored, and adjusted.
 **PA 2.2** requires that work products are defined, stored, controlled, reviewed, and adjusted.
@@ -90,9 +90,9 @@ For each assessed process, performance objectives are defined in the table below
 
 | Role | Assigned To | Process Responsibility |
 |---|---|---|
-| Project Manager / CM Manager | Dermot Murphy | MAN.3, MAN.5, SUP.8, ACQ.4 |
-| Lead Developer | Dermot Murphy | SWE.1, SWE.2, SWE.3, SWE.4 implementation |
-| Test Lead | Dermot Murphy | SWE.4, SWE.5, SWE.6, SYS.4, SYS.5 execution |
+| Project Manager / CM Manager | Claude | MAN.3, MAN.5, SUP.8, ACQ.4 |
+| Lead Developer | Claude | SWE.1, SWE.2, SWE.3, SWE.4 implementation |
+| Test Lead | Claude | SWE.4, SWE.5, SWE.6, SYS.4, SYS.5 execution |
 | Quality Assurance | \<Name\> | SUP.1, work product review, pre-release checklist |
 | Reviewer | \<Name\> | Document reviews; PR reviews |
 | CI System | GitHub Actions | Automated enforcement of GATE-01, GATE-02, GATE-03 |
@@ -101,11 +101,11 @@ For each assessed process, performance objectives are defined in the table below
 
 | Interface | Parties | Agreement | Communication Method |
 |---|---|---|---|
-| CI → Developer | GitHub Actions ↔ Dermot Murphy | CI must pass before merge to `develop`/`main` | GitHub Actions status checks; email notification |
-| Developer → Reviewer | Dermot Murphy ↔ Reviewer | PR requires at least 1 approval for Medium/High impact | GitHub PR review mechanism |
-| Developer → QA | Dermot Murphy ↔ QA role | Pre-release checklist must be signed before release | CNC-SUP1-001 §5.4 checklist |
-| Project → Suppliers | CNameCheck ↔ SUP-01 to SUP-05 | Acceptance criteria per CNC-ACQ4-001 §5 | CI jobs; advisory monitoring |
-| Project → Assessor | CNameCheck ↔ ASPICE Assessor | Full documentation set; CI evidence; GitHub repository access | Document delivery; GitHub access grant |
+| CI → Developer | GitHub Actions ↔ Claude | CI must pass before merge to `develop`/`main` | GitHub Actions status checks; email notification |
+| Developer → Reviewer | Claude ↔ Reviewer | PR requires at least 1 approval for Medium/High impact | GitHub PR review mechanism |
+| Developer → QA | Claude ↔ QA role | Pre-release checklist must be signed before release | CNC-SUP1-001 §5.4 checklist |
+| Project → Suppliers | CStyleCheck ↔ SUP-01 to SUP-05 | Acceptance criteria per CNC-ACQ4-001 §5 | CI jobs; advisory monitoring |
+| Project → Assessor | CStyleCheck ↔ ASPICE Assessor | Full documentation set; CI evidence; GitHub repository access | Document delivery; GitHub access grant |
 
 ---
 
@@ -223,7 +223,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |
