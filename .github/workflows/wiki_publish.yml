@@ -72,12 +72,26 @@ jobs:
         uses: actions/checkout@v6
 
       # ── 2. Clone wiki repository ────────────────────────────────────────────
+      #
+      # GitHub returns HTTP 403 when "x-access-token" is used as the username
+      # against a wiki repo.  The fix is to use the actual GitHub account
+      # username (github.actor) paired with the PAT.  We write credentials to
+      # git's credential store so the token is never embedded in the remote URL
+      # or visible in process listings.
+      #
       - name: Clone wiki
         env:
           WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
-          REPO: ${{ github.repository }}
+          REPO:       ${{ github.repository }}
+          ACTOR:      ${{ github.actor }}
         run: |
-          WIKI_URL="https://x-access-token:${WIKI_TOKEN}@github.com/${REPO}.wiki.git"
+          # Configure credential store — token stored in ~/.git-credentials,
+          # never embedded in the remote URL.
+          git config --global credential.helper store
+          printf 'https://%s:%s@github.com\n' "$ACTOR" "$WIKI_TOKEN" \
+            > ~/.git-credentials
+
+          WIKI_URL="https://github.com/${REPO}.wiki.git"
           git clone "$WIKI_URL" wiki
           echo "Wiki cloned. Existing pages:"
           ls wiki/ || true
@@ -411,6 +425,7 @@ jobs:
         env:
           WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
           REPO:       ${{ github.repository }}
+          ACTOR:      ${{ github.actor }}
           SHA:        ${{ github.sha }}
           REF:        ${{ github.ref_name }}
         run: |
@@ -418,6 +433,11 @@ jobs:
 
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Ensure the push remote also uses credentials from the store.
+          # (The clone URL is plain https://github.com/... which the credential
+          # helper will match against ~/.git-credentials.)
+          git remote set-url origin "https://github.com/${REPO}.wiki.git"
 
           git add .
 
