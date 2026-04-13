@@ -1,0 +1,40 @@
+# .dockerignore — applied relative to the build context (repo root)
+# Excludes files not needed inside the image
+
+# Test suite
+tests/
+*.test
+
+# Git metadata
+.git/
+.gitignore
+.gitattributes
+
+# CI workflows
+.github/
+
+# Python caches
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+
+# Dev artefacts
+*.egg-info/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

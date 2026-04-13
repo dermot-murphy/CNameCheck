@@ -1,0 +1,111 @@
+# Per-file and per-identifier rule exclusions — used with --exclusions FILE
+#
+# ============================================================================
+# FORMAT
+# ============================================================================
+#
+# Each top-level key is an fnmatch pattern matched against the BASENAME of
+# the file being checked.  The value may contain:
+#
+#   disabled_rules:   (existing)  — suppresses listed rules for EVERY
+#                                   identifier in the file
+#
+#   identifiers:      (new)       — suppresses rules for SPECIFIC named
+#                                   identifiers only (function, variable,
+#                                   macro, typedef, struct/enum name, etc.)
+#                                   Other identifiers in the same file are
+#                                   still subject to those rules.
+#
+# The two can be combined — file-level rules disable a rule for the whole
+# file, while identifier-level rules disable a rule for one name only.
+#
+# ============================================================================
+# GLOB PATTERNS
+# ============================================================================
+#
+#   ascii.*            matches ascii.c AND ascii.h
+#   util_*.c           matches util_string.c, util_math.c, …
+#   legacy_module.c    exact filename (no path component)
+#
+# ============================================================================
+# EXAMPLES
+# ============================================================================
+#
+# ── Example 1: suppress all function naming rules in an entire file ──────────
+#
+# "ascii.c":
+#   disabled_rules:
+#     - function.prefix
+#     - function.style
+#
+#
+# ── Example 2: suppress rules for specific functions in a file ───────────────
+#
+# "uart.c":
+#   identifiers:
+#     uart_OldInit:             # this function only
+#       disabled_rules:
+#         - function.style
+#     uart_LegacyReset:         # this function only
+#       disabled_rules:
+#         - function.style
+#         - function.prefix
+#
+#
+# ── Example 3: combine file-level and identifier-level ──────────────────────
+#
+# "generated_protocol.c":
+#   disabled_rules:             # whole file
+#     - misc.magic_number
+#     - misc.unsigned_suffix
+#   identifiers:
+#     PROTO_HandleEvent:        # this function only
+#       disabled_rules:
+#         - function.prefix
+#         - function.style
+#
+#
+# ── Example 4: suppress a g_prefix violation for a legacy global variable ────
+#
+# "legacy_driver.c":
+#   identifiers:
+#     g_legacy_state_machine:
+#       disabled_rules:
+#         - variable.global.g_prefix
+#         - variable.global.prefix
+#
+#
+# ── Example 5: suppress rules across an entire module (header and source) ────
+#
+# "stm32_hal_uart.*":
+#   disabled_rules:
+#     - function.prefix
+#     - function.style
+#     - misc.magic_number
+#
+#
+# ============================================================================
+# AVAILABLE RULE IDs
+# ============================================================================
+#
+#   function.prefix             function.style            function.max_length
+#   variable.global.case        variable.global.prefix    variable.global.g_prefix
+#   variable.static.case        variable.static.prefix    variable.static.s_prefix
+#   variable.local.case         variable.parameter.case   variable.parameter.p_prefix
+#   variable.pointer_prefix     variable.pp_prefix        variable.bool_prefix
+#   variable.handle_prefix      variable.min_length       variable.max_length
+#   variable.no_numeric_in_name variable.prefix_order
+#   constant.prefix             constant.case             constant.max_length
+#   macro.prefix                macro.case                macro.max_length
+#   enum.type_case              enum.type_suffix
+#   enum.member_case            enum.member_prefix
+#   typedef.case                typedef.suffix
+#   struct.tag_case             struct.tag_suffix         struct.member_case
+#   include_guard.missing       include_guard.format
+#   sign_compatibility
+#   misc.magic_number           misc.unsigned_suffix
+#   misc.line_length            misc.indentation
+#   misc.block_comment_spacing
+#   misc.yoda_condition
+#   reserved_name               spell_check
+#

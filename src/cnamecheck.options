@@ -1,0 +1,46 @@
+# cnamecheck.options — used with --options-file FILE
+# =====================================================================
+# Project-level command-line options for CNameCheck.
+#
+# Format:
+#   - One option (or option + value) per line
+#   - Shell quoting applies: paths with spaces must be quoted
+#   - Lines starting with # are comments; blank lines are ignored
+#   - Options here are applied BEFORE any explicit CLI arguments,
+#     so direct CLI args always override this file
+#
+# Usage:
+#   python src/cnamecheck.py --options-file src/cnamecheck.options [overrides]
+#
+# Or in a Makefile:
+#   namecheck:
+#       python src/cnamecheck.py --options-file src/cnamecheck.options
+# =====================================================================
+
+# --- Core configuration ---
+--config     src/naming_convention.yaml
+
+# --- Dictionary files (defaults shown; override to use project-specific lists) ---
+--keywords-file  src/c_keywords.txt
+--stdlib-file    src/c_stdlib_names.txt
+# --spell-dict  src/c_spell_dict.txt   # uncomment if spell_check.enabled: true
+
+# --- Project-specific support files ---
+--aliases    src/aliases.txt
+--exclusions src/exclusions.yml
+--defines    src/project.defines
+# --copyright  src/copyright_header.txt   # uncomment to enforce copyright header rule
+
+# --- Source tree ---
+--include source/**/*.c
+--include source/**/*.h
+
+# --- Directories to skip ---
+--exclude source/cots/
+
+# --- Output ---
+--summary
+--log output/cnamecheck/cnamecheck_results.txt
+
+# --- Strictness (uncomment to enable) ---
+# --warnings-as-errors

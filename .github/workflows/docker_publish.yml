@@ -1,0 +1,152 @@
+# .github/workflows/docker_publish.yml
+# =============================================================================
+# Build and publish the CNameCheck Docker image
+# =============================================================================
+#
+# Triggers:
+#   - Push to default branch (main/master) when Dockerfile/ or src/ changes
+#   - Version tags:  v*.*.*  →  tagged release image
+#   - Manual trigger (workflow_dispatch)
+#
+# Publishes to:
+#   - GitHub Container Registry  ghcr.io/<owner>/<repo>
+#   - Docker Hub cnamecheck
+#
+# Required secrets (Settings → Secrets and variables → Actions):
+#   DOCKERHUB_USERNAME   Your Docker Hub username
+#   DOCKERHUB_TOKEN      Docker Hub access token (not your password)
+#                        Create at: hub.docker.com → Account Settings →
+#                        Security → New Access Token
+#
+# The GITHUB_TOKEN for GHCR is provided automatically — no extra secret needed.
+# =============================================================================
+
+name: Docker Publish
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "Dockerfile/**"
+      - "src/cnamecheck.py"
+      - "src/naming_convention.yaml"
+      - "src/_version.py"
+      - ".github/workflows/docker_publish.yml"
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      push:
+        description: "Push image to registries (true/false)"
+        required: false
+        default: "true"
+
+env:
+  IMAGE_NAME: cnamecheck
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write   # needed to push to GHCR
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # ── Generate _version.py so the image reports its exact version ─────────
+      - name: Generate _version.py
+        run: |
+          VERSION=$(git describe --tags --dirty --always 2>/dev/null || echo "0.0.0.dev")
+          echo "__version__ = \"${VERSION}\"" > src/_version.py
+          echo "Embedding version: ${VERSION}"
+
+      # ── Set up QEMU for multi-platform builds (amd64 + arm64) ───────────────
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # ── Set up Docker Buildx ─────────────────────────────────────────────────
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: image=moby/buildkit:latest
+
+      # ── Log in to GitHub Container Registry ─────────────────────────────────
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Log in to Docker Hub ─────────────────────────────────────────────────
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # ── Derive image tags ────────────────────────────────────────────────────
+      # docker/metadata-action automatically creates:
+      #   On a version tag  v1.2.3:  :1.2.3  :1.2  :1  :latest
+      #   On branch push:            :main   :sha-<short>
+      #   All pushes also get:       :sha-<short>
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+
+      # ── Build and push ───────────────────────────────────────────────────────
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'workflow_dispatch' || inputs.push == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Layer cache from the registry — speeds up incremental rebuilds
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to:   type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            PYTHON_VERSION=3.12
+
+      # ── Print the image digest for audit trail ───────────────────────────────
+      - name: Image digest
+        run: |
+          echo "## Docker image published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Digest:** \`${{ steps.build-and-push.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
+
+      # ── Update Docker Hub description from README ────────────────────────────
+      - name: Update Docker Hub description
+        if: github.event_name != 'pull_request'
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+          readme-filepath: README.md
+        continue-on-error: true   # non-fatal — Hub description is nice-to-have

@@ -1,0 +1,409 @@
+# action.yml
+# =============================================================================
+# CNameCheck — Embedded C naming-convention linter
+# GitHub Action (composite)
+# =============================================================================
+#
+# Minimal usage:
+#
+#   - uses: dermot-murphy/CNameCheck@v1
+#     with:
+#       config: src/naming_convention.yaml
+#
+# Full example:
+#
+#   - uses: dermot-murphy/CNameCheck@v1
+#     id: namecheck
+#     with:
+#       config:      src/naming_convention.yaml
+#       include: |
+#         source/**/*.c
+#         source/**/*.h
+#       exclude: |
+#         source/cots/
+#         source/third_party/
+#       options-file:      src/cnamecheck.options
+#       fail-on:           error
+#       sarif-file:        results/cnamecheck.sarif
+#
+#   - name: Upload SARIF to Code Scanning
+#     uses: github/codeql-action/upload-sarif@v3
+#     with:
+#       sarif_file: results/cnamecheck.sarif
+#
+#   - name: Print violation counts
+#     run: echo "Errors=${{ steps.namecheck.outputs.errors }}"
+#
+# =============================================================================
+
+name:        'CNameCheck'
+description: 'Embedded C naming-convention linter (Barr-C / MISRA-C complementary)'
+author:      'Dermot Murphy'
+
+branding:
+  icon:  'check-circle'
+  color: 'blue'
+
+# ---------------------------------------------------------------------------
+# Inputs
+# ---------------------------------------------------------------------------
+
+inputs:
+
+  config:
+    description: >-
+      Path to the YAML rule configuration file, relative to the workspace root.
+    required: false
+    default: 'src/naming_convention.yaml'
+
+  include:
+    description: >-
+      Newline- or space-separated glob patterns for source files to scan.
+      Defaults to source/**/*.c and source/**/*.h.
+    required: false
+    default: |
+      source/**/*.c
+      source/**/*.h
+
+  exclude:
+    description: >-
+      Newline- or space-separated glob patterns to exclude from scanning.
+    required: false
+    default: ''
+
+  options-file:
+    description: >-
+      Path to an options file read via --options-file.  Options in the file
+      are applied before any other arguments so explicit inputs always win.
+    required: false
+    default: ''
+
+  defines:
+    description: >-
+      Path to a project defines file (--defines).
+    required: false
+    default: ''
+
+  aliases:
+    description: >-
+      Path to a module alias map file (--aliases).
+    required: false
+    default: ''
+
+  exclusions:
+    description: >-
+      Path to a per-file rule exclusion YAML (--exclusions).
+    required: false
+    default: ''
+
+  copyright:
+    description: >-
+      Path to a plain-text file containing the copyright block comment
+      template (--copyright).  When supplied, every C source file must
+      begin with this block comment (followed by one blank line).  The
+      year on the '(C) Copyright YEAR' line may differ from the template.
+    required: false
+    default: ''
+
+  baseline-file:
+    description: >-
+      Path to a baseline JSON file produced by --write-baseline.  Violations
+      present in the baseline are suppressed so CI only fails on new ones.
+    required: false
+    default: ''
+
+  warnings-as-errors:
+    description: >-
+      Promote all warnings and info-level messages to errors.
+    required: false
+    default: 'false'
+
+  fail-on:
+    description: >-
+      Minimum severity level that causes the action to exit with code 1.
+      Accepted values: error | warning | info | never.
+      'error'   — fail only if there are error-level violations (default).
+      'warning' — fail if there are errors or warnings.
+      'info'    — fail on any violation.
+      'never'   — always exit 0 (useful for annotation-only steps).
+    required: false
+    default: 'error'
+
+  sarif-file:
+    description: >-
+      If set, CNameCheck also writes a SARIF 2.1.0 file to this path.
+      Intended for upload to GitHub Code Scanning via
+      github/codeql-action/upload-sarif.
+    required: false
+    default: ''
+
+  args:
+    description: >-
+      Verbatim extra arguments appended to the cnamecheck command line.
+      Use this as an escape hatch for any flag not exposed as a dedicated input.
+    required: false
+    default: ''
+
+# ---------------------------------------------------------------------------
+# Outputs
+# ---------------------------------------------------------------------------
+
+outputs:
+
+  violations:
+    description: 'Total number of violations (all severity levels combined).'
+    value: ${{ steps.cnamecheck.outputs.violations }}
+
+  errors:
+    description: 'Number of error-level violations.'
+    value: ${{ steps.cnamecheck.outputs.errors }}
+
+  warnings:
+    description: 'Number of warning-level violations.'
+    value: ${{ steps.cnamecheck.outputs.warnings }}
+
+  info:
+    description: 'Number of info-level violations.'
+    value: ${{ steps.cnamecheck.outputs.info }}
+
+  sarif-file:
+    description: >-
+      Absolute path to the SARIF output file, if sarif-file input was given.
+    value: ${{ steps.cnamecheck.outputs.sarif_file }}
+
+# ---------------------------------------------------------------------------
+# Implementation — composite action
+# ---------------------------------------------------------------------------
+#
+# Design notes
+# ------------
+# * Composite is used instead of Docker to avoid the ~30 s image pull/build
+#   overhead on every run.
+# * cnamecheck is installed with pip from github.action_path so the action
+#   always uses exactly the version that was checked out (the ref/tag the
+#   caller pinned to).
+# * The checker is always invoked with --output-format json so that outputs
+#   (violation counts) can be parsed reliably.  A separate inline Python step
+#   reads the JSON and emits ::error / ::warning annotations.  This decoupling
+#   means annotations and SARIF output can coexist without running the checker
+#   twice.
+# ---------------------------------------------------------------------------
+
+runs:
+  using: 'composite'
+
+  steps:
+
+    # ── 1. Python environment ────────────────────────────────────────────────
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # ── 2. Install CNameCheck from the checked-out action source ─────────────
+    - name: Install CNameCheck
+      shell: bash
+      run: |
+        pip install --quiet "${{ github.action_path }}"
+
+    # ── 3. Run CNameCheck ────────────────────────────────────────────────────
+    #
+    # All argument construction is done in Python to avoid bash quoting issues
+    # with glob patterns that contain spaces or special characters.
+    # The checker is invoked with --output-format json so the result can be
+    # parsed in step 4.  A SARIF file is written additionally if requested.
+    #
+    - name: Run CNameCheck
+      id: cnamecheck
+      shell: python
+      env:
+        # Pass all inputs via environment variables to avoid shell quoting.
+        INPUT_CONFIG:           ${{ inputs.config }}
+        INPUT_INCLUDE:          ${{ inputs.include }}
+        INPUT_EXCLUDE:          ${{ inputs.exclude }}
+        INPUT_OPTIONS_FILE:     ${{ inputs.options-file }}
+        INPUT_DEFINES:          ${{ inputs.defines }}
+        INPUT_ALIASES:          ${{ inputs.aliases }}
+        INPUT_EXCLUSIONS:       ${{ inputs.exclusions }}
+        INPUT_COPYRIGHT:        ${{ inputs.copyright }}
+        INPUT_BASELINE_FILE:    ${{ inputs.baseline-file }}
+        INPUT_WARNINGS_AS_ERR:  ${{ inputs.warnings-as-errors }}
+        INPUT_FAIL_ON:          ${{ inputs.fail-on }}
+        INPUT_SARIF_FILE:       ${{ inputs.sarif-file }}
+        INPUT_ARGS:             ${{ inputs.args }}
+        ACTION_PATH:            ${{ github.action_path }}
+        RUNNER_TEMP:            ${{ runner.temp }}
+        GITHUB_OUTPUT:          ${{ github.output }}
+        GITHUB_WORKSPACE:       ${{ github.workspace }}
+      run: |
+        import json
+        import os
+        import shlex
+        import subprocess
+        import sys
+        from pathlib import Path
+
+        action_path  = os.environ["ACTION_PATH"]
+        runner_temp  = os.environ.get("RUNNER_TEMP", "/tmp")
+        workspace    = os.environ.get("GITHUB_WORKSPACE", ".")
+        gh_output    = os.environ.get("GITHUB_OUTPUT", "")
+
+        results_path = Path(runner_temp) / "cnamecheck_results.json"
+
+        # ── Build argument list ──────────────────────────────────────────────
+
+        def env(key):
+            return os.environ.get(key, "").strip()
+
+        argv = [sys.executable, f"{action_path}/src/cnamecheck.py"]
+
+        # Config
+        if env("INPUT_CONFIG"):
+            argv += ["--config", env("INPUT_CONFIG")]
+
+        # Options file (applied before other flags — matches CLI semantics)
+        if env("INPUT_OPTIONS_FILE"):
+            argv += ["--options-file", env("INPUT_OPTIONS_FILE")]
+
+        # Include globs (one --include per token, split on newlines and spaces)
+        for pat in env("INPUT_INCLUDE").replace("\n", " ").split():
+            argv += ["--include", pat]
+
+        # Exclude globs
+        for pat in env("INPUT_EXCLUDE").replace("\n", " ").split():
+            argv += ["--exclude", pat]
+
+        # Optional support files
+        for flag, key in (
+            ("--defines",     "INPUT_DEFINES"),
+            ("--aliases",     "INPUT_ALIASES"),
+            ("--exclusions",  "INPUT_EXCLUSIONS"),
+            ("--copyright",   "INPUT_COPYRIGHT"),
+            ("--baseline-file", "INPUT_BASELINE_FILE"),
+        ):
+            if env(key):
+                argv += [flag, env(key)]
+
+        # Flags
+        if env("INPUT_WARNINGS_AS_ERR").lower() in ("true", "1", "yes"):
+            argv.append("--warnings-as-errors")
+
+        # Always emit JSON so we can parse outputs and set annotations
+        argv += ["--output-format", "json"]
+
+        # Log to a temp file so we can read it after the process exits
+        argv += ["--log", str(results_path)]
+
+        # Extra verbatim arguments
+        if env("INPUT_ARGS"):
+            argv += shlex.split(env("INPUT_ARGS"))
+
+        # ── Execute ──────────────────────────────────────────────────────────
+
+        print(f"::group::CNameCheck command")
+        print(" ".join(shlex.quote(a) for a in argv))
+        print("::endgroup::")
+
+        proc = subprocess.run(argv, capture_output=False, cwd=workspace)
+        checker_exit = proc.returncode
+
+        # ── Parse results ────────────────────────────────────────────────────
+
+        try:
+            data = json.loads(results_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            print(f"::error::CNameCheck: could not read results JSON: {exc}")
+            sys.exit(checker_exit or 2)
+
+        summary    = data.get("summary", {})
+        violations = data.get("violations", [])
+        total      = summary.get("total",    0)
+        errors     = summary.get("errors",   0)
+        warnings   = summary.get("warnings", 0)
+        info_count = summary.get("info",     0)
+
+        # ── GitHub annotations ───────────────────────────────────────────────
+
+        SEV_MAP = {"error": "error", "warning": "warning", "info": "notice"}
+
+        for v in violations:
+            level = SEV_MAP.get(v.get("severity", "info"), "notice")
+            file  = v.get("file",    "")
+            line  = v.get("line",    1)
+            col   = v.get("col",     1)
+            rule  = v.get("rule",    "")
+            msg   = v.get("message", "")
+            print(f"::{level} file={file},line={line},col={col},"
+                  f"title=CNameCheck[{rule}]::{msg}")
+
+        # ── SARIF output ─────────────────────────────────────────────────────
+
+        sarif_input = env("INPUT_SARIF_FILE")
+        sarif_abs   = ""
+        if sarif_input:
+            sarif_path = (Path(workspace) / sarif_input).resolve()
+            sarif_path.parent.mkdir(parents=True, exist_ok=True)
+            # Re-run with sarif output to the requested path
+            sarif_argv = [
+                a for a in argv
+                if a not in ("--output-format", "json", str(results_path))
+                   and not (argv[max(0,argv.index(a)-1):argv.index(a)] == ["--log"])
+            ]
+            # Build a clean sarif invocation
+            sarif_argv = [sys.executable, f"{action_path}/src/cnamecheck.py"]
+            for flag, key in (
+                ("--config",       "INPUT_CONFIG"),
+                ("--options-file", "INPUT_OPTIONS_FILE"),
+                ("--defines",      "INPUT_DEFINES"),
+                ("--aliases",      "INPUT_ALIASES"),
+                ("--exclusions",   "INPUT_EXCLUSIONS"),
+                ("--copyright",    "INPUT_COPYRIGHT"),
+                ("--baseline-file","INPUT_BASELINE_FILE"),
+            ):
+                if env(key):
+                    sarif_argv += [flag, env(key)]
+            for pat in env("INPUT_INCLUDE").replace("\n", " ").split():
+                sarif_argv += ["--include", pat]
+            for pat in env("INPUT_EXCLUDE").replace("\n", " ").split():
+                sarif_argv += ["--exclude", pat]
+            if env("INPUT_WARNINGS_AS_ERR").lower() in ("true", "1", "yes"):
+                sarif_argv.append("--warnings-as-errors")
+            if env("INPUT_ARGS"):
+                sarif_argv += shlex.split(env("INPUT_ARGS"))
+            sarif_argv += ["--output-format", "sarif", "--log", str(sarif_path), "--exit-zero"]
+            subprocess.run(sarif_argv, capture_output=True, cwd=workspace)
+            sarif_abs = str(sarif_path)
+            print(f"::notice::SARIF written to {sarif_abs}")
+
+        # ── Set step outputs ─────────────────────────────────────────────────
+
+        if gh_output:
+            with open(gh_output, "a", encoding="utf-8") as fh:
+                fh.write(f"violations={total}\n")
+                fh.write(f"errors={errors}\n")
+                fh.write(f"warnings={warnings}\n")
+                fh.write(f"info={info_count}\n")
+                fh.write(f"sarif_file={sarif_abs}\n")
+
+        # ── Print summary ─────────────────────────────────────────────────────
+
+        print(f"\n{'='*50}")
+        print(f"  Files checked : {summary.get('files_checked', '?')}")
+        print(f"  Errors        : {errors}")
+        print(f"  Warnings      : {warnings}")
+        print(f"  Info          : {info_count}")
+        print(f"  Total         : {total}")
+        print(f"{'='*50}\n")
+
+        # ── Determine exit code based on fail-on ─────────────────────────────
+
+        fail_on = env("INPUT_FAIL_ON").lower()
+
+        if fail_on == "never":
+            sys.exit(0)
+        elif fail_on == "info":
+            sys.exit(1 if total > 0 else 0)
+        elif fail_on == "warning":
+            sys.exit(1 if (errors + warnings) > 0 else 0)
+        else:  # default: "error"
+            sys.exit(1 if errors > 0 else 0)

@@ -1,0 +1,591 @@
+# ============================================================
+# Naming Convention Configuration for Embedded C Projects
+# ============================================================
+# All rules can be toggled on/off with `enabled: true/false`
+# Severity levels: error | warning | info
+# ============================================================
+
+# --- File-level module prefix ---
+# Applies to: globals, file-scope statics, functions, macros, constants.
+# Does NOT apply to: local variables, parameters, struct fields.
+file_prefix:
+  enabled: true
+  severity: error
+  separator: "_"          # character inserted between module name and identifier
+  case: lower             # module name case: lower | upper | as_is
+  exempt_main: true       # skip prefix check entirely for main.c / main.h
+  exempt_patterns:        # regex patterns for identifiers exempt from prefix rule
+    - "^main$"
+    - "^ISR$"
+    - "^app_"             # shared 'app_' namespace accepted as a valid prefix
+
+# --- Variables ---
+# Rules are broken down by scope.  The top-level 'case', 'severity', and
+# 'min_length' act as defaults for any scope that does not override them.
+variables:
+  enabled: true
+  severity: error
+  case: lower_snake       # default case for all scopes not individually configured
+  min_length: 3             # Barr-C 7.1.e: no variable shorter than 3 characters
+  max_length: 40           # Barr-C 7.1.d: no variable longer than 31 chars
+                            # (we use 40 to allow for module prefix)
+  allow_single_char_loop_vars: true  # Barr-C 7.1.e: loop counters must also be >= 3 chars
+  # When true, variables that appear only as for-loop iteration counters
+  # (e.g. i, ix, ii) are exempt from the min_length rule regardless of
+  # allow_single_char_loop_vars. Useful when min_length >= 2 but you want
+  # to permit conventional loop counters.
+  allow_loop_vars_short: true
+
+  # Uppercase abbreviations that are allowed anywhere in an otherwise
+  # lower_snake name.  Add any project-standard abbreviations here.
+  # e.g.  read_FIFO_registers  and  MCU_timing  both pass lower_snake
+  # when FIFO and MCU are listed.
+  allowed_abbreviations:
+    - FIFO
+    - MCU
+    - ADC
+    - DAC
+    - SPI
+    - I2C
+    - UART
+    - CAN
+    - DMA
+    - IRQ
+    - ISR
+    - GPIO
+    - PWM
+    - PLL
+    - USB
+    - CRC
+    - RTC
+    - API
+    - SDK
+    - HAL
+    - RTOS
+    - CPU
+    - ECU
+    - OTA
+
+  # Global variables  (file scope, not static)
+  global:
+    severity: error
+    case: lower_snake
+    require_module_prefix: true
+    g_prefix:
+      enabled: true
+      severity: warning
+      prefix: "g_"        # local part (after module prefix) must start with g_
+
+  # File-scope static variables
+  static:
+    severity: error
+    case: lower_snake
+    require_module_prefix: true
+    s_prefix:
+      enabled: true
+      severity: warning
+      prefix: "s_"        # local part must start with s_
+
+  # Local variables (inside a function body, not a parameter)
+  local:
+    severity: error
+    case: lower_snake
+    require_module_prefix: false
+
+  # Function parameters
+  parameter:
+    severity: warning
+    case: lower_snake
+    require_module_prefix: false
+    # Parameter p_ prefix rule.
+    # When enabled every function parameter name must begin with p_
+    # (after any module prefix, if applicable). If the parameter also
+    # requires another prefix (pointer p_, bool b_, handle h_) the
+    # parameter prefix p_ must come first:
+    #   uint8_t        p_channel       OK — plain param
+    #   uint8_t *      p_p_buffer      OK — param + pointer (p_ then p_)
+    #   bool           p_b_enabled     OK — param + bool  (p_ then b_)
+    #   TaskHandle_t   p_h_task        OK — param + handle (p_ then h_)
+    p_prefix:
+      enabled: false        # off by default — enable to enforce
+      severity: warning
+      prefix: "p_"
+
+  # Pointer prefix — single pointer (*) → local part must start with p_
+  # (BARR-C 7.1.k)
+  pointer_prefix:
+    enabled: true
+    severity: warning
+    prefix: "p_"
+
+  # Double-pointer prefix (**) → local part must start with pp_
+  # (BARR-C 7.1.l)
+  pp_prefix:
+    enabled: true
+    severity: warning
+    prefix: "pp_"
+
+  # Boolean prefix — bool / _Bool variables → local part must start with b_
+  # and should be phrased as a question: b_is_buffer_full, b_done_yet
+  # (BARR-C 7.1.m)
+  bool_prefix:
+    enabled: false
+    severity: warning
+    prefix: "b_"
+
+  # Handle prefix — non-pointer handle variables must start with h_
+  # (BARR-C 7.1.n)
+  # List every handle type used in your project under handle_types.
+  # Common examples: FILE (stdio), OS/RTOS handle types (FreeRTOS, CMSIS-RTOS).
+  handle_prefix:
+    enabled: true
+    severity: warning
+    prefix: "h_"
+    handle_types:
+      # POSIX / stdio
+      - FILE
+      # FreeRTOS
+      - TaskHandle_t
+      - QueueHandle_t
+      - SemaphoreHandle_t
+      - TimerHandle_t
+      - EventGroupHandle_t
+      - StreamBufferHandle_t
+      - MessageBufferHandle_t
+      # CMSIS-RTOS v2
+      - osThreadId_t
+      - osMutexId_t
+      - osSemaphoreId_t
+      - osMessageQueueId_t
+      - osTimerId_t
+      - osEventFlagsId_t
+      # Generic / project-specific: add your own here
+      # - MY_HANDLE_T
+
+  # No embedded numeric values (BARR-C 7.1.g)
+  # A variable name must not contain a digit that is "called out elsewhere"
+  # (e.g. the number of bits in a type, the number of elements in an array).
+  # Examples that should be flagged: buffer32, array8, gpio3
+  # Use exempt_patterns (regex) for hardware-port numbers you deliberately allow.
+  no_numeric_in_name:
+    enabled: false          # off by default — enable for strict Barr-C compliance
+    severity: warning
+    exempt_patterns:        # regex patterns exempt from this rule
+      # Peripheral port numbers (uart2, spi1, i2c0, can1, tim3)
+      - "^uart[0-9]+$"
+      - "^spi[0-9]+$"
+      - "^i2c[0-9]+$"
+      - "^can[0-9]+$"
+      - "^tim[0-9]+$"
+      # Unit qualifiers embedded after an underscore separator
+      # e.g. timer_24hour, delay_100ms, freq_48mhz, buf_16bit
+      - ".*_[0-9]+(hour|hours|min|sec|ms|us|ns|hz|khz|mhz|bit|bits|byte|bytes|baud|rpm|deg)$"
+
+  # Prefix ordering (BARR-C 7.1.o)
+  # When a variable requires multiple prefixes they must appear in the order:
+  #   [g_] [p_|pp_] [b_|h_]
+  # Examples:
+  #   global pointer to bool:          g_p_b_done
+  #   global double-pointer:           g_pp_buf
+  #   global handle:                   g_h_uart
+  # This check is only meaningful when the individual prefix rules are enabled.
+  prefix_order:
+    enabled: false          # off by default — enable with strict Barr-C compliance
+    severity: warning
+
+# --- Constants (#define object-like, const-qualified variables) ---
+constants:
+  enabled: true
+  severity: error
+  case: upper_snake
+  max_length: 60
+  min_length: 2
+  # Patterns of constant names that are exempt from case and prefix rules.
+  # Supports full Python regex syntax.
+  exempt_patterns:
+    - "^STACK_SIZE$"        # common RTOS / linker constant
+    - "^PRIORITY$"          # common RTOS task priority
+    - "^__"                 # names starting with __ (RTOS / compiler reserved)
+    - "^configUSE_"         # FreeRTOS configuration macros
+    - "^portMAX_DELAY$"
+    - "^pdTRUE$"
+    - "^pdFALSE$"
+    - "^pdPASS$"
+    - "^pdFAIL$"
+    - "^errQUEUE_EMPTY$"
+    - "^NULL$"
+    - "^TRUE$"
+    - "^FALSE$"
+    - "^STATIC$"          # common alias for static
+    - "^INLINE$"          # common alias for inline
+    - "^LOCAL_INLINE$"    # common alias for static inline
+    - "^CONST$"           # common alias for const
+    - "^EXTERN$"          # common alias for extern
+
+# --- Macros (#define function-like) ---
+macros:
+  enabled: true
+  severity: error
+  case: upper_snake
+  max_length: 60
+  # Patterns of macro names exempt from case and prefix checks.
+  exempt_patterns:
+    - "^__"                 # compiler / RTOS reserved
+    - "^configASSERT$"
+    - "^taskENTER_CRITICAL$"
+    - "^taskEXIT_CRITICAL$"
+    - "^portYIELD$"
+    - "^vTaskDelay$"        # FreeRTOS API macros that use camelCase
+  function_like_suffix:
+    enabled: false          # optionally require e.g. trailing _M
+    suffix: "_M"
+
+# --- Enumerations ---
+enums:
+  enabled: true
+  severity: error
+  # Enum type name
+  type_case: lower_snake          # e.g. uart_status_t
+  type_suffix:
+    enabled: true
+    suffix: "_t"                  # lower-case _t for enum type names
+  # Enum member values
+  member_case: upper_snake        # e.g. UART_STATUS_OK
+  member_prefix_from_type:
+    enabled: true
+    severity: warning
+    # The prefix is derived automatically:
+    #   1. Strip type suffix (_t) from type name  → uart_status
+    #   2. Convert to member case (upper_snake)   → UART_STATUS
+    #   3. Members must start with UART_STATUS_
+
+# --- Typedefs ---
+typedefs:
+  enabled: true
+  severity: warning
+  case: upper_snake
+  suffix:
+    enabled: true
+    suffix: "_T"                  # e.g. UART_CONFIG_T
+
+# --- Structs / Unions ---
+structs:
+  enabled: true
+  severity: warning
+  tag_case: lower_snake           # struct tag: uart_config_s
+  tag_suffix:
+    enabled: true
+    suffix: "_s"
+  # Member names: no module prefix required
+  member_case: lower_snake
+  # Uppercase abbreviations permitted in member names, same as
+  # variables.allowed_abbreviations. e.g. FIFO, CRC, SPI, ADC.
+  allowed_abbreviations: []
+
+# --- Functions ---
+functions:
+  enabled: true
+  severity: error
+  # Pattern: <module>_<Object><Verb>  e.g. uart_BufferRead
+  # object_verb  → modulePrefix_ObjectVerb  (e.g. uart_BufferRead)
+  # verb_object  → modulePrefix_VerbObject  (e.g. uart_ReadBuffer)
+  # lower_snake  → module_prefix_body       (e.g. uart_buffer_read)
+  style: object_verb
+  object_case: pascal
+  verb_case: pascal
+  max_length: 60
+  min_length: 4
+  # Allowed abbreviations in function body segments (same concept as
+  # variables.allowed_abbreviations but scoped to function names).
+  allowed_abbreviations:
+    - FIFO
+    - MCU
+    - ADC
+    - DAC
+    - SPI
+    - I2C
+    - UART
+    - CAN
+    - DMA
+    - IRQ
+    - GPIO
+    - PWM
+    - USB
+    - CRC
+    - RTC
+    - API
+    - ECU
+    - OTA
+    - OBD
+
+  # Object names that, when present in a function body, cause the
+  # object_verb style check to be waived entirely.  Use this for
+  # established abbreviations that act as both object and verb.
+  # e.g.  APP_Cmd_Wr_Mode  passes because Wr is in this list.
+  object_exclusions:
+    - Wr
+    - Rd
+    - IoCntrl
+    - EcuReset
+    - Init
+
+  isr_suffix:
+    enabled: true
+    severity: warning
+    suffix: "_IRQHandler"         # e.g. USART1_IRQHandler
+  static_prefix:
+    enabled: false                # set to true to require prv_ on static fns
+    prefix: "prv_"
+    severity: warning
+
+# --- Include guards ---
+include_guards:
+  enabled: true
+  severity: error
+  pattern: "{FILENAME_UPPER}_{EXT_UPPER}_"
+  allow_pragma_once: true
+
+# --- Miscellaneous embedded-C conventions ---
+misc:
+  # Magic numbers
+  magic_numbers:
+    enabled: true
+    severity: warning
+    # Array-index literals (e.g. array[2]) are always exempt regardless of
+    # this list.
+    exempt_values: [0, 1, -1, 2, 8, 16, 32, 64, 128, 256, 1024, 0xFF, 0xFFFF]
+
+  # Numeric literal unsigned suffix (e.g. 10U, 255U)
+  unsigned_suffix:
+    enabled: true
+    severity: info
+    require_on_unsigned_constants: true
+    # When true, the literal 0 does not require a U suffix (it is bitwise
+    # compatible with both signed and unsigned types). Set to false for
+    # strict Barr-C compliance where 0U must be used with unsigned types.
+    zero_is_neutral: true
+
+    # Functions whose integer arguments are known to be signed (int) and
+    # therefore do not need a U suffix. Literals inside any call to a
+    # listed function are fully exempt — no header scanning required.
+    # Add project-specific functions (e.g. RTOS APIs) to extend the list.
+    # Set to an empty list [] to disable this exemption entirely.
+    exempt_function_args:
+      # C standard memory functions  (int c parameter in memset/memchr)
+      - memset
+      - memcmp
+      - memchr
+      # C stdio — printf family accepts signed int arguments
+      - printf
+      - fprintf
+      - sprintf
+      - snprintf
+      - vprintf
+      - vfprintf
+      - vsprintf
+      - vsnprintf
+      # C stdio character I/O
+      - fputc
+      - putc
+      - putchar
+      - ungetc
+      # Add your own project functions here, e.g.:
+      # - my_log_write
+      # - rtos_task_delay
+    # Note: literals used as array indices are always exempt (e.g. array[2]).
+
+  # Max line length
+  line_length:
+    enabled: true
+    severity: warning
+    max: 180
+
+  # Tabs vs spaces
+  indentation:
+    enabled: true
+    severity: info
+    style: tabs           # spaces | tabs
+    width: 8
+
+  # Block-comment spacing
+  # Checks that between the closing */ of a multi-line block comment
+  # and the next non-blank line there are at least min_blank_lines and
+  # at most max_blank_lines blank lines.
+  block_comment_spacing:
+    enabled: false        # off by default — enable to enforce
+    severity: warning
+    min_blank_lines: 1    # minimum blank lines after */
+    max_blank_lines: 2    # maximum blank lines after */
+
+  # Copyright block comment header
+  # Checks that every C source file begins with the copyright block comment
+  # supplied via --copyright FILE on the command line, followed by exactly
+  # one blank line.  The match is exact except that the year (or year range)
+  # on the '(C) Copyright YEAR' line may differ — any 4-digit year or
+  # YYYY-YYYY range is accepted.
+  #
+  # This rule is only active when --copyright is provided; the 'enabled'
+  # flag lets you disable it even when the file is present (e.g. in a
+  # per-file exclusion via --exclusions).
+  copyright_header:
+    enabled: true           # active whenever --copyright FILE is supplied
+    severity: error
+
+  # EOF comment
+  # Requires the last non-blank line of every file to match a configured
+  # template, with {filename} substituted by the file's base name.
+  # A single blank line must follow it as the very last line in the file.
+  #
+  # filename_case controls the case applied to {filename}:
+  #   lower    → ascii.c          (default)
+  #   upper    → ASCII.C
+  #   preserve → unchanged from the file system name
+  #
+  # Example for ascii.c with default settings:
+  #   /* EOF: ascii.c */
+  #   <blank line>
+  eof_comment:
+    enabled: false          # set to true to enforce
+    severity: warning
+    template: "/* EOF: {filename} */"
+    filename_case: lower    # lower | upper | preserve
+
+  # Yoda conditions: constant must appear on the LEFT of == and !=
+  #   Correct:    if (NULL == p_buf)
+  #   Violation:  if (p_buf == NULL)
+  # Only == and != are checked; directional operators < > <= >= are excluded.
+  yoda_conditions:
+    enabled: true
+    severity: warning
+
+# --- Reserved / banned identifier names ---
+# Checks that no declared variable, function, macro, or constant name
+# shadows a C keyword, C++ keyword, or C standard library name.
+# Additional names can be banned via --banned-names FILE on the command line.
+# Per-file exceptions: add 'reserved_name' to disabled_rules in exclusions.yml.
+reserved_names:
+  enabled: true
+  severity: error
+
+# --- Comment spell-check ---
+# When enabled, every word in every comment is checked against a built-in
+# English dictionary merged with the project-specific exempt word lists.
+#
+# Two ways to supply project-specific words:
+#   1. Add words to 'exempt_values' below (checked into version control).
+#   2. Pass --spell-words <file> on the command line (one word per line,
+#      lines starting with # are comments).  Useful for generated or
+#      user-specific abbreviation lists.
+spell_check:
+  enabled: false            # set to true to enable; info-level by default
+  severity: info
+  exempt_values:
+    # Project-specific abbreviations and proper nouns
+    - "Sensoteq"
+    - "sensoteq"
+    - "PRQA"
+    - "MISRA"
+    - "ASPICE"
+    - "FreeRTOS"
+    - "freertos"
+    - "CMSIS"
+    - "STM32"
+    - "stm32"
+    - "HAL"
+    - "NVIC"
+    - "SysTick"
+    - "systick"
+    - "PLL"
+    - "HSE"
+    - "HSI"
+    - "LSE"
+    - "LSI"
+    - "AHB"
+    - "APB"
+    - "HCLK"
+    - "PCLK"
+    - "IRQ"
+    - "IRQHandler"
+    - "DMA"
+    - "USART"
+    - "I2C"
+    - "SPI"
+    - "GPIO"
+    - "ADC"
+    - "DAC"
+    - "TIM"
+    - "RCC"
+    - "PWM"
+    - "OTA"
+    - "CRC"
+    - "IDE"
+    - "SDK"
+    - "MCU"
+    - "CPU"
+    - "RTOS"
+    - "API"
+    - "APP"
+    - "HAL"
+    - "MW"
+    - "DRV"
+    # Common technical abbreviations
+    - "buf"
+    - "cfg"
+    - "ctx"
+    - "clk"
+    - "cnt"
+    - "ctr"
+    - "dev"
+    - "drv"
+    - "hdl"
+    - "idx"
+    - "inst"
+    - "io"
+    - "irq"
+    - "len"
+    - "msg"
+    - "num"
+    - "obj"
+    - "pos"
+    - "ptr"
+    - "rx"
+    - "tx"
+    - "src"
+    - "dst"
+    - "tmp"
+    - "val"
+
+# --- Paths / files to ignore entirely ---
+ignore:
+  paths:
+    - "third_party/**"
+    - "vendor/**"
+    - "build/**"
+    - "*.pb.c"
+  files:
+    - "stm32f4xx_hal_*.c"
+    - "stm32f4xx_hal_*.h"
+
+# --- Sign compatibility (cross-file) ---
+# Check that unsigned literals (e.g. 100U) are not passed to signed parameters
+# and vice-versa, based on function prototypes found in header files.
+#
+# Type resolution follows typedef chains:
+#   typedef signed char int8_t;  -> int8_t is signed
+#   typedef int8_t sint8;        -> sint8  is signed
+#
+# Arguments are classified as:
+#   UNSIGNED  : literal with U/u suffix (e.g. 100U, 0xFFU), or (unsigned T) cast
+#   SIGNED    : negative literal (-1), or (signed T) cast
+#   NEUTRAL   : plain positive integer literal (10, 0xFF) — allowed for either
+#   UNKNOWN   : variable or expression — skipped conservatively
+#
+# Only arguments that are definitively SIGNED or UNSIGNED and conflict with
+# the parameter's resolved signedness generate a violation.
+sign_compatibility:
+  enabled: true
+  severity: error
+  # Whether to treat plain 'char' (without signed/unsigned keyword) as signed.
+  # Most embedded compilers default to signed char; set false if your toolchain
+  # defaults to unsigned char.
+  plain_char_is_signed: true

@@ -1,0 +1,24 @@
+# Module alias file — used with --aliases FILE
+#
+# Format:  alias_stem   actual_module_stem
+#
+# Meaning: when checking a file whose stem is actual_module_stem, identifiers
+# that carry the alias_stem prefix are accepted as if they carried the
+# actual module prefix.
+#
+# Example:
+#   api_param  api_param_cfg
+#
+# → in api_param_cfg.c  the prefix api_param_ is accepted alongside
+#   api_param_cfg_.  So API_PARAM_VALUE_NORMAL_SIGNATURE passes even though
+#   the file is called api_param_cfg.c.
+#
+# Rules:
+#   • One alias per line.
+#   • Lines starting with # are comments.
+#   • Blank lines are ignored.
+#   • Both words are treated case-insensitively.
+#   • A module may have multiple alias lines.
+
+# api_param       api_param_cfg
+# sensor_mgr      sensor_manager
