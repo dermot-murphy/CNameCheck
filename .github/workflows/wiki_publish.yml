@@ -1,0 +1,470 @@
+# .github/workflows/wiki_publish.yml
+# =============================================================================
+# Build and publish the CNameCheck GitHub Wiki
+# =============================================================================
+#
+# Triggers:
+#   - Push to main when README.md or docs/aspice/ changes
+#   - Manual trigger (workflow_dispatch)
+#
+# What it does:
+#   1.  Clones the repository wiki (.wiki.git).
+#   2.  Generates Home.md from the README.md introduction block.
+#   3.  Splits README.md into one wiki page per ## section:
+#         "Repository layout"        → Repository-layout.md
+#         "Quick start"              → Quick-start.md
+#         "Running the tests"        → Running-the-tests.md
+#         "All options"              → All-options.md
+#         "Structured output"        → Structured-output.md
+#         "Baseline suppression"     → Baseline-suppression.md
+#         "New in this release"      → New-in-this-release.md  (merged if duplicated)
+#         "Rule IDs (48 total)"      → Rule-IDs.md
+#         "Dictionary files"         → Dictionary-files.md
+#         "pre-commit"               → Pre-commit.md
+#         "Docker"                   → Docker.md
+#         "GitHub Action"            → GitHub-Action.md
+#         "Publishing to the GitHub Marketplace"
+#                                    → Publishing-to-Marketplace.md
+#         "GitHub Actions (CI workflow)"
+#                                    → CI-Workflows.md
+#   4.  Converts each Markdown file in docs/aspice/ to wiki format and writes
+#       it to wiki/ASPICE/<filename>.md.
+#   5.  Generates wiki/ASPICE.md — index page for all ASPICE documents.
+#   6.  Builds _Sidebar.md with:
+#         • Links to every README-derived page
+#         • An ASPICE section linking to the index and each document
+#   7.  Commits and pushes the wiki if anything changed.
+#
+# Required secret:
+#   WIKI_TOKEN   A GitHub PAT (classic, repo scope) or fine-grained PAT with
+#                Contents read+write on this repository.
+#                Settings → Secrets and variables → Actions → New secret.
+#
+# One-time setup:
+#   1. Settings → Features → enable Wikis.
+#   2. Create one page manually so the wiki Git repo exists.
+#   3. Add the WIKI_TOKEN secret (see above).
+# =============================================================================
+
+name: Publish Wiki
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "README.md"
+      - "docs/aspice/**.md"
+      - ".github/workflows/wiki_publish.yml"
+  workflow_dispatch:
+
+jobs:
+  publish-wiki:
+    name: Build & Publish Wiki
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      # ── 1. Checkout source repository ──────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Clone wiki repository ────────────────────────────────────────────
+      - name: Clone wiki
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          WIKI_URL="https://x-access-token:${WIKI_TOKEN}@github.com/${REPO}.wiki.git"
+          git clone "$WIKI_URL" wiki
+          echo "Wiki cloned. Existing pages:"
+          ls wiki/ || true
+
+      # ── 3. Generate all wiki pages from README + ASPICE docs ────────────────
+      - name: Generate wiki pages
+        run: |
+          python3 - << 'PYEOF'
+          import os, re, shutil
+          from pathlib import Path
+
+          # ------------------------------------------------------------------ #
+          # Helpers
+          # ------------------------------------------------------------------ #
+
+          REPO_URL = os.environ.get("GITHUB_SERVER_URL", "https://github.com") \
+                   + "/" + os.environ.get("GITHUB_REPOSITORY", "")
+
+          NAV_SEP  = "\n\n---\n\n"
+          BACK_HOME = "*[[← Home]]*"
+
+          def slug(heading: str) -> str:
+              """Convert a section heading to a wiki-safe filename stem."""
+              mapping = {
+                  "Repository layout":                    "Repository-layout",
+                  "Quick start":                          "Quick-start",
+                  "Running the tests":                    "Running-the-tests",
+                  "All options":                          "All-options",
+                  "Structured output":                    "Structured-output",
+                  "Baseline suppression":                 "Baseline-suppression",
+                  "New in this release":                  "New-in-this-release",
+                  "Rule IDs (48 total)":                  "Rule-IDs",
+                  "Dictionary files":                     "Dictionary-files",
+                  "pre-commit":                           "Pre-commit",
+                  "Docker":                               "Docker",
+                  "GitHub Action":                        "GitHub-Action",
+                  "Publishing to the GitHub Marketplace": "Publishing-to-Marketplace",
+                  "GitHub Actions (CI workflow)":         "CI-Workflows",
+              }
+              if heading in mapping:
+                  return mapping[heading]
+              # Fallback: strip special chars, replace spaces with hyphens
+              s = re.sub(r'[^\w\s-]', '', heading)
+              return re.sub(r'\s+', '-', s.strip())
+
+          def write(path: str, content: str):
+              Path(path).write_text(content.rstrip() + "\n", encoding="utf-8")
+              print(f"  wrote {path}")
+
+          def nav_footer(prev_label=None, prev_slug=None,
+                         next_label=None, next_slug=None):
+              parts = [BACK_HOME]
+              if prev_slug:
+                  parts.append(f"*[[← {prev_label}|{prev_slug}]]*")
+              if next_slug:
+                  parts.append(f"*[[{next_label} →|{next_slug}]]*")
+              return "\n\n---\n\n" + " &nbsp;|&nbsp; ".join(parts)
+
+          # ------------------------------------------------------------------ #
+          # 3a. Parse README.md into sections
+          # ------------------------------------------------------------------ #
+          readme = Path("README.md").read_text(encoding="utf-8")
+
+          # Split on top-level ## headings (not ### or deeper)
+          raw_sections = re.split(r'\n(?=## )', readme)
+
+          intro_block = raw_sections[0]   # Everything before the first ##
+          section_blocks = raw_sections[1:]
+
+          # Extract (heading_text, body) from each block; merge duplicate headings
+          seen_headings: dict[str, str] = {}
+          ordered_headings: list[str] = []
+
+          for block in section_blocks:
+              lines = block.split("\n")
+              heading = lines[0].lstrip("# ").strip()
+              body = "\n".join(lines)   # keep the ## heading in body
+
+              if heading in seen_headings:
+                  # Merge duplicate sections (two "New in this release" blocks)
+                  seen_headings[heading] += "\n\n" + "\n".join(lines[2:]).strip()
+              else:
+                  seen_headings[heading] = body
+                  ordered_headings.append(heading)
+
+          print(f"Parsed {len(ordered_headings)} unique README sections.")
+
+          # ------------------------------------------------------------------ #
+          # 3b. Write Home.md
+          # ------------------------------------------------------------------ #
+          os.makedirs("wiki", exist_ok=True)
+
+          # Build a clean intro: title + badges + description + section links
+          intro_lines = intro_block.strip().split("\n")
+          title_line    = intro_lines[0]            # # CNameCheck
+          # Find badge lines and description
+          badge_lines = [l for l in intro_lines if l.startswith("[![")]
+          desc_lines  = [l for l in intro_lines[1:]
+                         if l.strip() and not l.startswith("[![") and not l.startswith("---")]
+
+          home_sections = []
+          for h in ordered_headings:
+              s = slug(h)
+              home_sections.append(f"- [[{h}|{s}]]")
+
+          home_sections.append(f"- [[ASPICE CL2 Documentation|ASPICE]]")
+
+          home_md = (
+              f"{title_line}\n\n"
+              + "\n".join(badge_lines) + "\n\n"
+              + "\n".join(desc_lines)  + "\n\n"
+              + "---\n\n"
+              + "## Contents\n\n"
+              + "\n".join(home_sections) + "\n"
+          )
+          write("wiki/Home.md", home_md)
+
+          # ------------------------------------------------------------------ #
+          # 3c. Write one page per README section
+          # ------------------------------------------------------------------ #
+          heading_list = ordered_headings   # preserve order
+
+          for idx, heading in enumerate(heading_list):
+              s   = slug(heading)
+              body = seen_headings[heading]
+
+              prev_label = heading_list[idx - 1] if idx > 0 else None
+              prev_s     = slug(prev_label) if prev_label else None
+              next_label = heading_list[idx + 1] if idx < len(heading_list) - 1 else None
+              next_s     = slug(next_label) if next_label else None
+
+              # Prepend "Home" as first nav entry for the first page
+              if idx == 0:
+                  prev_label, prev_s = "Home", "Home"
+
+              content = body.rstrip() + nav_footer(prev_label, prev_s,
+                                                    next_label, next_s)
+              write(f"wiki/{s}.md", content)
+
+          # ------------------------------------------------------------------ #
+          # 3d. Write ASPICE wiki pages
+          # ------------------------------------------------------------------ #
+          aspice_src = Path("docs/aspice")
+          aspice_wiki = Path("wiki/ASPICE")
+          aspice_wiki.mkdir(exist_ok=True)
+
+          aspice_files: list[str] = []
+
+          if aspice_src.is_dir():
+              src_files = sorted(aspice_src.glob("*.md"))
+              ASPICE_FOOTER = "\n\n---\n\n*[[← ASPICE Documentation Index|ASPICE]]*\n"
+
+              for src in src_files:
+                  content = src.read_text(encoding="utf-8")
+
+                  # Strip YAML front-matter
+                  content = re.sub(r'^---\s*\n.*?\n---\s*\n', '',
+                                   content, flags=re.DOTALL)
+
+                  # Rewrite relative .md links to wiki paths
+                  def rewrite(m):
+                      text, target = m.group(1), m.group(2)
+                      if target.endswith('.md') and not target.startswith('http'):
+                          return f'[{text}](ASPICE/{target[:-3]})'
+                      return m.group(0)
+                  content = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', rewrite, content)
+
+                  content = content.rstrip() + ASPICE_FOOTER
+                  dest = aspice_wiki / src.name
+                  dest.write_text(content, encoding="utf-8")
+                  aspice_files.append(src.name)
+                  print(f"  wrote wiki/ASPICE/{src.name}")
+
+              print(f"Wrote {len(aspice_files)} ASPICE pages.")
+          else:
+              print("docs/aspice/ not found — skipping ASPICE pages.")
+
+          # ------------------------------------------------------------------ #
+          # 3e. Generate ASPICE index page
+          # ------------------------------------------------------------------ #
+          from datetime import datetime, timezone
+          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+          def display_name(filename: str) -> str:
+              stem = filename[:-3] if filename.endswith(".md") else filename
+              stem = re.sub(r'^CNameCheck_', '', stem)
+              return stem.replace('_', ' ')
+
+          def classify(fn: str) -> str:
+              u = fn.upper()
+              if '_SYS' in u:  return "System Engineering (SYS)"
+              if '_SWE' in u:  return "Software Engineering (SWE)"
+              if '_MAN' in u:  return "Management (MAN)"
+              if '_SUP' in u:  return "Support Processes (SUP)"
+              if '_ACQ' in u:  return "Acquisition (ACQ)"
+              if '_PA'  in u:  return "Capability Level 2 (PA 2.1 / PA 2.2)"
+              return "Other"
+
+          groups: dict[str, list[str]] = {}
+          group_order = [
+              "System Engineering (SYS)",
+              "Software Engineering (SWE)",
+              "Management (MAN)",
+              "Support Processes (SUP)",
+              "Acquisition (ACQ)",
+              "Capability Level 2 (PA 2.1 / PA 2.2)",
+              "Other",
+          ]
+          for g in group_order:
+              groups[g] = []
+          for f in aspice_files:
+              groups[classify(f)].append(f)
+
+          idx_lines = [
+              "# ASPICE CL2 Documentation",
+              "",
+              "**CNameCheck v1.0.0** | Automotive SPICE® PAM v4.0 | Capability Level 2",
+              "",
+              f"*Auto-generated from `docs/aspice/` on {now}.*",
+              "",
+              "This section contains the complete ASPICE CL2 documentation set for CNameCheck.",
+              "All documents are traceable to Automotive SPICE® PAM v4.0 process requirements.",
+              "",
+              "---",
+              "",
+          ]
+
+          for g in group_order:
+              files = groups[g]
+              if not files:
+                  continue
+              idx_lines.append(f"## {g}")
+              idx_lines.append("")
+              for f in files:
+                  stem    = f[:-3]
+                  display = display_name(f)
+                  idx_lines.append(f"- [[{display}|ASPICE/{stem}]]")
+              idx_lines.append("")
+
+          # Document ID table
+          if aspice_files:
+              idx_lines += [
+                  "---",
+                  "",
+                  "## Document ID Reference",
+                  "",
+                  "| Document ID | Process | Page |",
+                  "|---|---|---|",
+              ]
+              for f in aspice_files:
+                  stem    = f[:-3]
+                  display = display_name(f)
+                  doc_id  = process = ""
+                  src = aspice_src / f
+                  if src.exists():
+                      for line in src.read_text(encoding="utf-8").splitlines():
+                          if not doc_id:
+                              m = re.search(
+                                  r'\|\s*\*\*Document ID\*\*\s*\|\s*(\S+)\s*\|', line)
+                              if m:
+                                  doc_id = m.group(1)
+                          if not process:
+                              p = re.search(
+                                  r'\|\s*\*\*Related Process\*\*\s*\|\s*([^\|]+?)\s*\|', line)
+                              if p:
+                                  process = p.group(1).strip()
+                          if doc_id and process:
+                              break
+                  idx_lines.append(f"| {doc_id} | {process} | [[{display}\\|ASPICE/{stem}]] |")
+
+          idx_lines += [
+              "",
+              "---",
+              "",
+              "*Source files: "
+              f"[`docs/aspice/`]({REPO_URL}/tree/main/docs/aspice)*",
+              "",
+          ]
+
+          write("wiki/ASPICE.md", "\n".join(idx_lines))
+
+          # ------------------------------------------------------------------ #
+          # 3f. Build _Sidebar.md
+          # ------------------------------------------------------------------ #
+          sidebar_lines = [
+              "## [[CNameCheck|Home]]",
+              "",
+          ]
+
+          # README-derived pages
+          sidebar_lines.append("**User Guide**")
+          sidebar_lines.append("")
+          for h in heading_list:
+              s = slug(h)
+              sidebar_lines.append(f"- [[{h}|{s}]]")
+          sidebar_lines.append("")
+
+          # ASPICE section
+          sidebar_lines += [
+              "---",
+              "",
+              "**📋 ASPICE CL2 Docs**",
+              "",
+              "[[Documentation Index|ASPICE]]",
+              "",
+          ]
+
+          for g in group_order:
+              files = groups[g]
+              if not files:
+                  continue
+              # Short group label for sidebar
+              short = g.split("(")[0].strip()
+              sidebar_lines.append(f"*{short}*")
+              for f in files:
+                  stem    = f[:-3]
+                  display = display_name(f)
+                  sidebar_lines.append(f"- [[{display}|ASPICE/{stem}]]")
+              sidebar_lines.append("")
+
+          write("wiki/_Sidebar.md", "\n".join(sidebar_lines))
+
+          print("\nAll wiki pages generated successfully.")
+          PYEOF
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+
+      # ── 4. Commit and push wiki ─────────────────────────────────────────────
+      - name: Commit and push wiki changes
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
+          REPO:       ${{ github.repository }}
+          SHA:        ${{ github.sha }}
+          REF:        ${{ github.ref_name }}
+        run: |
+          cd wiki
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No changes detected — wiki is already up to date."
+            exit 0
+          fi
+
+          CHANGED=$(git diff --cached --name-only | wc -l | tr -d ' ')
+          ADDED=$(git diff --cached --name-only --diff-filter=A | wc -l | tr -d ' ')
+          MODIFIED=$(git diff --cached --name-only --diff-filter=M | wc -l | tr -d ' ')
+
+          git commit -m "wiki: rebuild from README + ASPICE docs @ ${SHA:0:7}
+
+          Trigger : push to ${REF} (${SHA:0:7})
+          Changed : ${CHANGED} file(s)  (${ADDED} added, ${MODIFIED} modified)
+
+          Pages generated:
+            - Home.md (README introduction)
+            - One page per README ## section (user guide)
+            - ASPICE/*.md (ASPICE CL2 documentation)
+            - ASPICE.md (ASPICE index)
+            - _Sidebar.md (navigation)
+
+          Auto-generated by .github/workflows/wiki_publish.yml"
+
+          git push
+          echo "Wiki pushed successfully."
+
+      # ── 5. Job summary ──────────────────────────────────────────────────────
+      - name: Write job summary
+        if: success()
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          README_SECTIONS=$(grep -c "^## " README.md || echo "0")
+          ASPICE_COUNT=$(find docs/aspice -maxdepth 1 -name "*.md" 2>/dev/null \
+                         | wc -l | tr -d ' ')
+
+          {
+            echo "## ✅ Wiki Published"
+            echo ""
+            echo "| Item | Count |"
+            echo "|---|---|"
+            echo "| README sections → wiki pages | ${README_SECTIONS} |"
+            echo "| ASPICE documents published   | ${ASPICE_COUNT} |"
+            echo ""
+            echo "🏠 [Home](https://github.com/${REPO}/wiki)"
+            echo "📋 [ASPICE Documentation Index](https://github.com/${REPO}/wiki/ASPICE)"
+          } >> "$GITHUB_STEP_SUMMARY"
