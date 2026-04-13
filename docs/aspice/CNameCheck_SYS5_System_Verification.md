@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SYS5-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SYS.5 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SYS.5 |
 
 ---
 
@@ -20,7 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
@@ -28,7 +28,7 @@
 
 ### 3.1 Purpose
 
-This System Verification Report documents the qualification test specification, execution results, and verdict for **CNameCheck v1.0.0** — verifying that the complete, integrated system satisfies all system requirements defined in CNC-SYS2-001. It satisfies **Automotive SPICE® PAM v4.0, SYS.5 — System Verification**.
+This System Verification Report documents the qualification test specification, execution results, and verdict for **CStyleCheck v1.0.0** — verifying that the complete, integrated system satisfies all system requirements defined in CNC-SYS2-001. It satisfies **Automotive SPICE® PAM v4.0, SYS.5 — System Verification**.
 
 System verification (SYS.5) differs from system integration testing (SYS.4) in that it tests the **complete, fully integrated system against its requirements**, rather than testing interface behaviour between subsystems.
 
@@ -36,11 +36,11 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SYS2-001 | CNameCheck System Requirements Specification | 1.0 |
-| CNC-SYS3-001 | CNameCheck System Architecture Description | 1.0 |
-| CNC-SYS4-001 | CNameCheck System Integration Test Specification | 1.0 |
+| CNC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
+| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CNC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CNC-SUP8-001 | CNameCheck Configuration Management Plan | 1.1 |
+| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ### 3.3 System Configuration Under Test
 
@@ -317,7 +317,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | Step | Action | Expected Result | Result |
 |---|---|---|---|
 | 1 | `python -m venv venv && pip install .` in clean venv | Install completes; no errors | |
-| 2 | `venv/bin/cnamecheck --version` | Prints `CNameCheck v1.0.0`; exit 0 | |
+| 2 | `venv/bin/cnamecheck --version` | Prints `CStyleCheck v1.0.0`; exit 0 | |
 | 3 | `pipx install .` (separate test) | Install completes; `cnamecheck` on PATH | |
 | 4 | `cnamecheck --version` via pipx | Correct version; exit 0 | |
 
@@ -441,7 +441,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

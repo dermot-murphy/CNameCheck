@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SUP1-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SUP.1 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SUP.1 |
 
 ---
 
@@ -20,15 +20,15 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Quality Assurance Plan defines the QA strategy, activities, criteria, and records for **CNameCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.1 — Quality Assurance**.
+This Quality Assurance Plan defines the QA strategy, activities, criteria, and records for **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.1 — Quality Assurance**.
 
-QA activities for CNameCheck verify that project processes are followed as planned and that work products meet their defined quality criteria. Because CNameCheck is itself a quality tool (a naming-convention linter), the project benefits from self-hosting its own quality checks.
+QA activities for CStyleCheck verify that project processes are followed as planned and that work products meet their defined quality criteria. Because CStyleCheck is itself a quality tool (a naming-convention linter), the project benefits from self-hosting its own quality checks.
 
 ### 3.1 Referenced Documents
 
@@ -128,7 +128,7 @@ All QA evidence is retained as follows:
 When a QA gate failure or non-conformance is identified:
 
 1. Raise a GitHub Issue with label `bug` (process violation) or `non-conformance` (QA process)
-2. Assign to responsible party (Dermot Murphy for v1.0.0)
+2. Assign to responsible party (Claude for v1.0.0)
 3. Implement fix on `bugfix/<issue-id>-<description>` branch
 4. Verify fix resolves the non-conformance (re-run affected CI gates)
 5. Merge via pull request; close Issue with resolution comment
@@ -140,7 +140,7 @@ When a QA gate failure or non-conformance is identified:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

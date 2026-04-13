@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SWE6-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SWE.6 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SWE.6 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Software Qualification Test Specification defines the qualification test cases that verify **CNameCheck v1.0.0** against its software requirements (CNC-SWE1-001) as a complete software build. It satisfies **Automotive SPICE® PAM v4.0, SWE.6 — Software Verification**.
+This Software Qualification Test Specification defines the qualification test cases that verify **CStyleCheck v1.0.0** against its software requirements (CNC-SWE1-001) as a complete software build. It satisfies **Automotive SPICE® PAM v4.0, SWE.6 — Software Verification**.
 
 Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they verify the software against its **specification**, not its internal architecture. They confirm that all SWE.1 requirements are met by the delivered software artefact and provide the final evidence gate before the software is released via SPL.2.
 
@@ -34,10 +34,10 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE1-001 | CNameCheck Software Requirements Specification | 1.0 |
-| CNC-SWE5-001 | CNameCheck Software Integration Test Specification | 1.0 |
-| CNC-SYS5-001 | CNameCheck System Verification Report | 1.0 |
-| CNC-SUP8-001 | CNameCheck Configuration Management Plan | 1.1 |
+| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CNC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.0 |
+| CNC-SYS5-001 | CStyleCheck System Verification Report | 1.0 |
+| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ### 3.2 Software Configuration Under Test
 
@@ -415,7 +415,7 @@ All of the following conditions must be met before the v1.0.0 release baseline i
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

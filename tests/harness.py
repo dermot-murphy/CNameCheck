@@ -1,7 +1,7 @@
 """
 conftest.py / harness.py
 ========================
-Shared test infrastructure for CNameCheck tests.
+Shared test infrastructure for CStyleCheck tests.
 
 Import from any test file:
     from harness import Checker, run, rules, count, messages, CFG

@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-ACQ4-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | ACQ.4 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | ACQ.4 |
 
 ---
 
@@ -20,15 +20,15 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Supplier Monitoring Plan defines how CNameCheck monitors and manages its external suppliers of components, tools, and services. It satisfies **Automotive SPICE® PAM v4.0, ACQ.4 — Supplier Monitoring**.
+This Supplier Monitoring Plan defines how CStyleCheck monitors and manages its external suppliers of components, tools, and services. It satisfies **Automotive SPICE® PAM v4.0, ACQ.4 — Supplier Monitoring**.
 
-CNameCheck is a Python-only tool with minimal external dependencies. Its suppliers are limited to:
+CStyleCheck is a Python-only tool with minimal external dependencies. Its suppliers are limited to:
 
 1. **PyPI / PyYAML** — the single runtime dependency
 2. **GitHub** — version control, CI/CD, container registry, and release infrastructure
@@ -67,8 +67,8 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Activity | Method | Frequency | Owner | Evidence |
 |---|---|---|---|---|
-| Security advisory monitoring | Check PyPI security advisories and GitHub advisory database for `pyyaml` | Monthly | Dermot Murphy | Advisory review note in GitHub Issue (if action needed) |
-| Version range review | Assess whether `pyyaml>=6.0,<7.0` remains appropriate; evaluate new major versions | Per PyYAML major release | Dermot Murphy | `pyproject.toml` version constraint update CR if required |
+| Security advisory monitoring | Check PyPI security advisories and GitHub advisory database for `pyyaml` | Monthly | Claude | Advisory review note in GitHub Issue (if action needed) |
+| Version range review | Assess whether `pyyaml>=6.0,<7.0` remains appropriate; evaluate new major versions | Per PyYAML major release | Claude | `pyproject.toml` version constraint update CR if required |
 | Availability check | Verify `pip install` succeeds in CI | Per CI run | GitHub Actions | `cnamecheck_tests.yml` — install step |
 
 **Acceptance criteria for PyYAML:**
@@ -82,8 +82,8 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 |---|---|---|---|---|
 | CI workflow availability | Monitor `cnamecheck_tests.yml`, `naming_convention.yml`, `docker_publish.yml` job completion | Per commit | GitHub Actions status | CI badge on README; Actions run log |
 | GHCR availability | Verify Docker images pullable after each push | Per `docker_publish.yml` run | GitHub Actions | `docker manifest inspect` in publish job |
-| Actions runner version changes | Monitor GitHub changelog for breaking changes to `ubuntu-latest` runner | Monthly | Dermot Murphy | GitHub blog / changelog review |
-| API deprecation notices | Monitor GitHub Actions deprecation notices (e.g., deprecated action versions) | Monthly | Dermot Murphy | GitHub announcement emails |
+| Actions runner version changes | Monitor GitHub changelog for breaking changes to `ubuntu-latest` runner | Monthly | Claude | GitHub blog / changelog review |
+| API deprecation notices | Monitor GitHub Actions deprecation notices (e.g., deprecated action versions) | Monthly | Claude | GitHub announcement emails |
 
 **Actions versions pinned:**
 - `actions/checkout@v6`
@@ -99,7 +99,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 | Activity | Method | Frequency | Owner | Evidence |
 |---|---|---|---|---|
 | Push availability | `docker_publish.yml` pushes to Docker Hub on release tags | Per release | GitHub Actions | `docker_publish.yml` job log |
-| Image pullability | Verify published image pullable via `docker pull` | Post-release | Dermot Murphy | Manual verification; GitHub Release checklist |
+| Image pullability | Verify published image pullable via `docker pull` | Post-release | Claude | Manual verification; GitHub Release checklist |
 
 **Acceptance criteria for Docker Hub:**
 - Image push succeeds without error in `docker_publish.yml`
@@ -109,8 +109,8 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Activity | Method | Frequency | Owner | Evidence |
 |---|---|---|---|---|
-| Version support monitoring | Track CPython release schedule for EOL of 3.10, 3.11, 3.12 | Annually | Dermot Murphy | Python EOL schedule (`devguide.python.org`) |
-| New minor version evaluation | Evaluate adding new Python minor version to CI matrix | Per new Python minor release | Dermot Murphy | CR raised if new version added to matrix |
+| Version support monitoring | Track CPython release schedule for EOL of 3.10, 3.11, 3.12 | Annually | Claude | Python EOL schedule (`devguide.python.org`) |
+| New minor version evaluation | Evaluate adding new Python minor version to CI matrix | Per new Python minor release | Claude | CR raised if new version added to matrix |
 | Compatibility testing | `cnamecheck_tests.yml` matrix tests all supported versions | Per commit | GitHub Actions | CI matrix result |
 
 **Current Python version policy:** Support the three most recent minor releases. When Python 3.13 is added, Python 3.10 is dropped (raise CR).
@@ -123,9 +123,9 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Activity | Method | Frequency | Owner | Evidence |
 |---|---|---|---|---|
-| Base image security scan | Review Docker Scout / Docker Hub security advisories for `python:3.12-slim` | Monthly | Dermot Murphy | Advisory review note |
+| Base image security scan | Review Docker Scout / Docker Hub security advisories for `python:3.12-slim` | Monthly | Claude | Advisory review note |
 | Image digest verification | Docker digest recorded in `docker_publish.yml` build log | Per build | GitHub Actions | Actions run log |
-| Base image update | Bump `ARG PYTHON_VERSION` or rebuild to get updated OS packages | Per security advisory | Dermot Murphy | CR raised; new Docker image pushed |
+| Base image update | Bump `ARG PYTHON_VERSION` or rebuild to get updated OS packages | Per security advisory | Claude | CR raised; new Docker image pushed |
 
 **Acceptance criteria for base image:**
 - No critical CVEs unpatched in the deployed `python:3.12-slim` layer
@@ -165,7 +165,7 @@ All non-conformances are recorded as GitHub Issues (label: `supplier-issue`) and
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

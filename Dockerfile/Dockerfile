@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # =============================================================================
-# CNameCheck — Embedded C naming-convention linter
+# CStyleCheck — Embedded C Style Compliance Checker
 # =============================================================================
 #
 # Usage (mount your project at /repo):
@@ -25,8 +25,8 @@
 ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION}-slim AS base
 
-LABEL org.opencontainers.image.title="CNameCheck"
-LABEL org.opencontainers.image.description="Embedded C naming-convention linter (Barr-C / MISRA-C complementary)"
+LABEL org.opencontainers.image.title="CStyleCheck"
+LABEL org.opencontainers.image.description="Embedded C Style Compliance Checker (Barr-C / MISRA-C complementary)"
 LABEL org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY:-org/cnamecheck}"
 LABEL org.opencontainers.image.licenses="MIT"
 

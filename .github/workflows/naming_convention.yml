@@ -1,6 +1,6 @@
 # .github/workflows/naming_convention.yml
 # =============================================================================
-# Embedded C naming convention check with trend analysis
+# Embedded C Style Compliance Checker with trend analysis
 # =============================================================================
 #
 # Runs on every push and pull-request that touches C source or headers.

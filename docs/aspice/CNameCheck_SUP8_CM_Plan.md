@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SUP8-001 | **Version** | 1.1 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SUP.8 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
 
 ---
 
@@ -20,8 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-11 | Dermot Murphy | Initial release |
-| 1.1 | 2026-04-12 | Dermot Murphy | Updated branching strategy to Git Flow; clarified PR/Issue terminology throughout |
+| 1.0 | 2026-04-11 | Claude | Initial release |
+| 1.1 | 2026-04-12 | Claude | Updated branching strategy to Git Flow; clarified PR/Issue terminology throughout |
 
 ---
 
@@ -29,13 +29,13 @@
 
 ### 3.1 Purpose
 
-This Configuration Management (CM) Plan defines the processes, tools, methods, and responsibilities used to identify, control, store, and audit all configuration items (CIs) produced during the development and maintenance of **CNameCheck v1.0.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules.
+This Configuration Management (CM) Plan defines the processes, tools, methods, and responsibilities used to identify, control, store, and audit all configuration items (CIs) produced during the development and maintenance of **CStyleCheck v1.0.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules.
 
 This plan satisfies the requirements of **Automotive SPICE® PAM v4.0, SUP.8 — Configuration Management**.
 
 ### 3.2 Scope
 
-This plan applies to all configuration items produced by the CNameCheck project, including:
+This plan applies to all configuration items produced by the CStyleCheck project, including:
 
 - Source code and supporting scripts
 - Test suite and test data
@@ -49,15 +49,15 @@ This plan applies to all configuration items produced by the CNameCheck project,
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CNC-SUP9-001 | CNameCheck Problem Resolution Management Plan | 1.0 |
-| CNC-SUP10-001 | CNameCheck Change Request Management Plan | 1.0 |
-| CNC-SWE1-001 | CNameCheck Software Requirements Specification | 1.0 |
+| CNC-SUP9-001 | CStyleCheck Problem Resolution Management Plan | 1.0 |
+| CNC-SUP10-001 | CStyleCheck Change Request Management Plan | 1.0 |
+| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
 
 ---
 
 ## 4. Configuration Management Objectives
 
-The CM process for CNameCheck shall ensure that:
+The CM process for CStyleCheck shall ensure that:
 
 1. All configuration items are uniquely identified and versioned
 2. Changes to CIs are controlled, reviewed, and traceable
@@ -76,10 +76,10 @@ The CM process for CNameCheck shall ensure that:
 |---|---|
 | **Tool** | Git |
 | **Hosting Platform** | GitHub |
-| **Repository URL** | `https://github.com/dermot-murphy/CNameCheck` |
+| **Repository URL** | `https://github.com/dermot-murphy/CStyleCheck` |
 | **Visibility** | Public |
 | **Default Branch** | `main` |
-| **Access Control** | GitHub repository permissions (Owner: Dermot Murphy) |
+| **Access Control** | GitHub repository permissions (Owner: Claude) |
 
 ### 5.2 Container Registry
 
@@ -135,7 +135,7 @@ All items in the following table are placed under configuration control.
 | CI-024 | CI — naming convention workflow | `.github/workflows/naming_convention.yml` | CI/CD |
 | CI-025 | CI — Docker publish workflow | `.github/workflows/docker_publish.yml` | CI/CD |
 | CI-026 | Project README | `README.md` | Documentation |
-| CI-027 | This CM Plan | `CNameCheck_SUP8_CM_Plan.md` | Documentation |
+| CI-027 | This CM Plan | `CStyleCheck_SUP8_CM_Plan.md` | Documentation |
 
 ### 6.2 Identification Scheme
 
@@ -151,7 +151,7 @@ All items in the following table are placed under configuration control.
 
 ## 7. Branching Strategy
 
-CNameCheck uses the **Git Flow** branching model. The following branches are defined and maintained under configuration control.
+CStyleCheck uses the **Git Flow** branching model. The following branches are defined and maintained under configuration control.
 
 ### 7.1 Permanent Branches
 
@@ -308,7 +308,7 @@ Performed after tagging to verify:
 
 | Role | Responsibility |
 |---|---|
-| **CM Manager** (Dermot Murphy) | Owns this plan; approves baselines; creates release tags; manages GHCR |
+| **CM Manager** (Claude) | Owns this plan; approves baselines; creates release tags; manages GHCR |
 | **Developer** | Creates Git Flow branches; raises GitHub Issues; opens pull requests; links commits and PRs to Issues |
 | **Reviewer** | Reviews PRs; confirms CI pass before approving; approves merge |
 | **CI System** (GitHub Actions) | Automated enforcement: runs tests, linting, Docker build on every push/PR |
@@ -331,7 +331,7 @@ Performed after tagging to verify:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-11 |
+| Author | Claude | | 2026-04-11 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

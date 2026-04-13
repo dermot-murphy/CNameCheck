@@ -1,4 +1,4 @@
-"""test_misc_improvements.py — tests for four enhancements to CNameCheck:
+"""test_misc_improvements.py — tests for four enhancements to CStyleCheck:
 
   1. misc.unsigned_suffix: zero_is_neutral option — literal 0 exempt from U suffix
   2. misc.unsigned_suffix: signed-variable context — literals assigned to signed-typed

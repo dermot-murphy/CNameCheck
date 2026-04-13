@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SYS2-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SYS.2 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
 
 ---
 
@@ -20,7 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
@@ -28,13 +28,13 @@
 
 ### 3.1 Purpose
 
-This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CNameCheck v1.0.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 48 rule IDs.
+This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.0.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 48 rule IDs.
 
 This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2 — System Requirements Analysis**.
 
 ### 3.2 Scope
 
-CNameCheck is a software-only system. It operates as a static analysis tool that accepts C source files and a rule-configuration file as inputs, evaluates each identifier in those files against the configured naming rules, and produces a structured violation report as output.
+CStyleCheck is a software-only system. It operates as a static analysis tool that accepts C source files and a rule-configuration file as inputs, evaluates each identifier in those files against the configured naming rules, and produces a structured violation report as output.
 
 The system is deployed in three integration modes:
 
@@ -49,8 +49,8 @@ The system is deployed in three integration modes:
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
-| CNC-SUP8-001 | CNameCheck Configuration Management Plan | 1.1 |
-| CNC-SYS3-001 | CNameCheck System Architecture Description | 1.0 |
+| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
 
 ### 3.4 Glossary
 
@@ -203,7 +203,7 @@ The following table summarises the stakeholder needs from which the system requi
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

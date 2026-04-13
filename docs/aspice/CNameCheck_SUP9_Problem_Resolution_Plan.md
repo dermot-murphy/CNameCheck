@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SUP9-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SUP.9 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SUP.9 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Problem Resolution Management Plan defines the process for recording, classifying, investigating, resolving, and closing problems identified in **CNameCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.9 — Problem Resolution Management**.
+This Problem Resolution Management Plan defines the process for recording, classifying, investigating, resolving, and closing problems identified in **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.9 — Problem Resolution Management**.
 
 A **problem** is any unintended behaviour, defect, failure, or non-conformance discovered in any work product — including source code, test cases, documentation, configuration files, or CI workflows.
 
@@ -95,7 +95,7 @@ Minimum required fields when raising an Issue:
 
 ### 5.2 Triage and Investigation
 
-1. Issue is assigned to Dermot Murphy (sole maintainer for v1.0.0)
+1. Issue is assigned to Claude (sole maintainer for v1.0.0)
 2. Severity label is confirmed or revised
 3. Root cause is investigated:
    - For code defects: identify affected unit(s) from CNC-SWE3-001
@@ -132,7 +132,7 @@ Fix commit messages must reference the Issue: `Fixes #<issue-id>: <description>`
 
 ## 6. Problem Report Register
 
-The GitHub Issues board at `https://github.com/dermot-murphy/CNameCheck/issues` serves as the problem report register. Filter by `bug` label for problem reports.
+The GitHub Issues board at `https://github.com/dermot-murphy/CStyleCheck/issues` serves as the problem report register. Filter by `bug` label for problem reports.
 
 Summary view (updated per release):
 
@@ -169,7 +169,7 @@ The following problems were identified and resolved during v1.0.0 development:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

@@ -1,18 +1,18 @@
 # action.yml
 # =============================================================================
-# CNameCheck — Embedded C naming-convention linter
+# CStyleCheck — Embedded C naming-convention linter
 # GitHub Action (composite)
 # =============================================================================
 #
 # Minimal usage:
 #
-#   - uses: dermot-murphy/CNameCheck@v1
+#   - uses: dermot-murphy/CStyleCheck@v1
 #     with:
 #       config: src/naming_convention.yaml
 #
 # Full example:
 #
-#   - uses: dermot-murphy/CNameCheck@v1
+#   - uses: dermot-murphy/CStyleCheck@v1
 #     id: namecheck
 #     with:
 #       config:      src/naming_convention.yaml
@@ -36,7 +36,7 @@
 #
 # =============================================================================
 
-name:        'CNameCheck'
+name:        'CStyleCheck'
 description: 'Embedded C naming-convention linter (Barr-C / MISRA-C complementary)'
 author:      'Dermot Murphy'
 
@@ -131,7 +131,7 @@ inputs:
 
   sarif-file:
     description: >-
-      If set, CNameCheck also writes a SARIF 2.1.0 file to this path.
+      If set, CStyleCheck also writes a SARIF 2.1.0 file to this path.
       Intended for upload to GitHub Code Scanning via
       github/codeql-action/upload-sarif.
     required: false
@@ -200,20 +200,20 @@ runs:
       with:
         python-version: '3.11'
 
-    # ── 2. Install CNameCheck from the checked-out action source ─────────────
-    - name: Install CNameCheck
+    # ── 2. Install CStyleCheck from the checked-out action source ─────────────
+    - name: Install CStyleCheck
       shell: bash
       run: |
         pip install --quiet "${{ github.action_path }}"
 
-    # ── 3. Run CNameCheck ────────────────────────────────────────────────────
+    # ── 3. Run CStyleCheck ────────────────────────────────────────────────────
     #
     # All argument construction is done in Python to avoid bash quoting issues
     # with glob patterns that contain spaces or special characters.
     # The checker is invoked with --output-format json so the result can be
     # parsed in step 4.  A SARIF file is written additionally if requested.
     #
-    - name: Run CNameCheck
+    - name: Run CStyleCheck
       id: cnamecheck
       shell: python
       env:
@@ -300,7 +300,7 @@ runs:
 
         # ── Execute ──────────────────────────────────────────────────────────
 
-        print(f"::group::CNameCheck command")
+        print(f"::group::CStyleCheck command")
         print(" ".join(shlex.quote(a) for a in argv))
         print("::endgroup::")
 
@@ -312,7 +312,7 @@ runs:
         try:
             data = json.loads(results_path.read_text(encoding="utf-8"))
         except Exception as exc:
-            print(f"::error::CNameCheck: could not read results JSON: {exc}")
+            print(f"::error::CStyleCheck: could not read results JSON: {exc}")
             sys.exit(checker_exit or 2)
 
         summary    = data.get("summary", {})
@@ -334,7 +334,7 @@ runs:
             rule  = v.get("rule",    "")
             msg   = v.get("message", "")
             print(f"::{level} file={file},line={line},col={col},"
-                  f"title=CNameCheck[{rule}]::{msg}")
+                  f"title=CStyleCheck[{rule}]::{msg}")
 
         # ── SARIF output ─────────────────────────────────────────────────────
 

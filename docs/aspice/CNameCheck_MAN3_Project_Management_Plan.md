@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-MAN3-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | MAN.3 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | MAN.3 |
 
 ---
 
@@ -20,21 +20,21 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This Project Management Plan (PMP) defines the project scope, lifecycle, work breakdown, resources, schedule, interfaces, and monitoring approach for **CNameCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, MAN.3 — Project Management**.
+This Project Management Plan (PMP) defines the project scope, lifecycle, work breakdown, resources, schedule, interfaces, and monitoring approach for **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, MAN.3 — Project Management**.
 
 ### 3.1 Project Overview
 
 | Attribute | Value |
 |---|---|
-| **Product** | CNameCheck — Embedded C naming-convention linter |
+| **Product** | CStyleCheck — Embedded C naming-convention linter |
 | **Version** | 1.0.0 |
-| **Repository** | `https://github.com/dermot-murphy/CNameCheck` |
+| **Repository** | `https://github.com/dermot-murphy/CStyleCheck` |
 | **Language** | Python 3.10–3.12 |
 | **Deployment** | CLI, pip/pipx, Docker (GHCR + Docker Hub), GitHub Action, pre-commit |
 | **Standards** | Barr-C:2018, MISRA-C complementary, Automotive SPICE® PAM v4.0 |
@@ -85,7 +85,7 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 
 ## 5. Project Lifecycle
 
-CNameCheck follows a **Git Flow** based lifecycle aligned with the V-model:
+CStyleCheck follows a **Git Flow** based lifecycle aligned with the V-model:
 
 ```
 Requirements  →  Architecture  →  Detailed Design  →  Implementation
@@ -113,23 +113,23 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 
 | WBS-ID | Work Package | Estimated Effort | Responsible | Status |
 |---|---|---|---|---|
-| WBS-01 | System requirements (SYS.2) | 4h | Dermot Murphy | Complete |
-| WBS-02 | System architecture (SYS.3) | 4h | Dermot Murphy | Complete |
-| WBS-03 | Software requirements (SWE.1) | 8h | Dermot Murphy | Complete |
-| WBS-04 | Software architecture (SWE.2) | 6h | Dermot Murphy | Complete |
-| WBS-05 | Detailed design (SWE.3) | 8h | Dermot Murphy | Complete |
-| WBS-06 | Core linter implementation | 80h | Dermot Murphy | Complete |
-| WBS-07 | Test suite (500+ tests) | 40h | Dermot Murphy | Complete |
-| WBS-08 | Docker packaging and CI | 8h | Dermot Murphy | Complete |
-| WBS-09 | GitHub Action and pre-commit | 6h | Dermot Murphy | Complete |
-| WBS-10 | Unit verification (SWE.4) | 4h | Dermot Murphy | In Progress |
-| WBS-11 | Integration testing (SWE.5) | 4h | Dermot Murphy | In Progress |
-| WBS-12 | Qualification testing (SWE.6) | 4h | Dermot Murphy | In Progress |
-| WBS-13 | System integration testing (SYS.4) | 4h | Dermot Murphy | In Progress |
-| WBS-14 | System verification (SYS.5) | 4h | Dermot Murphy | In Progress |
-| WBS-15 | Management documents (MAN.3, MAN.5) | 4h | Dermot Murphy | In Progress |
-| WBS-16 | Support documents (SUP.1, SUP.9, SUP.10, ACQ.4) | 6h | Dermot Murphy | In Progress |
-| WBS-17 | Release (v1.0.0 tag, GitHub Release) | 2h | Dermot Murphy | Planned |
+| WBS-01 | System requirements (SYS.2) | 4h | Claude | Complete |
+| WBS-02 | System architecture (SYS.3) | 4h | Claude | Complete |
+| WBS-03 | Software requirements (SWE.1) | 8h | Claude | Complete |
+| WBS-04 | Software architecture (SWE.2) | 6h | Claude | Complete |
+| WBS-05 | Detailed design (SWE.3) | 8h | Claude | Complete |
+| WBS-06 | Core linter implementation | 80h | Claude | Complete |
+| WBS-07 | Test suite (500+ tests) | 40h | Claude | Complete |
+| WBS-08 | Docker packaging and CI | 8h | Claude | Complete |
+| WBS-09 | GitHub Action and pre-commit | 6h | Claude | Complete |
+| WBS-10 | Unit verification (SWE.4) | 4h | Claude | In Progress |
+| WBS-11 | Integration testing (SWE.5) | 4h | Claude | In Progress |
+| WBS-12 | Qualification testing (SWE.6) | 4h | Claude | In Progress |
+| WBS-13 | System integration testing (SYS.4) | 4h | Claude | In Progress |
+| WBS-14 | System verification (SYS.5) | 4h | Claude | In Progress |
+| WBS-15 | Management documents (MAN.3, MAN.5) | 4h | Claude | In Progress |
+| WBS-16 | Support documents (SUP.1, SUP.9, SUP.10, ACQ.4) | 6h | Claude | In Progress |
+| WBS-17 | Release (v1.0.0 tag, GitHub Release) | 2h | Claude | Planned |
 
 ---
 
@@ -137,7 +137,7 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 
 | Resource | Type | Allocation |
 |---|---|---|
-| Dermot Murphy | Engineer (sole developer) | 100% |
+| Claude | Engineer (sole developer) | 100% |
 | GitHub Actions | CI/CD infrastructure | On-demand; zero cost (public repo) |
 | GHCR | Container registry | Free tier |
 | Docker Hub | Container registry | Free tier |
@@ -204,7 +204,7 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

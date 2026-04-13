@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SWE4-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SWE.4 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
 
 ---
 
@@ -20,13 +20,13 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This specification defines the unit verification strategy, coverage criteria, and test case catalogue for **CNameCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SWE.4 — Software Unit Verification**.
+This specification defines the unit verification strategy, coverage criteria, and test case catalogue for **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SWE.4 — Software Unit Verification**.
 
 Unit verification covers both dynamic testing (pytest test suite) and static verification (naming convention self-check via `naming_convention.yml` CI workflow).
 
@@ -34,10 +34,10 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE1-001 | CNameCheck Software Requirements Specification | 1.0 |
-| CNC-SWE3-001 | CNameCheck Software Detailed Design | 1.0 |
-| CNC-SWE5-001 | CNameCheck Software Integration Test Specification | 1.0 |
-| CNC-SUP8-001 | CNameCheck Configuration Management Plan | 1.1 |
+| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CNC-SWE3-001 | CStyleCheck Software Detailed Design | 1.0 |
+| CNC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.0 |
+| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ---
 
@@ -87,7 +87,7 @@ Key harness functions:
 
 ### 4.4 Naming Convention Self-Check (Static Verification)
 
-CNameCheck enforces its own naming rules on `cnamecheck.py` via the `naming_convention.yml` CI workflow. This constitutes a static verification pass satisfying SWE.4 BP3.
+CStyleCheck enforces its own naming rules on `cnamecheck.py` via the `naming_convention.yml` CI workflow. This constitutes a static verification pass satisfying SWE.4 BP3.
 
 | Verification Item | Evidence |
 |---|---|
@@ -340,7 +340,7 @@ These test modules provide regression coverage for previously fixed bugs and new
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

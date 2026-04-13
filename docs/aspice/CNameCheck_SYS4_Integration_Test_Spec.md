@@ -9,10 +9,10 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CNC-SYS4-001 | **Version** | 1.0 |
-| **Project** | CNameCheck | **Date** | 2026-04-12 |
+| **Project** | CStyleCheck | **Date** | 2026-04-12 |
 | **Status** | Draft | **Classification** | Internal |
-| **Author** | Dermot Murphy | **Reviewer** | \<Reviewer Name\> |
-| **Approver** | \<Approver Name\> | **Related Process** | SYS.4 |
+| **Author** | Claude | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
 
 ---
 
@@ -20,7 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-12 | Dermot Murphy | Initial release |
+| 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
 
@@ -28,7 +28,7 @@
 
 ### 3.1 Purpose
 
-This System Integration Test Specification defines the integration test cases that verify the correct assembly, interface behaviour, and end-to-end operation of the **CNameCheck v1.0.0** system across its six subsystems and four deployment modes. It satisfies **Automotive SPICE® PAM v4.0, SYS.4 — System Integration and Integration Verification**.
+This System Integration Test Specification defines the integration test cases that verify the correct assembly, interface behaviour, and end-to-end operation of the **CStyleCheck v1.0.0** system across its six subsystems and four deployment modes. It satisfies **Automotive SPICE® PAM v4.0, SYS.4 — System Integration and Integration Verification**.
 
 ### 3.2 Scope
 
@@ -46,9 +46,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SYS2-001 | CNameCheck System Requirements Specification | 1.0 |
-| CNC-SYS3-001 | CNameCheck System Architecture Description | 1.0 |
-| CNC-SYS5-001 | CNameCheck System Verification Report | 1.0 |
+| CNC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
+| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CNC-SYS5-001 | CStyleCheck System Verification Report | 1.0 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
 ### 3.4 Test Environment
@@ -454,7 +454,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Dermot Murphy | | 2026-04-12 |
+| Author | Claude | | 2026-04-12 |
 | Technical Reviewer | \<Name\> | | |
 | Quality Assurance | \<Name\> | | |
 | Approver | \<Name\> | | |

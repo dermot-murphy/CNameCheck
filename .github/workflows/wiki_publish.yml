@@ -1,6 +1,6 @@
 # .github/workflows/wiki_publish.yml
 # =============================================================================
-# Build and publish the CNameCheck GitHub Wiki
+# Build and publish the CStyleCheck GitHub Wiki
 # =============================================================================
 #
 # Triggers:
@@ -139,13 +139,13 @@ jobs:
 
           def aspice_slug(filename):
               stem = filename[:-3] if filename.endswith('.md') else filename
-              stem = re.sub(r'^CNameCheck_', '', stem)
+              stem = re.sub(r'^CStyleCheck_', '', stem)
               stem = stem.replace('_', '-')
               return 'ASPICE-' + stem
 
           def aspice_display(filename):
               stem = filename[:-3] if filename.endswith('.md') else filename
-              stem = re.sub(r'^CNameCheck_', '', stem)
+              stem = re.sub(r'^CStyleCheck_', '', stem)
               return stem.replace('_', ' ')
 
           def write(path, text):
@@ -222,7 +222,7 @@ jobs:
                   # Strip YAML front-matter
                   raw = re.sub(r'^---\s*\n.*?\n---\s*\n', '', raw, flags=re.DOTALL)
                   # Rewrite cross-links between ASPICE docs
-                  # e.g. [text](CNameCheck_SWE2_SW_Architecture.md)
+                  # e.g. [text](CStyleCheck_SWE2_SW_Architecture.md)
                   #   -> [[text|ASPICE-SWE2-SW-Architecture]]
                   def rewrite(m):
                       text, target = m.group(1), m.group(2)
@@ -267,7 +267,7 @@ jobs:
           idx_lines = [
               "# ASPICE CL2 Documentation",
               "",
-              "**CNameCheck v1.0.0** | Automotive SPICE PAM v4.0 | Capability Level 2",
+              "**CStyleCheck v1.0.0** | Automotive SPICE PAM v4.0 | Capability Level 2",
               "",
               f"*Auto-generated from docs/aspice/ on {now}.*",
               "",
@@ -315,7 +315,7 @@ jobs:
 
           # _Sidebar.md
           sidebar = [
-              "## [[CNameCheck|Home]]",
+              "## [[CStyleCheck|Home]]",
               "",
               "**User Guide**",
               "",
