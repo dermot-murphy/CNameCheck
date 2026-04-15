@@ -8,12 +8,12 @@ from harness import (
     Checker, SignChecker, cfg_only, run, has, clean, count, messages,
     _build_spell_dict, _BUILTIN_DICT,
 )
-import cnamecheck as _mod
+import cstylecheck as _mod
 
 _HERE    = Path(__file__).resolve().parent
 _SRC_DIR = _HERE.parent / "src"
-_CHECKER = str(_SRC_DIR / "cnamecheck.py")
-_YAML    = str(_HERE / "naming_convention.yaml")
+_CHECKER = str(_SRC_DIR / "cstylecheck.py")
+_YAML    = str(_HERE / "cstylecheck_rules.yaml")
 
 
 def _cli(*args, files=None):
@@ -144,7 +144,7 @@ def _fn_cfg(min_length=4, max_length=60):
             "enabled": True, "severity": "error",
             "style": "object_verb", "max_length": max_length,
             "min_length": min_length,
-            "object_exclusions": [], "allowed_abbreviations": [],
+            "object_cstylecheck_exclusions": [], "allowed_abbreviations": [],
             "isr_suffix": {"enabled": False},
             "static_prefix": {"enabled": False},
         },
@@ -174,7 +174,7 @@ class TestFunctionMinLength(unittest.TestCase):
         cfg = cfg_only(file_prefix={"enabled": False},
                        functions={"enabled": True, "severity": "error",
                                   "style": "object_verb", "max_length": 60,
-                                  "object_exclusions": [], "allowed_abbreviations": [],
+                                  "object_cstylecheck_exclusions": [], "allowed_abbreviations": [],
                                   "isr_suffix": {"enabled": False},
                                   "static_prefix": {"enabled": False}})
         viols = [v for v in run("void mod_A(void){}", cfg) if v.rule == "function.min_length"]
@@ -185,7 +185,7 @@ class TestFunctionMinLength(unittest.TestCase):
                        functions={"enabled": True, "severity": "error",
                                   "style": "object_verb", "max_length": 60,
                                   "min_length": 20,
-                                  "object_exclusions": [], "allowed_abbreviations": [],
+                                  "object_cstylecheck_exclusions": [], "allowed_abbreviations": [],
                                   "isr_suffix": {"enabled": True, "suffix": "_IRQHandler"},
                                   "static_prefix": {"enabled": False}})
         viols = [v for v in run("void TIM2_IRQHandler(void){}", cfg)
@@ -264,7 +264,7 @@ def _sp_cfg(enabled=True, prefix="prv_", severity="warning"):
         file_prefix={"enabled": False},
         functions={"enabled": True, "severity": "error",
                    "style": "object_verb", "max_length": 60,
-                   "object_exclusions": [], "allowed_abbreviations": [],
+                   "object_cstylecheck_exclusions": [], "allowed_abbreviations": [],
                    "isr_suffix": {"enabled": False},
                    "static_prefix": {"enabled": enabled, "prefix": prefix, "severity": severity}},
     )

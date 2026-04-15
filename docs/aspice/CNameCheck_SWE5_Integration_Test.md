@@ -30,7 +30,7 @@ This document defines the software integration test specification for **CStyleCh
 
 Integration tests operate at a higher level than unit tests (SWE.4): they exercise data flows **across component boundaries** — primarily the path from COMP-01 (CLI) through COMP-04 (Parser) into COMP-05 (Rule Engine) and COMP-07 (Output Formatter) — rather than individual method logic.
 
-The primary integration test suite is `tests/test_cli.py`, which invokes `cnamecheck.py` as a subprocess and validates its end-to-end behaviour.
+The primary integration test suite is `tests/test_cli.py`, which invokes `cstylecheck.py` as a subprocess and validates its end-to-end behaviour.
 
 ### 3.1 Referenced Documents
 
@@ -47,7 +47,7 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cnamec
 |---|---|
 | **OS** | Ubuntu 24.04 (`ubuntu-latest` GitHub Actions runner) |
 | **Python Versions** | 3.10, 3.11, 3.12 |
-| **Test runner** | pytest 7+ via `cnamecheck_tests.yml` CI workflow |
+| **Test runner** | pytest 7+ via `cstylecheck_tests.yml` CI workflow |
 | **Invocation method** | `subprocess.run()` — full process invocation including argument parsing |
 | **CM Baseline ID** | \<Git commit SHA at test execution\> |
 
@@ -68,7 +68,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Interface ID | Description | Covered By |
 |---|---|---|
-| SWA-IF-01 | COMP-01 → COMP-02: config/alias/exclusions paths | SIT-001, SIT-008 |
+| SWA-IF-01 | COMP-01 → COMP-02: config/alias/cstylecheck_exclusions paths | SIT-001, SIT-008 |
 | SWA-IF-02 | COMP-01 → main(): file list and CLI flags | SIT-001, SIT-002, SIT-003 |
 | SWA-IF-03 | COMP-02 → COMP-05: cfg dict, alias_prefixes, disabled_rules | SIT-004, SIT-008 |
 | SWA-IF-04 | COMP-02 → COMP-04: defines substitution applied to source | SIT-009 |
@@ -97,7 +97,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `subprocess.run(["python", "cnamecheck.py", "--config", "naming_convention.yaml", "violating.c"])` | Source with known `variable.global.case` violation | stdout contains `variable.global.case` violation line |
+| 1 | `subprocess.run(["python", "cstylecheck.py", "--config", "cstylecheck_rules.yaml", "violating.c"])` | Source with known `variable.global.case` violation | stdout contains `variable.global.case` violation line |
 | 2 | Check output format | stdout | `{file}:{line}:{col}: ERROR [variable.global.case] ...` |
 | 3 | Check exit code | returncode | `1` |
 
@@ -164,7 +164,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 |---|---|---|---|
 | 1 | Config with `variable.global.case.enabled: false`; source with case violation | Modified config | `variable.global.case` NOT in output |
 | 2 | Same source; default config | Default config | `variable.global.case` IS in output |
-| 3 | Config with per-file exclusion for the test file | Exclusions YAML | Rule suppressed for that file only |
+| 3 | Config with per-file exclusion for the test file | cstylecheck_exclusions YAML | Rule suppressed for that file only |
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
@@ -236,7 +236,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 ---
 
-### SIT-008 — Exclusions File → Disabled Rules → Rule Engine (SWA-IF-01, IF-03)
+### SIT-008 — cstylecheck_exclusions File → Disabled Rules → Rule Engine (SWA-IF-01, IF-03)
 
 | Field | Value |
 |---|---|
@@ -247,9 +247,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `exclusions.yml` suppresses `variable.global.case` for `uart.c` | Source with case violation | No `variable.global.case` in output for `uart.c` |
+| 1 | `cstylecheck_exclusions.yml` suppresses `variable.global.case` for `uart.c` | Source with case violation | No `variable.global.case` in output for `uart.c` |
 | 2 | Same exclusion; different file `spi.c` with same violation | `spi.c` | Violation IS reported for `spi.c` |
-| 3 | Remove exclusion; re-run | No exclusions | Violation reported for `uart.c` |
+| 3 | Remove exclusion; re-run | No cstylecheck_exclusions | Violation reported for `uart.c` |
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
@@ -375,7 +375,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-005 | Parser scope → Rule engine | IF-06 | \<PASS/FAIL\> | |
 | SIT-006 | Rule engine → JSON output | IF-10 | \<PASS/FAIL\> | |
 | SIT-007 | Rule engine → SARIF output | IF-10 | \<PASS/FAIL\> | |
-| SIT-008 | Exclusions → Rule engine | IF-01, IF-03 | \<PASS/FAIL\> | |
+| SIT-008 | cstylecheck_exclusions → Rule engine | IF-01, IF-03 | \<PASS/FAIL\> | |
 | SIT-009 | Defines → Source → Rule engine | IF-04 | \<PASS/FAIL\> | |
 | SIT-010 | Dictionary override → Rule engine | IF-05 | \<PASS/FAIL\> | |
 | SIT-011 | Source cache → Sign checker | IF-07 | \<PASS/FAIL\> | |

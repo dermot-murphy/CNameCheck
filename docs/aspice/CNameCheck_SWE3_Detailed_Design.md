@@ -42,52 +42,52 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 | Unit ID | Unit Name | Source Location | Component |
 |---|---|---|---|
-| UNIT-01 | `_read_options_file` | `cnamecheck.py:187` | COMP-01 |
-| UNIT-02 | `_expand_options_file` | `cnamecheck.py:218` | COMP-01 |
-| UNIT-03 | `discover_files` | `cnamecheck.py:2818` | COMP-01 |
-| UNIT-04 | `_path_matches_exclude` | `cnamecheck.py:2744` | COMP-01 |
-| UNIT-05 | `load_config` | `cnamecheck.py:250` | COMP-02 |
-| UNIT-06 | `load_alias_file` | `cnamecheck.py:275` | COMP-02 |
-| UNIT-07 | `load_exclusions_file` | `cnamecheck.py:314` | COMP-02 |
-| UNIT-08 | `_disabled_rules_for_file` | `cnamecheck.py:363` | COMP-02 |
-| UNIT-09 | `load_defines_file` | `cnamecheck.py:392` | COMP-02 |
-| UNIT-10 | `apply_defines` | `cnamecheck.py:441` | COMP-02 |
-| UNIT-11 | `_load_dict_file` | `cnamecheck.py:458` | COMP-03 |
-| UNIT-12 | `_data_file` | `cnamecheck.py:477` | COMP-03 |
-| UNIT-13 | `_build_spell_dict` | `cnamecheck.py:899` | COMP-03 |
-| UNIT-14 | `strip_comments` | `cnamecheck.py:683` | COMP-04 |
-| UNIT-15 | `strip_strings` | `cnamecheck.py:693` | COMP-04 |
-| UNIT-16 | `preprocess` | `cnamecheck.py:701` | COMP-04 |
-| UNIT-17 | `build_line_map` | `cnamecheck.py:874` | COMP-04 |
-| UNIT-18 | `offset_to_line_col` | `cnamecheck.py:881` | COMP-04 |
-| UNIT-19 | `_build_brace_depths` | `cnamecheck.py:750` | COMP-04 |
-| UNIT-20 | `_comment_only_lines` | `cnamecheck.py:705` | COMP-04 |
-| UNIT-21 | `Checker.__init__` | `cnamecheck.py:912` | COMP-05 |
-| UNIT-22 | `Checker.run_all` | `cnamecheck.py:~1060` | COMP-05 |
-| UNIT-23 | `Checker._check_variables` | `cnamecheck.py:1120` | COMP-05a |
-| UNIT-24 | `Checker._check_functions` | `cnamecheck.py:1562` | COMP-05b |
-| UNIT-25 | `Checker._check_defines` | `cnamecheck.py:1072` | COMP-05c |
-| UNIT-26 | `Checker._check_typedefs` | `cnamecheck.py:1652` | COMP-05d |
-| UNIT-27 | `Checker._check_enums` | `cnamecheck.py:1676` | COMP-05d |
-| UNIT-28 | `Checker._check_structs` | `cnamecheck.py:1739` | COMP-05d |
-| UNIT-29 | `Checker._check_include_guard` | `cnamecheck.py:1879` | COMP-05e |
-| UNIT-30 | `Checker._check_misc` | `cnamecheck.py:1912` | COMP-05f |
-| UNIT-31 | `Checker._check_yoda` | `cnamecheck.py:2245` | COMP-05f |
-| UNIT-32 | `Checker._check_spelling` | `cnamecheck.py:2226` | COMP-05f |
-| UNIT-33 | `Checker._check_reserved_names` | `cnamecheck.py:2348` | COMP-05f |
-| UNIT-34 | `SignChecker._check_calls` | `cnamecheck.py:2688` | COMP-05g |
-| UNIT-35 | `load_baseline` | `cnamecheck.py:3006` | COMP-06 |
-| UNIT-36 | `write_baseline` | `cnamecheck.py:3021` | COMP-06 |
-| UNIT-37 | `_baseline_key` | `cnamecheck.py:3001` | COMP-06 |
-| UNIT-38 | `_violations_to_json` | `cnamecheck.py:2917` | COMP-07 |
-| UNIT-39 | `_violations_to_sarif` | `cnamecheck.py:2949` | COMP-07 |
-| UNIT-40 | `print_summary` | `cnamecheck.py:3045` | COMP-07 |
-| UNIT-41 | `Violation.__str__` | `cnamecheck.py:165` | COMP-07 |
-| UNIT-42 | `Violation.github_annotation` | `cnamecheck.py:158` | COMP-07 |
-| UNIT-43 | `matches_case` | `cnamecheck.py:618` | COMP-05 (shared) |
-| UNIT-44 | `matches_case_abbrev` | `cnamecheck.py:623` | COMP-05 (shared) |
-| UNIT-45 | `module_name` | `cnamecheck.py:654` | COMP-05 (shared) |
-| UNIT-46 | `main` | `cnamecheck.py:3191` | Entry point |
+| UNIT-01 | `_read_options_file` | `cstylecheck.py:187` | COMP-01 |
+| UNIT-02 | `_expand_options_file` | `cstylecheck.py:218` | COMP-01 |
+| UNIT-03 | `discover_files` | `cstylecheck.py:2818` | COMP-01 |
+| UNIT-04 | `_path_matches_exclude` | `cstylecheck.py:2744` | COMP-01 |
+| UNIT-05 | `load_config` | `cstylecheck.py:250` | COMP-02 |
+| UNIT-06 | `load_alias_file` | `cstylecheck.py:275` | COMP-02 |
+| UNIT-07 | `load_cstylecheck_exclusions_file` | `cstylecheck.py:314` | COMP-02 |
+| UNIT-08 | `_disabled_rules_for_file` | `cstylecheck.py:363` | COMP-02 |
+| UNIT-09 | `load_defines_file` | `cstylecheck.py:392` | COMP-02 |
+| UNIT-10 | `apply_defines` | `cstylecheck.py:441` | COMP-02 |
+| UNIT-11 | `_load_dict_file` | `cstylecheck.py:458` | COMP-03 |
+| UNIT-12 | `_data_file` | `cstylecheck.py:477` | COMP-03 |
+| UNIT-13 | `_build_spell_dict` | `cstylecheck.py:899` | COMP-03 |
+| UNIT-14 | `strip_comments` | `cstylecheck.py:683` | COMP-04 |
+| UNIT-15 | `strip_strings` | `cstylecheck.py:693` | COMP-04 |
+| UNIT-16 | `preprocess` | `cstylecheck.py:701` | COMP-04 |
+| UNIT-17 | `build_line_map` | `cstylecheck.py:874` | COMP-04 |
+| UNIT-18 | `offset_to_line_col` | `cstylecheck.py:881` | COMP-04 |
+| UNIT-19 | `_build_brace_depths` | `cstylecheck.py:750` | COMP-04 |
+| UNIT-20 | `_comment_only_lines` | `cstylecheck.py:705` | COMP-04 |
+| UNIT-21 | `Checker.__init__` | `cstylecheck.py:912` | COMP-05 |
+| UNIT-22 | `Checker.run_all` | `cstylecheck.py:~1060` | COMP-05 |
+| UNIT-23 | `Checker._check_variables` | `cstylecheck.py:1120` | COMP-05a |
+| UNIT-24 | `Checker._check_functions` | `cstylecheck.py:1562` | COMP-05b |
+| UNIT-25 | `Checker._check_defines` | `cstylecheck.py:1072` | COMP-05c |
+| UNIT-26 | `Checker._check_typedefs` | `cstylecheck.py:1652` | COMP-05d |
+| UNIT-27 | `Checker._check_enums` | `cstylecheck.py:1676` | COMP-05d |
+| UNIT-28 | `Checker._check_structs` | `cstylecheck.py:1739` | COMP-05d |
+| UNIT-29 | `Checker._check_include_guard` | `cstylecheck.py:1879` | COMP-05e |
+| UNIT-30 | `Checker._check_misc` | `cstylecheck.py:1912` | COMP-05f |
+| UNIT-31 | `Checker._check_yoda` | `cstylecheck.py:2245` | COMP-05f |
+| UNIT-32 | `Checker._check_spelling` | `cstylecheck.py:2226` | COMP-05f |
+| UNIT-33 | `Checker._check_reserved_names` | `cstylecheck.py:2348` | COMP-05f |
+| UNIT-34 | `SignChecker._check_calls` | `cstylecheck.py:2688` | COMP-05g |
+| UNIT-35 | `load_baseline` | `cstylecheck.py:3006` | COMP-06 |
+| UNIT-36 | `write_baseline` | `cstylecheck.py:3021` | COMP-06 |
+| UNIT-37 | `_baseline_key` | `cstylecheck.py:3001` | COMP-06 |
+| UNIT-38 | `_violations_to_json` | `cstylecheck.py:2917` | COMP-07 |
+| UNIT-39 | `_violations_to_sarif` | `cstylecheck.py:2949` | COMP-07 |
+| UNIT-40 | `print_summary` | `cstylecheck.py:3045` | COMP-07 |
+| UNIT-41 | `Violation.__str__` | `cstylecheck.py:165` | COMP-07 |
+| UNIT-42 | `Violation.github_annotation` | `cstylecheck.py:158` | COMP-07 |
+| UNIT-43 | `matches_case` | `cstylecheck.py:618` | COMP-05 (shared) |
+| UNIT-44 | `matches_case_abbrev` | `cstylecheck.py:623` | COMP-05 (shared) |
+| UNIT-45 | `module_name` | `cstylecheck.py:654` | COMP-05 (shared) |
+| UNIT-46 | `main` | `cstylecheck.py:3191` | Entry point |
 
 ---
 
@@ -125,7 +125,7 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 ### UNIT-03 — `discover_files(includes, excludes) → list[str]`
 
-**Purpose:** Expand glob patterns into a de-duplicated, sorted list of source file paths, applying exclusions.
+**Purpose:** Expand glob patterns into a de-duplicated, sorted list of source file paths, applying cstylecheck_exclusions.
 
 **Algorithm:**
 1. For each include glob: call `glob_mod.glob(pattern, recursive=True)` → file list
@@ -389,7 +389,7 @@ Violation:
 | SWE1-001 to SWE1-002 | Config loading | UNIT-05 |
 | SWE1-003 | Defines substitution | UNIT-09, UNIT-10 |
 | SWE1-004 | Alias file | UNIT-06 |
-| SWE1-005 to SWE1-006 | Exclusions | UNIT-07, UNIT-08 |
+| SWE1-005 to SWE1-006 | cstylecheck_exclusions | UNIT-07, UNIT-08 |
 | SWE1-007 to SWE1-010 | Dictionary management | UNIT-11, UNIT-12, UNIT-13 |
 | SWE1-011 to SWE1-016 | Source parsing | UNIT-14, UNIT-15, UNIT-16, UNIT-17, UNIT-18, UNIT-19, UNIT-20 |
 | SWE1-017 to SWE1-029 | Variable rules | UNIT-23, UNIT-43, UNIT-44, UNIT-45 |

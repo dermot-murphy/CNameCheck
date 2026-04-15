@@ -3,28 +3,28 @@ name: CStyleCheck Tests
 on:
   push:
     paths:
-      - "src/cnamecheck.py"
-      - "src/naming_convention.yaml"
+      - "src/cstylecheck.py"
+      - "src/cstylecheck_rules.yaml"
       - "src/_version.py"
       - "src/c_keywords.txt"
       - "src/c_stdlib_names.txt"
       - "src/c_spell_dict.txt"
       - "tests/**"
-      - "tests/naming_convention.yaml"
+      - "tests/cstylecheck_rules.yaml"
       - "requirements.txt"
-      - ".github/workflows/cnamecheck_tests.yml"
+      - ".github/workflows/cstylecheck_tests.yml"
   pull_request:
     paths:
-      - "src/cnamecheck.py"
-      - "src/naming_convention.yaml"
+      - "src/cstylecheck.py"
+      - "src/cstylecheck_rules.yaml"
       - "src/_version.py"
       - "src/c_keywords.txt"
       - "src/c_stdlib_names.txt"
       - "src/c_spell_dict.txt"
       - "tests/**"
-      - "tests/naming_convention.yaml"
+      - "tests/cstylecheck_rules.yaml"
       - "requirements.txt"
-      - ".github/workflows/cnamecheck_tests.yml"
+      - ".github/workflows/cstylecheck_tests.yml"
   workflow_dispatch:
 
 jobs:

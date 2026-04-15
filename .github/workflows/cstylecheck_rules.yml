@@ -1,4 +1,4 @@
-# .github/workflows/naming_convention.yml
+# .github/workflows/cstylecheck_rules.yml
 # =============================================================================
 # Embedded C Style Compliance Checker with trend analysis
 # =============================================================================
@@ -6,9 +6,9 @@
 # Runs on every push and pull-request that touches C source or headers.
 #
 # On the default branch (main/master) it additionally:
-#   1. Appends a JSON record to gh-pages/namecheck/trend.jsonl.
-#   2. Regenerates gh-pages/namecheck/index.html (Chart.js trend graph).
-#   3. Regenerates gh-pages/namecheck/badge.json (shields.io endpoint).
+#   1. Appends a JSON record to gh-pages/cstylecheck/trend.jsonl.
+#   2. Regenerates gh-pages/cstylecheck/index.html (Chart.js trend graph).
+#   3. Regenerates gh-pages/cstylecheck/badge.json (shields.io endpoint).
 #   4. Updates the naming-convention badge line in README.md.
 #
 # Required repository settings
@@ -29,7 +29,7 @@ on:
       - "source/**/*.c"
       - "source/**/*.h"
       - "src/**"
-      - ".github/workflows/naming_convention.yml"
+      - ".github/workflows/cstylecheck_rules.yml"
   pull_request:
     paths:
       - "source/**/*.c"
@@ -40,7 +40,7 @@ jobs:
   # ---------------------------------------------------------------------------
   # Job 1: Run the checker
   # ---------------------------------------------------------------------------
-  namecheck:
+  stylecheck:
     name: Naming Convention Lint
     runs-on: ubuntu-latest
 
@@ -78,14 +78,14 @@ jobs:
           github.event_name == 'pull_request' &&
           steps.changed.outputs.any_changed == 'true'
         run: |
-          mkdir -p output/namecheck
-          python src/cnamecheck.py          \
-            --config     src/naming_convention.yaml \
-            --aliases    src/aliases.txt            \
-            --exclusions src/exclusions.yml         \
+          mkdir -p output/cstylecheck
+          python src/cstylecheck.py          \
+            --config     src/cstylecheck_rules.yaml \
+            --aliases    src/cstylecheck_aliases.txt            \
+            --cstylecheck_exclusions src/cstylecheck_exclusions.yml         \
             --github-actions                                   \
             --summary                                          \
-            --log        output/namecheck/cnamecheck_results.txt \
+            --log        output/cstylecheck/cstylecheck_results.txt \
             --exclude    source/cots/                          \
             ${{ steps.changed.outputs.all_changed_files }}    \
           || true
@@ -94,14 +94,14 @@ jobs:
       - name: Run checker (push, all source)
         if: github.event_name == 'push'
         run: |
-          mkdir -p output/namecheck
-          python src/cnamecheck.py          \
-            --config     src/naming_convention.yaml \
-            --aliases    src/aliases.txt            \
-            --exclusions src/exclusions.yml         \
+          mkdir -p output/cstylecheck
+          python src/cstylecheck.py          \
+            --config     src/cstylecheck_rules.yaml \
+            --aliases    src/cstylecheck_aliases.txt            \
+            --cstylecheck_exclusions src/cstylecheck_exclusions.yml         \
             --github-actions                                   \
             --summary                                          \
-            --log        output/namecheck/cnamecheck_results.txt \
+            --log        output/cstylecheck/cstylecheck_results.txt \
             --exclude    source/cots/                          \
             --include    "source/**/*.c"                       \
             --include    "source/**/*.h"                       \
@@ -114,7 +114,7 @@ jobs:
         run: |
           import re, os, pathlib
 
-          log = pathlib.Path("output/namecheck/cnamecheck_results.txt")
+          log = pathlib.Path("output/cstylecheck/cstylecheck_results.txt")
           text = log.read_text() if log.exists() else ""
 
           def extract(pattern):
@@ -138,8 +138,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: namecheck-results-${{ github.run_number }}
-          path: output/namecheck/cnamecheck_results.txt
+          name: stylecheck-results-${{ github.run_number }}
+          path: output/cstylecheck/cstylecheck_results.txt
           retention-days: 90
 
       - name: Fail job on naming errors
@@ -153,7 +153,7 @@ jobs:
   # ---------------------------------------------------------------------------
   trend:
     name: Update Trend
-    needs: namecheck
+    needs: stylecheck
     if: >
       always() &&
       github.event_name == 'push' &&
@@ -178,7 +178,7 @@ jobs:
             git checkout --orphan gh-pages
             git rm -rf . 2>/dev/null || true
           fi
-          mkdir -p namecheck
+          mkdir -p stylecheck
 
       - name: Append trend record
         shell: python
@@ -194,24 +194,24 @@ jobs:
               "infos":    int(os.environ["INFOS"]),
               "files":    int(os.environ["FILES"]),
           }
-          f = pathlib.Path("namecheck/trend.jsonl")
+          f = pathlib.Path("stylecheck/trend.jsonl")
           with f.open("a") as fh:
               fh.write(json.dumps(record) + "\n")
           print(f"Appended: {record}")
         env:
           RUN_NUMBER: ${{ github.run_number }}
           SHA:        ${{ github.sha }}
-          ERRORS:     ${{ needs.namecheck.outputs.errors }}
-          WARNINGS:   ${{ needs.namecheck.outputs.warnings }}
-          INFOS:      ${{ needs.namecheck.outputs.infos }}
-          FILES:      ${{ needs.namecheck.outputs.files }}
+          ERRORS:     ${{ needs.stylecheck.outputs.errors }}
+          WARNINGS:   ${{ needs.stylecheck.outputs.warnings }}
+          INFOS:      ${{ needs.stylecheck.outputs.infos }}
+          FILES:      ${{ needs.stylecheck.outputs.files }}
 
       - name: Generate trend HTML page and badge JSON
         shell: python
         run: |
           import json, os, pathlib, re
 
-          trend_file = pathlib.Path("namecheck/trend.jsonl")
+          trend_file = pathlib.Path("stylecheck/trend.jsonl")
           records    = [json.loads(l) for l in trend_file.read_text().splitlines() if l.strip()]
           recent     = records[-60:]   # keep last 60 data points on the chart
 
@@ -226,7 +226,7 @@ jobs:
           colour  = "brightgreen" if total == 0 else "yellow" if errors == 0 else "red"
           message = "clean" if total == 0 else f"{errors}E {warnings}W"
           badge   = {"schemaVersion": 1, "label": "naming", "message": message, "color": colour}
-          pathlib.Path("namecheck/badge.json").write_text(json.dumps(badge, indent=2))
+          pathlib.Path("stylecheck/badge.json").write_text(json.dumps(badge, indent=2))
 
           # --- Chart data ---
           labels = [r["date"][:10] + " #" + str(r.get("run","?")) for r in recent]
@@ -304,24 +304,24 @@ jobs:
           <p><small>Source: <a href="https://github.com/{repo}">{repo}</a></small></p>
           </body></html>"""
 
-          pathlib.Path("namecheck/index.html").write_text(html)
-          print(f"Trend page: {pages_base}/namecheck/")
-          print(f"Badge URL:  https://img.shields.io/endpoint?url={pages_base}/namecheck/badge.json")
+          pathlib.Path("stylecheck/index.html").write_text(html)
+          print(f"Trend page: {pages_base}/cstylecheck/")
+          print(f"Badge URL:  https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json")
         env:
-          ERRORS:   ${{ needs.namecheck.outputs.errors }}
-          WARNINGS: ${{ needs.namecheck.outputs.warnings }}
-          INFOS:    ${{ needs.namecheck.outputs.infos }}
-          FILES:    ${{ needs.namecheck.outputs.files }}
+          ERRORS:   ${{ needs.stylecheck.outputs.errors }}
+          WARNINGS: ${{ needs.stylecheck.outputs.warnings }}
+          INFOS:    ${{ needs.stylecheck.outputs.infos }}
+          FILES:    ${{ needs.stylecheck.outputs.files }}
           REPO:     ${{ github.repository }}
 
       - name: Commit and push trend data
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add namecheck/
+          git add stylecheck/
           git diff --staged --quiet && echo "No change" && exit 0
           git commit -m \
-            "trend: run #${{ github.run_number }} E=${{ needs.namecheck.outputs.errors }} W=${{ needs.namecheck.outputs.warnings }}"
+            "trend: run #${{ github.run_number }} E=${{ needs.stylecheck.outputs.errors }} W=${{ needs.stylecheck.outputs.warnings }}"
           git push origin gh-pages
 
       - name: Update README badge
@@ -334,8 +334,8 @@ jobs:
           repo    = os.environ["REPO"]
           owner, reponame = repo.split("/")
           pages_base = f"https://{owner}.github.io/{reponame}"
-          trend_url  = f"{pages_base}/namecheck/"
-          badge_url  = f"https://img.shields.io/endpoint?url={pages_base}/namecheck/badge.json"
+          trend_url  = f"{pages_base}/cstylecheck/"
+          badge_url  = f"https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json"
           badge_md   = f"[![Naming Convention]({badge_url})]({trend_url})"
 
           readme = pathlib.Path("README.md")

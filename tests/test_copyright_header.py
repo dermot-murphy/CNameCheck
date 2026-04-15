@@ -355,7 +355,8 @@ class TestLoadCopyrightFile(unittest.TestCase):
 
     def _write_and_load(self, text: str) -> tuple:
         with tempfile.NamedTemporaryFile(
-                mode='w', suffix='.txt', delete=False, encoding='utf-8') as fh:
+                mode='w', suffix='.txt', delete=False,
+                encoding='utf-8', newline='') as fh:
             fh.write(text)
             name = fh.name
         try:

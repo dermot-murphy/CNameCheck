@@ -47,14 +47,14 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 
 | Term | Definition |
 |---|---|
-| `Checker` | The primary analysis class in `cnamecheck.py` responsible for per-file rule evaluation |
+| `Checker` | The primary analysis class in `cstylecheck.py` responsible for per-file rule evaluation |
 | `CheckResult` | Data class aggregating `Violation` objects produced by one `Checker` run |
 | `Violation` | Data class holding: `filepath`, `line`, `col`, `severity`, `rule`, `message` |
 | `SignChecker` | Cross-file sign-compatibility analysis class |
 | `module_name` | The filename stem (e.g. `uart` from `uart.c`) used as the mandatory identifier prefix |
 | `clean` | Source text after stripping comments and string literals |
 | `defines` | Keyword/type alias substitutions applied to source before analysis |
-| `exclusions` | Per-file YAML map of rule IDs to suppressed identifier patterns |
+| `cstylecheck_exclusions` | Per-file YAML map of rule IDs to suppressed identifier patterns |
 | `baseline` | JSON file of known violations used to suppress pre-existing findings |
 
 ---
@@ -69,7 +69,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-002 | The software shall raise a configuration error (exit code 2) if the YAML file is absent, malformed, or unparseable | Mandatory | Test | SYS-F-039 |
 | SWE1-003 | The software shall apply project `--defines` substitutions to the preprocessed source text before any rule check, using the `apply_defines()` function | Mandatory | Test | SYS-F-006 |
 | SWE1-004 | The software shall load the module alias map via `load_alias_file()` and use it to derive accepted prefix strings per source file | Mandatory | Test | SYS-F-007 |
-| SWE1-005 | The software shall load per-file rule exclusions via `load_exclusions_file()` and pass the resulting map to each `Checker` instance | Mandatory | Test | SYS-F-008 |
+| SWE1-005 | The software shall load per-file rule cstylecheck_exclusions via `load_cstylecheck_exclusions_file()` and pass the resulting map to each `Checker` instance | Mandatory | Test | SYS-F-008 |
 | SWE1-006 | The software shall resolve the set of disabled rules for each source file via `_disabled_rules_for_file()` before instantiating the `Checker` | Mandatory | Test | SYS-F-008 |
 
 ### 4.2 Dictionary Management (SS-03)
@@ -79,7 +79,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-007 | The software shall load the C keyword dictionary from `c_keywords.txt` (or `--keywords-file` override) as a `frozenset` via `_load_dict_file()` | Mandatory | Test | SYS-F-009 |
 | SWE1-008 | The software shall load the C stdlib name dictionary from `c_stdlib_names.txt` (or `--stdlib-file` override) as a `frozenset` | Mandatory | Test | SYS-F-009 |
 | SWE1-009 | The software shall load the spell-check dictionary from `c_spell_dict.txt` (or `--spell-dict` override) and merge it with YAML-configured exemptions via `_build_spell_dict()` | Mandatory | Test | SYS-F-009 |
-| SWE1-010 | The software shall locate built-in dictionary files relative to `__file__` with a fallback to `{sys.prefix}/share/cnamecheck/` via `_data_file()` | Mandatory | Test | SYS-F-009 |
+| SWE1-010 | The software shall locate built-in dictionary files relative to `__file__` with a fallback to `{sys.prefix}/share/cstylecheck/` via `_data_file()` | Mandatory | Test | SYS-F-009 |
 
 ### 4.3 Source Parsing and Cache (SS-04)
 
@@ -198,7 +198,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SW-REQ-ID | Requirement | Priority | Verification | Parent |
 |---|---|---|---|---|
 | SWE1-068 | The `_expand_options_file()` function shall insert options-file tokens before direct CLI tokens so that direct CLI arguments take precedence | Mandatory | Test | SYS-NF-008 |
-| SWE1-069 | The `main()` function shall return exit code `0`, `1`, or `2` as defined in SYS-F-037 to SYS-F-039, and the `cnamecheck` entry point defined in `pyproject.toml` shall invoke `main()` | Mandatory | Test | SYS-F-037 to SYS-F-039 |
+| SWE1-069 | The `main()` function shall return exit code `0`, `1`, or `2` as defined in SYS-F-037 to SYS-F-039, and the `cstylecheck` entry point defined in `pyproject.toml` shall invoke `main()` | Mandatory | Test | SYS-F-037 to SYS-F-039 |
 | SWE1-070 | The `discover_files()` function shall expand `--include` globs, de-duplicate paths, and apply `--exclude` filters using `_path_matches_exclude()` | Mandatory | Test | SYS-F-004, SYS-F-005 |
 
 ### 4.15 Verification Criteria
@@ -207,9 +207,9 @@ The following criteria shall be met by all software requirements above. They are
 
 | Criterion | Target | Measurement |
 |---|---|---|
-| Statement coverage | ≥ 90% of `cnamecheck.py` | pytest-cov report |
-| Branch coverage | ≥ 85% of `cnamecheck.py` | pytest-cov report |
-| MISRA-equivalent naming compliance | Zero `cnamecheck` self-violations | `naming_convention.yml` CI result |
+| Statement coverage | ≥ 90% of `cstylecheck.py` | pytest-cov report |
+| Branch coverage | ≥ 85% of `cstylecheck.py` | pytest-cov report |
+| MISRA-equivalent naming compliance | Zero `cstylecheck` self-violations | `cstylecheck_rules.yml` CI result |
 | All unit test cases | PASS | pytest result across Python 3.10 / 3.11 / 3.12 |
 
 ---

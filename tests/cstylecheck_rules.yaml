@@ -29,12 +29,12 @@ variables:
   min_length: 3             # Barr-C 7.1.e: no variable shorter than 3 characters
   max_length: 40           # Barr-C 7.1.d: no variable longer than 31 chars
                             # (we use 40 to allow for module prefix)
-  allow_single_char_loop_vars: true  # Barr-C 7.1.e: loop counters must also be >= 3 chars
+  allow_single_char_loop_vars: false  # Barr-C 7.1.e: loop counters must also be >= 3 chars
   # When true, variables that appear only as for-loop iteration counters
   # (e.g. i, ix, ii) are exempt from the min_length rule regardless of
   # allow_single_char_loop_vars. Useful when min_length >= 2 but you want
   # to permit conventional loop counters.
-  allow_loop_vars_short: true
+  allow_loop_vars_short: false
 
   # Uppercase abbreviations that are allowed anywhere in an otherwise
   # lower_snake name.  Add any project-standard abbreviations here.
@@ -129,7 +129,7 @@ variables:
   # and should be phrased as a question: b_is_buffer_full, b_done_yet
   # (BARR-C 7.1.m)
   bool_prefix:
-    enabled: false
+    enabled: true
     severity: warning
     prefix: "b_"
 
@@ -322,7 +322,7 @@ functions:
   # object_verb style check to be waived entirely.  Use this for
   # established abbreviations that act as both object and verb.
   # e.g.  APP_Cmd_Wr_Mode  passes because Wr is in this list.
-  object_exclusions:
+  object_cstylecheck_exclusions:
     - Wr
     - Rd
     - IoCntrl
@@ -398,14 +398,14 @@ misc:
   line_length:
     enabled: true
     severity: warning
-    max: 180
+    max: 120
 
   # Tabs vs spaces
   indentation:
     enabled: true
     severity: info
-    style: tabs           # spaces | tabs
-    width: 8
+    style: spaces           # spaces | tabs
+    width: 4
 
   # Block-comment spacing
   # Checks that between the closing */ of a multi-line block comment
@@ -426,7 +426,7 @@ misc:
   #
   # This rule is only active when --copyright is provided; the 'enabled'
   # flag lets you disable it even when the file is present (e.g. in a
-  # per-file exclusion via --exclusions).
+  # per-file exclusion via --cstylecheck_exclusions).
   copyright_header:
     enabled: true           # active whenever --copyright FILE is supplied
     severity: error
@@ -462,7 +462,7 @@ misc:
 # Checks that no declared variable, function, macro, or constant name
 # shadows a C keyword, C++ keyword, or C standard library name.
 # Additional names can be banned via --banned-names FILE on the command line.
-# Per-file exceptions: add 'reserved_name' to disabled_rules in exclusions.yml.
+# Per-file exceptions: add 'reserved_name' to disabled_rules in cstylecheck_exclusions.yml.
 reserved_names:
   enabled: true
   severity: error

@@ -250,12 +250,12 @@ class TestAllowLoopVarsShort(unittest.TestCase):
         self.assertFalse(has(src, _var_cfg(allow_loop=True), RULE_ML))
 
     def test_allow_loop_vars_short_default_is_false(self):
-        """Test suite YAML (tests/naming_convention.yaml) has allow_loop_vars_short
+        """Test suite YAML (tests/cstylecheck_rules.yaml) has allow_loop_vars_short
         disabled so tests behave predictably regardless of project config."""
         import yaml, pathlib
         # Read from tests/ — the stable test config, not the project src/ YAML
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "naming_convention.yaml")
+            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml")
             .read_text()
         )
         self.assertFalse(cfg["variables"].get("allow_loop_vars_short", False))
@@ -339,7 +339,7 @@ class TestUnitSuffixExemptPatterns(unittest.TestCase):
     def test_yaml_contains_unit_patterns(self):
         import yaml, pathlib
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "naming_convention.yaml")
+            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml")
             .read_text()
         )
         patterns = cfg["variables"]["no_numeric_in_name"]["exempt_patterns"]
@@ -404,7 +404,7 @@ if __name__ == "__main__":
 class TestExemptFunctionArgs(unittest.TestCase):
     """Integer literals inside calls to known signed-parameter functions are
     exempt from misc.unsigned_suffix regardless of zero_is_neutral setting.
-    The function list is configurable in naming_convention.yaml and requires
+    The function list is configurable in cstylecheck_rules.yaml and requires
     no header file scanning."""
 
     def _us(self, zero_neutral=False, exempt_fns=None):
@@ -497,7 +497,7 @@ class TestExemptFunctionArgs(unittest.TestCase):
     def test_yaml_has_exempt_function_args(self):
         import yaml, pathlib
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "naming_convention.yaml")
+            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml")
             .read_text()
         )
         fns = cfg["misc"]["unsigned_suffix"].get("exempt_function_args", [])
@@ -572,8 +572,8 @@ class TestSummaryTotal(unittest.TestCase):
         import subprocess, sys, tempfile
         from pathlib import Path as P
         _HERE = P(__file__).parent
-        CHECKER = str(_HERE.parent / "src" / "cnamecheck.py")
-        YAML    = str(_HERE / "naming_convention.yaml")
+        CHECKER = str(_HERE.parent / "src" / "cstylecheck.py")
+        YAML    = str(_HERE / "cstylecheck_rules.yaml")
         with tempfile.TemporaryDirectory() as td:
             f = P(td) / filename
             f.write_text(src_text)

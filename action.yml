@@ -1,6 +1,6 @@
 # action.yml
 # =============================================================================
-# CStyleCheck — Embedded C naming-convention linter
+# CStyleCheck — Embedded C Style Compliance Checker
 # GitHub Action (composite)
 # =============================================================================
 #
@@ -8,36 +8,36 @@
 #
 #   - uses: dermot-murphy/CStyleCheck@v1
 #     with:
-#       config: src/naming_convention.yaml
+#       config: src/cstylecheck_rules.yaml
 #
 # Full example:
 #
 #   - uses: dermot-murphy/CStyleCheck@v1
-#     id: namecheck
+#     id: cstylecheck
 #     with:
-#       config:      src/naming_convention.yaml
+#       config:      src/cstylecheck_rules.yaml
 #       include: |
 #         source/**/*.c
 #         source/**/*.h
 #       exclude: |
 #         source/cots/
 #         source/third_party/
-#       options-file:      src/cnamecheck.options
+#       options-file:      src/cstylecheck.options
 #       fail-on:           error
-#       sarif-file:        results/cnamecheck.sarif
+#       sarif-file:        results/cstylecheck.sarif
 #
 #   - name: Upload SARIF to Code Scanning
 #     uses: github/codeql-action/upload-sarif@v3
 #     with:
-#       sarif_file: results/cnamecheck.sarif
+#       sarif_file: results/cstylecheck.sarif
 #
 #   - name: Print violation counts
-#     run: echo "Errors=${{ steps.namecheck.outputs.errors }}"
+#     run: echo "Errors=${{ steps.cstylecheck.outputs.errors }}"
 #
 # =============================================================================
 
 name:        'CStyleCheck'
-description: 'Embedded C naming-convention linter (Barr-C / MISRA-C complementary)'
+description: 'Embedded C Style Compliance Checker (Barr-C / MISRA-C complementary)'
 author:      'Dermot Murphy'
 
 branding:
@@ -54,7 +54,7 @@ inputs:
     description: >-
       Path to the YAML rule configuration file, relative to the workspace root.
     required: false
-    default: 'src/naming_convention.yaml'
+    default: 'src/cstylecheck_rules.yaml'
 
   include:
     description: >-
@@ -90,9 +90,9 @@ inputs:
     required: false
     default: ''
 
-  exclusions:
+  cstylecheck_exclusions:
     description: >-
-      Path to a per-file rule exclusion YAML (--exclusions).
+      Path to a per-file rule exclusion YAML (--cstylecheck_exclusions).
     required: false
     default: ''
 
@@ -139,7 +139,7 @@ inputs:
 
   args:
     description: >-
-      Verbatim extra arguments appended to the cnamecheck command line.
+      Verbatim extra arguments appended to the cstylecheck command line.
       Use this as an escape hatch for any flag not exposed as a dedicated input.
     required: false
     default: ''
@@ -152,24 +152,24 @@ outputs:
 
   violations:
     description: 'Total number of violations (all severity levels combined).'
-    value: ${{ steps.cnamecheck.outputs.violations }}
+    value: ${{ steps.cstylecheck.outputs.violations }}
 
   errors:
     description: 'Number of error-level violations.'
-    value: ${{ steps.cnamecheck.outputs.errors }}
+    value: ${{ steps.cstylecheck.outputs.errors }}
 
   warnings:
     description: 'Number of warning-level violations.'
-    value: ${{ steps.cnamecheck.outputs.warnings }}
+    value: ${{ steps.cstylecheck.outputs.warnings }}
 
   info:
     description: 'Number of info-level violations.'
-    value: ${{ steps.cnamecheck.outputs.info }}
+    value: ${{ steps.cstylecheck.outputs.info }}
 
   sarif-file:
     description: >-
       Absolute path to the SARIF output file, if sarif-file input was given.
-    value: ${{ steps.cnamecheck.outputs.sarif_file }}
+    value: ${{ steps.cstylecheck.outputs.sarif_file }}
 
 # ---------------------------------------------------------------------------
 # Implementation — composite action
@@ -179,7 +179,7 @@ outputs:
 # ------------
 # * Composite is used instead of Docker to avoid the ~30 s image pull/build
 #   overhead on every run.
-# * cnamecheck is installed with pip from github.action_path so the action
+# * cstylecheck is installed with pip from github.action_path so the action
 #   always uses exactly the version that was checked out (the ref/tag the
 #   caller pinned to).
 # * The checker is always invoked with --output-format json so that outputs
@@ -214,7 +214,7 @@ runs:
     # parsed in step 4.  A SARIF file is written additionally if requested.
     #
     - name: Run CStyleCheck
-      id: cnamecheck
+      id: cstylecheck
       shell: python
       env:
         # Pass all inputs via environment variables to avoid shell quoting.
@@ -224,7 +224,7 @@ runs:
         INPUT_OPTIONS_FILE:     ${{ inputs.options-file }}
         INPUT_DEFINES:          ${{ inputs.defines }}
         INPUT_ALIASES:          ${{ inputs.aliases }}
-        INPUT_EXCLUSIONS:       ${{ inputs.exclusions }}
+        INPUT_cstylecheck_exclusions:       ${{ inputs.cstylecheck_exclusions }}
         INPUT_COPYRIGHT:        ${{ inputs.copyright }}
         INPUT_BASELINE_FILE:    ${{ inputs.baseline-file }}
         INPUT_WARNINGS_AS_ERR:  ${{ inputs.warnings-as-errors }}
@@ -248,14 +248,14 @@ runs:
         workspace    = os.environ.get("GITHUB_WORKSPACE", ".")
         gh_output    = os.environ.get("GITHUB_OUTPUT", "")
 
-        results_path = Path(runner_temp) / "cnamecheck_results.json"
+        results_path = Path(runner_temp) / "cstylecheck_results.json"
 
         # ── Build argument list ──────────────────────────────────────────────
 
         def env(key):
             return os.environ.get(key, "").strip()
 
-        argv = [sys.executable, f"{action_path}/src/cnamecheck.py"]
+        argv = [sys.executable, f"{action_path}/src/cstylecheck.py"]
 
         # Config
         if env("INPUT_CONFIG"):
@@ -277,7 +277,7 @@ runs:
         for flag, key in (
             ("--defines",     "INPUT_DEFINES"),
             ("--aliases",     "INPUT_ALIASES"),
-            ("--exclusions",  "INPUT_EXCLUSIONS"),
+            ("--cstylecheck_exclusions",  "INPUT_cstylecheck_exclusions"),
             ("--copyright",   "INPUT_COPYRIGHT"),
             ("--baseline-file", "INPUT_BASELINE_FILE"),
         ):
@@ -350,13 +350,13 @@ runs:
                    and not (argv[max(0,argv.index(a)-1):argv.index(a)] == ["--log"])
             ]
             # Build a clean sarif invocation
-            sarif_argv = [sys.executable, f"{action_path}/src/cnamecheck.py"]
+            sarif_argv = [sys.executable, f"{action_path}/src/cstylecheck.py"]
             for flag, key in (
                 ("--config",       "INPUT_CONFIG"),
                 ("--options-file", "INPUT_OPTIONS_FILE"),
                 ("--defines",      "INPUT_DEFINES"),
                 ("--aliases",      "INPUT_ALIASES"),
-                ("--exclusions",   "INPUT_EXCLUSIONS"),
+                ("--cstylecheck_exclusions",   "INPUT_cstylecheck_exclusions"),
                 ("--copyright",    "INPUT_COPYRIGHT"),
                 ("--baseline-file","INPUT_BASELINE_FILE"),
             ):

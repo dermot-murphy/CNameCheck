@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 # =============================================================================
-# CStyleCheck — Embedded C naming-convention linter
+# CStyleCheck — Embedded C Style Compliance Checker
 # =============================================================================
 
 [project]
-name            = "cnamecheck"
+name            = "cstylecheck"
 version         = "1.0.0"
-description     = "Embedded C naming-convention linter (Barr-C / MISRA-C complementary)"
+description     = "Embedded C Style Compliance Checker (Barr-C / MISRA-C complementary)"
 readme          = "README.md"
 license         = { text = "MIT" }
 requires-python = ">=3.10"
@@ -21,30 +21,30 @@ Homepage      = "https://github.com/dermot-murphy/CStyleCheck"
 Repository    = "https://github.com/dermot-murphy/CStyleCheck"
 "Bug Tracker" = "https://github.com/dermot-murphy/CStyleCheck/issues"
 
-# `cnamecheck` is available as a command after `pip install .` or `pipx install .`
+# `cstylecheck` is available as a command after `pip install .` or `pipx install .`
 [project.scripts]
-cnamecheck = "cnamecheck:main"
+cstylecheck = "cstylecheck:main"
 
 # =============================================================================
 # Package layout
 #
-# cnamecheck.py and _version.py live in src/ and are installed as top-level
+# cstylecheck.py and _version.py live in src/ and are installed as top-level
 # Python modules.  The three dictionary files are installed alongside them in
-# {sys.prefix}/share/cnamecheck/ so that the tool can locate them at runtime
+# {sys.prefix}/share/cstylecheck/ so that the tool can locate them at runtime
 # regardless of whether it was run from a source checkout or a pip install.
 # =============================================================================
 
 [tool.setuptools]
-py-modules = ["cnamecheck", "_version"]
+py-modules = ["cstylecheck", "_version"]
 
 [tool.setuptools.package-dir]
 "" = "src"
 
-# data_files installs the bundled dictionaries to {sys.prefix}/share/cnamecheck/
-# cnamecheck._data_file() checks that directory as a fallback when the files
+# data_files installs the bundled dictionaries to {sys.prefix}/share/cstylecheck/
+# cstylecheck._data_file() checks that directory as a fallback when the files
 # are not found alongside __file__ (which is the case for regular pip installs).
 [tool.setuptools.data-files]
-"share/cnamecheck" = [
+"share/cstylecheck" = [
     "src/c_keywords.txt",
     "src/c_stdlib_names.txt",
     "src/c_spell_dict.txt",

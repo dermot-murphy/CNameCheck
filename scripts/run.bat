@@ -1,0 +1,2 @@
+docker run --rm -v "U:/PrivateWork/Sensoteq/Kepler/innovateuk-sensor/software:/repo" -v "%cd%:/config" canembed/cstylecheck:latest --config /repo/tools/cstylecheck/cstylecheck_rules.yaml --include "/repo/source/**/*.c" --include "/repo/source/**/*.h" --exclude "/repo/source/cots/**/*.*" --exclude "/repo/source/**/sdk_config.h" --summary --log /repo/output/cstylecheck/cstylecheck_results.log --verbose --cstylecheck_exclusions "/repo/tools/cstylecheck/cstylecheck_exclusions.yml" --copyright "/repo/tools/cstylecheck/copyright.c" 
+

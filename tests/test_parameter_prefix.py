@@ -225,10 +225,10 @@ class TestParameterPrefixSeverityAndDefaults(unittest.TestCase):
         self.assertEqual(vs[0].severity, "error")
 
     def test_yaml_default_is_disabled(self):
-        """Rule is off by default in tests/naming_convention.yaml."""
+        """Rule is off by default in tests/cstylecheck_rules.yaml."""
         import yaml, pathlib
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "naming_convention.yaml").read_text()
+            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml").read_text()
         )
         param_cfg = cfg["variables"]["parameter"]
         p_prefix = param_cfg.get("p_prefix", {})

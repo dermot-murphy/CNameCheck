@@ -43,13 +43,13 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 ## 4. Architectural Overview
 
-CStyleCheck is implemented as a **single Python module** (`cnamecheck.py`) with supporting data files. The module is structured into distinct functional components that map directly to the system-level subsystems defined in CNC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
+CStyleCheck is implemented as a **single Python module** (`cstylecheck.py`) with supporting data files. The module is structured into distinct functional components that map directly to the system-level subsystems defined in CNC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
 
 ```
-cnamecheck.py
+cstylecheck.py
 │
 ├── [COMP-01] CLI & Options Loader     (parse_args, _expand_options_file, discover_files)
-├── [COMP-02] Configuration Loader     (load_config, load_alias_file, load_exclusions_file,
+├── [COMP-02] Configuration Loader     (load_config, load_alias_file, load_cstylecheck_exclusions_file,
 │                                       load_defines_file, apply_defines)
 ├── [COMP-03] Dictionary Manager       (_load_dict_file, _data_file, _build_spell_dict,
 │                                       load_spell_words, load_banned_names_file)
@@ -90,9 +90,9 @@ cnamecheck.py
 
 | Attribute | Value |
 |---|---|
-| **Source functions** | `load_config()`, `load_alias_file()`, `load_exclusions_file()`, `_disabled_rules_for_file()`, `load_defines_file()`, `apply_defines()` |
+| **Source functions** | `load_config()`, `load_alias_file()`, `load_cstylecheck_exclusions_file()`, `_disabled_rules_for_file()`, `load_defines_file()`, `apply_defines()` |
 | **Responsibility** | Load and validate YAML config; build alias-prefix lists; resolve per-file disabled rules; apply defines substitutions to preprocessed source |
-| **Inputs** | YAML config file path; alias file path; exclusions file path; defines file path |
+| **Inputs** | YAML config file path; alias file path; cstylecheck_exclusions file path; defines file path |
 | **Outputs** | `cfg` dict; `alias_prefixes` list; `disabled_rules` frozenset; preprocessed source text |
 
 ### COMP-03 — Dictionary Manager
@@ -211,7 +211,7 @@ The `Checker` class is the central analysis component. It is instantiated once p
 
 | Interface ID | From | To | Data | Notes |
 |---|---|---|---|---|
-| SWA-IF-01 | COMP-01 | COMP-02 | Config file path, defines path, aliases path, exclusions path | Paths from `argparse.Namespace` |
+| SWA-IF-01 | COMP-01 | COMP-02 | Config file path, defines path, aliases path, cstylecheck_exclusions path | Paths from `argparse.Namespace` |
 | SWA-IF-02 | COMP-01 | `main()` | Resolved file list, all CLI flags | `argparse.Namespace` |
 | SWA-IF-03 | COMP-02 | COMP-05 | `cfg` dict, `alias_prefixes`, `disabled_rules` | Per-file constructor args |
 | SWA-IF-04 | COMP-02 | COMP-04 | Source text (for `apply_defines`) | After initial read |
@@ -238,7 +238,7 @@ main()
 │
 ├─ for each file in file_list:
 │   ├─ read file once → raw_source (cached in source_cache dict)
-│   ├─ COMP-02: load_exclusions, _disabled_rules_for_file → disabled_rules
+│   ├─ COMP-02: load_cstylecheck_exclusions, _disabled_rules_for_file → disabled_rules
 │   ├─ COMP-04: preprocess(raw_source) → clean; build_line_map; _build_brace_depths
 │   ├─ COMP-05: Checker(filepath, raw_source, cfg, ...).run_all() → CheckResult
 │   │   ├─ _check_defines()

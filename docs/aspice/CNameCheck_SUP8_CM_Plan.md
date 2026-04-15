@@ -86,7 +86,7 @@ The CM process for CStyleCheck shall ensure that:
 | Attribute | Value |
 |---|---|
 | **Registry** | GitHub Container Registry (GHCR) |
-| **Image Path** | `ghcr.io/<org>/cnamecheck` |
+| **Image Path** | `ghcr.io/<org>/cstylecheck` |
 | **Secondary Registry** | Docker Hub |
 | **Image Build** | Automated via `docker_publish.yml` on push to `main` or version tag |
 
@@ -109,13 +109,13 @@ All items in the following table are placed under configuration control.
 
 | CI ID | Item | Path in Repository | Type |
 |---|---|---|---|
-| CI-001 | Main linter source | `src/cnamecheck.py` | Source code |
+| CI-001 | Main linter source | `src/cstylecheck.py` | Source code |
 | CI-002 | Version file | `src/_version.py` | Generated / version |
-| CI-003 | Production naming convention config | `src/naming_convention.yaml` | Configuration |
-| CI-004 | CLI options defaults file | `src/cnamecheck.options` | Configuration |
-| CI-005 | Exclusions configuration | `src/exclusions.yml` | Configuration |
+| CI-003 | Production naming convention config | `src/cstylecheck_rules.yaml` | Configuration |
+| CI-004 | CLI options defaults file | `src/cstylecheck.options` | Configuration |
+| CI-005 | cstylecheck_exclusions configuration | `src/cstylecheck_exclusions.yml` | Configuration |
 | CI-006 | Project preprocessor defines | `src/project.defines` | Configuration |
-| CI-007 | Module alias map | `src/aliases.txt` | Configuration |
+| CI-007 | Module alias map | `src/cstylecheck_aliases.txt` | Configuration |
 | CI-008 | C keyword dictionary | `src/c_keywords.txt` | Data file |
 | CI-009 | C stdlib name dictionary | `src/c_stdlib_names.txt` | Data file |
 | CI-010 | Spell-check dictionary | `src/c_spell_dict.txt` | Data file |
@@ -126,13 +126,13 @@ All items in the following table are placed under configuration control.
 | CI-015 | pre-commit hook definition | `.pre-commit-hooks.yaml` | Integration |
 | CI-016 | GitHub Action definition | `action.yml` | Integration |
 | CI-017 | Test suite (all test files) | `tests/test_*.py` | Test |
-| CI-018 | Test naming convention config | `tests/naming_convention.yaml` | Test configuration |
+| CI-018 | Test naming convention config | `tests/cstylecheck_rules.yaml` | Test configuration |
 | CI-019 | Test harness | `tests/harness.py` | Test |
 | CI-020 | Test keyword dictionary | `tests/c_keywords.txt` | Test data |
 | CI-021 | Test stdlib dictionary | `tests/c_stdlib_names.txt` | Test data |
 | CI-022 | Test spell dictionary | `tests/c_spell_dict.txt` | Test data |
-| CI-023 | CI — test workflow | `.github/workflows/cnamecheck_tests.yml` | CI/CD |
-| CI-024 | CI — naming convention workflow | `.github/workflows/naming_convention.yml` | CI/CD |
+| CI-023 | CI — test workflow | `.github/workflows/cstylecheck_tests.yml` | CI/CD |
+| CI-024 | CI — naming convention workflow | `.github/workflows/cstylecheck_rules.yml` | CI/CD |
 | CI-025 | CI — Docker publish workflow | `.github/workflows/docker_publish.yml` | CI/CD |
 | CI-026 | Project README | `README.md` | Documentation |
 | CI-027 | This CM Plan | `CStyleCheck_SUP8_CM_Plan.md` | Documentation |
@@ -194,8 +194,8 @@ main ──► hotfix/* ──► main ──► tag v1.0.1
 
 ### 7.5 CI Enforcement
 
-- All merges to `develop` and `main` require CI (`cnamecheck_tests.yml`) to pass
-- The `naming_convention.yml` workflow runs the linter against the project's own source on every commit touching C files, enforcing self-hosting of the tool's own rules
+- All merges to `develop` and `main` require CI (`cstylecheck_tests.yml`) to pass
+- The `cstylecheck_rules.yml` workflow runs the linter against the project's own source on every commit touching C files, enforcing self-hosting of the tool's own rules
 - Supporting branches are deleted after merge
 
 > **📋 Note:** The `release/*` branch is the only branch where version-bump commits (`_version.py`, `pyproject.toml`) and release notes updates are permitted outside of `develop`. No new features may be introduced on a `release/*` branch.
@@ -243,7 +243,7 @@ Changes to controlled configuration items shall follow the change control proces
 5. The merged commit SHA is recorded in the GitHub Issue closure comment
 6. If the change affects a release, a `release/*` branch is created and a new version tag applied per §8.2
 
-> **⚠️ Important:** Changes to `src/naming_convention.yaml` (CI-003) or dictionary files (CI-008 to CI-010) require explicit review as they directly affect linter behaviour and may introduce breaking changes for downstream users.
+> **⚠️ Important:** Changes to `src/cstylecheck_rules.yaml` (CI-003) or dictionary files (CI-008 to CI-010) require explicit review as they directly affect linter behaviour and may introduce breaking changes for downstream users.
 
 ---
 

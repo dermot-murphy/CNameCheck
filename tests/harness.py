@@ -15,12 +15,12 @@ from pathlib import Path
 # Locate checker
 # ---------------------------------------------------------------------------
 # Checker lives in src/ which is a sibling of tests/
-# Layout:  repo-root/src/cnamecheck.py
+# Layout:  repo-root/src/cstylecheck.py
 #          repo-root/tests/harness.py
 _SRC_DIR = Path(__file__).resolve().parent.parent / "src"
 sys.path.insert(0, str(_SRC_DIR))
 
-import cnamecheck as _mod  # noqa: E402
+import cstylecheck as _mod  # noqa: E402
 
 Checker   = _mod.Checker
 Violation = _mod.Violation
