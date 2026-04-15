@@ -114,6 +114,21 @@ jobs:
           REPO_URL = (os.environ.get("GITHUB_SERVER_URL", "https://github.com")
                       + "/" + os.environ.get("GITHUB_REPOSITORY", ""))
 
+          RAW_BASE = ("https://raw.githubusercontent.com/"
+                      + os.environ.get("GITHUB_REPOSITORY", "") + "/main")
+
+          def rewrite_images(text):
+              """Rewrite relative image paths to absolute raw.githubusercontent.com URLs.
+              Wiki pages live in a separate repo with no logo/ directory, so relative
+              paths like ![Logo](logo/cstylecheck.jpg) silently break.
+              Absolute URLs (http/https) are left untouched."""
+              def _fix(m):
+                  alt, src = m.group(1), m.group(2)
+                  if src.startswith("http://") or src.startswith("https://"):
+                      return m.group(0)
+                  return f"![{alt}]({RAW_BASE}/{src})"
+              return re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', _fix, text)
+
           README_SLUG_MAP = {
               "Repository layout":                    "Repository-layout",
               "Quick start":                          "Quick-start",
@@ -197,7 +212,7 @@ jobs:
               + "---\n\n## Contents\n\n"
               + "\n".join(home_toc) + "\n"
           )
-          write("wiki/Home.md", home_md)
+          write("wiki/Home.md", rewrite_images(home_md))
 
           # One page per README section
           for idx, heading in enumerate(ordered):
@@ -208,7 +223,7 @@ jobs:
               next_label = ordered[idx + 1] if idx < len(ordered) - 1 else None
               next_s     = readme_slug(ordered[idx + 1]) if idx < len(ordered) - 1 else None
               write(f"wiki/{s}.md",
-                    body.rstrip() + nav_footer(prev_label, prev_s, next_label, next_s))
+                    rewrite_images(body.rstrip() + nav_footer(prev_label, prev_s, next_label, next_s)))
 
           print(f"Wrote {len(ordered)} README section pages.")
 
