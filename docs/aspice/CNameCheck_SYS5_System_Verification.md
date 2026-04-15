@@ -51,7 +51,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | **Commit SHA** | \<SHA to be filled at execution\> |
 | **Python Versions Tested** | 3.10, 3.11, 3.12 |
 | **OS** | Ubuntu 24.04 (`ubuntu-latest` GitHub Actions runner) |
-| **Docker Image** | `ghcr.io/<org>/cnamecheck:1.0.0` |
+| **Docker Image** | `ghcr.io/<org>/cstylecheck:1.0.0` |
 | **Docker Image Digest** | \<SHA-256 digest to be filled at execution\> |
 | **Test Execution Date** | \<YYYY-MM-DD\> |
 | **Tester** | \<Name\> |
@@ -95,9 +95,9 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `python cnamecheck.py file1.c file2.h file3.c` | 3 source files (all clean) | All 3 files scanned; exit 0 |
-| 2 | `python cnamecheck.py --include "src/**/*.c" --include "src/**/*.h"` | Directory with 5 `.c`, 3 `.h` | All 8 files scanned |
-| 3 | `python cnamecheck.py --include "src/**" --exclude "src/cots/"` | src/ with cots/ subdirectory (containing violations) | cots/ violations NOT reported |
+| 1 | `python cstylecheck.py file1.c file2.h file3.c` | 3 source files (all clean) | All 3 files scanned; exit 0 |
+| 2 | `python cstylecheck.py --include "src/**/*.c" --include "src/**/*.h"` | Directory with 5 `.c`, 3 `.h` | All 8 files scanned |
+| 3 | `python cstylecheck.py --include "src/**" --exclude "src/cots/"` | src/ with cots/ subdirectory (containing violations) | cots/ violations NOT reported |
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
@@ -256,15 +256,15 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Scenario | Invocation | Expected Exit Code | Result |
 |---|---|---|---|
-| Clean source | `cnamecheck clean.c` | 0 | |
-| Errors present | `cnamecheck violating.c` | 1 | |
-| Warnings only, default | `cnamecheck warning_only.c` | 0 | |
-| Warnings only, `--warnings-as-errors` | `cnamecheck --warnings-as-errors warning_only.c` | 1 | |
-| Invalid config | `cnamecheck --config missing.yaml` | 2 | |
-| `--version` | `cnamecheck --version` | 0 | |
-| `--help` | `cnamecheck --help` | 0 | |
-| `--exit-zero` + errors | `cnamecheck --exit-zero violating.c` | 0 | |
-| `--write-baseline` + errors | `cnamecheck --write-baseline b.json violating.c` | 0 | |
+| Clean source | `cstylecheck clean.c` | 0 | |
+| Errors present | `cstylecheck violating.c` | 1 | |
+| Warnings only, default | `cstylecheck warning_only.c` | 0 | |
+| Warnings only, `--warnings-as-errors` | `cstylecheck --warnings-as-errors warning_only.c` | 1 | |
+| Invalid config | `cstylecheck --config missing.yaml` | 2 | |
+| `--version` | `cstylecheck --version` | 0 | |
+| `--help` | `cstylecheck --help` | 0 | |
+| `--exit-zero` + errors | `cstylecheck --exit-zero violating.c` | 0 | |
+| `--write-baseline` + errors | `cstylecheck --write-baseline b.json violating.c` | 0 | |
 
 **Overall VTC-008 Result:** \<PASS / FAIL\>
 
@@ -281,9 +281,9 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Python Version | CI Job | Result | GitHub Actions Run URL |
 |---|---|---|---|
-| 3.10 | `cnamecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
-| 3.11 | `cnamecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
-| 3.12 | `cnamecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
+| 3.10 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
+| 3.11 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
+| 3.12 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
 
 ---
 
@@ -293,13 +293,13 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|
 | **Test Case ID** | SYS-VTC-010 |
 | **Requirement** | SYS-NF-004 |
-| **Objective** | Verify that `cnamecheck.py` has no runtime imports outside Python stdlib and PyYAML |
+| **Objective** | Verify that `cstylecheck.py` has no runtime imports outside Python stdlib and PyYAML |
 | **Verification Method** | Inspection |
 | **Pass Criteria** | Code review confirms no runtime third-party imports |
 
 | Check | Finding | Result |
 |---|---|---|
-| Inspect all `import` statements in `cnamecheck.py` | All imports are from Python stdlib or `yaml` (PyYAML) | \<PASS / FAIL\> |
+| Inspect all `import` statements in `cstylecheck.py` | All imports are from Python stdlib or `yaml` (PyYAML) | \<PASS / FAIL\> |
 | Inspect `requirements.txt` | Contains only `pyyaml>=6.0,<7.0` | \<PASS / FAIL\> |
 | Inspect `pyproject.toml` dependencies | `dependencies = ["pyyaml>=6.0,<7.0"]` only | \<PASS / FAIL\> |
 
@@ -312,14 +312,14 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | **Test Case ID** | SYS-VTC-011 |
 | **Requirement** | SYS-NF-005 |
 | **Objective** | Verify successful pip and pipx installation and correct entry point |
-| **Pass Criteria** | `cnamecheck` command available after install; version correct |
+| **Pass Criteria** | `cstylecheck` command available after install; version correct |
 
 | Step | Action | Expected Result | Result |
 |---|---|---|---|
 | 1 | `python -m venv venv && pip install .` in clean venv | Install completes; no errors | |
-| 2 | `venv/bin/cnamecheck --version` | Prints `CStyleCheck v1.0.0`; exit 0 | |
-| 3 | `pipx install .` (separate test) | Install completes; `cnamecheck` on PATH | |
-| 4 | `cnamecheck --version` via pipx | Correct version; exit 0 | |
+| 2 | `venv/bin/cstylecheck --version` | Prints `CStyleCheck v1.0.0`; exit 0 | |
+| 3 | `pipx install .` (separate test) | Install completes; `cstylecheck` on PATH | |
+| 4 | `cstylecheck --version` via pipx | Correct version; exit 0 | |
 
 ---
 
@@ -335,8 +335,8 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Check | Finding | Result |
 |---|---|---|
-| `docker manifest inspect ghcr.io/<org>/cnamecheck:1.0.0` | Contains `linux/amd64` digest | \<PASS / FAIL\> |
-| `docker manifest inspect ghcr.io/<org>/cnamecheck:1.0.0` | Contains `linux/arm64` digest | \<PASS / FAIL\> |
+| `docker manifest inspect ghcr.io/<org>/cstylecheck:1.0.0` | Contains `linux/amd64` digest | \<PASS / FAIL\> |
+| `docker manifest inspect ghcr.io/<org>/cstylecheck:1.0.0` | Contains `linux/arm64` digest | \<PASS / FAIL\> |
 | `docker_publish.yml` CI run result | Job `build-and-push` status = success | \<PASS / FAIL\> |
 | Image digest recorded | Digest in Actions log | \<Digest value\> |
 
@@ -348,13 +348,13 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|
 | **Test Case ID** | SYS-VTC-013 |
 | **Requirement** | SYS-F-011 (implicit quality gate) |
-| **Objective** | Verify that `cnamecheck.py` passes its own naming-convention rules, as enforced by the `naming_convention.yml` CI workflow |
+| **Objective** | Verify that `cstylecheck.py` passes its own naming-convention rules, as enforced by the `cstylecheck_rules.yml` CI workflow |
 | **Verification Method** | CI evidence review |
-| **Pass Criteria** | `naming_convention.yml` workflow reports zero errors on the v1.0.0 release commit |
+| **Pass Criteria** | `cstylecheck_rules.yml` workflow reports zero errors on the v1.0.0 release commit |
 
 | Check | Finding | Result |
 |---|---|---|
-| `naming_convention.yml` CI job on v1.0.0 tag | Status = success; zero error violations | \<PASS / FAIL\> |
+| `cstylecheck_rules.yml` CI job on v1.0.0 tag | Status = success; zero error violations | \<PASS / FAIL\> |
 | Workflow run URL | \<GitHub Actions URL\> | |
 
 ---
@@ -392,7 +392,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-F-005 | `--exclude` glob patterns | SYS-VTC-001 | \<Covered\> |
 | SYS-F-006 | `--defines` file | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-F-007 | `--aliases` file | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-F-008 | `--exclusions` file | SITC-009 | \<Covered\> |
+| SYS-F-008 | `--cstylecheck_exclusions` file | SITC-009 | \<Covered\> |
 | SYS-F-009 | Dictionary override flags | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | \<Covered\> |
 | SYS-F-011 to F-024 | All 48 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | \<Covered\> |
@@ -420,7 +420,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-NF-006 | Multi-platform Docker | SYS-VTC-012 | \<Covered\> |
 | SYS-NF-007 | YAML configuration | SYS-VTC-002 | \<Covered\> |
 | SYS-NF-008 | Options file precedence | SITC-003 | \<Covered\> |
-| SYS-NF-009 | Per-file exclusions | SITC-009 | \<Covered\> |
+| SYS-NF-009 | Per-file cstylecheck_exclusions | SITC-009 | \<Covered\> |
 | SYS-NF-010 | pre-commit integration | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-NF-011 | GitHub Action `action.yml` | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-NF-012 | GitHub Action step outputs | \<SYS-VTC-xxx\> | \<TBD\> |

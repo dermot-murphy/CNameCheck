@@ -95,7 +95,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Impact** | 3 (Moderate) — user trust erosion; adoption blocked |
 | **RPN** | 9 (Medium) |
 | **Treatment Option** | Mitigate |
-| **Treatment Activities** | Comprehensive test suite (500+ tests); `test_improvements.py` regression suite for each bug fixed; `naming_convention.yml` self-hosting verification; baseline suppression feature for legacy adoption |
+| **Treatment Activities** | Comprehensive test suite (500+ tests); `test_improvements.py` regression suite for each bug fixed; `cstylecheck_rules.yml` self-hosting verification; baseline suppression feature for legacy adoption |
 | **Residual Likelihood** | 2 |
 | **Residual Impact** | 2 |
 | **Residual RPN** | 4 (Low) |
@@ -116,7 +116,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Impact** | 3 (Moderate) — users on affected version blocked |
 | **RPN** | 6 (Medium) |
 | **Treatment Option** | Mitigate |
-| **Treatment Activities** | `cnamecheck_tests.yml` matrix tests all three versions on every commit; `pyproject.toml` specifies `requires-python = ">=3.10"` |
+| **Treatment Activities** | `cstylecheck_tests.yml` matrix tests all three versions on every commit; `pyproject.toml` specifies `requires-python = ">=3.10"` |
 | **Residual Likelihood** | 1 |
 | **Residual Impact** | 2 |
 | **Residual RPN** | 2 (Low) |
@@ -200,7 +200,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Impact** | 2 (Minor) — user confusion; support burden |
 | **RPN** | 6 (Medium) |
 | **Treatment Option** | Mitigate |
-| **Treatment Activities** | Each rule documented in README with rationale and Barr-C section reference; all rules configurable (enable/disable/severity); `exclusions.yml` allows per-file suppression |
+| **Treatment Activities** | Each rule documented in README with rationale and Barr-C section reference; all rules configurable (enable/disable/severity); `cstylecheck_exclusions.yml` allows per-file suppression |
 | **Residual Likelihood** | 2 |
 | **Residual Impact** | 1 |
 | **Residual RPN** | 2 (Low) |

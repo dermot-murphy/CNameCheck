@@ -85,12 +85,12 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | **Test Objective** | Verify that a conforming C source file produces zero violations and exit code 0 across the complete SS-01 → SS-06 pipeline |
 | **Architecture Interface** | IF-01, IF-02, IF-04, IF-06, IF-08, IF-09 |
 | **Requirement Reference** | SYS-F-001, SYS-F-027, SYS-F-037 |
-| **Pre-conditions** | `naming_convention.yaml` present; conforming `.c` and `.h` files available |
+| **Pre-conditions** | `cstylecheck_rules.yaml` present; conforming `.c` and `.h` files available |
 | **Test Method** | Dynamic execution via subprocess |
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cnamecheck.py --config naming_convention.yaml clean.c` | Conforming `clean.c` | stdout: no violation lines |
+| 1 | Invoke: `python cstylecheck.py --config cstylecheck_rules.yaml clean.c` | Conforming `clean.c` | stdout: no violation lines |
 | 2 | Check exit code | — | Exit code = 0 |
 | 3 | Repeat on Python 3.10, 3.11, 3.12 | — | All pass |
 
@@ -113,7 +113,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke with file containing `int BadName = 0;` in global scope | `--config naming_convention.yaml` | stdout contains line with format: `<file>:<line>:<col>: error [variable.global.case] ...` |
+| 1 | Invoke with file containing `int BadName = 0;` in global scope | `--config cstylecheck_rules.yaml` | stdout contains line with format: `<file>:<line>:<col>: error [variable.global.case] ...` |
 | 2 | Verify all four fields present | — | File path, line number, column, rule ID all present in output |
 | 3 | Check exit code | — | Exit code = 1 |
 
@@ -131,13 +131,13 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | **Test Objective** | Verify that options loaded from `--options-file` are correctly merged with direct CLI arguments, and that direct CLI args take precedence (IF-01) |
 | **Architecture Interface** | IF-01 |
 | **Requirement Reference** | SYS-F-003, SYS-NF-008 |
-| **Pre-conditions** | `cnamecheck.options` specifying a config file; direct `--config` override available |
+| **Pre-conditions** | `cstylecheck.options` specifying a config file; direct `--config` override available |
 | **Test Method** | Dynamic execution via subprocess |
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke with `--options-file cnamecheck.options` | Options file specifies `--config src/naming_convention.yaml` | Tool uses the config from options file; no error |
-| 2 | Invoke with `--options-file cnamecheck.options --config override.yaml` | Override config has different rules | Tool uses `override.yaml` not the options file config (CLI takes precedence) |
+| 1 | Invoke with `--options-file cstylecheck.options` | Options file specifies `--config src/cstylecheck_rules.yaml` | Tool uses the config from options file; no error |
+| 2 | Invoke with `--options-file cstylecheck.options --config override.yaml` | Override config has different rules | Tool uses `override.yaml` not the options file config (CLI takes precedence) |
 | 3 | Check exit codes | — | Both invocations: exit 0 or 1 (not 2) |
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
@@ -159,7 +159,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cnamecheck.py --output-format json --config naming_convention.yaml violating.c` | File with 3 errors, 2 warnings | stdout is valid JSON |
+| 1 | Invoke: `python cstylecheck.py --output-format json --config cstylecheck_rules.yaml violating.c` | File with 3 errors, 2 warnings | stdout is valid JSON |
 | 2 | Parse JSON and validate schema | JSON output | `summary.errors == 3`, `summary.warnings == 2`, `violations` array has 5 entries |
 | 3 | Verify each violation object | — | Each entry has: `file`, `line`, `col`, `severity`, `rule`, `message` keys |
 | 4 | Check exit code | — | Exit code = 1 (errors present) |
@@ -183,7 +183,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cnamecheck.py --output-format sarif --config naming_convention.yaml violating.c` | Violating source file | stdout is valid SARIF 2.1.0 JSON |
+| 1 | Invoke: `python cstylecheck.py --output-format sarif --config cstylecheck_rules.yaml violating.c` | Violating source file | stdout is valid SARIF 2.1.0 JSON |
 | 2 | Validate SARIF schema | SARIF output | `$schema` field present; `runs[0].results` array populated |
 | 3 | Verify location data | — | Each result includes `physicalLocation.artifactLocation.uri` and `region.startLine` |
 
@@ -229,10 +229,10 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cnamecheck.py --write-baseline baseline.json violating_v1.c` | File with 1 violation | baseline.json created; exit code = 0 |
+| 1 | Invoke: `python cstylecheck.py --write-baseline baseline.json violating_v1.c` | File with 1 violation | baseline.json created; exit code = 0 |
 | 2 | Inspect baseline.json | JSON file | Valid JSON; contains the 1 violation entry |
 | 3 | Add second violation to source → `violating_v2.c` | Source with 2 violations | — |
-| 4 | Invoke: `python cnamecheck.py --baseline-file baseline.json violating_v2.c` | Source v2 + baseline | Only the new (2nd) violation reported; original suppressed |
+| 4 | Invoke: `python cstylecheck.py --baseline-file baseline.json violating_v2.c` | Source v2 + baseline | Only the new (2nd) violation reported; original suppressed |
 | 5 | Check exit code | — | Exit code = 1 (new error present) |
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
@@ -264,21 +264,21 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 ---
 
-### SITC-009 — Exclusions File Integration (SS-02 → SS-05)
+### SITC-009 — cstylecheck_exclusions File Integration (SS-02 → SS-05)
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SITC-009 |
-| **Test Objective** | Verify that per-file rule suppressions defined in `exclusions.yml` are applied correctly by the rule engine |
+| **Test Objective** | Verify that per-file rule suppressions defined in `cstylecheck_exclusions.yml` are applied correctly by the rule engine |
 | **Architecture Interface** | IF-04, IF-08 |
 | **Requirement Reference** | SYS-F-008, SYS-NF-009 |
-| **Pre-conditions** | `exclusions.yml` suppressing a specific rule for a specific file; source file violating that rule |
+| **Pre-conditions** | `cstylecheck_exclusions.yml` suppressing a specific rule for a specific file; source file violating that rule |
 | **Test Method** | Dynamic execution |
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke with `--exclusions exclusions.yml` on file that violates an excluded rule | Both file and exclusions | Excluded violation NOT reported |
-| 2 | Invoke without `--exclusions` on same file | Same source only | Violation IS reported |
+| 1 | Invoke with `--cstylecheck_exclusions cstylecheck_exclusions.yml` on file that violates an excluded rule | Both file and cstylecheck_exclusions | Excluded violation NOT reported |
+| 2 | Invoke without `--cstylecheck_exclusions` on same file | Same source only | Violation IS reported |
 | 3 | Verify other rules still enforced | Same file with additional unexcluded violation | Unexcluded violation reported |
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
@@ -320,12 +320,12 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | **Test Objective** | Verify that the Docker image correctly mounts user source files and produces correct output |
 | **Architecture Interface** | All (via container boundary) |
 | **Requirement Reference** | SYS-NF-006 |
-| **Pre-conditions** | Docker runtime available; `cnamecheck` image built and available |
+| **Pre-conditions** | Docker runtime available; `cstylecheck` image built and available |
 | **Test Method** | Dynamic execution via `docker run` |
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `docker run --rm -v "$(pwd):/repo" cnamecheck:latest --config /app/naming_convention.yaml /repo/violating.c` | Violating source mounted at `/repo` | Violations reported to stdout |
+| 1 | `docker run --rm -v "$(pwd):/repo" cstylecheck:latest --config /app/cstylecheck_rules.yaml /repo/violating.c` | Violating source mounted at `/repo` | Violations reported to stdout |
 | 2 | Check exit code | — | Exit code = 1 |
 | 3 | Invoke with `--help` via Docker | — | Help text printed; exit code = 0 |
 | 4 | Verify image available for `linux/amd64` and `linux/arm64` | `docker manifest inspect` | Both platform digests present |
@@ -341,7 +341,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | Field | Value |
 |---|---|
 | **Test Case ID** | SITC-012 |
-| **Test Objective** | Verify that `pip install .` produces a working `cnamecheck` command with correct version |
+| **Test Objective** | Verify that `pip install .` produces a working `cstylecheck` command with correct version |
 | **Architecture Interface** | Entry point → SS-01 |
 | **Requirement Reference** | SYS-NF-005 |
 | **Pre-conditions** | Clean Python virtualenv |
@@ -350,8 +350,8 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
 | 1 | `pip install .` in clean venv | Repository root | Installation succeeds; no errors |
-| 2 | `cnamecheck --version` | — | Version string matches `_version.py`; exit code = 0 |
-| 3 | `cnamecheck --config src/naming_convention.yaml clean.c` | Conforming source | Exit code = 0; no violations |
+| 2 | `cstylecheck --version` | — | Version string matches `_version.py`; exit code = 0 |
+| 3 | `cstylecheck --config src/cstylecheck_rules.yaml clean.c` | Conforming source | Exit code = 0; no violations |
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
@@ -372,7 +372,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cnamecheck.py --github-actions --config naming_convention.yaml violating.c` | Mixed error/warning source | stdout contains `::error file=...,line=...,col=...::` for errors |
+| 1 | Invoke: `python cstylecheck.py --github-actions --config cstylecheck_rules.yaml violating.c` | Mixed error/warning source | stdout contains `::error file=...,line=...,col=...::` for errors |
 | 2 | Verify warning format | — | stdout contains `::warning file=...,line=...,col=...::` for warnings |
 | 3 | Invoke without `--github-actions` | Same source | No `::error` / `::warning` prefixes in output |
 
@@ -416,7 +416,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-006 | Log file output | \<PASS / FAIL / N/A\> | |
 | SITC-007 | Baseline suppression round-trip | \<PASS / FAIL / N/A\> | |
 | SITC-008 | Cross-file sign compatibility | \<PASS / FAIL / N/A\> | |
-| SITC-009 | Exclusions file integration | \<PASS / FAIL / N/A\> | |
+| SITC-009 | cstylecheck_exclusions file integration | \<PASS / FAIL / N/A\> | |
 | SITC-010 | Exit code matrix | \<PASS / FAIL / N/A\> | |
 | SITC-011 | Docker container integration | \<PASS / FAIL / N/A\> | |
 | SITC-012 | pip install integration | \<PASS / FAIL / N/A\> | |

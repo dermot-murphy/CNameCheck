@@ -10,7 +10,7 @@
 #
 # Publishes to:
 #   - GitHub Container Registry  ghcr.io/<owner>/<repo>
-#   - Docker Hub cnamecheck
+#   - Docker Hub cstylecheck
 #
 # Required secrets (Settings → Secrets and variables → Actions):
 #   DOCKERHUB_USERNAME   Your Docker Hub username
@@ -30,8 +30,8 @@ on:
       - master
     paths:
       - "Dockerfile/**"
-      - "src/cnamecheck.py"
-      - "src/naming_convention.yaml"
+      - "src/cstylecheck.py"
+      - "src/cstylecheck_rules.yaml"
       - "src/_version.py"
       - ".github/workflows/docker_publish.yml"
     tags:
@@ -44,7 +44,7 @@ on:
         default: "true"
 
 env:
-  IMAGE_NAME: cnamecheck
+  IMAGE_NAME: cstylecheck
 
 jobs:
   build-and-push:

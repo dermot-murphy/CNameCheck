@@ -11,7 +11,7 @@ FN_CFG = cfg_only(
     functions={"enabled": True, "severity": "error",
                "style": "object_verb", "max_length": 40,
                "allowed_abbreviations": ["FIFO", "CRC", "IRQ"],
-               "object_exclusions": ["Init", "Deinit"],
+               "object_cstylecheck_exclusions": ["Init", "Deinit"],
                "isr_suffix": {"enabled": True, "severity": "warning",
                                "suffix": "_IRQHandler"}},
 )

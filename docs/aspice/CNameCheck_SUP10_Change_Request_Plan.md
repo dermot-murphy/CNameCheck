@@ -49,7 +49,7 @@ A **change request (CR)** covers any planned modification to a baselined work pr
 | **Enhancement** | `enhancement` | New rule, new output format, new CLI flag, new integration |
 | **Improvement** | `improvement` | Optimisation, UX improvement, performance improvement |
 | **Documentation** | `documentation` | Update to ASPICE documents, README, or in-code documentation |
-| **Configuration** | `config-change` | Update to `naming_convention.yaml`, `exclusions.yml`, or dictionary files |
+| **Configuration** | `config-change` | Update to `cstylecheck_rules.yaml`, `cstylecheck_exclusions.yml`, or dictionary files |
 | **Process** | `process-change` | Update to CI workflows, Git Flow procedure, or QA activities |
 
 ### 4.2 Impact Levels
@@ -111,7 +111,7 @@ Accepted changes are implemented following the Git Flow process defined in CNC-S
 Commit messages must reference the Issue: `Implements #<issue-id>: <description>`
 
 All implementing PRs must:
-- Pass CI (`cnamecheck_tests.yml`, `naming_convention.yml`)
+- Pass CI (`cstylecheck_tests.yml`, `cstylecheck_rules.yml`)
 - Include or update affected ASPICE documents in the same branch or a linked follow-up Issue
 - Update traceability tables if requirements are added or modified
 
@@ -139,7 +139,7 @@ When a CR is approved, the following CIs may require update:
 
 | CR Type | Likely Affected CIs |
 |---|---|
-| New rule | CI-001 (`cnamecheck.py`), CI-003 (`naming_convention.yaml`), CI-017 (test suite), CI-026 (README) |
+| New rule | CI-001 (`cstylecheck.py`), CI-003 (`cstylecheck_rules.yaml`), CI-017 (test suite), CI-026 (README) |
 | New CLI flag | CI-001, CI-013 (`pyproject.toml`), CI-016 (`action.yml`), CI-026 (README) |
 | New output format | CI-001, CI-016 (`action.yml`), CI-026 (README) |
 | Config file change | CI-003 or CI-005 to CI-010 |

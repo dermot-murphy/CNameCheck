@@ -56,7 +56,7 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 
 ### 4.1 In Scope
 
-- Design, implementation, and testing of `cnamecheck.py` (≈2,800 lines) implementing 48 rule IDs
+- Design, implementation, and testing of `cstylecheck.py` (≈2,800 lines) implementing 48 rule IDs
 - Test suite (≥500 pytest tests across 20+ test modules)
 - Docker image build and multi-platform publication to GHCR and Docker Hub
 - GitHub Action integration (`action.yml`)
@@ -102,7 +102,7 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | PH-01 | Requirements | SYS.2, SWE.1 | Project initiated | Requirements reviewed and approved |
 | PH-02 | Architecture | SYS.3, SWE.2 | Requirements approved | Architecture reviewed and approved |
 | PH-03 | Detailed Design | SWE.3 | Architecture approved | Design reviewed and approved |
-| PH-04 | Implementation | `cnamecheck.py` v1.0.0, test suite | Design approved | All unit tests pass (SWE.4) |
+| PH-04 | Implementation | `cstylecheck.py` v1.0.0, test suite | Design approved | All unit tests pass (SWE.4) |
 | PH-05 | Integration & Verification | SWE.5, SWE.6, SYS.4, SYS.5 | Unit tests pass | All qualification tests pass |
 | PH-06 | Release | v1.0.0 tag, GHCR image, GitHub Release | All tests pass; docs approved | Release baseline created (SPL.2) |
 | PH-07 | Documentation | Full ASPICE CL2 doc set | Release complete | All documents approved |
@@ -181,8 +181,8 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | Activity | Method | Frequency |
 |---|---|---|
 | Build and test status | GitHub Actions CI badge on README | Continuous (per commit) |
-| Test pass rate | `cnamecheck_tests.yml` — pytest result matrix | Per commit to `develop`/`main` |
-| Naming convention compliance | `naming_convention.yml` CI job | Per commit touching `src/` |
+| Test pass rate | `cstylecheck_tests.yml` — pytest result matrix | Per commit to `develop`/`main` |
+| Naming convention compliance | `cstylecheck_rules.yml` CI job | Per commit touching `src/` |
 | Code coverage | `pytest-cov` — `coverage.xml` artefact | Per CI run on Python 3.11 |
 | Open Issues (bugs/changes) | GitHub Issues board | Reviewed weekly |
 | WBS progress | Manual update to this document | Per milestone |

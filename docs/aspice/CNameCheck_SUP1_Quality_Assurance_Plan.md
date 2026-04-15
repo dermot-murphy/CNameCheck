@@ -46,8 +46,8 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 
 | QO-ID | Objective | Target | Measurement |
 |---|---|---|---|
-| QO-001 | All unit tests pass on all supported Python versions | 100% PASS on 3.10, 3.11, 3.12 | `cnamecheck_tests.yml` CI result |
-| QO-002 | Source code naming conventions self-compliant | Zero error-level violations on `cnamecheck.py` | `naming_convention.yml` CI result |
+| QO-001 | All unit tests pass on all supported Python versions | 100% PASS on 3.10, 3.11, 3.12 | `cstylecheck_tests.yml` CI result |
+| QO-002 | Source code naming conventions self-compliant | Zero error-level violations on `cstylecheck.py` | `cstylecheck_rules.yml` CI result |
 | QO-003 | Statement code coverage | ≥ 90% | `pytest-cov` coverage report |
 | QO-004 | Branch code coverage | ≥ 85% | `pytest-cov` coverage report |
 | QO-005 | All ASPICE CL2 work products documented and reviewed | 100% of required WPs approved | Document review records |
@@ -72,9 +72,9 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 
 | WP-ID | Work Product | Quality Criteria | Verification Method |
 |---|---|---|---|
-| WP-01 | `cnamecheck.py` | Zero naming violations; all tests pass; coverage ≥ targets | CI (automated) |
+| WP-01 | `cstylecheck.py` | Zero naming violations; all tests pass; coverage ≥ targets | CI (automated) |
 | WP-02 | Test suite | All tests pass; each test has clear assertion; test IDs traceable to requirements | Peer review; CI |
-| WP-03 | `naming_convention.yaml` | Valid YAML; loads without error; each rule documented in README | CI parse check; inspection |
+| WP-03 | `cstylecheck_rules.yaml` | Valid YAML; loads without error; each rule documented in README | CI parse check; inspection |
 | WP-04 | `Dockerfile` | Builds successfully; image runs `--help`; both platforms available | CI `docker_publish.yml` |
 | WP-05 | ASPICE documentation | All required sections present; traceability tables complete; no placeholder IDs in approved docs | Document review |
 | WP-06 | `pyproject.toml` | Version matches `_version.py`; all required fields present | Inspection pre-release |
@@ -86,8 +86,8 @@ The following CI checks act as automated quality gates. Merging to `develop` or 
 
 | Gate ID | CI Workflow | Check | Branch |
 |---|---|---|---|
-| GATE-01 | `cnamecheck_tests.yml` | All pytest tests pass (Python 3.10, 3.11, 3.12) | `develop`, `main` |
-| GATE-02 | `naming_convention.yml` | `cnamecheck.py` passes its own naming rules (zero errors) | All branches touching `src/` |
+| GATE-01 | `cstylecheck_tests.yml` | All pytest tests pass (Python 3.10, 3.11, 3.12) | `develop`, `main` |
+| GATE-02 | `cstylecheck_rules.yml` | `cstylecheck.py` passes its own naming rules (zero errors) | All branches touching `src/` |
 | GATE-03 | `docker_publish.yml` | Docker image builds successfully | `main`, `v*.*.*` tags |
 
 ### 5.4 Pre-Release Quality Review Checklist

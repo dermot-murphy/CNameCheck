@@ -69,7 +69,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 |---|---|---|---|---|
 | Security advisory monitoring | Check PyPI security advisories and GitHub advisory database for `pyyaml` | Monthly | Claude | Advisory review note in GitHub Issue (if action needed) |
 | Version range review | Assess whether `pyyaml>=6.0,<7.0` remains appropriate; evaluate new major versions | Per PyYAML major release | Claude | `pyproject.toml` version constraint update CR if required |
-| Availability check | Verify `pip install` succeeds in CI | Per CI run | GitHub Actions | `cnamecheck_tests.yml` — install step |
+| Availability check | Verify `pip install` succeeds in CI | Per CI run | GitHub Actions | `cstylecheck_tests.yml` — install step |
 
 **Acceptance criteria for PyYAML:**
 - `pip install pyyaml>=6.0,<7.0` succeeds without error in all CI environments
@@ -80,7 +80,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Activity | Method | Frequency | Owner | Evidence |
 |---|---|---|---|---|
-| CI workflow availability | Monitor `cnamecheck_tests.yml`, `naming_convention.yml`, `docker_publish.yml` job completion | Per commit | GitHub Actions status | CI badge on README; Actions run log |
+| CI workflow availability | Monitor `cstylecheck_tests.yml`, `cstylecheck_rules.yml`, `docker_publish.yml` job completion | Per commit | GitHub Actions status | CI badge on README; Actions run log |
 | GHCR availability | Verify Docker images pullable after each push | Per `docker_publish.yml` run | GitHub Actions | `docker manifest inspect` in publish job |
 | Actions runner version changes | Monitor GitHub changelog for breaking changes to `ubuntu-latest` runner | Monthly | Claude | GitHub blog / changelog review |
 | API deprecation notices | Monitor GitHub Actions deprecation notices (e.g., deprecated action versions) | Monthly | Claude | GitHub announcement emails |
@@ -103,7 +103,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 **Acceptance criteria for Docker Hub:**
 - Image push succeeds without error in `docker_publish.yml`
-- Published image responds correctly to `docker run cnamecheck:latest --help`
+- Published image responds correctly to `docker run cstylecheck:latest --help`
 
 ### 5.4 Python Software Foundation (SUP-04)
 
@@ -111,7 +111,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 |---|---|---|---|---|
 | Version support monitoring | Track CPython release schedule for EOL of 3.10, 3.11, 3.12 | Annually | Claude | Python EOL schedule (`devguide.python.org`) |
 | New minor version evaluation | Evaluate adding new Python minor version to CI matrix | Per new Python minor release | Claude | CR raised if new version added to matrix |
-| Compatibility testing | `cnamecheck_tests.yml` matrix tests all supported versions | Per commit | GitHub Actions | CI matrix result |
+| Compatibility testing | `cstylecheck_tests.yml` matrix tests all supported versions | Per commit | GitHub Actions | CI matrix result |
 
 **Current Python version policy:** Support the three most recent minor releases. When Python 3.13 is added, Python 3.10 is dropped (raise CR).
 
@@ -137,8 +137,8 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Interface | From | To | Data Exchanged | Protocol |
 |---|---|---|---|---|
-| ACQ-IF-01 | `cnamecheck.py` | PyYAML (SUP-01) | YAML config file content | Python `import yaml; yaml.safe_load()` |
-| ACQ-IF-02 | `cnamecheck_tests.yml` | GitHub Actions (SUP-02) | Source code; test results; coverage report | GitHub Actions event-driven |
+| ACQ-IF-01 | `cstylecheck.py` | PyYAML (SUP-01) | YAML config file content | Python `import yaml; yaml.safe_load()` |
+| ACQ-IF-02 | `cstylecheck_tests.yml` | GitHub Actions (SUP-02) | Source code; test results; coverage report | GitHub Actions event-driven |
 | ACQ-IF-03 | `docker_publish.yml` | GHCR (SUP-02) | Docker image layers | Docker push; OCI registry API |
 | ACQ-IF-04 | `docker_publish.yml` | Docker Hub (SUP-03) | Docker image layers | Docker push; Docker Registry API |
 | ACQ-IF-05 | Dockerfile | `python:3.12-slim` (SUP-05) | Base OS + Python runtime | Docker `FROM` directive |

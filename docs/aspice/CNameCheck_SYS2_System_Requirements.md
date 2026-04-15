@@ -95,7 +95,7 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-F-005 | The system shall accept glob patterns for source exclusion via `--exclude` (repeatable) | Mandatory | Test | STK-002 |
 | SYS-F-006 | The system shall accept a project defines file via `--defines` for keyword/type alias substitution | Mandatory | Test | STK-002 |
 | SYS-F-007 | The system shall accept a module alias map via `--aliases` | Mandatory | Test | STK-002 |
-| SYS-F-008 | The system shall accept a per-file rule suppression file via `--exclusions` | Mandatory | Test | STK-002 |
+| SYS-F-008 | The system shall accept a per-file rule suppression file via `--cstylecheck_exclusions` | Mandatory | Test | STK-002 |
 | SYS-F-009 | The system shall accept replacement dictionary files for C keywords (`--keywords-file`), stdlib names (`--stdlib-file`), and spell-check words (`--spell-dict`) | Mandatory | Test | STK-002 |
 | SYS-F-010 | The system shall read each source file exactly once per invocation | Mandatory | Test | STK-001 |
 
@@ -171,7 +171,7 @@ The following table summarises the stakeholder needs from which the system requi
 |---|---|---|---|---|
 | SYS-NF-007 | All rules shall be configurable via a single YAML file without modifying source code | Mandatory | Inspection | STK-002 |
 | SYS-NF-008 | The system shall apply CLI arguments specified in `--options-file` before direct CLI arguments, allowing direct arguments to override | Mandatory | Test | STK-002 |
-| SYS-NF-009 | The system shall support per-file rule suppression via a YAML exclusions file | Mandatory | Test | STK-002 |
+| SYS-NF-009 | The system shall support per-file rule suppression via a YAML cstylecheck_exclusions file | Mandatory | Test | STK-002 |
 
 ### 5.9 Non-Functional Requirements — Integration
 

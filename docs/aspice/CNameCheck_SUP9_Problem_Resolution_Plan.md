@@ -72,7 +72,7 @@ A **problem** is any unintended behaviour, defect, failure, or non-conformance d
 
 Problems may be identified by:
 
-- Automated CI failures (`cnamecheck_tests.yml`, `naming_convention.yml`, `docker_publish.yml`)
+- Automated CI failures (`cstylecheck_tests.yml`, `cstylecheck_rules.yml`, `docker_publish.yml`)
 - Manual testing during development or qualification
 - User reports via GitHub Issues
 - ASPICE assessment findings
@@ -91,7 +91,7 @@ Minimum required fields when raising an Issue:
 | **Steps to reproduce** | Minimal source file or command that triggers the problem |
 | **Expected behaviour** | What the correct behaviour should be |
 | **Actual behaviour** | What actually happened |
-| **Affected work products** | Which CIs (e.g., CI-001 `cnamecheck.py`) are affected |
+| **Affected work products** | Which CIs (e.g., CI-001 `cstylecheck.py`) are affected |
 
 ### 5.2 Triage and Investigation
 
@@ -116,7 +116,7 @@ Fix commit messages must reference the Issue: `Fixes #<issue-id>: <description>`
 
 ### 5.4 Verification of Fix
 
-1. CI must pass (`cnamecheck_tests.yml`) on the fix branch
+1. CI must pass (`cstylecheck_tests.yml`) on the fix branch
 2. A regression test must be added to `tests/test_improvements.py` (or appropriate test module) to prevent recurrence — this is mandatory for SEV-1 and SEV-2
 3. The regression test must explicitly reference the Issue ID in a comment: `# Regression test for GitHub Issue #<id>`
 4. Pull request is reviewed; at least one approval required before merge

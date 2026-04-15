@@ -1,14 +1,14 @@
-"""test_exclusions.py — tests for the per-file and per-identifier exclusion system.
+"""test_cstylecheck_exclusions.py — tests for the per-file and per-identifier exclusion system.
 
-Exclusions are configured via a YAML file passed with --exclusions FILE.
+cstylecheck_exclusions are configured via a YAML file passed with --cstylecheck_exclusions FILE.
 
-Per-file exclusions (existing):
+Per-file cstylecheck_exclusions (existing):
   "filename.c":
     disabled_rules:
       - function.prefix
       - misc.magic_number
 
-Per-identifier exclusions (new):
+Per-identifier cstylecheck_exclusions (new):
   "filename.c":
     identifiers:
       LegacyFunction:
@@ -36,8 +36,8 @@ from harness import cfg_only, run, has
 
 _HERE    = Path(__file__).resolve().parent
 _SRC     = _HERE.parent / "src"
-CHECKER  = str(_SRC / "cnamecheck.py")
-YAML     = str(_HERE / "naming_convention.yaml")
+CHECKER  = str(_SRC / "cstylecheck.py")
+YAML     = str(_HERE / "cstylecheck_rules.yaml")
 
 
 # ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ def _run_with_excl(td, excl_yaml, c_src, filename="mod.c"):
     excl_file = _write(td, "excl.yml", excl_yaml)
     r = subprocess.run(
         [sys.executable, CHECKER, "--config", YAML,
-         "--exclusions", excl_file, src_file],
+         "--cstylecheck_exclusions", excl_file, src_file],
         capture_output=True, text=True,
     )
     return r.stdout + r.stderr
@@ -77,17 +77,17 @@ def _violations_in(output, rule=None, identifier=None):
 
 
 # ---------------------------------------------------------------------------
-# load_exclusions_file unit tests
+# load_cstylecheck_exclusions_file unit tests
 # ---------------------------------------------------------------------------
 
-class TestLoadExclusionsFile(unittest.TestCase):
+class TestLoadcstylecheck_exclusionsFile(unittest.TestCase):
 
     def _load(self, yaml_text):
-        import cnamecheck as m
+        import cstylecheck as m
         with tempfile.TemporaryDirectory() as td:
             f = Path(td) / "excl.yml"
             f.write_text(yaml_text)
-            return m.load_exclusions_file(str(f))
+            return m.load_cstylecheck_exclusions_file(str(f))
 
     def test_file_level_rules_parsed(self):
         data = self._load('"mod.c":\n  disabled_rules:\n    - function.prefix\n')
@@ -160,14 +160,14 @@ class TestLoadExclusionsFile(unittest.TestCase):
 class TestDisabledRulesForFile(unittest.TestCase):
 
     def _build_excl(self, yaml_text):
-        import cnamecheck as m
+        import cstylecheck as m
         with tempfile.TemporaryDirectory() as td:
             f = Path(td) / "excl.yml"
             f.write_text(yaml_text)
-            return m.load_exclusions_file(str(f))
+            return m.load_cstylecheck_exclusions_file(str(f))
 
     def _get(self, filepath, yaml_text):
-        import cnamecheck as m
+        import cstylecheck as m
         excl = self._build_excl(yaml_text)
         return m._disabled_rules_for_file(filepath, excl)
 
@@ -228,7 +228,7 @@ class TestDisabledRulesForFile(unittest.TestCase):
 # Per-file exclusion end-to-end (existing behaviour, regression tests)
 # ---------------------------------------------------------------------------
 
-class TestPerFileExclusionsEndToEnd(unittest.TestCase):
+class TestPerFilecstylecheck_exclusionsEndToEnd(unittest.TestCase):
 
     def test_file_level_rule_suppressed(self):
         excl = '"mod.c":\n  disabled_rules:\n    - variable.global.prefix\n'
@@ -268,7 +268,7 @@ class TestPerFileExclusionsEndToEnd(unittest.TestCase):
 # Per-identifier exclusion end-to-end (new feature)
 # ---------------------------------------------------------------------------
 
-class TestPerIdentifierExclusionsEndToEnd(unittest.TestCase):
+class TestPerIdentifiercstylecheck_exclusionsEndToEnd(unittest.TestCase):
 
     def test_identifier_rule_suppressed(self):
         """A specific variable's rule is suppressed by identifier exclusion."""
@@ -344,7 +344,7 @@ class TestPerIdentifierExclusionsEndToEnd(unittest.TestCase):
                                                   identifier="g_legacy"))
         self.assertFalse(g_prefix_flagged, "g_prefix should be suppressed")
 
-    def test_file_and_identifier_exclusions_combined(self):
+    def test_file_and_identifier_cstylecheck_exclusions_combined(self):
         """File-level suppresses all; identifier-level suppresses specific."""
         excl = (
             '"mod.c":\n'
@@ -365,7 +365,7 @@ class TestPerIdentifierExclusionsEndToEnd(unittest.TestCase):
         self.assertFalse(bool(_violations_in(out, rule="misc.magic_number")))
 
     def test_identifier_exclusion_in_nonmatching_file_ignored(self):
-        """Identifier exclusions only apply to files matching the pattern."""
+        """Identifier cstylecheck_exclusions only apply to files matching the pattern."""
         excl = (
             '"other.c":\n'
             '  identifiers:\n'
@@ -379,7 +379,7 @@ class TestPerIdentifierExclusionsEndToEnd(unittest.TestCase):
         self.assertTrue(bool(_violations_in(out, identifier="g_legacy")))
 
     def test_identifier_exclusion_with_glob_pattern(self):
-        """Identifier exclusions work when the file key is a glob pattern."""
+        """Identifier cstylecheck_exclusions work when the file key is a glob pattern."""
         excl = (
             '"mod.*":\n'
             '  identifiers:\n'
@@ -395,20 +395,20 @@ class TestPerIdentifierExclusionsEndToEnd(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Exclusions YAML format correctness
+# cstylecheck_exclusions YAML format correctness
 # ---------------------------------------------------------------------------
 
-class TestExclusionsYamlFormat(unittest.TestCase):
+class Testcstylecheck_exclusionsYamlFormat(unittest.TestCase):
 
-    def test_empty_exclusions_file_runs_cleanly(self):
-        """An empty exclusions file causes no crash."""
+    def test_empty_cstylecheck_exclusions_file_runs_cleanly(self):
+        """An empty cstylecheck_exclusions file causes no crash."""
         excl = "{}\n"
         src  = "void mod_DoWork(void){}\n"
         with tempfile.TemporaryDirectory() as td:
             out = _run_with_excl(td, excl, src)
         self.assertNotIn("Error", out[:50])
 
-    def test_exclusions_file_with_only_comments(self):
+    def test_cstylecheck_exclusions_file_with_only_comments(self):
         excl = "# This file is intentionally empty\n"
         src  = "void mod_DoWork(void){}\n"
         with tempfile.TemporaryDirectory() as td:

@@ -59,7 +59,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | SW Requirements coverage | 100% | All SWE1-001 to SWE1-070 traced to ≥ 1 SWQ test |
 | Statement coverage | ≥ 90% | Coverage report at execution |
 | Branch coverage | ≥ 85% | Coverage report at execution |
-| Static verification | PASS | `naming_convention.yml` CI job on v1.0.0 commit |
+| Static verification | PASS | `cstylecheck_rules.yml` CI job on v1.0.0 commit |
 | Open bug Issues targeting v1.0.0 | 0 | No unresolved bug-labelled Issues |
 
 ---
@@ -78,12 +78,12 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Run with valid `naming_convention.yaml` | Valid YAML | Tool runs; exit 0 or 1 (not 2) |
+| 1 | Run with valid `cstylecheck_rules.yaml` | Valid YAML | Tool runs; exit 0 or 1 (not 2) |
 | 2 | Run with malformed YAML | `bad: [unclosed` | Exit 2; error message to stderr |
 | 3 | Run with missing YAML | `--config nonexistent.yaml` | Exit 2; error message to stderr |
 | 4 | Run with `--defines project.defines` | Valid defines file | Tool runs; defines applied (verify via known substitution) |
-| 5 | Run with `--aliases aliases.txt` | Valid aliases file | Tool runs; alias prefixes accepted |
-| 6 | Run with `--exclusions exclusions.yml` | Valid exclusions | Tool runs; excluded rules suppressed for specified files |
+| 5 | Run with `--aliases cstylecheck_aliases.txt` | Valid aliases file | Tool runs; alias prefixes accepted |
+| 6 | Run with `--cstylecheck_exclusions cstylecheck_exclusions.yml` | Valid cstylecheck_exclusions | Tool runs; excluded rules suppressed for specified files |
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
@@ -101,7 +101,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Positional source files | `cnamecheck.py file1.c file2.h` | Both files scanned |
+| 1 | Positional source files | `cstylecheck.py file1.c file2.h` | Both files scanned |
 | 2 | `--include` glob | `--include "src/**/*.c"` | All matching `.c` files scanned |
 | 3 | `--exclude` pattern | `--exclude "src/cots/"` | Files in cots/ not scanned |
 | 4 | `--options-file` with `--config` | Options file sets config; direct arg overrides | Direct arg config used |
@@ -245,16 +245,16 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Scenario | Invocation | Expected Exit Code | Result |
 |---|---|---|---|
-| Clean source | `cnamecheck clean.c` | 0 | |
-| Error violations | `cnamecheck violating.c` | 1 | |
-| Warnings only, default | `cnamecheck warning_only.c` | 0 | |
-| Warnings + `--warnings-as-errors` | `cnamecheck --warnings-as-errors warning_only.c` | 1 | |
-| Invalid config path | `cnamecheck --config missing.yaml` | 2 | |
-| Invalid YAML syntax | `cnamecheck --config bad.yaml` | 2 | |
-| `--version` | `cnamecheck --version` | 0 | |
-| `--help` | `cnamecheck --help` | 0 | |
-| `--exit-zero` + errors | `cnamecheck --exit-zero violating.c` | 0 | |
-| `--write-baseline` + errors | `cnamecheck --write-baseline b.json violating.c` | 0 | |
+| Clean source | `cstylecheck clean.c` | 0 | |
+| Error violations | `cstylecheck violating.c` | 1 | |
+| Warnings only, default | `cstylecheck warning_only.c` | 0 | |
+| Warnings + `--warnings-as-errors` | `cstylecheck --warnings-as-errors warning_only.c` | 1 | |
+| Invalid config path | `cstylecheck --config missing.yaml` | 2 | |
+| Invalid YAML syntax | `cstylecheck --config bad.yaml` | 2 | |
+| `--version` | `cstylecheck --version` | 0 | |
+| `--help` | `cstylecheck --help` | 0 | |
+| `--exit-zero` + errors | `cstylecheck --exit-zero violating.c` | 0 | |
+| `--write-baseline` + errors | `cstylecheck --write-baseline b.json violating.c` | 0 | |
 
 **SWQ-008 Overall Result:** \<PASS / FAIL\>
 
@@ -303,14 +303,14 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | Field | Value |
 |---|---|
 | **Test Case ID** | SWQ-011 |
-| **Objective** | Verify the delivered `cnamecheck.py` passes its own naming rules |
+| **Objective** | Verify the delivered `cstylecheck.py` passes its own naming rules |
 | **SW-REQ** | SWE1-017 to SWE1-056 (self-hosting quality gate) |
-| **Verification Method** | CI evidence — `naming_convention.yml` job on v1.0.0 tag |
+| **Verification Method** | CI evidence — `cstylecheck_rules.yml` job on v1.0.0 tag |
 
 | Check | Evidence | Result |
 |---|---|---|
-| `naming_convention.yml` CI job result | GitHub Actions job PASS on v1.0.0 commit | \<PASS / FAIL\> |
-| Zero error-level violations on `cnamecheck.py` | Workflow output — errors count = 0 | \<PASS / FAIL\> |
+| `cstylecheck_rules.yml` CI job result | GitHub Actions job PASS on v1.0.0 commit | \<PASS / FAIL\> |
+| Zero error-level violations on `cstylecheck.py` | Workflow output — errors count = 0 | \<PASS / FAIL\> |
 | CI Run URL | \<GitHub Actions run URL\> | |
 
 ---
@@ -322,13 +322,13 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | **Test Case ID** | SWQ-012 |
 | **Objective** | Verify SWE1-007 (implicitly) — full test suite passes on Python 3.10, 3.11, 3.12 |
 | **SW-REQ** | SWE1-069 (portability via `pyproject.toml`) |
-| **Verification Method** | CI matrix evidence — `cnamecheck_tests.yml` |
+| **Verification Method** | CI matrix evidence — `cstylecheck_tests.yml` |
 
 | Python Version | CI Job | Result | GitHub Actions Run URL |
 |---|---|---|---|
-| 3.10 | `cnamecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
-| 3.11 | `cnamecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
-| 3.12 | `cnamecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
+| 3.10 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
+| 3.11 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
+| 3.12 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
 
 ---
 
@@ -402,8 +402,8 @@ All of the following conditions must be met before the v1.0.0 release baseline i
 - [ ] All SWQ test cases: PASS
 - [ ] Statement coverage ≥ 90%
 - [ ] Branch coverage ≥ 85%
-- [ ] `naming_convention.yml` CI job: PASS on v1.0.0 commit
-- [ ] `cnamecheck_tests.yml` CI: PASS on Python 3.10, 3.11, 3.12
+- [ ] `cstylecheck_rules.yml` CI job: PASS on v1.0.0 commit
+- [ ] `cstylecheck_tests.yml` CI: PASS on Python 3.10, 3.11, 3.12
 - [ ] `docker_publish.yml` CI: PASS; image available on GHCR + Docker Hub
 - [ ] Zero open bug-labelled GitHub Issues targeting v1.0.0
 - [ ] This document approved and placed under CM baseline (SUP.8)

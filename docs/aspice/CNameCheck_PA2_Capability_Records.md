@@ -127,7 +127,7 @@ All work products are defined with content requirements in their respective docu
 | Unit Verification Specification | 13-12 | CNC-SWE4-001 §5 test catalogue | CI-027 |
 | Integration Test Specification | 13-12 | CNC-SWE5-001 §4 test cases | CI-027 |
 | Qualification Test Specification | 13-12 | CNC-SWE6-001 §4 test cases | CI-027 |
-| Source code (`cnamecheck.py`) | 20-04 | CNC-SWE3-001 unit specifications | CI-001 |
+| Source code (`cstylecheck.py`) | 20-04 | CNC-SWE3-001 unit specifications | CI-001 |
 | Test suite | 13-12 | CNC-SWE4-001 test catalogue | CI-017 |
 | Configuration Management Plan | 08-27 | CNC-SUP8-001 — this document is the plan | CI-027 |
 | Project Management Plan | 08-14 | CNC-MAN3-001 | CI-027 |
@@ -186,7 +186,7 @@ All work products are reviewed before approval according to the following schedu
 | CNC-SUP10-001 | Change Request Plan | 1.0 | \<Draft / Approved\> | v1.0.0 tag |
 | CNC-ACQ4-001 | Supplier Monitoring Plan | 1.0 | \<Draft / Approved\> | v1.0.0 tag |
 | CNC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.0 | \<Draft / Approved\> | v1.0.0 tag |
-| CI-001 | `cnamecheck.py` v1.0.0 | 1.0.0 | \<Baselined\> | v1.0.0 tag |
+| CI-001 | `cstylecheck.py` v1.0.0 | 1.0.0 | \<Baselined\> | v1.0.0 tag |
 | CI-017 | Test suite | 1.0.0 | \<Baselined\> | v1.0.0 tag |
 
 ---

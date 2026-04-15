@@ -28,7 +28,7 @@
 
 This specification defines the unit verification strategy, coverage criteria, and test case catalogue for **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SWE.4 — Software Unit Verification**.
 
-Unit verification covers both dynamic testing (pytest test suite) and static verification (naming convention self-check via `naming_convention.yml` CI workflow).
+Unit verification covers both dynamic testing (pytest test suite) and static verification (naming convention self-check via `cstylecheck_rules.yml` CI workflow).
 
 ### 3.1 Referenced Documents
 
@@ -48,8 +48,8 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 | Method | Scope | Tool |
 |---|---|---|
 | Dynamic unit testing | All COMP-05 rule-check methods; COMP-02, COMP-03, COMP-04, COMP-06, COMP-07 utility functions | pytest 7+ |
-| Static verification (naming convention) | `cnamecheck.py` source file itself | `cnamecheck` self-hosted via `naming_convention.yml` CI |
-| Code coverage measurement | `src/cnamecheck.py` | pytest-cov |
+| Static verification (naming convention) | `cstylecheck.py` source file itself | `cstylecheck` self-hosted via `cstylecheck_rules.yml` CI |
+| Code coverage measurement | `src/cstylecheck.py` | pytest-cov |
 | Code review / inspection | `SignChecker` try/finally pattern (SWE1-053); `_data_file()` fallback logic | Manual review during PR |
 
 ### 4.2 Coverage Criteria
@@ -87,12 +87,12 @@ Key harness functions:
 
 ### 4.4 Naming Convention Self-Check (Static Verification)
 
-CStyleCheck enforces its own naming rules on `cnamecheck.py` via the `naming_convention.yml` CI workflow. This constitutes a static verification pass satisfying SWE.4 BP3.
+CStyleCheck enforces its own naming rules on `cstylecheck.py` via the `cstylecheck_rules.yml` CI workflow. This constitutes a static verification pass satisfying SWE.4 BP3.
 
 | Verification Item | Evidence |
 |---|---|
-| Zero `error`-level violations on `cnamecheck.py` | `naming_convention.yml` CI job PASS |
-| Workflow trigger | Every push that modifies `src/cnamecheck.py` |
+| Zero `error`-level violations on `cstylecheck.py` | `cstylecheck_rules.yml` CI job PASS |
+| Workflow trigger | Every push that modifies `src/cstylecheck.py` |
 
 ---
 
@@ -243,7 +243,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 |---|---|---|---|
 | UV-DCT-001 | `test_load_keywords_default` | UNIT-11, UNIT-12 | Built-in keyword file loaded correctly |
 | UV-DCT-002 | `test_load_keywords_override` | UNIT-11 | `--keywords-file` replaces built-in |
-| UV-DCT-003 | `test_data_file_fallback` | UNIT-12 | Fallback to `sys.prefix/share/cnamecheck/` works |
+| UV-DCT-003 | `test_data_file_fallback` | UNIT-12 | Fallback to `sys.prefix/share/cstylecheck/` works |
 | UV-DCT-004 | `test_spell_dict_merge` | UNIT-13 | YAML exemptions merged with file dictionary |
 
 ---
@@ -265,7 +265,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.13 Bug-Fix and Improvement Tests — `test_improvements.py` (63), `test_barr_c.py` (42), `test_eof_comment.py`, `test_copyright_header.py`, `test_parameter_prefix.py`, `test_exclusions.py`
+### 5.13 Bug-Fix and Improvement Tests — `test_improvements.py` (63), `test_barr_c.py` (42), `test_eof_comment.py`, `test_copyright_header.py`, `test_parameter_prefix.py`, `test_cstylecheck_exclusions.py`
 
 These test modules provide regression coverage for previously fixed bugs and new rules. Key cases:
 
@@ -303,7 +303,7 @@ These test modules provide regression coverage for previously fixed bugs and new
 | `test_improvements.py` | 63 | \<N\> | \<N\> | Multiple |
 | `test_barr_c.py` | 42 | \<N\> | \<N\> | Multiple |
 | `test_cli.py` | 29 | \<N\> | \<N\> | COMP-01, COMP-07 |
-| `test_exclusions.py` | \<N\> | \<N\> | \<N\> | COMP-02 |
+| `test_cstylecheck_exclusions.py` | \<N\> | \<N\> | \<N\> | COMP-02 |
 | `test_eof_comment.py` | \<N\> | \<N\> | \<N\> | `_check_eof_comment` |
 | `test_copyright_header.py` | \<N\> | \<N\> | \<N\> | `_check_copyright_header` |
 | `test_parameter_prefix.py` | \<N\> | \<N\> | \<N\> | `_check_variables` |
@@ -312,7 +312,7 @@ These test modules provide regression coverage for previously fixed bugs and new
 **Statement Coverage:** \<fill from coverage.xml\> %
 **Branch Coverage:** \<fill from coverage.xml\> %
 
-**Static Verification (naming_convention.yml):** \<PASS / FAIL\>
+**Static Verification (cstylecheck_rules.yml):** \<PASS / FAIL\>
 
 ---
 

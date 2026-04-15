@@ -15,8 +15,8 @@ from harness import cfg_only, run, has, clean, _load_dict_file, _BUILTIN_DICT
 
 _HERE   = Path(__file__).resolve().parent
 _SRC    = _HERE.parent / "src"
-CHECKER = str(_SRC / "cnamecheck.py")
-YAML    = str(_SRC / "naming_convention.yaml")
+CHECKER = str(_SRC / "cstylecheck.py")
+YAML    = str(_SRC / "cstylecheck_rules.yaml")
 
 
 def _subprocess(*args, src_text=None, filename="mod.c"):
@@ -303,29 +303,29 @@ class TestDictionaryLoadedAtStartup(unittest.TestCase):
     def test_c_keywords_module_loaded(self):
         import importlib, sys
         # Import fresh
-        if 'cnamecheck' in sys.modules:
-            mod = sys.modules['cnamecheck']
+        if 'cstylecheck' in sys.modules:
+            mod = sys.modules['cstylecheck']
         else:
             sys.path.insert(0, str(_SRC))
-            mod = importlib.import_module('cnamecheck')
+            mod = importlib.import_module('cstylecheck')
         self.assertGreater(len(mod.C_KEYWORDS), 0)
         self.assertIn("interrupt", mod.C_KEYWORDS)
 
     def test_c_stdlib_module_loaded(self):
         import sys
-        mod = sys.modules.get('cnamecheck')
+        mod = sys.modules.get('cstylecheck')
         if mod is None:
             sys.path.insert(0, str(_SRC))
-            import cnamecheck as mod
+            import cstylecheck as mod
         self.assertGreater(len(mod.C_STDLIB_NAMES), 0)
         self.assertIn("strlen", mod.C_STDLIB_NAMES)
 
     def test_builtin_spell_dict_loaded(self):
         import sys
-        mod = sys.modules.get('cnamecheck')
+        mod = sys.modules.get('cstylecheck')
         if mod is None:
             sys.path.insert(0, str(_SRC))
-            import cnamecheck as mod
+            import cstylecheck as mod
         self.assertGreater(len(mod._BUILTIN_DICT), 0)
         self.assertIn("uart", mod._BUILTIN_DICT)
 

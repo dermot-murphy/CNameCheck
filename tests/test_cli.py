@@ -1,18 +1,18 @@
 """test_cli.py — end-to-end CLI tests using subprocess.
 
 Covers: --version, --help, --warnings-as-errors, --options-file, --defines,
---banned-names, --exclusions, --summary, --log.
+--banned-names, --cstylecheck_exclusions, --summary, --log.
 """
 import sys, os, subprocess, tempfile, textwrap, unittest
 from pathlib import Path
 
 _HERE    = Path(__file__).resolve().parent
 _SRC     = _HERE.parent / "src"
-CHECKER  = str(_SRC / "cnamecheck.py")
-# Use the tests/ copy of naming_convention.yaml so src/ config
+CHECKER  = str(_SRC / "cstylecheck.py")
+# Use the tests/ copy of cstylecheck_rules.yaml so src/ config
 # can be changed independently without breaking the test suite.
-_TESTS_YAML = _HERE / "naming_convention.yaml"
-YAML = str(_TESTS_YAML if _TESTS_YAML.exists() else _SRC / "naming_convention.yaml")
+_TESTS_YAML = _HERE / "cstylecheck_rules.yaml"
+YAML = str(_TESTS_YAML if _TESTS_YAML.exists() else _SRC / "cstylecheck_rules.yaml")
 
 
 def _run(*args, files=None):
@@ -94,14 +94,14 @@ class TestWarningsAsErrors(unittest.TestCase):
 class TestOptionsFile(unittest.TestCase):
     def test_summary_in_options_file_appears_in_output(self):
         with tempfile.TemporaryDirectory() as td:
-            opts = _write(td, "cnamecheck.options", "--summary\n")
+            opts = _write(td, "cstylecheck.options", "--summary\n")
             src  = _write(td, "main.c", "int main(void){ return 0; }\n")
             _, out = _run("--options-file", str(opts), files=[src])
         self.assertIn("Files checked", out)
 
     def test_comment_lines_in_options_file_ignored(self):
         with tempfile.TemporaryDirectory() as td:
-            opts = _write(td, "cnamecheck.options", "# comment\n--summary\n")
+            opts = _write(td, "cstylecheck.options", "# comment\n--summary\n")
             src  = _write(td, "main.c", "int main(void){ return 0; }\n")
             rc, out = _run("--options-file", str(opts), files=[src])
         self.assertEqual(rc, 0)
@@ -186,10 +186,10 @@ class TestBannedNamesFile(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-class TestExclusions(unittest.TestCase):
+class Testcstylecheck_exclusions(unittest.TestCase):
     def test_disabled_rule_suppressed_for_matching_file(self):
         with tempfile.TemporaryDirectory() as td:
-            excl = _write(td, "exclusions.yml", textwrap.dedent("""\
+            excl = _write(td, "cstylecheck_exclusions.yml", textwrap.dedent("""\
                 "legacy_mod.*":
                   disabled_rules:
                     - reserved_name
@@ -198,12 +198,12 @@ class TestExclusions(unittest.TestCase):
                          "void legacy_mod_DoWork(void){\n"
                          "    int strlen = 0; (void)strlen;\n"
                          "}\n")
-            _, out = _run("--exclusions", str(excl), files=[src])
+            _, out = _run("--cstylecheck_exclusions", str(excl), files=[src])
         self.assertNotIn("reserved_name", out)
 
     def test_non_matching_file_still_receives_violations(self):
         with tempfile.TemporaryDirectory() as td:
-            excl = _write(td, "exclusions.yml", textwrap.dedent("""\
+            excl = _write(td, "cstylecheck_exclusions.yml", textwrap.dedent("""\
                 "legacy_mod.*":
                   disabled_rules:
                     - reserved_name
@@ -212,12 +212,12 @@ class TestExclusions(unittest.TestCase):
                          "void other_mod_DoWork(void){\n"
                          "    int strlen = 0; (void)strlen;\n"
                          "}\n")
-            _, out = _run("--exclusions", str(excl), files=[src])
+            _, out = _run("--cstylecheck_exclusions", str(excl), files=[src])
         self.assertIn("reserved_name", out)
 
     def test_multiple_rules_can_be_disabled(self):
         with tempfile.TemporaryDirectory() as td:
-            excl = _write(td, "exclusions.yml", textwrap.dedent("""\
+            excl = _write(td, "cstylecheck_exclusions.yml", textwrap.dedent("""\
                 "legacy_mod.*":
                   disabled_rules:
                     - reserved_name
@@ -227,7 +227,7 @@ class TestExclusions(unittest.TestCase):
                          "void legacy_mod_DoWork(void){\n"
                          "\tint strlen = 0; (void)strlen;\n"
                          "}\n")
-            _, out = _run("--exclusions", str(excl), files=[src])
+            _, out = _run("--cstylecheck_exclusions", str(excl), files=[src])
         self.assertNotIn("reserved_name", out)
         self.assertNotIn("misc.indentation", out)
 
