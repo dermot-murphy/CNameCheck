@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CStyleCheck -- Naming Convention Trend</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 960px;
+         margin: 0 auto; padding: 1rem 1.5rem; color: #222; }
+  h1   { font-size: 1.4rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+  th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: right; }
+  th { background: #f5f5f5; text-align: center; }
+  td:nth-child(1), td:nth-child(2), td:nth-child(3) { text-align: left; }
+  .stat { display: inline-block; margin: 0 1rem; font-size: 1.1rem; }
+  canvas { margin: 1.5rem 0; }
+</style>
+</head><body>
+<h1>📋 CStyleCheck: Naming Convention Trend</h1>
+<p>
+  <span class="stat">🔴 <strong style="color:green">0</strong> errors</span>
+  <span class="stat">🟡 <strong style="color:green">0</strong> warnings</span>
+  <span class="stat">📁 0 files</span>
+  <span class="stat">🔢 1 runs recorded</span>
+</p>
+<canvas id="chart" height="120"></canvas>
+<script>
+new Chart(document.getElementById('chart'), {
+  type: 'line',
+  data: {
+    labels: ["2026-04-17 #26"],
+    datasets: [
+      { label: 'Errors',   data: [0], fill: true,
+         borderColor: '#d32f2f', backgroundColor: 'rgba(211,47,47,0.15)',
+         tension: 0.3, pointRadius: 3 },
+      { label: 'Warnings', data: [0], fill: true,
+         borderColor: '#f57c00', backgroundColor: 'rgba(245,124,0,0.12)',
+         tension: 0.3, pointRadius: 3 },
+      { label: 'Info',     data: [0], fill: true,
+         borderColor: '#1976d2', backgroundColor: 'rgba(25,118,210,0.10)',
+         tension: 0.3, pointRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { position: 'top' },
+               tooltip: { mode: 'index' } },
+    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+  }
+});
+</script>
+<h2>Run history (last 1 runs)</h2>
+<table>
+<tr><th>Date</th><th>Run</th><th>SHA</th><th>Files</th>
+    <th>Errors</th><th>Warnings</th><th>Info</th></tr>
+<tr><td>2026-04-17</td><td>#26</td><td><code>2c69014a</code></td><td>0</td><td style="color:green">0</td><td style="color:green">0</td><td>0</td></tr>
+</table>
+<p><small>Source: <a href="https://github.com/dermot-murphy/CStyleCheck">dermot-murphy/CStyleCheck</a></small></p>
+</body></html>

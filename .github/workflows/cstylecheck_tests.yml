@@ -25,6 +25,7 @@ on:
       - "tests/rules.yml"
       - "requirements.txt"
       - ".github/workflows/cstylecheck_tests.yml"
+
   workflow_dispatch:
 
 jobs:
