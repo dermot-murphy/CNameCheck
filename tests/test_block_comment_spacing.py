@@ -185,7 +185,7 @@ class TestBlockCommentSpacingSeverityAndMeta(unittest.TestCase):
     def test_yaml_config_has_block_comment_spacing(self):
         import yaml, pathlib
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml").read_text()
+            (pathlib.Path(__file__).parent / "rules.yml").read_text(encoding="utf-8")
         )
         bcs = cfg["misc"].get("block_comment_spacing", {})
         self.assertIn("enabled",        bcs)
@@ -195,21 +195,21 @@ class TestBlockCommentSpacingSeverityAndMeta(unittest.TestCase):
     def test_yaml_default_is_disabled(self):
         import yaml, pathlib
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml").read_text()
+            (pathlib.Path(__file__).parent / "rules.yml").read_text(encoding="utf-8")
         )
         self.assertFalse(cfg["misc"]["block_comment_spacing"]["enabled"])
 
     def test_yaml_default_min_is_1(self):
         import yaml, pathlib
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml").read_text()
+            (pathlib.Path(__file__).parent / "rules.yml").read_text(encoding="utf-8")
         )
         self.assertEqual(cfg["misc"]["block_comment_spacing"]["min_blank_lines"], 1)
 
     def test_yaml_default_max_is_2(self):
         import yaml, pathlib
         cfg = yaml.safe_load(
-            (pathlib.Path(__file__).parent / "cstylecheck_rules.yaml").read_text()
+            (pathlib.Path(__file__).parent / "rules.yml").read_text(encoding="utf-8")
         )
         self.assertEqual(cfg["misc"]["block_comment_spacing"]["max_blank_lines"], 2)
 

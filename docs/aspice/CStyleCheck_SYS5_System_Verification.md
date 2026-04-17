@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SYS5-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.5 |
 
@@ -28,7 +28,7 @@
 
 ### 3.1 Purpose
 
-This System Verification Report documents the qualification test specification, execution results, and verdict for **CStyleCheck v1.0.0** — verifying that the complete, integrated system satisfies all system requirements defined in CNC-SYS2-001. It satisfies **Automotive SPICE® PAM v4.0, SYS.5 — System Verification**.
+This System Verification Report documents the qualification test specification, execution results, and verdict for **CStyleCheck v1.0.0** — verifying that the complete, integrated system satisfies all system requirements defined in CSC-SYS2-001. It satisfies **Automotive SPICE® PAM v4.0, SYS.5 — System Verification**.
 
 System verification (SYS.5) differs from system integration testing (SYS.4) in that it tests the **complete, fully integrated system against its requirements**, rather than testing interface behaviour between subsystems.
 
@@ -36,11 +36,11 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CNC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ### 3.3 System Configuration Under Test
 
@@ -348,13 +348,13 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|
 | **Test Case ID** | SYS-VTC-013 |
 | **Requirement** | SYS-F-011 (implicit quality gate) |
-| **Objective** | Verify that `cstylecheck.py` passes its own naming-convention rules, as enforced by the `cstylecheck_rules.yml` CI workflow |
+| **Objective** | Verify that `cstylecheck.py` passes its own naming-convention rules, as enforced by the `rules.yml` CI workflow |
 | **Verification Method** | CI evidence review |
-| **Pass Criteria** | `cstylecheck_rules.yml` workflow reports zero errors on the v1.0.0 release commit |
+| **Pass Criteria** | `rules.yml` workflow reports zero errors on the v1.0.0 release commit |
 
 | Check | Finding | Result |
 |---|---|---|
-| `cstylecheck_rules.yml` CI job on v1.0.0 tag | Status = success; zero error violations | \<PASS / FAIL\> |
+| `rules.yml` CI job on v1.0.0 tag | Status = success; zero error violations | \<PASS / FAIL\> |
 | Workflow run URL | \<GitHub Actions URL\> | |
 
 ---
@@ -392,7 +392,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-F-005 | `--exclude` glob patterns | SYS-VTC-001 | \<Covered\> |
 | SYS-F-006 | `--defines` file | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-F-007 | `--aliases` file | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-F-008 | `--cstylecheck_exclusions` file | SITC-009 | \<Covered\> |
+| SYS-F-008 | `--exclusions` file | SITC-009 | \<Covered\> |
 | SYS-F-009 | Dictionary override flags | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | \<Covered\> |
 | SYS-F-011 to F-024 | All 48 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | \<Covered\> |
@@ -420,7 +420,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-NF-006 | Multi-platform Docker | SYS-VTC-012 | \<Covered\> |
 | SYS-NF-007 | YAML configuration | SYS-VTC-002 | \<Covered\> |
 | SYS-NF-008 | Options file precedence | SITC-003 | \<Covered\> |
-| SYS-NF-009 | Per-file cstylecheck_exclusions | SITC-009 | \<Covered\> |
+| SYS-NF-009 | Per-file exclusions | SITC-009 | \<Covered\> |
 | SYS-NF-010 | pre-commit integration | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-NF-011 | GitHub Action `action.yml` | \<SYS-VTC-xxx\> | \<TBD\> |
 | SYS-NF-012 | GitHub Action step outputs | \<SYS-VTC-xxx\> | \<TBD\> |
@@ -441,9 +441,9 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** System verification is considered complete only when all SYS-VTC test cases achieve PASS status and all \<TBD\> requirements are covered. This document must be approved before the system is released to production and before the release baseline is created (SUP.8). Any open issues must be resolved or formally accepted via the change control process (SUP.10).
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

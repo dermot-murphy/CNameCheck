@@ -4,7 +4,7 @@ This document describes every rule enforced by CStyleCheck, including its rule
 ID, default severity, YAML configuration keys, what it checks, and annotated
 C code examples showing both passing and failing code.
 
-All rules are configured in `cstylecheck_rules.yaml`.  Every rule supports an
+All rules are configured in `rules.yml`.  Every rule supports an
 `enabled` key and a `severity` key.  Severity values are `error`, `warning`,
 and `info`.
 
@@ -582,7 +582,7 @@ functions:
     - FIFO
     - ADC
     - UART
-  object_cstylecheck_exclusions:
+  object_exclusions:
     - Init               # segments that waive the style check entirely
     - Wr
     - Rd
@@ -597,7 +597,7 @@ prefix):
 | `verb_object` | `uart_driver_ReadBuffer` |
 | `lower_snake` | `uart_driver_buffer_read` |
 
-`object_cstylecheck_exclusions` lists body segments that disable the style check entirely —
+`object_exclusions` lists body segments that disable the style check entirely —
 useful for established abbreviations that act as both object and verb.
 
 ```c
@@ -606,7 +606,7 @@ useful for established abbreviations that act as both object and verb.
 /* ✓ PASS */
 void uart_driver_BufferRead(void);
 void uart_driver_StatusGet(void);
-void uart_driver_Init(void);          /* Init in object_cstylecheck_exclusions — waived */
+void uart_driver_Init(void);          /* Init in object_exclusions — waived */
 
 /* ✗ FAIL */
 void uart_driver_readBuffer(void);    /* function.style — verb first, lower-case */

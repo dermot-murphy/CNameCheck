@@ -8,21 +8,21 @@
 #
 #   - uses: dermot-murphy/CStyleCheck@v1
 #     with:
-#       config: src/cstylecheck_rules.yaml
+#       config: src/rules.yml
 #
 # Full example:
 #
 #   - uses: dermot-murphy/CStyleCheck@v1
 #     id: cstylecheck
 #     with:
-#       config:      src/cstylecheck_rules.yaml
+#       config:      src/rules.yml
 #       include: |
 #         source/**/*.c
 #         source/**/*.h
 #       exclude: |
 #         source/cots/
 #         source/third_party/
-#       options-file:      src/cstylecheck.options
+#       options-file:      src/options.txt
 #       fail-on:           error
 #       sarif-file:        results/cstylecheck.sarif
 #
@@ -54,7 +54,7 @@ inputs:
     description: >-
       Path to the YAML rule configuration file, relative to the workspace root.
     required: false
-    default: 'src/cstylecheck_rules.yaml'
+    default: 'src/rules.yml'
 
   include:
     description: >-
@@ -90,9 +90,9 @@ inputs:
     required: false
     default: ''
 
-  cstylecheck_exclusions:
+  exclusions:
     description: >-
-      Path to a per-file rule exclusion YAML (--cstylecheck_exclusions).
+      Path to a per-file rule exclusion YAML (--exclusions).
     required: false
     default: ''
 
@@ -224,7 +224,7 @@ runs:
         INPUT_OPTIONS_FILE:     ${{ inputs.options-file }}
         INPUT_DEFINES:          ${{ inputs.defines }}
         INPUT_ALIASES:          ${{ inputs.aliases }}
-        INPUT_cstylecheck_exclusions:       ${{ inputs.cstylecheck_exclusions }}
+        INPUT_exclusions:       ${{ inputs.exclusions }}
         INPUT_COPYRIGHT:        ${{ inputs.copyright }}
         INPUT_BASELINE_FILE:    ${{ inputs.baseline-file }}
         INPUT_WARNINGS_AS_ERR:  ${{ inputs.warnings-as-errors }}
@@ -277,7 +277,7 @@ runs:
         for flag, key in (
             ("--defines",     "INPUT_DEFINES"),
             ("--aliases",     "INPUT_ALIASES"),
-            ("--cstylecheck_exclusions",  "INPUT_cstylecheck_exclusions"),
+            ("--exclusions",  "INPUT_exclusions"),
             ("--copyright",   "INPUT_COPYRIGHT"),
             ("--baseline-file", "INPUT_BASELINE_FILE"),
         ):
@@ -356,7 +356,7 @@ runs:
                 ("--options-file", "INPUT_OPTIONS_FILE"),
                 ("--defines",      "INPUT_DEFINES"),
                 ("--aliases",      "INPUT_ALIASES"),
-                ("--cstylecheck_exclusions",   "INPUT_cstylecheck_exclusions"),
+                ("--exclusions",   "INPUT_exclusions"),
                 ("--copyright",    "INPUT_COPYRIGHT"),
                 ("--baseline-file","INPUT_BASELINE_FILE"),
             ):

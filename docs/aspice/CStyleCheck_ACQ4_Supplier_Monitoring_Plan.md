@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-ACQ4-001 | **Version** | 1.0 |
+| **Document ID** | CSC-ACQ4-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | ACQ.4 |
 
@@ -42,10 +42,10 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-MAN3-001 | Project Management Plan | 1.0 |
-| CNC-MAN5-001 | Risk Management Plan | 1.0 |
-| CNC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CNC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.0 |
+| CSC-MAN5-001 | Risk Management Plan | 1.0 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
 
 ---
 
@@ -80,7 +80,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Activity | Method | Frequency | Owner | Evidence |
 |---|---|---|---|---|
-| CI workflow availability | Monitor `cstylecheck_tests.yml`, `cstylecheck_rules.yml`, `docker_publish.yml` job completion | Per commit | GitHub Actions status | CI badge on README; Actions run log |
+| CI workflow availability | Monitor `cstylecheck_tests.yml`, `rules.yml`, `docker_publish.yml` job completion | Per commit | GitHub Actions status | CI badge on README; Actions run log |
 | GHCR availability | Verify Docker images pullable after each push | Per `docker_publish.yml` run | GitHub Actions | `docker manifest inspect` in publish job |
 | Actions runner version changes | Monitor GitHub changelog for breaking changes to `ubuntu-latest` runner | Monthly | Claude | GitHub blog / changelog review |
 | API deprecation notices | Monitor GitHub Actions deprecation notices (e.g., deprecated action versions) | Monthly | Claude | GitHub announcement emails |
@@ -165,9 +165,9 @@ All non-conformances are recorded as GitHub Issues (label: `supplier-issue`) and
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This plan must be reviewed whenever a new external dependency is added or an existing supplier relationship materially changes. All supplier non-conformances must be logged as GitHub Issues and resolved before the affected release baseline is created.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

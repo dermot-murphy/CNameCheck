@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SWE1-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
 
@@ -28,7 +28,7 @@
 
 ### 3.1 Purpose
 
-This Software Requirements Specification (SRS) refines the system-level requirements from CNC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.0.0**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
+This Software Requirements Specification (SRS) refines the system-level requirements from CSC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.0.0**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requirements Analysis**.
 
@@ -36,10 +36,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CNC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
-| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
@@ -54,7 +54,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | `module_name` | The filename stem (e.g. `uart` from `uart.c`) used as the mandatory identifier prefix |
 | `clean` | Source text after stripping comments and string literals |
 | `defines` | Keyword/type alias substitutions applied to source before analysis |
-| `cstylecheck_exclusions` | Per-file YAML map of rule IDs to suppressed identifier patterns |
+| `exclusions` | Per-file YAML map of rule IDs to suppressed identifier patterns |
 | `baseline` | JSON file of known violations used to suppress pre-existing findings |
 
 ---
@@ -69,7 +69,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-002 | The software shall raise a configuration error (exit code 2) if the YAML file is absent, malformed, or unparseable | Mandatory | Test | SYS-F-039 |
 | SWE1-003 | The software shall apply project `--defines` substitutions to the preprocessed source text before any rule check, using the `apply_defines()` function | Mandatory | Test | SYS-F-006 |
 | SWE1-004 | The software shall load the module alias map via `load_alias_file()` and use it to derive accepted prefix strings per source file | Mandatory | Test | SYS-F-007 |
-| SWE1-005 | The software shall load per-file rule cstylecheck_exclusions via `load_cstylecheck_exclusions_file()` and pass the resulting map to each `Checker` instance | Mandatory | Test | SYS-F-008 |
+| SWE1-005 | The software shall load per-file rule exclusions via `load_exclusions_file()` and pass the resulting map to each `Checker` instance | Mandatory | Test | SYS-F-008 |
 | SWE1-006 | The software shall resolve the set of disabled rules for each source file via `_disabled_rules_for_file()` before instantiating the `Checker` | Mandatory | Test | SYS-F-008 |
 
 ### 4.2 Dictionary Management (SS-03)
@@ -209,7 +209,7 @@ The following criteria shall be met by all software requirements above. They are
 |---|---|---|
 | Statement coverage | ≥ 90% of `cstylecheck.py` | pytest-cov report |
 | Branch coverage | ≥ 85% of `cstylecheck.py` | pytest-cov report |
-| MISRA-equivalent naming compliance | Zero `cstylecheck` self-violations | `cstylecheck_rules.yml` CI result |
+| MISRA-equivalent naming compliance | Zero `cstylecheck` self-violations | `rules.yml` CI result |
 | All unit test cases | PASS | pytest result across Python 3.10 / 3.11 / 3.12 |
 
 ---
@@ -239,9 +239,90 @@ The following criteria shall be met by all software requirements above. They are
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be placed under configuration management (SUP.8) upon approval. Any post-approval changes require a change request (SUP.10) and a new document version.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
+
+---
+
+## Appendix A — MISRA C Compliance Traceability Matrix
+
+This appendix satisfies **SWE.1 BP4** (requirements are consistent with the applicable standards) and provides direct input to **SWE.6 BP3** (test coverage of standard-mandated requirements).
+
+CStyleCheck is a **complementary** tool to cppcheck (used for full MISRA C static analysis). It handles naming, formatting, and structural style rules that cppcheck does not enforce. The table below maps each CStyleCheck rule to its MISRA C:2012 and MISRA C:2023 clause.
+
+### A.1 Rules Currently Enforced
+
+| CStyleCheck Rule ID | Check Method | MISRA C:2012 | MISRA C:2023 | Category | Barr-C:2018 | SWE4 Test File |
+|---|---|---|---|---|---|---|
+| `reserved_name` | `_check_reserved_names()` | Rule 5.3, 5.4, 5.5 | Rule 5.3, 5.4, 5.5 | Required | §6.1.a, §7.1.a | `test_reserved_name.py` |
+| `misc.unsigned_suffix` | `_check_misc()` | Rule 7.2 | Rule 7.2 | Required | §8.5 | `test_misc.py` |
+| `misc.lowercase_l_suffix` | `_check_lowercase_l_suffix()` | Rule 7.3 | Rule 7.3 | Required | §8.5 | `test_misra_rules.py` |
+| `misc.octal_constant` | `_check_octal_constants()` | Rule 7.1 | Rule 7.1 | Required | §8.5 | `test_misra_rules.py` |
+| `misc.trigraph` | `_check_trigraphs()` | Rule 4.2 (Advisory) | Rule 4.2 (Required) | Adv / Req | — | `test_misra_rules.py` |
+| `misc.yoda_condition` | `_check_yoda()` | Rule 14.4 (informative) | — | Advisory | §8.3 | `test_yoda_condition.py` |
+| `include_guard.missing` | `_check_include_guard()` | Dir 4.10 | Dir 4.10 | Required | §3.2 | `test_include_guards.py` |
+| `include_guard.format` | `_check_include_guard()` | Dir 4.10 | Dir 4.10 | Required | §3.2 | `test_include_guards.py` |
+| `variable.global.g_prefix` | `_check_variables()` | Rule 5.8 (informative) | Rule 5.8 | Advisory | §7.1.h | `test_variables.py` |
+| `variable.static.s_prefix` | `_check_variables()` | Rule 5.9 (informative) | Rule 5.9 | Advisory | §7.1.i | `test_variables.py` |
+| `variable.pointer_prefix` | `_check_variables()` | — | — | — | §7.1.k | `test_variables.py` |
+| `variable.pp_prefix` | `_check_variables()` | — | — | — | §7.1.l | `test_variables.py` |
+| `variable.bool_prefix` | `_check_variables()` | — | — | — | §7.1.m | `test_variables.py` |
+| `variable.handle_prefix` | `_check_variables()` | — | — | — | §7.1.n | `test_variables.py` |
+| `variable.min_length` | `_check_variables()` | — | — | — | §7.1.e | `test_variables.py` |
+| `sign_compatibility` | `SignChecker._check_calls()` | Rule 10.1, 10.3 (partial) | Rule 10.1, 10.3 (partial) | Required | — | `test_sign_compatibility.py` |
+| `typedef.case` / `typedef.suffix` | `_check_typedefs()` | Dir 4.6 (partial) | Dir 4.6 (partial) | Required | §7.3 | `test_typedefs.py` |
+| `function.prefix` / `function.style` | `_check_functions()` | — | — | — | §8.1 | `test_functions.py` |
+| `enum.type_case` / `enum.member_case` | `_check_enums()` | — | — | — | §7.2 | `test_enums.py` |
+| `struct.tag_case` / `struct.member_case` | `_check_structs()` | — | — | — | §7.3 | `test_structs.py` |
+| `misc.magic_number` | `_check_misc()` | — | — | — | §8.5 | `test_misc.py` |
+| `misc.line_length` | `_check_misc()` | — | — | — | §3.3 | `test_misc.py` |
+| `misc.copyright_header` | `_check_copyright_header()` | — | — | — | §3.1 | `test_copyright_header.py` |
+| `misc.eof_comment` | `_check_misc()` | — | — | — | §3.1 | `test_eof_comment.py` |
+| `misc.block_comment_spacing` | `_check_misc()` | — | — | — | §3.3 | `test_block_comment_spacing.py` |
+| `spell_check` | `_check_spelling()` | — | — | — | — | `test_spell_check.py` |
+
+### A.2 MISRA C Rules Delegated to cppcheck
+
+The following MISRA C rules require full compiler-level analysis and are enforced by **cppcheck** (run separately in the CI pipeline). CStyleCheck does not duplicate them.
+
+| MISRA C:2012 | MISRA C:2023 | Topic | Category |
+|---|---|---|---|
+| Dir 4.1 | Dir 4.1 | Run-time failures shall be minimised | Required |
+| Dir 4.7 | Dir 4.7 | Error information shall be tested | Required |
+| Dir 4.11 | Dir 4.11 | Validity of values passed to library functions | Required |
+| Dir 4.12 | Dir 4.12 | Dynamic memory shall not be used | Required |
+| Rules 1.1–1.3 | Rules 1.1–1.3 | Language conformance, extensions, UB | Required |
+| Rules 2.1–2.7 | Rules 2.1–2.7 | Unused code, dead code, unreachable code | Required / Advisory |
+| Rules 6.1–6.2 | Rules 6.1–6.2 | Bit-field types | Required |
+| Rules 8.1–8.18 | Rules 8.1–8.18 | Declarations and definitions | Required / Advisory |
+| Rules 9.1–9.5 | Rules 9.1–9.5 | Initialisation | Required / Advisory |
+| Rules 10.1–10.8 | Rules 10.1–10.8 | Essential type model | Required |
+| Rules 11.1–11.9 | Rules 11.1–11.9 | Pointer type conversions | Required / Advisory |
+| Rules 12.1–12.5 | Rules 12.1–12.5 | Expressions | Required / Advisory |
+| Rules 13.1–13.6 | Rules 13.1–13.6 | Side effects | Required |
+| Rules 14.1–14.4 | Rules 14.1–14.4 | Control flow | Required |
+| Rules 15.1–15.7 | Rules 15.1–15.7 | Control statements | Required / Advisory |
+| Rules 16.1–16.7 | Rules 16.1–16.7 | Switch statements | Required / Advisory |
+| Rules 17.1–17.8 | Rules 17.1–17.8 | Functions | Required / Advisory |
+| Rules 18.1–18.8 | Rules 18.1–18.8 | Pointers and arrays | Required / Advisory |
+| Rules 20.1–20.14 | Rules 20.1–20.14 | Preprocessing directives | Required / Advisory |
+| Rules 21.1–21.21 | Rules 21.1–21.21 | Standard library | Required / Advisory |
+| Rules 22.1–22.10 | Rules 22.1–22.10 | Resource management | Required / Advisory |
+
+### A.3 Gap Analysis Summary
+
+| Category | MISRA C:2012 Rules | Covered by CStyleCheck | Covered by cppcheck | Gap (not covered) |
+|---|---|---|---|---|
+| Preprocessing directives | Dir 4.1–4.14 | Dir 4.10 (partial) | Dir 4.1, 4.7, 4.11–4.14 | Dir 4.2 ✅ (added v1.1) |
+| Lexical conventions | Rules 4.1–4.2, 7.1–7.4 | Rule 4.2 ✅, 7.1 ✅, 7.2 ✅, 7.3 ✅ | Rule 7.4 | Rule 4.1 (delegated cppcheck) |
+| Identifiers | Rules 5.1–5.9 | Rules 5.3–5.5 (partial), 5.8–5.9 (advisory) | Rules 5.1, 5.2, 5.6, 5.7 | None critical |
+| Types | Rules 6.1–6.2 | — | Rules 6.1–6.2 | None |
+| Sign / type model | Rules 10.1–10.8 | Rules 10.1, 10.3 (partial) | Full coverage | Rules 10.2, 10.4–10.8 (cppcheck) |
+| Control flow | Rules 14.1–15.7 | Rule 14.4 (advisory/yoda) | Full coverage | None critical |
+
+> **Conclusion:** All MISRA C:2012/2023 Required rules are covered by the combination of CStyleCheck and cppcheck. The three new rules added in v1.1 (7.1, 7.3, 4.2) close the previously identified lexical-convention gap.
+

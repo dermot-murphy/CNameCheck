@@ -53,6 +53,11 @@ _ALL_OFF: dict = {
         "copyright_header":      {"enabled": False},
         "eof_comment":           {"enabled": False},
         "yoda_conditions":       {"enabled": False},
+        # New MISRA checks (NR-001/002/003) -- must be off so existing tests
+        # are not contaminated by these rules when using cfg_only().
+        "lowercase_l_suffix":    {"enabled": False},
+        "octal_constant":        {"enabled": False},
+        "trigraph":              {"enabled": False},
     },
     "reserved_names":    {"enabled": False},
     "sign_compatibility":{"enabled": False},

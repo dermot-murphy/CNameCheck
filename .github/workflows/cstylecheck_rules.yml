@@ -13,15 +13,15 @@
 #
 # Required repository settings
 # -----------------------------
-#   Settings → Actions → General → Workflow permissions:
+#   Settings -> Actions -> General -> Workflow permissions:
 #     "Read and write permissions"
 #
 # The gh-pages branch is created automatically on the first trend run.
-# Enable GitHub Pages (Settings → Pages → Source: gh-pages branch / root)
+# Enable GitHub Pages (Settings -> Pages -> Source: gh-pages branch / root)
 # to make the trend page publicly accessible.
 # =============================================================================
 
-name: CStyleCheck
+name: CStyleCheck Rules
 
 on:
   push:
@@ -29,7 +29,7 @@ on:
       - "source/**/*.c"
       - "source/**/*.h"
       - "src/**"
-      - ".github/workflows/cstylecheck_rules.yml"
+      - ".github/workflows/rules.yml"
   pull_request:
     paths:
       - "source/**/*.c"
@@ -80,9 +80,9 @@ jobs:
         run: |
           mkdir -p output/cstylecheck
           python src/cstylecheck.py          \
-            --config     src/cstylecheck_rules.yaml \
-            --aliases    src/cstylecheck_aliases.txt            \
-            --cstylecheck_exclusions src/cstylecheck_exclusions.yml         \
+            --config     src/rules.yml \
+            --aliases    src/aliases.txt            \
+            --exclusions src/exclusions.yml         \
             --github-actions                                   \
             --summary                                          \
             --log        output/cstylecheck/cstylecheck_results.txt \
@@ -90,15 +90,15 @@ jobs:
             ${{ steps.changed.outputs.all_changed_files }}    \
           || true
 
-      # Push run — all files
+      # Push run -- all files
       - name: Run checker (push, all source)
         if: github.event_name == 'push'
         run: |
           mkdir -p output/cstylecheck
           python src/cstylecheck.py          \
-            --config     src/cstylecheck_rules.yaml \
-            --aliases    src/cstylecheck_aliases.txt            \
-            --cstylecheck_exclusions src/cstylecheck_exclusions.yml         \
+            --config     src/rules.yml \
+            --aliases    src/aliases.txt            \
+            --exclusions src/exclusions.yml         \
             --github-actions                                   \
             --summary                                          \
             --log        output/cstylecheck/cstylecheck_results.txt \
@@ -247,7 +247,7 @@ jobs:
           <html lang="en"><head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>{reponame} — Naming Convention Trend</title>
+          <title>{reponame} -- Naming Convention Trend</title>
           <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
           <style>
             body {{ font-family: system-ui, sans-serif; max-width: 960px;
@@ -340,7 +340,7 @@ jobs:
 
           readme = pathlib.Path("README.md")
           if not readme.exists():
-              print("No README.md — skipping")
+              print("No README.md -- skipping")
           else:
               text    = readme.read_text()
               pattern = r"\[!\[Naming Convention\]\([^)]+\)\]\([^)]+\)"

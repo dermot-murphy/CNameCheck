@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SUP9-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SUP9-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.9 |
 
@@ -34,10 +34,10 @@ A **problem** is any unintended behaviour, defect, failure, or non-conformance d
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-MAN3-001 | Project Management Plan | 1.0 |
-| CNC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CNC-SUP10-001 | Change Request Management Plan | 1.0 |
-| CNC-SUP1-001 | Quality Assurance Plan | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.0 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-SUP10-001 | Change Request Management Plan | 1.0 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.0 |
 
 ---
 
@@ -72,7 +72,7 @@ A **problem** is any unintended behaviour, defect, failure, or non-conformance d
 
 Problems may be identified by:
 
-- Automated CI failures (`cstylecheck_tests.yml`, `cstylecheck_rules.yml`, `docker_publish.yml`)
+- Automated CI failures (`cstylecheck_tests.yml`, `rules.yml`, `docker_publish.yml`)
 - Manual testing during development or qualification
 - User reports via GitHub Issues
 - ASPICE assessment findings
@@ -98,8 +98,8 @@ Minimum required fields when raising an Issue:
 1. Issue is assigned to Claude (sole maintainer for v1.0.0)
 2. Severity label is confirmed or revised
 3. Root cause is investigated:
-   - For code defects: identify affected unit(s) from CNC-SWE3-001
-   - For test defects: identify affected test case from CNC-SWE4-001
+   - For code defects: identify affected unit(s) from CSC-SWE3-001
+   - For test defects: identify affected test case from CSC-SWE4-001
    - For documentation defects: identify affected work product and document ID
 4. If not reproducible or not a defect: close Issue as `Rejected` with explanation
 5. Root cause documented in the GitHub Issue comment thread
@@ -169,9 +169,9 @@ The following problems were identified and resolved during v1.0.0 development:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** All SEV-1 problems must be resolved before the v1.0.0 release baseline is created. SEV-2 problems require a resolution plan approved before release. This plan must be placed under configuration management (SUP.8) upon approval.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

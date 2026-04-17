@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SUP10-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SUP10-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.10 |
 
@@ -34,9 +34,9 @@ A **change request (CR)** covers any planned modification to a baselined work pr
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CNC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
-| CNC-MAN3-001 | Project Management Plan | 1.0 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.0 |
 
 ---
 
@@ -49,7 +49,7 @@ A **change request (CR)** covers any planned modification to a baselined work pr
 | **Enhancement** | `enhancement` | New rule, new output format, new CLI flag, new integration |
 | **Improvement** | `improvement` | Optimisation, UX improvement, performance improvement |
 | **Documentation** | `documentation` | Update to ASPICE documents, README, or in-code documentation |
-| **Configuration** | `config-change` | Update to `cstylecheck_rules.yaml`, `cstylecheck_exclusions.yml`, or dictionary files |
+| **Configuration** | `config-change` | Update to `rules.yml`, `exclusions.yml`, or dictionary files |
 | **Process** | `process-change` | Update to CI workflows, Git Flow procedure, or QA activities |
 
 ### 4.2 Impact Levels
@@ -76,7 +76,7 @@ Minimum required fields when raising a CR Issue:
 | **Type label** | One of the type labels from §4.1 |
 | **Impact level** | Low / Medium / High |
 | **Motivation** | Why the change is needed; which stakeholder need or deficiency it addresses |
-| **Description** | What specifically will change; which CIs (from CNC-SUP8-001 §6.1) are affected |
+| **Description** | What specifically will change; which CIs (from CSC-SUP8-001 §6.1) are affected |
 | **Affected documents** | Which ASPICE work products require updating |
 | **Proposed target release** | Which version the change is planned for |
 
@@ -96,11 +96,11 @@ Minimum required fields when raising a CR Issue:
 | Medium | At least one peer review approval on the implementing pull request |
 | High | Explicit approval comment from QA role in the Issue thread before implementation begins |
 
-Changes that modify requirements (CNC-SWE1-001 or CNC-SYS2-001) always require Medium or High approval regardless of other impact assessment.
+Changes that modify requirements (CSC-SWE1-001 or CSC-SYS2-001) always require Medium or High approval regardless of other impact assessment.
 
 ### 5.4 Implementation
 
-Accepted changes are implemented following the Git Flow process defined in CNC-SUP8-001 §7:
+Accepted changes are implemented following the Git Flow process defined in CSC-SUP8-001 §7:
 
 | Change Type | Branch | Target |
 |---|---|---|
@@ -111,7 +111,7 @@ Accepted changes are implemented following the Git Flow process defined in CNC-S
 Commit messages must reference the Issue: `Implements #<issue-id>: <description>`
 
 All implementing PRs must:
-- Pass CI (`cstylecheck_tests.yml`, `cstylecheck_rules.yml`)
+- Pass CI (`cstylecheck_tests.yml`, `rules.yml`)
 - Include or update affected ASPICE documents in the same branch or a linked follow-up Issue
 - Update traceability tables if requirements are added or modified
 
@@ -139,7 +139,7 @@ When a CR is approved, the following CIs may require update:
 
 | CR Type | Likely Affected CIs |
 |---|---|
-| New rule | CI-001 (`cstylecheck.py`), CI-003 (`cstylecheck_rules.yaml`), CI-017 (test suite), CI-026 (README) |
+| New rule | CI-001 (`cstylecheck.py`), CI-003 (`rules.yml`), CI-017 (test suite), CI-026 (README) |
 | New CLI flag | CI-001, CI-013 (`pyproject.toml`), CI-016 (`action.yml`), CI-026 (README) |
 | New output format | CI-001, CI-016 (`action.yml`), CI-026 (README) |
 | Config file change | CI-003 or CI-005 to CI-010 |
@@ -177,9 +177,9 @@ Summary view:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** All High-impact CRs require explicit QA approval before implementation. No CR affecting released baseline CIs may be implemented without following this process. This plan must be placed under configuration management (SUP.8) upon approval.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SYS3-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SYS3-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.3 |
 
@@ -35,9 +35,9 @@ This System Architecture Description defines the top-level structural and behavi
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CNC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CNC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
-| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ---
 
@@ -60,8 +60,8 @@ CStyleCheck is a software-only system with no hardware dependencies. It is deplo
 ┌─────────────────────────────────────────────────────┐
 │                   CStyleCheck System                  │
 │                                                     │
-│   Inputs:  .c / .h files, cstylecheck_rules.yaml,   │
-│            options, dictionaries, cstylecheck_exclusions         │
+│   Inputs:  .c / .h files, rules.yml,   │
+│            options, dictionaries, exclusions                     │
 │                                                     │
 │   Outputs: violations (text/JSON/SARIF), exit code, │
 │            log file, GitHub annotations, baseline   │
@@ -78,11 +78,11 @@ CStyleCheck is decomposed into six functional subsystems, all implemented within
 
 | Subsystem ID | Name | Responsibility | Primary CIs |
 |---|---|---|---|
-| SS-01 | CLI & Options Loader | Parse command-line arguments and options file; resolve file lists from globs | `cstylecheck.py` (main / argparse), `cstylecheck.options` |
-| SS-02 | Configuration Loader | Load and validate `cstylecheck_rules.yaml`; merge project defines and aliases | `cstylecheck.py`, `cstylecheck_rules.yaml`, `cstylecheck_aliases.txt`, `project.defines` |
+| SS-01 | CLI & Options Loader | Parse command-line arguments and options file; resolve file lists from globs | `cstylecheck.py` (main / argparse), `options.txt` |
+| SS-02 | Configuration Loader | Load and validate `rules.yml`; merge project defines and aliases | `cstylecheck.py`, `rules.yml`, `aliases.txt`, `defines.txt` |
 | SS-03 | Dictionary Manager | Load keyword, stdlib, and spell-check dictionaries; support runtime override | `c_keywords.txt`, `c_stdlib_names.txt`, `c_spell_dict.txt` |
 | SS-04 | Source Parser & Cache | Read each source file once; tokenise identifiers, extract scoped declarations; cache content for cross-file checks | `cstylecheck.py` |
-| SS-05 | Rule Engine | Evaluate all enabled rules against each identifier; classify violations by severity; apply cstylecheck_exclusions and baselines | `cstylecheck.py`, `cstylecheck_exclusions.yml` |
+| SS-05 | Rule Engine | Evaluate all enabled rules against each identifier; classify violations by severity; apply exclusions and baselines | `cstylecheck.py`, `exclusions.yml` |
 | SS-06 | Output Formatter | Render violation results as plain text, JSON, or SARIF; emit GitHub annotations; write log file; print summary | `cstylecheck.py` |
 
 ### 5.2 Subsystem Interface Summary
@@ -112,7 +112,7 @@ CStyleCheck is decomposed into six functional subsystems, all implemented within
 | pip/pipx install | Python package (`.whl`) | `cstylecheck` command | Python 3.10+, PyYAML |
 | Docker container | `ghcr.io/<org>/cstylecheck` image | `docker run` | Docker runtime |
 | GitHub Action | `action.yml` | GitHub Actions runner step | GitHub-hosted or self-hosted runner |
-| pre-commit hook | `.pre-commit-hooks.yaml` | pre-commit framework | Python 3.10+, pre-commit |
+| pre-commit hook | `.pre-commit-hooks.yml` | pre-commit framework | Python 3.10+, pre-commit |
 
 ### 6.2 Docker Image Structure
 
@@ -120,11 +120,11 @@ CStyleCheck is decomposed into six functional subsystems, all implemented within
 /app/
   cstylecheck.py          ← main linter (CI-001)
   _version.py            ← version string (CI-002)
-  cstylecheck_rules.yaml ← default rule config (CI-003)
-  cstylecheck.options     ← default options (CI-004)
-  cstylecheck_exclusions.yml         ← default cstylecheck_exclusions (CI-005)
-  project.defines        ← default defines (CI-006)
-  cstylecheck_aliases.txt            ← default aliases (CI-007)
+  rules.yml ← default rule config (CI-003)
+  options.txt     ← default options (CI-004)
+  exclusions.yml         <- default exclusions (CI-005)
+  defines.txt        ← default defines (CI-006)
+  aliases.txt            ← default aliases (CI-007)
   c_keywords.txt         ← C keyword dictionary (CI-008)
   c_stdlib_names.txt     ← stdlib name dictionary (CI-009)
   c_spell_dict.txt       ← spell-check dictionary (CI-010)
@@ -149,7 +149,7 @@ User source files are mounted at runtime (e.g., `-v $(pwd):/repo`). All dictiona
    │   └─ Resolve all file paths → [file_list]
    │
    ├─ SS-02: load_config()
-   │   ├─ Parse cstylecheck_rules.yaml
+   │   ├─ Parse rules.yml
    │   ├─ Apply --defines substitutions
    │   └─ Apply --aliases module map → config_object
    │
@@ -165,7 +165,7 @@ User source files are mounted at runtime (e.g., `-v $(pwd):/repo`). All dictiona
    │
    ├─ SS-05: run_rules()  [for each identifier token]
    │   ├─ Apply all enabled rules from config_object
-   │   ├─ Apply --cstylecheck_exclusions per-file suppressions
+   │   ├─ Apply --exclusions per-file suppressions
    │   ├─ Apply --baseline-file suppression (if specified)
    │   └─ Collect Violation objects → [violations]
    │
@@ -222,7 +222,7 @@ If any configuration or invocation error is detected during steps 1 or 2:
 | SYS-NF-005 | pip/pipx installable | `pyproject.toml`, packaging (CI-013) |
 | SYS-NF-006 | Multi-platform Docker | `Dockerfile` (CI-011), `docker_publish.yml` (CI-025) |
 | SYS-NF-007 to SYS-NF-009 | Configurability | SS-02 (Configuration Loader) |
-| SYS-NF-010 | pre-commit integration | `.pre-commit-hooks.yaml` (CI-015) |
+| SYS-NF-010 | pre-commit integration | `.pre-commit-hooks.yml` (CI-015) |
 | SYS-NF-011 to SYS-NF-012 | GitHub Action integration | `action.yml` (CI-016) |
 
 ---
@@ -231,9 +231,9 @@ If any configuration or invocation error is detected during steps 1 or 2:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be placed under configuration management (SUP.8) upon approval. Any post-approval changes require a change request (SUP.10) and a new document version.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-MAN3-001 | **Version** | 1.0 |
+| **Document ID** | CSC-MAN3-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | MAN.3 |
 
@@ -44,11 +44,11 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SYS2-001 | System Requirements Specification | 1.0 |
-| CNC-SWE1-001 | Software Requirements Specification | 1.0 |
-| CNC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CNC-MAN5-001 | Risk Management Plan | 1.0 |
-| CNC-SUP1-001 | Quality Assurance Plan | 1.0 |
+| CSC-SYS2-001 | System Requirements Specification | 1.0 |
+| CSC-SWE1-001 | Software Requirements Specification | 1.0 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-MAN5-001 | Risk Management Plan | 1.0 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.0 |
 
 ---
 
@@ -60,7 +60,7 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 - Test suite (≥500 pytest tests across 20+ test modules)
 - Docker image build and multi-platform publication to GHCR and Docker Hub
 - GitHub Action integration (`action.yml`)
-- pre-commit hook integration (`.pre-commit-hooks.yaml`)
+- pre-commit hook integration (`.pre-commit-hooks.yml`)
 - pip/pipx packaging (`pyproject.toml`)
 - Full ASPICE CL2 documentation set (SYS.2–SYS.5, SWE.1–SWE.6, MAN.3, MAN.5, SUP.1, SUP.8–SUP.10, ACQ.4, PA 2.1, PA 2.2)
 - CI/CD automation via GitHub Actions (3 workflows)
@@ -168,7 +168,7 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | INT-01 | End users (embedded C developers) | External | GitHub README, GitHub Releases, Docker Hub | On release |
 | INT-02 | CI/CD system (GitHub Actions) | Internal tool | `push` / `pull_request` event triggers | Per commit/PR |
 | INT-03 | Container registries (GHCR, Docker Hub) | External service | Automated push via `docker_publish.yml` | On release tag |
-| INT-04 | pre-commit framework | External tool | `.pre-commit-hooks.yaml` | On user install |
+| INT-04 | pre-commit framework | External tool | `.pre-commit-hooks.yml` | On user install |
 | INT-05 | GitHub Marketplace | External platform | `action.yml` + release tag | On publish |
 | INT-06 | Assessor / auditor | External | ASPICE documentation set | On assessment |
 
@@ -182,11 +182,11 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 |---|---|---|
 | Build and test status | GitHub Actions CI badge on README | Continuous (per commit) |
 | Test pass rate | `cstylecheck_tests.yml` — pytest result matrix | Per commit to `develop`/`main` |
-| Naming convention compliance | `cstylecheck_rules.yml` CI job | Per commit touching `src/` |
+| Naming convention compliance | `rules.yml` CI job | Per commit touching `src/` |
 | Code coverage | `pytest-cov` — `coverage.xml` artefact | Per CI run on Python 3.11 |
 | Open Issues (bugs/changes) | GitHub Issues board | Reviewed weekly |
 | WBS progress | Manual update to this document | Per milestone |
-| Risk status | Risk register (CNC-MAN5-001) | Monthly or on new risk identified |
+| Risk status | Risk register (CSC-MAN5-001) | Monthly or on new risk identified |
 
 ### 10.2 Corrective Action Triggers
 
@@ -195,8 +195,8 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | CI test failure on `develop` or `main` | Raise GitHub Issue; fix on `bugfix/` branch before next merge |
 | Coverage drop below target threshold | Raise Issue; add missing tests before next release |
 | Naming convention CI failure on own source | Raise Issue; fix in same commit; never merge failing source |
-| Milestone slipped by >1 week | Update schedule; assess risk impact; update CNC-MAN5-001 |
-| New risk identified | Add to risk register (CNC-MAN5-001); assign treatment |
+| Milestone slipped by >1 week | Update schedule; assess risk impact; update CSC-MAN5-001 |
+| New risk identified | Add to risk register (CSC-MAN5-001); assign treatment |
 
 ---
 
@@ -204,9 +204,9 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This plan must be approved before the project enters Phase PH-06 (Release). Any changes to scope, schedule, or resources require a change request (SUP.10) and a revised version of this document.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

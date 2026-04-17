@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SWE5-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.5 |
 
@@ -26,7 +26,7 @@
 
 ## 3. Purpose & Scope
 
-This document defines the software integration test specification for **CStyleCheck v1.0.0**, verifying that the software components integrate correctly across the interfaces defined in CNC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
+This document defines the software integration test specification for **CStyleCheck v1.0.0**, verifying that the software components integrate correctly across the interfaces defined in CSC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
 
 Integration tests operate at a higher level than unit tests (SWE.4): they exercise data flows **across component boundaries** — primarily the path from COMP-01 (CLI) through COMP-04 (Parser) into COMP-05 (Rule Engine) and COMP-07 (Output Formatter) — rather than individual method logic.
 
@@ -36,10 +36,10 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
-| CNC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
-| CNC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.0 |
-| CNC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.0 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
 
 ### 3.2 Test Environment
 
@@ -68,7 +68,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Interface ID | Description | Covered By |
 |---|---|---|
-| SWA-IF-01 | COMP-01 → COMP-02: config/alias/cstylecheck_exclusions paths | SIT-001, SIT-008 |
+| SWA-IF-01 | COMP-01 → COMP-02: config/alias/exclusions paths | SIT-001, SIT-008 |
 | SWA-IF-02 | COMP-01 → main(): file list and CLI flags | SIT-001, SIT-002, SIT-003 |
 | SWA-IF-03 | COMP-02 → COMP-05: cfg dict, alias_prefixes, disabled_rules | SIT-004, SIT-008 |
 | SWA-IF-04 | COMP-02 → COMP-04: defines substitution applied to source | SIT-009 |
@@ -97,7 +97,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `subprocess.run(["python", "cstylecheck.py", "--config", "cstylecheck_rules.yaml", "violating.c"])` | Source with known `variable.global.case` violation | stdout contains `variable.global.case` violation line |
+| 1 | `subprocess.run(["python", "cstylecheck.py", "--config", "rules.yml", "violating.c"])` | Source with known `variable.global.case` violation | stdout contains `variable.global.case` violation line |
 | 2 | Check output format | stdout | `{file}:{line}:{col}: ERROR [variable.global.case] ...` |
 | 3 | Check exit code | returncode | `1` |
 
@@ -164,7 +164,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 |---|---|---|---|
 | 1 | Config with `variable.global.case.enabled: false`; source with case violation | Modified config | `variable.global.case` NOT in output |
 | 2 | Same source; default config | Default config | `variable.global.case` IS in output |
-| 3 | Config with per-file exclusion for the test file | cstylecheck_exclusions YAML | Rule suppressed for that file only |
+| 3 | Config with per-file exclusion for the test file | exclusions YAML | Rule suppressed for that file only |
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
@@ -236,7 +236,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 ---
 
-### SIT-008 — cstylecheck_exclusions File → Disabled Rules → Rule Engine (SWA-IF-01, IF-03)
+### SIT-008 — exclusions File → Disabled Rules → Rule Engine (SWA-IF-01, IF-03)
 
 | Field | Value |
 |---|---|
@@ -247,9 +247,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `cstylecheck_exclusions.yml` suppresses `variable.global.case` for `uart.c` | Source with case violation | No `variable.global.case` in output for `uart.c` |
+| 1 | `exclusions.yml` suppresses `variable.global.case` for `uart.c` | Source with case violation | No `variable.global.case` in output for `uart.c` |
 | 2 | Same exclusion; different file `spi.c` with same violation | `spi.c` | Violation IS reported for `spi.c` |
-| 3 | Remove exclusion; re-run | No cstylecheck_exclusions | Violation reported for `uart.c` |
+| 3 | Remove exclusion; re-run | No exclusions file | Violation reported for `uart.c` |
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
@@ -268,7 +268,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `project.defines` maps `STATIC → static`; source uses `STATIC int uart_s_count` | Source + defines file | Correctly identified as file-static; `variable.static.*` rules applied |
+| 1 | `defines.txt` maps `STATIC → static`; source uses `STATIC int uart_s_count` | Source + defines file | Correctly identified as file-static; `variable.static.*` rules applied |
 | 2 | Same source without defines | No defines | `STATIC` not recognised; rule may not fire correctly |
 | 3 | Defines mapping `uint32_t → unsigned int`; source uses both | Mixed types | Both resolve to same signedness for sign-compat check |
 
@@ -375,7 +375,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-005 | Parser scope → Rule engine | IF-06 | \<PASS/FAIL\> | |
 | SIT-006 | Rule engine → JSON output | IF-10 | \<PASS/FAIL\> | |
 | SIT-007 | Rule engine → SARIF output | IF-10 | \<PASS/FAIL\> | |
-| SIT-008 | cstylecheck_exclusions → Rule engine | IF-01, IF-03 | \<PASS/FAIL\> | |
+| SIT-008 | exclusions -> rule engine | IF-01, IF-03 | \<PASS/FAIL\> | |
 | SIT-009 | Defines → Source → Rule engine | IF-04 | \<PASS/FAIL\> | |
 | SIT-010 | Dictionary override → Rule engine | IF-05 | \<PASS/FAIL\> | |
 | SIT-011 | Source cache → Sign checker | IF-07 | \<PASS/FAIL\> | |
@@ -412,9 +412,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** Software integration testing must be complete before software qualification testing (SWE.6) begins. All PASS results must be recorded in this document or a linked test execution report and placed under configuration management (SUP.8).
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

@@ -32,7 +32,7 @@
 | Field | Value |
 |---|---|
 | **Test Scope** | \<Define what is within scope: which software units, components, interfaces, or system functions are covered by this test specification\> |
-| **cstylecheck_exclusions** | \<What is explicitly out of scope and why\> |
+| **exclusions** | \<What is explicitly out of scope and why\> |
 | **SW Requirements Spec** | \<Document ID, Version — SWE.1 output (upstream traceability)\> |
 | **SW Architecture** | \<Document ID, Version — SWE.2 output\> |
 | **SW Detailed Design** | \<Document ID, Version — SWE.3 / SDD output\> |
