@@ -1,0 +1,110 @@
+name: CStyleCheck Tests
+
+on:
+  push:
+    paths:
+      - "src/cstylecheck.py"
+      - "src/rules.yml"
+      - "src/_version.py"
+      - "src/c_keywords.txt"
+      - "src/c_stdlib_names.txt"
+      - "src/c_spell_dict.txt"
+      - "tests/**"
+      - "tests/rules.yml"
+      - "requirements.txt"
+      - ".github/workflows/cstylecheck_tests.yml"
+  pull_request:
+    paths:
+      - "src/cstylecheck.py"
+      - "src/rules.yml"
+      - "src/_version.py"
+      - "src/c_keywords.txt"
+      - "src/c_stdlib_names.txt"
+      - "src/c_spell_dict.txt"
+      - "tests/**"
+      - "tests/rules.yml"
+      - "requirements.txt"
+      - ".github/workflows/cstylecheck_tests.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Unit Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate _version.py
+        working-directory: src
+        run: |
+          VERSION=$(git describe --tags --dirty --always 2>/dev/null || echo "0.0.0.dev")
+          echo "__version__ = \"${VERSION}\"" > _version.py
+          echo "Version: ${VERSION}"
+
+      # -----------------------------------------------------------------------
+      # YAML-004: Verify tests/rules.yml only differs from
+      # src/rules.yml in the two documented test-fixture lines:
+      #   - misc.indentation.style   (src: tabs | tests: spaces)
+      #   - variables.allow_loop_vars_short  (src: true | tests: false)
+      # Any other divergence fails the build.
+      # -----------------------------------------------------------------------
+      - name: Verify tests/ YAML divergence is intentional
+        run: |
+          DIFF=$(diff src/rules.yml tests/rules.yml \
+                   | grep '^[<>]' \
+                   | grep -v 'style: tabs\|style: spaces\|allow_loop_vars_short\|TEST FIXTURE\|intentionally' \
+                   || true)
+          if [ -n "$DIFF" ]; then
+            echo "ERROR: tests/rules.yml has unexpected differences from src/:"
+            echo "$DIFF"
+            echo ""
+            echo "Run: cp src/rules.yml tests/rules.yml"
+            echo "then restore the two documented test-fixture overrides."
+            exit 1
+          fi
+          echo "YAML diff check passed -- only permitted test-fixture differences found."
+
+      # -----------------------------------------------------------------------
+      # ASPICE SWE.4 BP7: coverage must meet the targets documented in
+      # CSC-SWE4-001 (>=90% statement, >=85% branch).
+      #
+      # Current measured coverage: ~72%.  The gap is entirely in main() and
+      # the CLI output helpers (lines 2894-3559) which are exercised only via
+      # subprocess in test_cli.py.  pytest-cov cannot instrument child
+      # processes without COVERAGE_PROCESS_START / sitecustomize.py support.
+      #
+      # Gate is set to 72 (current baseline) to catch any regressions.
+      # Raise to 90 once subprocess coverage instrumentation is added.
+      # See: https://pytest-cov.readthedocs.io/en/latest/subprocess-support.html
+      # -----------------------------------------------------------------------
+      - name: Run unit tests with coverage gate
+        run: |
+          pytest tests/ --ignore=tests/test_cli.py \
+            -v --tb=short \
+            --cov=src --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-fail-under=72
+
+      - name: Run CLI integration tests
+        run: pytest tests/test_cli.py -v --tb=short
+
+      - name: Upload coverage
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 30
+

@@ -1,0 +1,363 @@
+# .github/workflows/cstylecheck_rules.yml
+# =============================================================================
+# Embedded C Style Compliance Checker with trend analysis
+# =============================================================================
+#
+# Runs on every push and pull-request that touches C source or headers.
+#
+# On the default branch (main/master) it additionally:
+#   1. Appends a JSON record to gh-pages/cstylecheck/trend.jsonl.
+#   2. Regenerates gh-pages/cstylecheck/index.html (Chart.js trend graph).
+#   3. Regenerates gh-pages/cstylecheck/badge.json (shields.io endpoint).
+#   4. Updates the naming-convention badge line in README.md.
+#
+# Required repository settings
+# -----------------------------
+#   Settings -> Actions -> General -> Workflow permissions:
+#     "Read and write permissions"
+#
+# The gh-pages branch is created automatically on the first trend run.
+# Enable GitHub Pages (Settings -> Pages -> Source: gh-pages branch / root)
+# to make the trend page publicly accessible.
+# =============================================================================
+
+name: CStyleCheck Rules
+
+on:
+  push:
+    paths:
+      - "source/**/*.c"
+      - "source/**/*.h"
+      - "src/**"
+      - ".github/workflows/rules.yml"
+  pull_request:
+    paths:
+      - "source/**/*.c"
+      - "source/**/*.h"
+      - "src/**"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Run the checker
+  # ---------------------------------------------------------------------------
+  stylecheck:
+    name: Example C file action
+    runs-on: ubuntu-latest
+
+    outputs:
+      errors:   ${{ steps.parse.outputs.errors }}
+      warnings: ${{ steps.parse.outputs.warnings }}
+      infos:    ${{ steps.parse.outputs.infos }}
+      files:    ${{ steps.parse.outputs.files }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # On PRs, only the changed files are checked for speed
+      - name: Get changed C files (PR only)
+        if: github.event_name == 'pull_request'
+        id: changed
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            source/**/*.c
+            source/**/*.h
+
+      # PR run
+      - name: Run checker (pull request)
+        if: >
+          github.event_name == 'pull_request' &&
+          steps.changed.outputs.any_changed == 'true'
+        run: |
+          mkdir -p output/cstylecheck
+          python src/cstylecheck.py          \
+            --config     src/rules.yml \
+            --aliases    src/aliases.txt            \
+            --exclusions src/exclusions.yml         \
+            --github-actions                                   \
+            --summary                                          \
+            --log        output/cstylecheck/cstylecheck_results.txt \
+            --exclude    source/cots/                          \
+            ${{ steps.changed.outputs.all_changed_files }}    \
+          || true
+
+      # Push run -- all files
+      - name: Run checker (push, all source)
+        if: github.event_name == 'push'
+        run: |
+          mkdir -p output/cstylecheck
+          python src/cstylecheck.py          \
+            --config     src/rules.yml \
+            --aliases    src/aliases.txt            \
+            --exclusions src/exclusions.yml         \
+            --github-actions                                   \
+            --summary                                          \
+            --log        output/cstylecheck/cstylecheck_results.txt \
+            --exclude    source/cots/                          \
+            --include    "source/**/*.c"                       \
+            --include    "source/**/*.h"                       \
+          || true
+
+      - name: Parse summary numbers
+        id: parse
+        if: always()
+        shell: python
+        run: |
+          import re, os, pathlib
+
+          log = pathlib.Path("output/cstylecheck/cstylecheck_results.txt")
+          text = log.read_text() if log.exists() else ""
+
+          def extract(pattern):
+              m = re.search(pattern, text)
+              return m.group(1) if m else "0"
+
+          errors   = extract(r"Errors\s+:\s+(\d+)")
+          warnings = extract(r"Warnings\s+:\s+(\d+)")
+          infos    = extract(r"Info\s+:\s+(\d+)")
+          files    = extract(r"Files checked\s+:\s+(\d+)")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"errors={errors}\n")
+              fh.write(f"warnings={warnings}\n")
+              fh.write(f"infos={infos}\n")
+              fh.write(f"files={files}\n")
+
+          print(f"Errors={errors} Warnings={warnings} Info={infos} Files={files}")
+
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: stylecheck-results-${{ github.run_number }}
+          path: output/cstylecheck/cstylecheck_results.txt
+          retention-days: 90
+
+      - name: Fail job on naming errors
+        if: steps.parse.outputs.errors != '0'
+        run: |
+          echo "::error::Naming convention: ${{ steps.parse.outputs.errors }} error(s) found."
+          exit 1
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Update trend data and README badge (default branch push only)
+  # ---------------------------------------------------------------------------
+  trend:
+    name: Update Trend
+    needs: stylecheck
+    if: >
+      always() &&
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo (for README)
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Checkout or create gh-pages branch
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            git fetch origin gh-pages
+            git checkout gh-pages
+            git checkout ${{ github.sha }} -- .github 2>/dev/null || true
+            git checkout ${{ github.sha }} -- README.md 2>/dev/null || true
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . 2>/dev/null || true
+          fi
+          mkdir -p stylecheck
+
+      - name: Append trend record
+        shell: python
+        run: |
+          import json, datetime, os, pathlib
+
+          record = {
+              "date":     datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "run":      int(os.environ["RUN_NUMBER"]),
+              "sha":      os.environ["SHA"][:8],
+              "errors":   int(os.environ["ERRORS"]),
+              "warnings": int(os.environ["WARNINGS"]),
+              "infos":    int(os.environ["INFOS"]),
+              "files":    int(os.environ["FILES"]),
+          }
+          f = pathlib.Path("stylecheck/trend.jsonl")
+          with f.open("a") as fh:
+              fh.write(json.dumps(record) + "\n")
+          print(f"Appended: {record}")
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          SHA:        ${{ github.sha }}
+          ERRORS:     ${{ needs.stylecheck.outputs.errors }}
+          WARNINGS:   ${{ needs.stylecheck.outputs.warnings }}
+          INFOS:      ${{ needs.stylecheck.outputs.infos }}
+          FILES:      ${{ needs.stylecheck.outputs.files }}
+
+      - name: Generate trend HTML page and badge JSON
+        shell: python
+        run: |
+          import json, os, pathlib, re
+
+          trend_file = pathlib.Path("stylecheck/trend.jsonl")
+          records    = [json.loads(l) for l in trend_file.read_text().splitlines() if l.strip()]
+          recent     = records[-60:]   # keep last 60 data points on the chart
+
+          errors   = int(os.environ["ERRORS"])
+          warnings = int(os.environ["WARNINGS"])
+          repo     = os.environ["REPO"]
+          owner, reponame = repo.split("/")
+          pages_base = f"https://{owner}.github.io/{reponame}"
+
+          # --- Badge JSON (served by shields.io endpoint) ---
+          total   = errors + warnings
+          colour  = "brightgreen" if total == 0 else "yellow" if errors == 0 else "red"
+          message = "clean" if total == 0 else f"{errors}E {warnings}W"
+          badge   = {"schemaVersion": 1, "label": "naming", "message": message, "color": colour}
+          pathlib.Path("stylecheck/badge.json").write_text(json.dumps(badge, indent=2))
+
+          # --- Chart data ---
+          labels = [r["date"][:10] + " #" + str(r.get("run","?")) for r in recent]
+          e_vals = [r["errors"]   for r in recent]
+          w_vals = [r["warnings"] for r in recent]
+          i_vals = [r["infos"]    for r in recent]
+
+          rows = "".join(
+              f'<tr><td>{r["date"][:10]}</td><td>#{r.get("run","?")}</td>'
+              f'<td><code>{r["sha"]}</code></td><td>{r["files"]}</td>'
+              f'<td style="color:{"red" if r["errors"] else "green"}">{r["errors"]}</td>'
+              f'<td style="color:{"orange" if r["warnings"] else "green"}">{r["warnings"]}</td>'
+              f'<td>{r["infos"]}</td></tr>'
+              for r in reversed(recent)
+          )
+
+          html = f"""<!doctype html>
+          <html lang="en"><head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>{reponame} -- Naming Convention Trend</title>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+          <style>
+            body {{ font-family: system-ui, sans-serif; max-width: 960px;
+                   margin: 0 auto; padding: 1rem 1.5rem; color: #222; }}
+            h1   {{ font-size: 1.4rem; }}
+            table {{ border-collapse: collapse; width: 100%; font-size: 0.85rem; }}
+            th, td {{ border: 1px solid #ccc; padding: 4px 8px; text-align: right; }}
+            th {{ background: #f5f5f5; text-align: center; }}
+            td:nth-child(1), td:nth-child(2), td:nth-child(3) {{ text-align: left; }}
+            .stat {{ display: inline-block; margin: 0 1rem; font-size: 1.1rem; }}
+            canvas {{ margin: 1.5rem 0; }}
+          </style>
+          </head><body>
+          <h1>📋 {reponame}: Naming Convention Trend</h1>
+          <p>
+            <span class="stat">🔴 <strong style="color:{'red' if errors else 'green'}">{errors}</strong> errors</span>
+            <span class="stat">🟡 <strong style="color:{'orange' if warnings else 'green'}">{warnings}</strong> warnings</span>
+            <span class="stat">📁 {os.environ["FILES"]} files</span>
+            <span class="stat">🔢 {len(records)} runs recorded</span>
+          </p>
+          <canvas id="chart" height="120"></canvas>
+          <script>
+          new Chart(document.getElementById('chart'), {{
+            type: 'line',
+            data: {{
+              labels: {json.dumps(labels)},
+              datasets: [
+                {{ label: 'Errors',   data: {json.dumps(e_vals)}, fill: true,
+                   borderColor: '#d32f2f', backgroundColor: 'rgba(211,47,47,0.15)',
+                   tension: 0.3, pointRadius: 3 }},
+                {{ label: 'Warnings', data: {json.dumps(w_vals)}, fill: true,
+                   borderColor: '#f57c00', backgroundColor: 'rgba(245,124,0,0.12)',
+                   tension: 0.3, pointRadius: 3 }},
+                {{ label: 'Info',     data: {json.dumps(i_vals)}, fill: true,
+                   borderColor: '#1976d2', backgroundColor: 'rgba(25,118,210,0.10)',
+                   tension: 0.3, pointRadius: 3 }},
+              ]
+            }},
+            options: {{
+              responsive: true,
+              interaction: {{ mode: 'index', intersect: false }},
+              plugins: {{ legend: {{ position: 'top' }},
+                         tooltip: {{ mode: 'index' }} }},
+              scales: {{ y: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }} }}
+            }}
+          }});
+          </script>
+          <h2>Run history (last {len(recent)} runs)</h2>
+          <table>
+          <tr><th>Date</th><th>Run</th><th>SHA</th><th>Files</th>
+              <th>Errors</th><th>Warnings</th><th>Info</th></tr>
+          {rows}
+          </table>
+          <p><small>Source: <a href="https://github.com/{repo}">{repo}</a></small></p>
+          </body></html>"""
+
+          pathlib.Path("stylecheck/index.html").write_text(html)
+          print(f"Trend page: {pages_base}/cstylecheck/")
+          print(f"Badge URL:  https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json")
+        env:
+          ERRORS:   ${{ needs.stylecheck.outputs.errors }}
+          WARNINGS: ${{ needs.stylecheck.outputs.warnings }}
+          INFOS:    ${{ needs.stylecheck.outputs.infos }}
+          FILES:    ${{ needs.stylecheck.outputs.files }}
+          REPO:     ${{ github.repository }}
+
+      - name: Commit and push trend data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add stylecheck/
+          git diff --staged --quiet && echo "No change" && exit 0
+          git commit -m \
+            "trend: run #${{ github.run_number }} E=${{ needs.stylecheck.outputs.errors }} W=${{ needs.stylecheck.outputs.warnings }}"
+          git push origin gh-pages
+
+      - name: Update README badge
+        run: |
+          # Switch back to the source branch to update README
+          git checkout ${{ github.ref_name }} -- README.md 2>/dev/null || true
+          python - << 'EOF'
+          import json, os, pathlib, re
+
+          repo    = os.environ["REPO"]
+          owner, reponame = repo.split("/")
+          pages_base = f"https://{owner}.github.io/{reponame}"
+          trend_url  = f"{pages_base}/cstylecheck/"
+          badge_url  = f"https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json"
+          badge_md   = f"[![Naming Convention]({badge_url})]({trend_url})"
+
+          readme = pathlib.Path("README.md")
+          if not readme.exists():
+              print("No README.md -- skipping")
+          else:
+              text    = readme.read_text()
+              pattern = r"\[!\[Naming Convention\]\([^)]+\)\]\([^)]+\)"
+              if re.search(pattern, text):
+                  text = re.sub(pattern, badge_md, text, count=1)
+              else:
+                  text = re.sub(r"(^#[^\n]+\n)", rf"\1\n{badge_md}\n",
+                                text, count=1, flags=re.MULTILINE)
+              readme.write_text(text)
+              print(f"README updated: {badge_md}")
+          EOF
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Commit and push README update
+        run: |
+          git add README.md
+          git diff --staged --quiet && echo "No README change" && exit 0
+          git commit -m "ci: update naming convention badge [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}

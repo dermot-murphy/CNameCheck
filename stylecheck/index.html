@@ -21,22 +21,22 @@
   <span class="stat">🔴 <strong style="color:green">0</strong> errors</span>
   <span class="stat">🟡 <strong style="color:green">0</strong> warnings</span>
   <span class="stat">📁 0 files</span>
-  <span class="stat">🔢 1 runs recorded</span>
+  <span class="stat">🔢 2 runs recorded</span>
 </p>
 <canvas id="chart" height="120"></canvas>
 <script>
 new Chart(document.getElementById('chart'), {
   type: 'line',
   data: {
-    labels: ["2026-04-17 #23"],
+    labels: ["2026-04-17 #23", "2026-04-17 #23"],
     datasets: [
-      { label: 'Errors',   data: [0], fill: true,
+      { label: 'Errors',   data: [0, 0], fill: true,
          borderColor: '#d32f2f', backgroundColor: 'rgba(211,47,47,0.15)',
          tension: 0.3, pointRadius: 3 },
-      { label: 'Warnings', data: [0], fill: true,
+      { label: 'Warnings', data: [0, 0], fill: true,
          borderColor: '#f57c00', backgroundColor: 'rgba(245,124,0,0.12)',
          tension: 0.3, pointRadius: 3 },
-      { label: 'Info',     data: [0], fill: true,
+      { label: 'Info',     data: [0, 0], fill: true,
          borderColor: '#1976d2', backgroundColor: 'rgba(25,118,210,0.10)',
          tension: 0.3, pointRadius: 3 },
     ]
@@ -50,11 +50,11 @@ new Chart(document.getElementById('chart'), {
   }
 });
 </script>
-<h2>Run history (last 1 runs)</h2>
+<h2>Run history (last 2 runs)</h2>
 <table>
 <tr><th>Date</th><th>Run</th><th>SHA</th><th>Files</th>
     <th>Errors</th><th>Warnings</th><th>Info</th></tr>
-<tr><td>2026-04-17</td><td>#23</td><td><code>69e7a353</code></td><td>0</td><td style="color:green">0</td><td style="color:green">0</td><td>0</td></tr>
+<tr><td>2026-04-17</td><td>#23</td><td><code>69e7a353</code></td><td>0</td><td style="color:green">0</td><td style="color:green">0</td><td>0</td></tr><tr><td>2026-04-17</td><td>#23</td><td><code>69e7a353</code></td><td>0</td><td style="color:green">0</td><td style="color:green">0</td><td>0</td></tr>
 </table>
 <p><small>Source: <a href="https://github.com/dermot-murphy/CStyleCheck">dermot-murphy/CStyleCheck</a></small></p>
 </body></html>
