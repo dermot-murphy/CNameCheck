@@ -1,4 +1,3 @@
-# .github/workflows/rules.yml
 # =============================================================================
 # Embedded C Style Compliance Checker with trend analysis
 # =============================================================================
@@ -21,7 +20,7 @@
 # to make the trend page publicly accessible.
 # =============================================================================
 
-name: CStyleCheck
+name: CStyleCheck Rules
 
 on:
   push:
