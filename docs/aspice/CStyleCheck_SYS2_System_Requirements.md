@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SYS2-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
 
@@ -40,7 +40,7 @@ The system is deployed in three integration modes:
 
 1. **Command-line tool** — invoked directly via Python or as a pip-installed entry point
 2. **GitHub Action** — integrated into GitHub Actions CI workflows via `action.yml`
-3. **pre-commit hook** — integrated into pre-commit framework via `.pre-commit-hooks.yaml`
+3. **pre-commit hook** — integrated into pre-commit framework via `.pre-commit-hooks.yml`
 4. **Docker container** — packaged as a portable, self-contained image for CI/CD pipelines
 
 ### 3.3 Referenced Documents
@@ -49,8 +49,8 @@ The system is deployed in three integration modes:
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
-| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
-| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
 
 ### 3.4 Glossary
 
@@ -177,7 +177,7 @@ The following table summarises the stakeholder needs from which the system requi
 
 | REQ-ID | Requirement | Priority | Verification Method | Derived From |
 |---|---|---|---|---|
-| SYS-NF-010 | The system shall integrate with the pre-commit framework via `.pre-commit-hooks.yaml` | Mandatory | Test | STK-001 |
+| SYS-NF-010 | The system shall integrate with the pre-commit framework via `.pre-commit-hooks.yml` | Mandatory | Test | STK-001 |
 | SYS-NF-011 | The system shall integrate with GitHub Actions via `action.yml` at the repository root | Mandatory | Test | STK-005 |
 | SYS-NF-012 | The GitHub Action shall expose violation counts (`errors`, `warnings`, `info`, `violations`) as step outputs | Mandatory | Test | STK-005 |
 
@@ -203,9 +203,9 @@ The following table summarises the stakeholder needs from which the system requi
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be placed under configuration management (SUP.8) upon approval. Any post-approval changes require a change request (SUP.10) and a new document version.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

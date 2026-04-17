@@ -16,7 +16,7 @@ from harness import cfg_only, run, has, clean, _load_dict_file, _BUILTIN_DICT
 _HERE   = Path(__file__).resolve().parent
 _SRC    = _HERE.parent / "src"
 CHECKER = str(_SRC / "cstylecheck.py")
-YAML    = str(_SRC / "cstylecheck_rules.yaml")
+YAML    = str(_SRC / "rules.yml")
 
 
 def _subprocess(*args, src_text=None, filename="mod.c"):
@@ -143,12 +143,12 @@ class TestDefaultDictionaryFiles(unittest.TestCase):
             self.assertIn(expected, words, f"'{expected}' missing from c_spell_dict.txt")
 
     def test_keywords_file_has_no_duplicates(self):
-        lines = [l.strip() for l in (_SRC / "c_keywords.txt").read_text().splitlines()
+        lines = [l.strip() for l in (_SRC / "c_keywords.txt").read_text(encoding="utf-8").splitlines()
                  if l.strip() and not l.startswith("#")]
         self.assertEqual(len(lines), len(set(lines)), "Duplicate entries in c_keywords.txt")
 
     def test_stdlib_file_has_no_duplicates(self):
-        lines = [l.strip() for l in (_SRC / "c_stdlib_names.txt").read_text().splitlines()
+        lines = [l.strip() for l in (_SRC / "c_stdlib_names.txt").read_text(encoding="utf-8").splitlines()
                  if l.strip() and not l.startswith("#")]
         self.assertEqual(len(lines), len(set(lines)), "Duplicate entries in c_stdlib_names.txt")
 

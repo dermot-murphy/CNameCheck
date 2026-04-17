@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SWE2-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
 
@@ -26,7 +26,7 @@
 
 ## 3. Purpose & Scope
 
-This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.0.0**. It refines the system architecture (CNC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
+This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.0.0**. It refines the system architecture (CSC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Architectural Design**.
 
@@ -34,16 +34,16 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
-| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CNC-SWE3-001 | CStyleCheck Software Detailed Design | 1.0 |
-| CNC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.0 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
 
 ---
 
 ## 4. Architectural Overview
 
-CStyleCheck is implemented as a **single Python module** (`cstylecheck.py`) with supporting data files. The module is structured into distinct functional components that map directly to the system-level subsystems defined in CNC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
+CStyleCheck is implemented as a **single Python module** (`cstylecheck.py`) with supporting data files. The module is structured into distinct functional components that map directly to the system-level subsystems defined in CSC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
 
 ```
 cstylecheck.py
@@ -238,7 +238,7 @@ main()
 │
 ├─ for each file in file_list:
 │   ├─ read file once → raw_source (cached in source_cache dict)
-│   ├─ COMP-02: load_exclusions, _disabled_rules_for_file → disabled_rules
+│   ├─ COMP-02: load_exclusions_file, _disabled_rules_for_file → disabled_rules
 │   ├─ COMP-04: preprocess(raw_source) → clean; build_line_map; _build_brace_depths
 │   ├─ COMP-05: Checker(filepath, raw_source, cfg, ...).run_all() → CheckResult
 │   │   ├─ _check_defines()
@@ -307,9 +307,9 @@ main()
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be placed under configuration management (SUP.8) upon approval. Any post-approval changes require a change request (SUP.10) and a new document version.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

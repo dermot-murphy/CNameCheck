@@ -29,11 +29,16 @@ variables:
   min_length: 3             # Barr-C 7.1.e: no variable shorter than 3 characters
   max_length: 40           # Barr-C 7.1.d: no variable longer than 31 chars
                             # (we use 40 to allow for module prefix)
-  allow_single_char_loop_vars: true  # Barr-C 7.1.e: loop counters must also be >= 3 chars
+  allow_single_char_loop_vars: true  # Barr-C 7.1.e: when true, single-character
+                                      # loop variables (e.g. i, j, k) are exempt
+                                      # from the min_length rule
   # When true, variables that appear only as for-loop iteration counters
   # (e.g. i, ix, ii) are exempt from the min_length rule regardless of
   # allow_single_char_loop_vars. Useful when min_length >= 2 but you want
   # to permit conventional loop counters.
+  # NOTE: intentionally set to false in tests/ copy -- TestAllowLoopVarsShort
+  # in test_misc_improvements.py verifies default-is-false behaviour.
+  # src/ canonical copy sets this to true (project default).
   allow_loop_vars_short: true
 
   # Uppercase abbreviations that are allowed anywhere in an otherwise
@@ -102,30 +107,30 @@ variables:
     # (after any module prefix, if applicable). If the parameter also
     # requires another prefix (pointer p_, bool b_, handle h_) the
     # parameter prefix p_ must come first:
-    #   uint8_t        p_channel       OK — plain param
-    #   uint8_t *      p_p_buffer      OK — param + pointer (p_ then p_)
-    #   bool           p_b_enabled     OK — param + bool  (p_ then b_)
-    #   TaskHandle_t   p_h_task        OK — param + handle (p_ then h_)
+    #   uint8_t        p_channel       OK -- plain param
+    #   uint8_t *      p_p_buffer      OK -- param + pointer (p_ then p_)
+    #   bool           p_b_enabled     OK -- param + bool  (p_ then b_)
+    #   TaskHandle_t   p_h_task        OK -- param + handle (p_ then h_)
     p_prefix:
-      enabled: false        # off by default — enable to enforce
+      enabled: false        # off by default -- enable to enforce
       severity: warning
       prefix: "p_"
 
-  # Pointer prefix — single pointer (*) → local part must start with p_
+  # Pointer prefix -- single pointer (*) -> local part must start with p_
   # (BARR-C 7.1.k)
   pointer_prefix:
     enabled: true
     severity: warning
     prefix: "p_"
 
-  # Double-pointer prefix (**) → local part must start with pp_
+  # Double-pointer prefix (**) -> local part must start with pp_
   # (BARR-C 7.1.l)
   pp_prefix:
     enabled: true
     severity: warning
     prefix: "pp_"
 
-  # Boolean prefix — bool / _Bool variables → local part must start with b_
+  # Boolean prefix -- bool / _Bool variables -> local part must start with b_
   # and should be phrased as a question: b_is_buffer_full, b_done_yet
   # (BARR-C 7.1.m)
   bool_prefix:
@@ -133,7 +138,7 @@ variables:
     severity: warning
     prefix: "b_"
 
-  # Handle prefix — non-pointer handle variables must start with h_
+  # Handle prefix -- non-pointer handle variables must start with h_
   # (BARR-C 7.1.n)
   # List every handle type used in your project under handle_types.
   # Common examples: FILE (stdio), OS/RTOS handle types (FreeRTOS, CMSIS-RTOS).
@@ -168,7 +173,7 @@ variables:
   # Examples that should be flagged: buffer32, array8, gpio3
   # Use exempt_patterns (regex) for hardware-port numbers you deliberately allow.
   no_numeric_in_name:
-    enabled: false          # off by default — enable for strict Barr-C compliance
+    enabled: false          # off by default -- enable for strict Barr-C compliance
     severity: warning
     exempt_patterns:        # regex patterns exempt from this rule
       # Peripheral port numbers (uart2, spi1, i2c0, can1, tim3)
@@ -190,7 +195,7 @@ variables:
   #   global handle:                   g_h_uart
   # This check is only meaningful when the individual prefix rules are enabled.
   prefix_order:
-    enabled: false          # off by default — enable with strict Barr-C compliance
+    enabled: false          # off by default -- enable with strict Barr-C compliance
     severity: warning
 
 # --- Constants (#define object-like, const-qualified variables) ---
@@ -255,8 +260,8 @@ enums:
     enabled: true
     severity: warning
     # The prefix is derived automatically:
-    #   1. Strip type suffix (_t) from type name  → uart_status
-    #   2. Convert to member case (upper_snake)   → UART_STATUS
+    #   1. Strip type suffix (_t) from type name  -> uart_status
+    #   2. Convert to member case (upper_snake)   -> UART_STATUS
     #   3. Members must start with UART_STATUS_
 
 # --- Typedefs ---
@@ -287,9 +292,9 @@ functions:
   enabled: true
   severity: error
   # Pattern: <module>_<Object><Verb>  e.g. uart_BufferRead
-  # object_verb  → modulePrefix_ObjectVerb  (e.g. uart_BufferRead)
-  # verb_object  → modulePrefix_VerbObject  (e.g. uart_ReadBuffer)
-  # lower_snake  → module_prefix_body       (e.g. uart_buffer_read)
+  # object_verb  -> modulePrefix_ObjectVerb  (e.g. uart_BufferRead)
+  # verb_object  -> modulePrefix_VerbObject  (e.g. uart_ReadBuffer)
+  # lower_snake  -> module_prefix_body       (e.g. uart_buffer_read)
   style: object_verb
   object_case: pascal
   verb_case: pascal
@@ -367,7 +372,7 @@ misc:
 
     # Functions whose integer arguments are known to be signed (int) and
     # therefore do not need a U suffix. Literals inside any call to a
-    # listed function are fully exempt — no header scanning required.
+    # listed function are fully exempt -- no header scanning required.
     # Add project-specific functions (e.g. RTOS APIs) to extend the list.
     # Set to an empty list [] to disable this exemption entirely.
     exempt_function_args:
@@ -375,7 +380,7 @@ misc:
       - memset
       - memcmp
       - memchr
-      # C stdio — printf family accepts signed int arguments
+      # C stdio -- printf family accepts signed int arguments
       - printf
       - fprintf
       - sprintf
@@ -401,6 +406,10 @@ misc:
     max: 180
 
   # Tabs vs spaces
+  # NOTE: this is intentionally set to 'spaces' in the tests/ copy so that
+  # the tab-prefixed source in TestWarningsAsErrors (test_cli.py) triggers
+  # misc.indentation INFO violations, enabling --warnings-as-errors tests.
+  # The src/ canonical copy uses 'tabs' as the project default.
   indentation:
     enabled: true
     severity: info
@@ -412,7 +421,7 @@ misc:
   # and the next non-blank line there are at least min_blank_lines and
   # at most max_blank_lines blank lines.
   block_comment_spacing:
-    enabled: false        # off by default — enable to enforce
+    enabled: false        # off by default -- enable to enforce
     severity: warning
     min_blank_lines: 1    # minimum blank lines after */
     max_blank_lines: 2    # maximum blank lines after */
@@ -421,7 +430,7 @@ misc:
   # Checks that every C source file begins with the copyright block comment
   # supplied via --copyright FILE on the command line, followed by exactly
   # one blank line.  The match is exact except that the year (or year range)
-  # on the '(C) Copyright YEAR' line may differ — any 4-digit year or
+  # on the '(C) Copyright YEAR' line may differ -- any 4-digit year or
   # YYYY-YYYY range is accepted.
   #
   # This rule is only active when --copyright is provided; the 'enabled'
@@ -437,9 +446,9 @@ misc:
   # A single blank line must follow it as the very last line in the file.
   #
   # filename_case controls the case applied to {filename}:
-  #   lower    → ascii.c          (default)
-  #   upper    → ASCII.C
-  #   preserve → unchanged from the file system name
+  #   lower    -> ascii.c          (default)
+  #   upper    -> ASCII.C
+  #   preserve -> unchanged from the file system name
   #
   # Example for ascii.c with default settings:
   #   /* EOF: ascii.c */
@@ -458,11 +467,56 @@ misc:
     enabled: true
     severity: warning
 
+  # -----------------------------------------------------------------------
+  # MISRA C:2012 Rule 7.3 / MISRA C:2023 Rule 7.3 (Required)
+  # -----------------------------------------------------------------------
+  # Integer literal suffixes must use uppercase letters only.
+  # The lowercase letter 'l' is visually indistinguishable from the digit
+  # '1' in many fonts and must not be used in any suffix position.
+  #
+  #   Violation:  1l   1ul   0xFFl   100UL  <- last example OK (uppercase L)
+  #   Correct:    1L   1UL   0xFFL
+  lowercase_l_suffix:
+    enabled: true
+    severity: error
+
+  # -----------------------------------------------------------------------
+  # MISRA C:2012 Rule 7.1 / MISRA C:2023 Rule 7.1 (Required)
+  # -----------------------------------------------------------------------
+  # Octal integer constants (leading zero followed by octal digits) are
+  # forbidden.  Zero-padded numbers look like decimals but are not.
+  #
+  #   Violation:  010  (= 8, not 10)   07   0777
+  #   Correct:    0    0x08   8U
+  #
+  # Note: the bare literal 0 (zero alone, or 0 with suffix 0U/0L) is
+  # always permitted.  Floating-point literals (0.5) and hexadecimal
+  # literals (0x07) are not affected.
+  octal_constant:
+    enabled: true
+    severity: error
+
+  # -----------------------------------------------------------------------
+  # MISRA C:2012 Rule 4.2 (Advisory) / MISRA C:2023 Rule 4.2 (Required)
+  # -----------------------------------------------------------------------
+  # Trigraphs are three-character sequences (??=, ??(, etc.) that the
+  # C preprocessor silently replaces before parsing.  They are forbidden
+  # because they can change the meaning of code in ways that are easy to
+  # overlook, especially in comments.
+  #
+  # The nine trigraphs and their expansions:
+  #   ??=  ->  #     ??(  ->  [     ??)  ->  ]
+  #   ??/  ->  \     ??'  ->  ^     ??<  ->  {
+  #   ??>  ->  }     ??!  ->  |     ??-  ->  ~
+  trigraph:
+    enabled: true
+    severity: error   # MISRA C:2023 promotes this to Required
+
 # --- Reserved / banned identifier names ---
 # Checks that no declared variable, function, macro, or constant name
 # shadows a C keyword, C++ keyword, or C standard library name.
 # Additional names can be banned via --banned-names FILE on the command line.
-# Per-file exceptions: add 'reserved_name' to disabled_rules in exclusions.yml.
+# Per-file exceptions: add 'reserved_name' to disabled_rules in the exclusions YAML (--exclusions).
 reserved_names:
   enabled: true
   severity: error
@@ -577,8 +631,8 @@ ignore:
 # Arguments are classified as:
 #   UNSIGNED  : literal with U/u suffix (e.g. 100U, 0xFFU), or (unsigned T) cast
 #   SIGNED    : negative literal (-1), or (signed T) cast
-#   NEUTRAL   : plain positive integer literal (10, 0xFF) — allowed for either
-#   UNKNOWN   : variable or expression — skipped conservatively
+#   NEUTRAL   : plain positive integer literal (10, 0xFF) -- allowed for either
+#   UNKNOWN   : variable or expression -- skipped conservatively
 #
 # Only arguments that are definitively SIGNED or UNSIGNED and conflict with
 # the parameter's resolved signedness generate a violation.

@@ -1,0 +1,53 @@
+# defines.txt — used with --defines FILE
+# =============================================================
+# Maps project-specific macros and type aliases to their C
+# equivalents so the checker can correctly identify storage
+# classes, type qualifiers, and signedness.
+#
+# Format:  TOKEN  expansion
+#   - First word is the token to be replaced (whole-word match).
+#   - Everything after the first whitespace run is the expansion.
+#   - Blank lines and lines starting with # are ignored.
+#   - Substitution is applied AFTER comment and string stripping,
+#     so tokens inside comments are never affected.
+#   - Order matters: longer/more-specific tokens should come first
+#     to avoid a shorter token matching inside a longer one.
+#     (Word-boundary matching prevents most such collisions, but
+#      ordering is still good practice.)
+# =============================================================
+
+# --- Storage class / qualifier keyword aliases ---
+# If your project uses a macro like "STATIC" for "static",
+# list it here so the checker treats it identically.
+
+STATIC          static
+INLINE          inline
+LOCAL_INLINE    static inline
+CONST           const
+
+# --- Exact-width integer types (stdint.h style) ---
+# These are already partially recognised by the checker's built-in
+# patterns (uint\w+, int\w+), but listing them here also feeds the
+# sign-compatibility analyser so it can resolve typedef chains when
+# the actual typedef declaration is not in the scanned files.
+
+uint8_t         unsigned char
+uint16_t        unsigned short int
+uint32_t        unsigned int
+uint64_t        unsigned long long int
+int8_t          signed char
+int16_t         signed short int
+int32_t         signed int
+int64_t         signed long long int
+uintptr_t       unsigned int
+
+# --- Project-specific type aliases ---
+# Add any project typedefs that the checker does not see because they
+# are defined in generated or third-party headers that are excluded.
+
+# MYUINT8     unsigned char
+# MYUINT16    unsigned short
+# MYBOOL      unsigned char
+
+# --- Boolean ---
+bool            unsigned char

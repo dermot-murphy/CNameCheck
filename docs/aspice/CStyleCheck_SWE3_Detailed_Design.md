@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SWE3-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.3 |
 
@@ -32,9 +32,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
-| CNC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
-| CNC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
 
 ---
 
@@ -414,9 +414,9 @@ Violation:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be placed under configuration management (SUP.8) upon approval. Any post-approval changes require a change request (SUP.10) and a new document version.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

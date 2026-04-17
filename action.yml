@@ -8,21 +8,21 @@
 #
 #   - uses: dermot-murphy/CStyleCheck@v1
 #     with:
-#       config: src/cstylecheck_rules.yaml
+#       config: src/rules.yml
 #
 # Full example:
 #
 #   - uses: dermot-murphy/CStyleCheck@v1
 #     id: cstylecheck
 #     with:
-#       config:      src/cstylecheck_rules.yaml
+#       config:      src/rules.yml
 #       include: |
 #         source/**/*.c
 #         source/**/*.h
 #       exclude: |
 #         source/cots/
 #         source/third_party/
-#       options-file:      src/cstylecheck.options
+#       options-file:      src/options.txt
 #       fail-on:           error
 #       sarif-file:        results/cstylecheck.sarif
 #
@@ -54,7 +54,7 @@ inputs:
     description: >-
       Path to the YAML rule configuration file, relative to the workspace root.
     required: false
-    default: 'src/cstylecheck_rules.yaml'
+    default: 'src/rules.yml'
 
   include:
     description: >-

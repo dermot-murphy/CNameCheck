@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SUP8-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SUP8-001 | **Version** | 1.1 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
 
@@ -49,9 +49,9 @@ This plan applies to all configuration items produced by the CStyleCheck project
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CNC-SUP9-001 | CStyleCheck Problem Resolution Management Plan | 1.0 |
-| CNC-SUP10-001 | CStyleCheck Change Request Management Plan | 1.0 |
-| CNC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CSC-SUP9-001 | CStyleCheck Problem Resolution Management Plan | 1.0 |
+| CSC-SUP10-001 | CStyleCheck Change Request Management Plan | 1.0 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
 
 ---
 
@@ -111,11 +111,11 @@ All items in the following table are placed under configuration control.
 |---|---|---|---|
 | CI-001 | Main linter source | `src/cstylecheck.py` | Source code |
 | CI-002 | Version file | `src/_version.py` | Generated / version |
-| CI-003 | Production naming convention config | `src/cstylecheck_rules.yaml` | Configuration |
-| CI-004 | CLI options defaults file | `src/cstylecheck.options` | Configuration |
-| CI-005 | exclusions configuration | `src/exclusions.yml` | Configuration |
-| CI-006 | Project preprocessor defines | `src/project.defines` | Configuration |
-| CI-007 | Module alias map | `src/cstylecheck_aliases.txt` | Configuration |
+| CI-003 | Production naming convention config | `src/rules.yml` | Configuration |
+| CI-004 | CLI options defaults file | `src/options.txt` | Configuration |
+| CI-005 | Exclusions configuration | `src/exclusions.yml` | Configuration |
+| CI-006 | Project preprocessor defines | `src/defines.txt` | Configuration |
+| CI-007 | Module alias map | `src/aliases.txt` | Configuration |
 | CI-008 | C keyword dictionary | `src/c_keywords.txt` | Data file |
 | CI-009 | C stdlib name dictionary | `src/c_stdlib_names.txt` | Data file |
 | CI-010 | Spell-check dictionary | `src/c_spell_dict.txt` | Data file |
@@ -123,16 +123,16 @@ All items in the following table are placed under configuration control.
 | CI-012 | Docker ignore file | `Dockerfile/.dockerignore` | Build / container |
 | CI-013 | Package metadata | `pyproject.toml` | Build / packaging |
 | CI-014 | pip dependencies | `requirements.txt` | Build / packaging |
-| CI-015 | pre-commit hook definition | `.pre-commit-hooks.yaml` | Integration |
+| CI-015 | pre-commit hook definition | `.pre-commit-hooks.yml` | Integration |
 | CI-016 | GitHub Action definition | `action.yml` | Integration |
 | CI-017 | Test suite (all test files) | `tests/test_*.py` | Test |
-| CI-018 | Test naming convention config | `tests/cstylecheck_rules.yaml` | Test configuration |
+| CI-018 | Test naming convention config | `tests/rules.yml` | Test configuration |
 | CI-019 | Test harness | `tests/harness.py` | Test |
 | CI-020 | Test keyword dictionary | `tests/c_keywords.txt` | Test data |
 | CI-021 | Test stdlib dictionary | `tests/c_stdlib_names.txt` | Test data |
 | CI-022 | Test spell dictionary | `tests/c_spell_dict.txt` | Test data |
 | CI-023 | CI — test workflow | `.github/workflows/cstylecheck_tests.yml` | CI/CD |
-| CI-024 | CI — naming convention workflow | `.github/workflows/cstylecheck_rules.yml` | CI/CD |
+| CI-024 | CI — naming convention workflow | `.github/workflows/rules.yml` | CI/CD |
 | CI-025 | CI — Docker publish workflow | `.github/workflows/docker_publish.yml` | CI/CD |
 | CI-026 | Project README | `README.md` | Documentation |
 | CI-027 | This CM Plan | `CStyleCheck_SUP8_CM_Plan.md` | Documentation |
@@ -145,7 +145,7 @@ All items in the following table are placed under configuration control.
   - On version tag `v1.2.3`: `:1.2.3`, `:1.2`, `:1`, `:latest`
   - On branch push: `:main`, `:sha-<short>`
 - **CI artefacts** (coverage reports) are identified by workflow run ID and Python version matrix entry
-- **Documents** use the ID scheme `CNC-<PROCESS>-<NNN>` (e.g., `CNC-SUP8-001`)
+- **Documents** use the ID scheme `CSC-<PROCESS>-<NNN>` (e.g., `CSC-SUP8-001`)
 
 ---
 
@@ -195,7 +195,7 @@ main ──► hotfix/* ──► main ──► tag v1.0.1
 ### 7.5 CI Enforcement
 
 - All merges to `develop` and `main` require CI (`cstylecheck_tests.yml`) to pass
-- The `cstylecheck_rules.yml` workflow runs the linter against the project's own source on every commit touching C files, enforcing self-hosting of the tool's own rules
+- The `rules.yml` workflow runs the linter against the project's own source on every commit touching C files, enforcing self-hosting of the tool's own rules
 - Supporting branches are deleted after merge
 
 > **📋 Note:** The `release/*` branch is the only branch where version-bump commits (`_version.py`, `pyproject.toml`) and release notes updates are permitted outside of `develop`. No new features may be introduced on a `release/*` branch.
@@ -234,7 +234,7 @@ main ──► hotfix/* ──► main ──► tag v1.0.1
 
 ## 9. Change Control
 
-Changes to controlled configuration items shall follow the change control process defined in **CNC-SUP10-001 (Change Request Management Plan)**. In summary:
+Changes to controlled configuration items shall follow the change control process defined in **CSC-SUP10-001 (Change Request Management Plan)**. In summary:
 
 1. A change request (CR) or problem resolution record is raised as a **GitHub Issue**, labelled appropriately (`bug`, `enhancement`, `change-request`)
 2. The Issue is linked in all related branch names and commit messages (e.g., `Closes #42`)
@@ -243,7 +243,7 @@ Changes to controlled configuration items shall follow the change control proces
 5. The merged commit SHA is recorded in the GitHub Issue closure comment
 6. If the change affects a release, a `release/*` branch is created and a new version tag applied per §8.2
 
-> **⚠️ Important:** Changes to `src/cstylecheck_rules.yaml` (CI-003) or dictionary files (CI-008 to CI-010) require explicit review as they directly affect linter behaviour and may introduce breaking changes for downstream users.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
 
 ---
 
@@ -310,7 +310,7 @@ Performed after tagging to verify:
 |---|---|
 | **CM Manager** (Claude) | Owns this plan; approves baselines; creates release tags; manages GHCR |
 | **Developer** | Creates Git Flow branches; raises GitHub Issues; opens pull requests; links commits and PRs to Issues |
-| **Reviewer** | Reviews PRs; confirms CI pass before approving; approves merge |
+| **Reviewer** | Dermot Murphy |
 | **CI System** (GitHub Actions) | Automated enforcement: runs tests, linting, Docker build on every push/PR |
 
 ---
@@ -331,9 +331,9 @@ Performed after tagging to verify:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-11 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be approved before the first release baseline is established. Post-approval changes must follow the change request process (SUP.10) and a new version issued.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

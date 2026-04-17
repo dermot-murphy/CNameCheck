@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-MAN5-001 | **Version** | 1.0 |
+| **Document ID** | CSC-MAN5-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | MAN.5 |
 
@@ -32,9 +32,9 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-MAN3-001 | Project Management Plan | 1.0 |
-| CNC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CNC-SUP10-001 | Change Request Management Plan | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.0 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-SUP10-001 | Change Request Management Plan | 1.0 |
 
 ---
 
@@ -95,13 +95,13 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Impact** | 3 (Moderate) — user trust erosion; adoption blocked |
 | **RPN** | 9 (Medium) |
 | **Treatment Option** | Mitigate |
-| **Treatment Activities** | Comprehensive test suite (500+ tests); `test_improvements.py` regression suite for each bug fixed; `cstylecheck_rules.yml` self-hosting verification; baseline suppression feature for legacy adoption |
+| **Treatment Activities** | Comprehensive test suite (500+ tests); `test_improvements.py` regression suite for each bug fixed; `rules.yml` self-hosting verification; baseline suppression feature for legacy adoption |
 | **Residual Likelihood** | 2 |
 | **Residual Impact** | 2 |
 | **Residual RPN** | 4 (Low) |
 | **Owner** | Claude |
 | **Review Date** | Per release |
-| **Status** | Active — monitored via CI |
+| **Status** | Released |
 
 ---
 
@@ -122,7 +122,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual RPN** | 2 (Low) |
 | **Owner** | Claude |
 | **Review Date** | Per Python minor release |
-| **Status** | Active — monitored via CI matrix |
+| **Status** | Released |
 
 ---
 
@@ -143,7 +143,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual RPN** | 4 (Low) |
 | **Owner** | Claude |
 | **Review Date** | Monthly |
-| **Status** | Active |
+| **Status** | Released |
 
 ---
 
@@ -164,7 +164,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual RPN** | 3 (Low) |
 | **Owner** | Claude |
 | **Review Date** | Quarterly |
-| **Status** | Accepted |
+| **Status** | Released |
 
 ---
 
@@ -185,7 +185,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual RPN** | 6 (Medium) |
 | **Owner** | Claude |
 | **Review Date** | Per milestone |
-| **Status** | Active |
+| **Status** | Released |
 
 ---
 
@@ -206,7 +206,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual RPN** | 2 (Low) |
 | **Owner** | Claude |
 | **Review Date** | Per major release |
-| **Status** | Active |
+| **Status** | Released |
 
 ---
 
@@ -227,7 +227,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual RPN** | 3 (Low) |
 | **Owner** | Claude |
 | **Review Date** | Pre-assessment |
-| **Status** | Active |
+| **Status** | Released |
 
 ---
 
@@ -248,7 +248,7 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 | **Residual RPN** | 3 (Low) |
 | **Owner** | Claude |
 | **Review Date** | Per Docker build |
-| **Status** | Active |
+| **Status** | Released |
 
 ---
 
@@ -285,9 +285,9 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be maintained throughout the project lifecycle. New risks must be added within 5 business days of identification. Any risk reaching High (RPN ≥ 10) residual must be escalated immediately.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

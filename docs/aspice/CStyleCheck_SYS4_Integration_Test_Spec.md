@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SYS4-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
 
@@ -46,9 +46,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CNC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CNC-SYS5-001 | CStyleCheck System Verification Report | 1.0 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.0 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
 ### 3.4 Test Environment
@@ -85,12 +85,12 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | **Test Objective** | Verify that a conforming C source file produces zero violations and exit code 0 across the complete SS-01 → SS-06 pipeline |
 | **Architecture Interface** | IF-01, IF-02, IF-04, IF-06, IF-08, IF-09 |
 | **Requirement Reference** | SYS-F-001, SYS-F-027, SYS-F-037 |
-| **Pre-conditions** | `cstylecheck_rules.yaml` present; conforming `.c` and `.h` files available |
+| **Pre-conditions** | `rules.yml` present; conforming `.c` and `.h` files available |
 | **Test Method** | Dynamic execution via subprocess |
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cstylecheck.py --config cstylecheck_rules.yaml clean.c` | Conforming `clean.c` | stdout: no violation lines |
+| 1 | Invoke: `python cstylecheck.py --config rules.yml clean.c` | Conforming `clean.c` | stdout: no violation lines |
 | 2 | Check exit code | — | Exit code = 0 |
 | 3 | Repeat on Python 3.10, 3.11, 3.12 | — | All pass |
 
@@ -113,7 +113,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke with file containing `int BadName = 0;` in global scope | `--config cstylecheck_rules.yaml` | stdout contains line with format: `<file>:<line>:<col>: error [variable.global.case] ...` |
+| 1 | Invoke with file containing `int BadName = 0;` in global scope | `--config rules.yml` | stdout contains line with format: `<file>:<line>:<col>: error [variable.global.case] ...` |
 | 2 | Verify all four fields present | — | File path, line number, column, rule ID all present in output |
 | 3 | Check exit code | — | Exit code = 1 |
 
@@ -131,13 +131,13 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | **Test Objective** | Verify that options loaded from `--options-file` are correctly merged with direct CLI arguments, and that direct CLI args take precedence (IF-01) |
 | **Architecture Interface** | IF-01 |
 | **Requirement Reference** | SYS-F-003, SYS-NF-008 |
-| **Pre-conditions** | `cstylecheck.options` specifying a config file; direct `--config` override available |
+| **Pre-conditions** | `options.txt` specifying a config file; direct `--config` override available |
 | **Test Method** | Dynamic execution via subprocess |
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke with `--options-file cstylecheck.options` | Options file specifies `--config src/cstylecheck_rules.yaml` | Tool uses the config from options file; no error |
-| 2 | Invoke with `--options-file cstylecheck.options --config override.yaml` | Override config has different rules | Tool uses `override.yaml` not the options file config (CLI takes precedence) |
+| 1 | Invoke with `--options-file options.txt` | Options file specifies `--config src/rules.yml` | Tool uses the config from options file; no error |
+| 2 | Invoke with `--options-file options.txt --config override.yaml` | Override config has different rules | Tool uses `override.yaml` not the options file config (CLI takes precedence) |
 | 3 | Check exit codes | — | Both invocations: exit 0 or 1 (not 2) |
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
@@ -159,7 +159,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cstylecheck.py --output-format json --config cstylecheck_rules.yaml violating.c` | File with 3 errors, 2 warnings | stdout is valid JSON |
+| 1 | Invoke: `python cstylecheck.py --output-format json --config rules.yml violating.c` | File with 3 errors, 2 warnings | stdout is valid JSON |
 | 2 | Parse JSON and validate schema | JSON output | `summary.errors == 3`, `summary.warnings == 2`, `violations` array has 5 entries |
 | 3 | Verify each violation object | — | Each entry has: `file`, `line`, `col`, `severity`, `rule`, `message` keys |
 | 4 | Check exit code | — | Exit code = 1 (errors present) |
@@ -183,7 +183,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cstylecheck.py --output-format sarif --config cstylecheck_rules.yaml violating.c` | Violating source file | stdout is valid SARIF 2.1.0 JSON |
+| 1 | Invoke: `python cstylecheck.py --output-format sarif --config rules.yml violating.c` | Violating source file | stdout is valid SARIF 2.1.0 JSON |
 | 2 | Validate SARIF schema | SARIF output | `$schema` field present; `runs[0].results` array populated |
 | 3 | Verify location data | — | Each result includes `physicalLocation.artifactLocation.uri` and `region.startLine` |
 
@@ -277,7 +277,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke with `--exclusions exclusions.yml` on file that violates an excluded rule | Both file and exclusions | Excluded violation NOT reported |
+| 1 | Invoke with `--exclusions exclusions.yml` on file that violates an excluded rule | Both file and exclusions file | Excluded violation NOT reported |
 | 2 | Invoke without `--exclusions` on same file | Same source only | Violation IS reported |
 | 3 | Verify other rules still enforced | Same file with additional unexcluded violation | Unexcluded violation reported |
 
@@ -325,7 +325,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | `docker run --rm -v "$(pwd):/repo" cstylecheck:latest --config /app/cstylecheck_rules.yaml /repo/violating.c` | Violating source mounted at `/repo` | Violations reported to stdout |
+| 1 | `docker run --rm -v "$(pwd):/repo" cstylecheck:latest --config /app/rules.yml /repo/violating.c` | Violating source mounted at `/repo` | Violations reported to stdout |
 | 2 | Check exit code | — | Exit code = 1 |
 | 3 | Invoke with `--help` via Docker | — | Help text printed; exit code = 0 |
 | 4 | Verify image available for `linux/amd64` and `linux/arm64` | `docker manifest inspect` | Both platform digests present |
@@ -351,7 +351,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 |---|---|---|---|
 | 1 | `pip install .` in clean venv | Repository root | Installation succeeds; no errors |
 | 2 | `cstylecheck --version` | — | Version string matches `_version.py`; exit code = 0 |
-| 3 | `cstylecheck --config src/cstylecheck_rules.yaml clean.c` | Conforming source | Exit code = 0; no violations |
+| 3 | `cstylecheck --config src/rules.yml clean.c` | Conforming source | Exit code = 0; no violations |
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
@@ -372,7 +372,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Step | Action | Input | Expected Result |
 |---|---|---|---|
-| 1 | Invoke: `python cstylecheck.py --github-actions --config cstylecheck_rules.yaml violating.c` | Mixed error/warning source | stdout contains `::error file=...,line=...,col=...::` for errors |
+| 1 | Invoke: `python cstylecheck.py --github-actions --config rules.yml violating.c` | Mixed error/warning source | stdout contains `::error file=...,line=...,col=...::` for errors |
 | 2 | Verify warning format | — | stdout contains `::warning file=...,line=...,col=...::` for warnings |
 | 3 | Invoke without `--github-actions` | Same source | No `::error` / `::warning` prefixes in output |
 
@@ -454,9 +454,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This document must be approved before integration testing commences. All test results must be recorded in this document or a linked test execution report and placed under configuration management (SUP.8).
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

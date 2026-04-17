@@ -7,12 +7,12 @@ Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
 Usage
 -----
   python cstylecheck.py [OPTIONS] <file1.c> [file2.h ...]
-  python cstylecheck.py --options-file cstylecheck.options [overrides ...]
+  python cstylecheck.py --options-file options.txt [overrides ...]
   python cstylecheck.py --version
   python cstylecheck.py --help
 
   Key options (see --help for the full list):
-    --config PATH          YAML config file (default: cstylecheck_rules.yaml)
+    --config PATH          YAML config file (default: rules.yml)
     --options-file FILE    Read options from FILE (one per line, # = comment)
     --defines FILE         Project macro/type substitution file
     --aliases FILE         Module alias prefix file
@@ -35,7 +35,7 @@ Exit codes
   1  One or more errors found (or warnings promoted by --warnings-as-errors)
   2  Configuration / invocation error
 
-Checks performed (driven by cstylecheck_rules.yaml)
+Checks performed (driven by rules.yml)
 ----------------------------------------------------
   Variables
     - Scope-aware: global (g_ prefix), file-static (s_ prefix), local,
@@ -194,9 +194,9 @@ def _read_options_file(path: str) -> list:
       - Shell quoting rules apply (via shlex), so paths containing spaces
         must be quoted:  --log "output path/results.txt"
       - Options that take a value may be on the same line:
-            --config tools/cstylecheck/cstylecheck_rules.yaml
+            --config tools/cstylecheck/rules.yml
         or split with an = sign (standard CLI syntax):
-            --config=tools/cstylecheck/cstylecheck_rules.yaml
+            --config=tools/cstylecheck/rules.yml
     """
     try:
         text = Path(path).read_text(encoding="utf-8", errors="replace")
@@ -251,7 +251,7 @@ def load_config(path: str) -> dict:
     cfg_path = Path(path)
     if not cfg_path.exists():
         sys.exit(f"Config file not found: {path}")
-    with cfg_path.open() as fh:
+    with cfg_path.open(encoding="utf-8") as fh:
         return yaml.safe_load(fh)
 
 
@@ -1055,6 +1055,9 @@ class Checker:
         self._check_misc()
         self._check_yoda()
         self._check_reserved_names()
+        self._check_lowercase_l_suffix()   # MISRA C:2012/2023 Rule 7.3
+        self._check_octal_constants()      # MISRA C:2012/2023 Rule 7.1
+        self._check_trigraphs()            # MISRA C:2012/2023 Rule 4.2
         if self._spell_dict is not None:
             self._check_spelling()
         # Remove violations for rules that are disabled for this file
@@ -1527,13 +1530,13 @@ class Checker:
     # Helper: check whether a function body string satisfies object_verb.
     # Extracted so verb_object can reuse the same logic.
     @staticmethod
-    def _body_is_object_verb(body: str, exclusions: set, abbrevs: set) -> bool:
+    def _body_is_object_verb(body: str, object_exclusions: set, abbrevs: set) -> bool:
         """
         Return True when *body* (text after the module prefix) satisfies the
         object_verb (or verb_object) convention:
 
           * If any underscore-delimited segment of *body* appears in
-            *exclusions*, the rule is waived entirely.
+            *object_exclusions*, the rule is waived entirely.
           * Otherwise every segment must be PascalCase or an entry in
             *abbrevs*.  A single segment (verb only, no explicit object)
             is also accepted.
@@ -1542,14 +1545,14 @@ class Checker:
           BufferRead          — classic ObjectVerb
           Init                — single verb, no object required
           LiveDataRead_X_Start — multi-segment; last = verb, rest = object
-          Wr_Mode_Transit     — Wr is in exclusions → waived
+          Wr_Mode_Transit     -- Wr is in object_exclusions -> waived
         """
         segments = [s for s in body.split("_") if s]
         if not segments:
             return False
         # Rule 1: exclusion list waives the entire check
         for seg in segments:
-            if seg in exclusions or seg.upper() in {e.upper() for e in exclusions}:
+            if seg in object_exclusions or seg.upper() in {e.upper() for e in object_exclusions}:
                 return True
         # Rule 2: every segment must be PascalCase or a known abbreviation
         for seg in segments:
@@ -1566,7 +1569,7 @@ class Checker:
         sev        = fn_cfg.get("severity", "error")
         style      = fn_cfg.get("style", "object_verb")
         isr_cfg    = fn_cfg.get("isr_suffix", {})
-        exclusions = set(fn_cfg.get("object_exclusions", []))
+        object_exclusions = set(fn_cfg.get("object_exclusions", []))
         abbrevs    = set(fn_cfg.get("allowed_abbreviations", []))
         sp_cfg     = fn_cfg.get("static_prefix", {})
 
@@ -1634,7 +1637,7 @@ class Checker:
             body = name[len(pfx):]
 
             if style in ("object_verb", "verb_object"):
-                if not self._body_is_object_verb(body, exclusions, abbrevs):
+                if not self._body_is_object_verb(body, object_exclusions, abbrevs):
                     self._v(m.start(), sev, "function.style",
                             f"Function '{name}' body '{body}' should be "
                             f"ObjectVerb segments separated by '_' "
@@ -2239,7 +2242,7 @@ class Checker:
 
 
     # -----------------------------------------------------------------------
-    # 10. Yoda conditions  (constant on the LHS of == and !=)
+    # 11. Yoda conditions  (constant on the LHS of == and !=)
     # -----------------------------------------------------------------------
 
     def _check_yoda(self) -> None:
@@ -2285,21 +2288,32 @@ class Checker:
                 lhs_s -= 1
             lhs = self.clean[lhs_s:lhs_end]
 
-            # Extract token immediately to the RIGHT of the operator
+            # Extract token immediately to the RIGHT of the operator.
+            # Include a leading '-' so that negative literals (-1, -100) are
+            # displayed correctly in the violation message (BUG-004).
             rhs_start = m.end()
             while rhs_start < len(self.clean) and self.clean[rhs_start] in " \t":
                 rhs_start += 1
+            # Check for a leading minus sign (negative literal)
+            rhs_display_start = rhs_start
+            if (rhs_start < len(self.clean)
+                    and self.clean[rhs_start] == "-"
+                    and rhs_start + 1 < len(self.clean)
+                    and self.clean[rhs_start + 1].isdigit()):
+                rhs_start += 1   # advance past '-' so digit-only token is used
+                                 # for _is_constant_token classification
             rhs_end = rhs_start
             while rhs_end < len(self.clean) and (
                     self.clean[rhs_end].isalnum()
                     or self.clean[rhs_end] in "_'xXuUlL"):
                 rhs_end += 1
-            rhs = self.clean[rhs_start:rhs_end]
+            rhs         = self.clean[rhs_start:rhs_end]        # digit-only for classify
+            rhs_display = self.clean[rhs_display_start:rhs_end]  # includes '-' for message
 
             if self._is_variable_token(lhs) and self._is_constant_token(rhs):
                 self._v(m.start(), sev, "misc.yoda_condition",
-                        f"Constant '{rhs}' should be on the left of '{op}': "
-                        f"write '{rhs} {op} {lhs}'")
+                        f"Constant '{rhs_display}' should be on the left of '{op}': "
+                        f"write '{rhs_display} {op} {lhs}'")
 
     @staticmethod
     def _is_constant_token(tok: str) -> bool:
@@ -2322,6 +2336,119 @@ class Checker:
         if not t:
             return False
         return bool(re.fullmatch(r"[a-z_][a-zA-Z0-9_]*", t))
+
+    # -----------------------------------------------------------------------
+    # 12. MISRA C:2012/2023 Rule 7.3 — lowercase 'l' suffix forbidden
+    #
+    # The letter 'l' (lowercase L) is visually indistinguishable from the
+    # digit '1' in many fonts.  MISRA C:2012 Rule 7.3 and MISRA C:2023
+    # Rule 7.3 (both Required) mandate that integer literal suffixes use
+    # only uppercase letters (U, L, UL, LL, ULL etc.).
+    #
+    # Examples:
+    #   1l   → violation  (should be 1L)
+    #   1ul  → violation  (should be 1UL)
+    #   1UL  → OK
+    #   0xFFl→ violation  (should be 0xFFL)
+    # -----------------------------------------------------------------------
+
+    # Pre-compiled once at class definition time.
+    _RE_INT_WITH_SUFFIX = re.compile(
+        r'\b(?:0[xX][0-9A-Fa-f]+|[0-9]+)([uUlL]+)\b'
+    )
+
+    def _check_lowercase_l_suffix(self) -> None:
+        ll_cfg = self.cfg.get("misc", {}).get("lowercase_l_suffix", {})
+        if not ll_cfg.get("enabled", True):
+            return
+        sev = ll_cfg.get("severity", "error")
+
+        for m in self._RE_INT_WITH_SUFFIX.finditer(self.clean):
+            suffix = m.group(1)
+            if 'l' in suffix:   # lowercase l present anywhere in suffix
+                self._v(
+                    m.start(), sev, "misc.lowercase_l_suffix",
+                    f"Integer literal '{m.group(0)}' uses lowercase 'l' suffix; "
+                    f"use uppercase 'L' to avoid confusion with digit '1' "
+                    f"(MISRA C:2012/2023 Rule 7.3)"
+                )
+
+    # -----------------------------------------------------------------------
+    # 13. MISRA C:2012/2023 Rule 7.1 — octal integer constants forbidden
+    #
+    # An integer literal that starts with '0' followed by one or more
+    # octal digits (0–7) is an octal constant.  This is a common source
+    # of bugs when numeric values are zero-padded for alignment.
+    #
+    # Examples:
+    #   010  → violation (= 8 decimal, NOT 10)
+    #   07   → violation (= 7 decimal but looks like it might be "07")
+    #   0    → OK  (zero)
+    #   0U   → OK  (zero with suffix)
+    #   0x1A → OK  (hexadecimal)
+    #   0.5  → OK  (floating-point)
+    # -----------------------------------------------------------------------
+
+    # Matches a leading-zero octal literal with at least one octal digit.
+    # Excludes hex (0x), float (0.), and bare zero (0 alone, 0U, 0L).
+    _RE_OCTAL_LITERAL = re.compile(
+        r'(?<![.\w])0[0-7][0-7]*(?:[uUlL]*)\b'
+    )
+
+    def _check_octal_constants(self) -> None:
+        oc_cfg = self.cfg.get("misc", {}).get("octal_constant", {})
+        if not oc_cfg.get("enabled", True):
+            return
+        sev = oc_cfg.get("severity", "error")
+
+        for m in self._RE_OCTAL_LITERAL.finditer(self.clean):
+            # Extra guard: reject match if preceded by 'x'/'X' (already in
+            # negative lookbehind, but be explicit for readability).
+            if m.start() > 0 and self.clean[m.start() - 1] in 'xX':
+                continue
+            self._v(
+                m.start(), sev, "misc.octal_constant",
+                f"Octal constant '{m.group(0).rstrip()}' is forbidden; "
+                f"use decimal or hexadecimal instead "
+                f"(MISRA C:2012/2023 Rule 7.1)"
+            )
+
+    # -----------------------------------------------------------------------
+    # 14. MISRA C:2012/2023 Rule 4.2 — trigraphs forbidden
+    #
+    # Trigraphs are three-character sequences beginning with '??' that the
+    # C preprocessor replaces with a single character before parsing.  They
+    # exist only for keyboards lacking certain punctuation characters.
+    # Their presence in modern code is almost certainly unintentional and
+    # can silently change program meaning.
+    #
+    # MISRA C:2012 Rule 4.2 is Advisory; MISRA C:2023 Rule 4.2 is Required.
+    #
+    # Trigraphs:  ??=  ??(  ??)  ??/  ??'  ??<  ??>  ??!  ??-
+    # Map to:      #    [    ]    \    ^    {    }    |    ~
+    #
+    # Note: trigraphs are checked against the raw source (self.source)
+    # because they are resolved by the preprocessor before comment stripping
+    # and could theoretically appear inside comments.
+    # -----------------------------------------------------------------------
+
+    _RE_TRIGRAPH = re.compile(r'\?\?[=\(\)\/\'<>!\-]')
+
+    def _check_trigraphs(self) -> None:
+        tg_cfg = self.cfg.get("misc", {}).get("trigraph", {})
+        if not tg_cfg.get("enabled", True):
+            return
+        sev = tg_cfg.get("severity", "error")
+
+        # Check raw source so trigraphs inside comments are also caught.
+        line_map = build_line_map(self.source)
+        for m in self._RE_TRIGRAPH.finditer(self.source):
+            line, col = offset_to_line_col(line_map, m.start())
+            self.result.add(Violation(
+                self.filepath, line, col, sev, "misc.trigraph",
+                f"Trigraph '{m.group(0)}' is forbidden "
+                f"(MISRA C:2012 Rule 4.2 Advisory; MISRA C:2023 Rule 4.2 Required)"
+            ))
 
     # -----------------------------------------------------------------------
     # 11. Reserved / banned name check
@@ -2486,25 +2613,37 @@ _RE_UINT_CAST  = re.compile(r"^\s*\(\s*(?:unsigned|uint\w+)\s*\)")
 _RE_SINT_CAST  = re.compile(r"^\s*\(\s*(?:signed|int\w+|sint\w+)\s*\)")
 
 
-def _classify_tokens(tokens: list) -> str:
-    """Return sign classification from a list of type/qualifier tokens."""
+def _classify_tokens(tokens: list,
+                     signed_types: set = None,
+                     unsigned_types: set = None) -> str:
+    """Return sign classification from a list of type/qualifier tokens.
+
+    *signed_types* and *unsigned_types* default to the module-level sets when
+    not supplied.  Passing explicit copies is the thread-safe path used by
+    ``SignChecker`` so that the ``plain_char_is_signed`` option never mutates
+    the module globals.
+    """
+    _st = signed_types   if signed_types   is not None else _SIGNED_TYPES
+    _ut = unsigned_types if unsigned_types is not None else _UNSIGNED_TYPES
     tset = set(tokens)
     if "unsigned" in tset:
         return _SIGN_UNSIGNED
     if "signed" in tset:
         return _SIGN_SIGNED
     for t in tokens:
-        if t in _UNSIGNED_TYPES:
+        if t in _ut:
             return _SIGN_UNSIGNED
-        if t in _SIGNED_TYPES:
+        if t in _st:
             return _SIGN_SIGNED
     return _SIGN_UNKNOWN
 
 
-def _signedness_of_type(type_str: str, tmap: dict) -> str:
+def _signedness_of_type(type_str: str, tmap: dict,
+                        signed_types: set = None,
+                        unsigned_types: set = None) -> str:
     """Resolve a full type string (e.g. 'int8_t' or 'unsigned short') to a sign."""
     tokens = type_str.split()
-    result = _classify_tokens(tokens)
+    result = _classify_tokens(tokens, signed_types, unsigned_types)
     if result != _SIGN_UNKNOWN:
         return result
     # Fall back: look each token up in the typedef map
@@ -2580,32 +2719,23 @@ class SignChecker:
             return []
 
         sev = sc_cfg.get("severity", "error")
-        # Temporarily remove 'char' from the module-level signed-types set if
-        # the project treats plain char as unsigned.  try/finally guarantees
-        # the set is restored even if an exception occurs mid-run, so calling
-        # check() multiple times (or from multiple tests) gives consistent results.
-        _char_removed  = False
-        _char_unsigned = False
+
+        # Build thread-safe local copies of the sign-type sets.
+        # Do NOT mutate the module-level globals — concurrent SignChecker
+        # instances (e.g. pytest-xdist) would race on them.
+        signed_types   = set(_SIGNED_TYPES)
+        unsigned_types = set(_UNSIGNED_TYPES)
         if not sc_cfg.get("plain_char_is_signed", True):
-            if "char" in _SIGNED_TYPES:
-                _SIGNED_TYPES.discard("char")
-                _char_removed = True
-            if "char" not in _UNSIGNED_TYPES:
-                _UNSIGNED_TYPES.add("char")
-                _char_unsigned = True
-        try:
-            self._build_typedef_map()
-            self._build_signatures()
-            return self._check_calls(sev)
-        finally:
-            if _char_removed:
-                _SIGNED_TYPES.add("char")
-            if _char_unsigned:
-                _UNSIGNED_TYPES.discard("char")
+            signed_types.discard("char")
+            unsigned_types.add("char")
+
+        self._build_typedef_map(signed_types, unsigned_types)
+        self._build_signatures(signed_types, unsigned_types)
+        return self._check_calls(sev, signed_types, unsigned_types)
 
     # --- Stage 1: typedef resolution ---
 
-    def _build_typedef_map(self) -> None:
+    def _build_typedef_map(self, signed_types: set, unsigned_types: set) -> None:
         raw: dict = {}
         pattern = re.compile(
             r"\btypedef\b"
@@ -2634,7 +2764,7 @@ class SignChecker:
             if len(non_qual) == 1 and non_qual[0] in raw:
                 result = resolve(non_qual[0], depth + 1)
             else:
-                result = _classify_tokens(tokens)
+                result = _classify_tokens(tokens, signed_types, unsigned_types)
             resolved[name] = result
             return result
 
@@ -2644,7 +2774,7 @@ class SignChecker:
 
     # --- Stage 2: function signature extraction ---
 
-    def _build_signatures(self) -> None:
+    def _build_signatures(self, signed_types: set, unsigned_types: set) -> None:
         pattern_decl  = re.compile(
             r"(?:^|\n)[ \t]*"
             r"(?:(?:extern|static|inline|const|volatile)[ \t]+)*"
@@ -2677,7 +2807,8 @@ class SignChecker:
                 for pm in pattern_param.finditer(plist + ","):
                     type_str = pm.group(1).strip()
                     pname    = pm.group(2)
-                    sign     = _signedness_of_type(type_str, self._tmap)
+                    sign     = _signedness_of_type(type_str, self._tmap,
+                                                   signed_types, unsigned_types)
                     params.append(_ParamSig(pname, type_str, sign))
                 # Prefer the first (header) declaration if already seen
                 if fname not in self._sigs:
@@ -2685,7 +2816,8 @@ class SignChecker:
 
     # --- Stage 3: call-site sign checking ---
 
-    def _check_calls(self, sev: str) -> list:
+    def _check_calls(self, sev: str,
+                     signed_types: set, unsigned_types: set) -> list:
         call_re = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
         violations: list = []
 
@@ -3106,8 +3238,8 @@ def _build_parser() -> argparse.ArgumentParser:
     # --- Positional ---
     p.add_argument("files", nargs="*",
                    help="C source / header files to check")
-    p.add_argument("--config", default="cstylecheck_rules.yaml",
-                   help="YAML config file (default: cstylecheck_rules.yaml)")
+    p.add_argument("--config", default="rules.yml",
+                   help="YAML config file (default: rules.yml)")
     p.add_argument("--github-actions", action="store_true",
                    help="Emit ::error/::warning GitHub Actions annotations")
     p.add_argument("--output-format", choices=["text", "json", "sarif"],

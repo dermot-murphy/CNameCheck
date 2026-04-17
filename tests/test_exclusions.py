@@ -1,6 +1,6 @@
-"""test_exclusions.py — tests for the per-file and per-identifier exclusion system.
+"""test_exclusions.py -- tests for the per-file and per-identifier exclusion system.
 
-exclusions are configured via a YAML file passed with --exclusions FILE.
+Exclusions are configured via a YAML file passed with --exclusions FILE.
 
 Per-file exclusions (existing):
   "filename.c":
@@ -37,7 +37,7 @@ from harness import cfg_only, run, has
 _HERE    = Path(__file__).resolve().parent
 _SRC     = _HERE.parent / "src"
 CHECKER  = str(_SRC / "cstylecheck.py")
-YAML     = str(_HERE / "cstylecheck_rules.yaml")
+YAML     = str(_HERE / "rules.yml")
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +80,7 @@ def _violations_in(output, rule=None, identifier=None):
 # load_exclusions_file unit tests
 # ---------------------------------------------------------------------------
 
-class TestLoadexclusionsFile(unittest.TestCase):
+class TestLoadExclusionsFile(unittest.TestCase):
 
     def _load(self, yaml_text):
         import cstylecheck as m
@@ -228,7 +228,7 @@ class TestDisabledRulesForFile(unittest.TestCase):
 # Per-file exclusion end-to-end (existing behaviour, regression tests)
 # ---------------------------------------------------------------------------
 
-class TestPerFileexclusionsEndToEnd(unittest.TestCase):
+class TestPerFileExclusionsEndToEnd(unittest.TestCase):
 
     def test_file_level_rule_suppressed(self):
         excl = '"mod.c":\n  disabled_rules:\n    - variable.global.prefix\n'
@@ -268,7 +268,7 @@ class TestPerFileexclusionsEndToEnd(unittest.TestCase):
 # Per-identifier exclusion end-to-end (new feature)
 # ---------------------------------------------------------------------------
 
-class TestPerIdentifierexclusionsEndToEnd(unittest.TestCase):
+class TestPerIdentifierExclusionsEndToEnd(unittest.TestCase):
 
     def test_identifier_rule_suppressed(self):
         """A specific variable's rule is suppressed by identifier exclusion."""
@@ -395,10 +395,10 @@ class TestPerIdentifierexclusionsEndToEnd(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# exclusions YAML format correctness
+# Exclusions YAML format correctness
 # ---------------------------------------------------------------------------
 
-class TestexclusionsYamlFormat(unittest.TestCase):
+class TestExclusionsYamlFormat(unittest.TestCase):
 
     def test_empty_exclusions_file_runs_cleanly(self):
         """An empty exclusions file causes no crash."""

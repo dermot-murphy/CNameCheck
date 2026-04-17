@@ -1,4 +1,4 @@
-# cstylecheck.options — used with --options-file FILE
+# options.txt — used with --options-file FILE
 # =====================================================================
 # Project-level command-line options for CStyleCheck.
 #
@@ -10,15 +10,15 @@
 #     so direct CLI args always override this file
 #
 # Usage:
-#   python src/cstylecheck.py --options-file src/cstylecheck.options [overrides]
+#   python src/cstylecheck.py --options-file src/options.txt [overrides]
 #
 # Or in a Makefile:
 #   cstylecheck:
-#       python src/cstylecheck.py --options-file src/cstylecheck.options
+#       python src/cstylecheck.py --options-file src/options.txt
 # =====================================================================
 
 # --- Core configuration ---
---config     src/cstylecheck_rules.yaml
+--config     src/rules.yml
 
 # --- Dictionary files (defaults shown; override to use project-specific lists) ---
 --keywords-file  src/c_keywords.txt
@@ -26,9 +26,9 @@
 # --spell-dict  src/c_spell_dict.txt   # uncomment if spell_check.enabled: true
 
 # --- Project-specific support files ---
---aliases    src/cstylecheck_aliases.txt
+--aliases    src/aliases.txt
 --exclusions src/exclusions.yml
---defines    src/project.defines
+--defines    src/defines.txt
 # --copyright  src/copyright_header.txt   # uncomment to enforce copyright header rule
 
 # --- Source tree ---

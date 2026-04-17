@@ -4,7 +4,7 @@ This document describes every rule enforced by CStyleCheck, including its rule
 ID, default severity, YAML configuration keys, what it checks, and annotated
 C code examples showing both passing and failing code.
 
-All rules are configured in `cstylecheck_rules.yaml`.  Every rule supports an
+All rules are configured in `rules.yml`.  Every rule supports an
 `enabled` key and a `severity` key.  Severity values are `error`, `warning`,
 and `info`.
 

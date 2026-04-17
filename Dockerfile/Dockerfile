@@ -8,7 +8,7 @@
 #   docker run --rm \
 #     -v "$(pwd):/repo" \
 #     ghcr.io/<org>/cstylecheck:latest \
-#     --config /app/cstylecheck_rules.yaml \
+#     --config /app/rules.yml \
 #     /repo/source/**/*.c /repo/source/**/*.h
 #
 # Override dictionary files at runtime:
@@ -43,12 +43,12 @@ WORKDIR /app
 
 # Core checker and configuration
 COPY src/cstylecheck.py          ./
-COPY src/cstylecheck_rules.yaml ./
+COPY src/rules.yml ./
 COPY src/_version.py            ./
-COPY src/cstylecheck.options     ./
-COPY src/cstylecheck_aliases.txt            ./
-COPY src/cstylecheck_exclusions.yml         ./
-COPY src/project.defines        ./
+COPY src/options.txt     ./
+COPY src/aliases.txt            ./
+COPY src/exclusions.yml         ./
+COPY src/defines.txt        ./
 
 # Dictionary files (can be overridden at runtime with CLI flags)
 COPY src/c_keywords.txt         ./

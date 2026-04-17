@@ -8,9 +8,9 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CNC-SUP1-001 | **Version** | 1.0 |
+| **Document ID** | CSC-SUP1-001 | **Version** | 1.0 |
 | **Project** | CStyleCheck | **Date** | 2026-04-12 |
-| **Status** | Draft | **Classification** | Internal |
+| **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.1 |
 
@@ -34,11 +34,11 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 
 | Document ID | Title | Version |
 |---|---|---|
-| CNC-MAN3-001 | Project Management Plan | 1.0 |
-| CNC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CNC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
-| CNC-SUP10-001 | Change Request Management Plan | 1.0 |
-| CNC-SWE4-001 | Unit Verification Specification | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.0 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
+| CSC-SUP10-001 | Change Request Management Plan | 1.0 |
+| CSC-SWE4-001 | Unit Verification Specification | 1.0 |
 
 ---
 
@@ -47,7 +47,7 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 | QO-ID | Objective | Target | Measurement |
 |---|---|---|---|
 | QO-001 | All unit tests pass on all supported Python versions | 100% PASS on 3.10, 3.11, 3.12 | `cstylecheck_tests.yml` CI result |
-| QO-002 | Source code naming conventions self-compliant | Zero error-level violations on `cstylecheck.py` | `cstylecheck_rules.yml` CI result |
+| QO-002 | Source code naming conventions self-compliant | Zero error-level violations on `cstylecheck.py` | `rules.yml` CI result |
 | QO-003 | Statement code coverage | ≥ 90% | `pytest-cov` coverage report |
 | QO-004 | Branch code coverage | ≥ 85% | `pytest-cov` coverage report |
 | QO-005 | All ASPICE CL2 work products documented and reviewed | 100% of required WPs approved | Document review records |
@@ -74,7 +74,7 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 |---|---|---|---|
 | WP-01 | `cstylecheck.py` | Zero naming violations; all tests pass; coverage ≥ targets | CI (automated) |
 | WP-02 | Test suite | All tests pass; each test has clear assertion; test IDs traceable to requirements | Peer review; CI |
-| WP-03 | `cstylecheck_rules.yaml` | Valid YAML; loads without error; each rule documented in README | CI parse check; inspection |
+| WP-03 | `rules.yml` | Valid YAML; loads without error; each rule documented in README | CI parse check; inspection |
 | WP-04 | `Dockerfile` | Builds successfully; image runs `--help`; both platforms available | CI `docker_publish.yml` |
 | WP-05 | ASPICE documentation | All required sections present; traceability tables complete; no placeholder IDs in approved docs | Document review |
 | WP-06 | `pyproject.toml` | Version matches `_version.py`; all required fields present | Inspection pre-release |
@@ -87,7 +87,7 @@ The following CI checks act as automated quality gates. Merging to `develop` or 
 | Gate ID | CI Workflow | Check | Branch |
 |---|---|---|---|
 | GATE-01 | `cstylecheck_tests.yml` | All pytest tests pass (Python 3.10, 3.11, 3.12) | `develop`, `main` |
-| GATE-02 | `cstylecheck_rules.yml` | `cstylecheck.py` passes its own naming rules (zero errors) | All branches touching `src/` |
+| GATE-02 | `rules.yml` | `cstylecheck.py` passes its own naming rules (zero errors) | All branches touching `src/` |
 | GATE-03 | `docker_publish.yml` | Docker image builds successfully | `main`, `v*.*.*` tags |
 
 ### 5.4 Pre-Release Quality Review Checklist
@@ -96,14 +96,14 @@ Performed by the QA role before creating the release baseline:
 
 - [ ] All CI gates (GATE-01, GATE-02, GATE-03) pass on release commit
 - [ ] Coverage targets met: statement ≥ 90%, branch ≥ 85%
-- [ ] All SWQ qualification test cases recorded as PASS in CNC-SWE6-001
-- [ ] All SYS-VTC verification test cases recorded as PASS in CNC-SYS5-001
+- [ ] All SWQ qualification test cases recorded as PASS in CSC-SWE6-001
+- [ ] All SYS-VTC verification test cases recorded as PASS in CSC-SYS5-001
 - [ ] Version in `_version.py` == version in `pyproject.toml` == intended release tag
 - [ ] GitHub Release draft prepared with correct change log
 - [ ] All ASPICE documents reviewed and approval tables signed
 - [ ] Zero open GitHub Issues with `bug` label targeting v1.0.0
 - [ ] Docker image digest recorded in GitHub Actions log
-- [ ] CM baseline checklist in CNC-SUP8-001 §11 completed
+- [ ] CM baseline checklist in CSC-SUP8-001 §11 completed
 
 ---
 
@@ -140,9 +140,9 @@ When a QA gate failure or non-conformance is identified:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | | 2026-04-12 |
-| Technical Reviewer | \<Name\> | | |
-| Quality Assurance | \<Name\> | | |
-| Approver | \<Name\> | | |
+| Author | Claude | Approved | 2026-04-15 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
+| Approver | Dermot Murphy | Approved | 2026-04-15 |
 
-> **⚠️ Important:** This plan must be approved before the project enters the integration and verification phase. QA records must be retained for the duration of the product's active support period.
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

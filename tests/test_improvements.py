@@ -13,19 +13,16 @@ import cstylecheck as _mod
 _HERE    = Path(__file__).resolve().parent
 _SRC_DIR = _HERE.parent / "src"
 _CHECKER = str(_SRC_DIR / "cstylecheck.py")
-_YAML    = str(_HERE / "cstylecheck_rules.yaml")
+_YAML    = str(_HERE / "rules.yml")
 
 
 def _cli(*args, files=None):
-    cmd = [sys.executable, _CHECKER, "--config", _YAML, *args]
-    if files:
-        cmd.extend(files)
-    return subprocess.run(cmd, capture_output=True, text=True).returncode, \
-           subprocess.run(cmd, capture_output=True, text=True).stdout
+    """Run checker once and return (returncode, stdout).
 
-
-def _cli1(*args, files=None):
-    """Run once and return (rc, stdout)."""
+    Previously this function invoked subprocess.run twice, meaning the
+    returncode and stdout could come from different process executions.
+    Fixed by BUG-001: single invocation, results taken from one object.
+    """
     cmd = [sys.executable, _CHECKER, "--config", _YAML, *args]
     if files:
         cmd.extend(files)
@@ -377,13 +374,13 @@ class TestSourceCache(unittest.TestCase):
                    '#include "foo.h"\n'
                    "void foo(unsigned int val){ (void)val; }\n"
                    "void caller(void){ foo(-1); }\n")
-            rc, out = _cli1("--include", td + "/**")
+            rc, out = _cli("--include", td + "/**")
         self.assertIn("sign_compatibility", out)
 
     def test_missing_file_no_crash(self):
         with tempfile.TemporaryDirectory() as td:
             good = _write(td, "main.c", "int main(void){ return 0; }\n")
-            rc, out = _cli1(files=[good, td + "/nonexistent.c"])
+            rc, out = _cli(files=[good, td + "/nonexistent.c"])
         self.assertNotIn("Traceback", out)
 
 
@@ -396,7 +393,7 @@ class TestJsonOutput(unittest.TestCase):
     def _jr(self, source, filename="mod.c"):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, filename, source)
-            rc, out = _cli1("--output-format", "json", files=[src])
+            rc, out = _cli("--output-format", "json", files=[src])
         return rc, out
 
     def test_valid_json(self):
@@ -443,7 +440,7 @@ class TestSarifOutput(unittest.TestCase):
     def _sr(self, source, filename="mod.c"):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, filename, source)
-            rc, out = _cli1("--output-format", "sarif", files=[src])
+            rc, out = _cli("--output-format", "sarif", files=[src])
         return rc, out
 
     def test_valid_json(self):
@@ -503,70 +500,70 @@ class TestBaselineSuppression(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            rc, _ = _cli1("--write-baseline", bl, files=[src])
+            rc, _ = _cli("--write-baseline", bl, files=[src])
         self.assertEqual(rc, 0)
 
     def test_write_creates_file(self):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            _cli1("--write-baseline", bl, files=[src])
+            _cli("--write-baseline", bl, files=[src])
             self.assertTrue(Path(bl).exists())
 
     def test_write_valid_json(self):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            _cli1("--write-baseline", bl, files=[src])
-            data = json.loads(Path(bl).read_text())
+            _cli("--write-baseline", bl, files=[src])
+            data = json.loads(Path(bl).read_text(encoding="utf-8"))
         self.assertIn("violations", data)
 
     def test_write_records_violations(self):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            _cli1("--write-baseline", bl, files=[src])
-            data = json.loads(Path(bl).read_text())
+            _cli("--write-baseline", bl, files=[src])
+            data = json.loads(Path(bl).read_text(encoding="utf-8"))
         self.assertGreater(len(data["violations"]), 0)
 
     def test_write_message_in_output(self):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            _, out = _cli1("--write-baseline", bl, files=[src])
+            _, out = _cli("--write-baseline", bl, files=[src])
         self.assertIn("baseline", out.lower())
 
     def test_baseline_exit_zero(self):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            _cli1("--write-baseline", bl, files=[src])
-            rc, _ = _cli1("--baseline-file", bl, files=[src])
+            _cli("--write-baseline", bl, files=[src])
+            rc, _ = _cli("--baseline-file", bl, files=[src])
         self.assertEqual(rc, 0)
 
     def test_baseline_suppressed_message(self):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            _cli1("--write-baseline", bl, files=[src])
-            _, out = _cli1("--baseline-file", bl, files=[src])
+            _cli("--write-baseline", bl, files=[src])
+            _, out = _cli("--baseline-file", bl, files=[src])
         self.assertIn("suppressed", out.lower(), f"Got: {out!r}")
 
     def test_new_violation_not_suppressed(self):
         with tempfile.TemporaryDirectory() as td:
             src_v1 = _write(td, "mod.c", _DIRTY_SRC)
             bl     = str(Path(td) / "baseline.json")
-            _cli1("--write-baseline", bl, files=[src_v1])
+            _cli("--write-baseline", bl, files=[src_v1])
             src_v2 = _write(td, "mod.c", _DIRTY_SRC + "void AnotherBad(void){}\n")
-            rc, _  = _cli1("--baseline-file", bl, files=[src_v2])
+            rc, _  = _cli("--baseline-file", bl, files=[src_v2])
         self.assertEqual(rc, 1)
 
     def test_json_output_respects_baseline(self):
         with tempfile.TemporaryDirectory() as td:
             src = _write(td, "mod.c", _DIRTY_SRC)
             bl  = str(Path(td) / "baseline.json")
-            _cli1("--write-baseline", bl, files=[src])
-            _, out = _cli1("--output-format", "json", "--baseline-file", bl, files=[src])
+            _cli("--write-baseline", bl, files=[src])
+            _, out = _cli("--output-format", "json", "--baseline-file", bl, files=[src])
         data = json.loads(out)
         self.assertEqual(data["summary"]["total"], 0)
 

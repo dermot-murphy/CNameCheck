@@ -9,10 +9,10 @@ from pathlib import Path
 _HERE    = Path(__file__).resolve().parent
 _SRC     = _HERE.parent / "src"
 CHECKER  = str(_SRC / "cstylecheck.py")
-# Use the tests/ copy of cstylecheck_rules.yaml so src/ config
+# Use the tests/ copy of rules.yml so src/ config
 # can be changed independently without breaking the test suite.
-_TESTS_YAML = _HERE / "cstylecheck_rules.yaml"
-YAML = str(_TESTS_YAML if _TESTS_YAML.exists() else _SRC / "cstylecheck_rules.yaml")
+_TESTS_YAML = _HERE / "rules.yml"
+YAML = str(_TESTS_YAML if _TESTS_YAML.exists() else _SRC / "rules.yml")
 
 
 def _run(*args, files=None):
@@ -94,14 +94,14 @@ class TestWarningsAsErrors(unittest.TestCase):
 class TestOptionsFile(unittest.TestCase):
     def test_summary_in_options_file_appears_in_output(self):
         with tempfile.TemporaryDirectory() as td:
-            opts = _write(td, "cstylecheck.options", "--summary\n")
+            opts = _write(td, "options.txt", "--summary\n")
             src  = _write(td, "main.c", "int main(void){ return 0; }\n")
             _, out = _run("--options-file", str(opts), files=[src])
         self.assertIn("Files checked", out)
 
     def test_comment_lines_in_options_file_ignored(self):
         with tempfile.TemporaryDirectory() as td:
-            opts = _write(td, "cstylecheck.options", "# comment\n--summary\n")
+            opts = _write(td, "options.txt", "# comment\n--summary\n")
             src  = _write(td, "main.c", "int main(void){ return 0; }\n")
             rc, out = _run("--options-file", str(opts), files=[src])
         self.assertEqual(rc, 0)
@@ -119,7 +119,7 @@ class TestOptionsFile(unittest.TestCase):
             log = Path(td) / "out.log"
             src = _write(td, "main.c", "\tvoid f(void){}\n")
             _run("--log", str(log), files=[src])
-            content = log.read_text()
+            content = log.read_text(encoding="utf-8")
         self.assertIn("misc.indentation", content)
 
 
@@ -128,7 +128,7 @@ class TestDefinesFile(unittest.TestCase):
     def test_custom_keyword_mapped_to_static(self):
         """NONSTANDARD_STATIC → static via --defines; function found correctly."""
         with tempfile.TemporaryDirectory() as td:
-            defs = _write(td, "project.defines", "NONSTANDARD_STATIC static\n")
+            defs = _write(td, "defines.txt", "NONSTANDARD_STATIC static\n")
             src  = _write(td, "uart.c",
                           "NONSTANDARD_STATIC void uart_BufferRead(void){}\n")
             _, out = _run("--defines", str(defs), files=[src])
@@ -137,7 +137,7 @@ class TestDefinesFile(unittest.TestCase):
     def test_type_alias_substituted(self):
         """MYBYTE → unsigned char via --defines; variable type recognised."""
         with tempfile.TemporaryDirectory() as td:
-            defs = _write(td, "project.defines", "MYBYTE unsigned char\n")
+            defs = _write(td, "defines.txt", "MYBYTE unsigned char\n")
             src  = _write(td, "uart.c",
                           "void uart_DoWork(void){\n"
                           "    MYBYTE *p_buf = 0U;\n"
@@ -186,7 +186,7 @@ class TestBannedNamesFile(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-class Testexclusions(unittest.TestCase):
+class TestExclusions(unittest.TestCase):
     def test_disabled_rule_suppressed_for_matching_file(self):
         with tempfile.TemporaryDirectory() as td:
             excl = _write(td, "exclusions.yml", textwrap.dedent("""\
