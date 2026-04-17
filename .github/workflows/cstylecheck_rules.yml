@@ -1,3 +1,4 @@
+# .github/workflows/rules.yml
 # =============================================================================
 # Embedded C Style Compliance Checker with trend analysis
 # =============================================================================
@@ -20,7 +21,7 @@
 # to make the trend page publicly accessible.
 # =============================================================================
 
-name: CStyleCheck Rules
+name: CStyleCheck
 
 on:
   push:
@@ -91,9 +92,9 @@ jobs:
             ${{ steps.changed.outputs.all_changed_files }}    \
           || true
 
-      # Push run -- all files
+      # Push / manual run -- all files
       - name: Run checker (push, all source)
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p output/cstylecheck
           python src/cstylecheck.py          \
@@ -157,7 +158,7 @@ jobs:
     needs: stylecheck
     if: >
       always() &&
-      github.event_name == 'push' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
 
@@ -179,7 +180,7 @@ jobs:
             git checkout --orphan gh-pages
             git rm -rf . 2>/dev/null || true
           fi
-          mkdir -p stylecheck
+          mkdir -p cstylecheck
 
       - name: Append trend record
         shell: python
@@ -195,7 +196,7 @@ jobs:
               "infos":    int(os.environ["INFOS"]),
               "files":    int(os.environ["FILES"]),
           }
-          f = pathlib.Path("stylecheck/trend.jsonl")
+          f = pathlib.Path("cstylecheck/trend.jsonl")
           with f.open("a") as fh:
               fh.write(json.dumps(record) + "\n")
           print(f"Appended: {record}")
@@ -212,7 +213,7 @@ jobs:
         run: |
           import json, os, pathlib, re
 
-          trend_file = pathlib.Path("stylecheck/trend.jsonl")
+          trend_file = pathlib.Path("cstylecheck/trend.jsonl")
           records    = [json.loads(l) for l in trend_file.read_text().splitlines() if l.strip()]
           recent     = records[-60:]   # keep last 60 data points on the chart
 
@@ -227,7 +228,7 @@ jobs:
           colour  = "brightgreen" if total == 0 else "yellow" if errors == 0 else "red"
           message = "clean" if total == 0 else f"{errors}E {warnings}W"
           badge   = {"schemaVersion": 1, "label": "naming", "message": message, "color": colour}
-          pathlib.Path("stylecheck/badge.json").write_text(json.dumps(badge, indent=2))
+          pathlib.Path("cstylecheck/badge.json").write_text(json.dumps(badge, indent=2))
 
           # --- Chart data ---
           labels = [r["date"][:10] + " #" + str(r.get("run","?")) for r in recent]
@@ -305,7 +306,7 @@ jobs:
           <p><small>Source: <a href="https://github.com/{repo}">{repo}</a></small></p>
           </body></html>"""
 
-          pathlib.Path("stylecheck/index.html").write_text(html)
+          pathlib.Path("cstylecheck/index.html").write_text(html)
           print(f"Trend page: {pages_base}/cstylecheck/")
           print(f"Badge URL:  https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json")
         env:
@@ -319,7 +320,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add stylecheck/
+          git add cstylecheck/
           git diff --staged --quiet && echo "No change" && exit 0
           git commit -m \
             "trend: run #${{ github.run_number }} E=${{ needs.stylecheck.outputs.errors }} W=${{ needs.stylecheck.outputs.warnings }}"
