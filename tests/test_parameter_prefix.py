@@ -257,5 +257,256 @@ class TestParameterPrefixSeverityAndDefaults(unittest.TestCase):
         self.assertEqual(vs, [])
 
 
+# ===========================================================================
+# Regression: param prefix + type prefix combined — no false positive
+# (GitHub issue: variable.pointer_prefix fires on 'p_ptr_packet_buffer'
+#  even though the local part 'ptr_packet_buffer' starts with 'ptr_')
+# ===========================================================================
+
+def _cfg_combined(param_pfx="p_", ptr_pfx="ptr_",
+                  pp_pfx="pp_", bool_pfx="b_",
+                  ptr_enabled=True, pp_enabled=True, bool_enabled=True):
+    """Config with parameter prefix AND pointer/pp/bool prefix all active."""
+    return cfg_only(variables={
+        "enabled": True, "severity": "error",
+        "case": "lower_snake", "min_length": 2, "max_length": 60,
+        "allow_single_char_loop_vars": True,
+        "allow_loop_vars_short": True,
+        "allowed_abbreviations": [],
+        "global": {
+            "severity": "error", "case": "lower_snake",
+            "require_module_prefix": False,
+            "g_prefix": {"enabled": False},
+        },
+        "static": {
+            "severity": "error", "case": "lower_snake",
+            "require_module_prefix": False,
+            "s_prefix": {"enabled": False},
+        },
+        "local":     {"severity": "error", "case": "lower_snake",
+                      "require_module_prefix": False},
+        "parameter": {"severity": "warning", "case": "lower_snake",
+                      "require_module_prefix": False,
+                      "p_prefix": {"enabled": True,
+                                   "severity": "warning",
+                                   "prefix": param_pfx}},
+        "pointer_prefix": {"enabled": ptr_enabled,
+                            "severity": "warning", "prefix": ptr_pfx},
+        "pp_prefix":      {"enabled": pp_enabled,
+                            "severity": "warning", "prefix": pp_pfx},
+        "bool_prefix":    {"enabled": bool_enabled,
+                            "severity": "warning", "prefix": bool_pfx},
+        "no_numeric_in_name": {"enabled": False, "exempt_patterns": []},
+        "prefix_order": {"enabled": False},
+        "handle_prefix": {"enabled": False, "handle_types": []},
+    })
+
+
+# ===========================================================================
+# Regression: param prefix + type prefix combined — no false positive
+# (GitHub issue: variable.pointer_prefix fires on 'p_ptr_packet_buffer'
+#  even though the local part 'ptr_packet_buffer' starts with 'ptr_')
+# ===========================================================================
+
+def _cfg_combined(param_pfx="p_", ptr_pfx="ptr_",
+                  pp_pfx="pp_", bool_pfx="b_",
+                  ptr_enabled=True, pp_enabled=True, bool_enabled=True,
+                  param_prefix_rule_enabled=True):
+    """Config with pointer/pp/bool prefix active.
+    param_prefix_rule_enabled controls variable.parameter.p_prefix.
+    The parameter prefix value (_pp_param_pfx) is always 'p_' regardless,
+    mirroring the real-world scenario where projects use the p_ naming
+    convention without enabling the rule that enforces it.
+    """
+    return cfg_only(variables={
+        "enabled": True, "severity": "error",
+        "case": "lower_snake", "min_length": 2, "max_length": 60,
+        "allow_single_char_loop_vars": True,
+        "allow_loop_vars_short": True,
+        "allowed_abbreviations": [],
+        "global": {
+            "severity": "error", "case": "lower_snake",
+            "require_module_prefix": False,
+            "g_prefix": {"enabled": False},
+        },
+        "static": {
+            "severity": "error", "case": "lower_snake",
+            "require_module_prefix": False,
+            "s_prefix": {"enabled": False},
+        },
+        "local":     {"severity": "error", "case": "lower_snake",
+                      "require_module_prefix": False},
+        "parameter": {"severity": "warning", "case": "lower_snake",
+                      "require_module_prefix": False,
+                      "p_prefix": {"enabled": param_prefix_rule_enabled,
+                                   "severity": "warning",
+                                   "prefix": param_pfx}},
+        "pointer_prefix": {"enabled": ptr_enabled,
+                            "severity": "warning", "prefix": ptr_pfx},
+        "pp_prefix":      {"enabled": pp_enabled,
+                            "severity": "warning", "prefix": pp_pfx},
+        "bool_prefix":    {"enabled": bool_enabled,
+                            "severity": "warning", "prefix": bool_pfx},
+        "no_numeric_in_name": {"enabled": False, "exempt_patterns": []},
+        "prefix_order": {"enabled": False},
+        "handle_prefix": {"enabled": False, "handle_types": []},
+    })
+
+
+# Config with p_prefix ENABLED (rule enforced)
+PTR_RULE_ON  = _cfg_combined(param_prefix_rule_enabled=True)
+# Config with p_prefix DISABLED (the default — real-world failing case)
+PTR_RULE_OFF = _cfg_combined(param_prefix_rule_enabled=False)
+
+
+class TestParamPrefixCombinedNoFalsePositive(unittest.TestCase):
+    """Regression: when pointer_prefix (or pp_prefix / bool_prefix) is active,
+    a parameter named '<param_pfx><type_pfx>name' must NOT trigger a false
+    positive on the type-prefix rule — regardless of whether
+    variable.parameter.p_prefix is enabled.
+
+    The reported failure:
+        uint8_t* p_ptr_packet_buffer
+        WARNING [variable.pointer_prefix] local part should start with 'ptr_'
+    The local part after the parameter prefix is 'ptr_packet_buffer' which
+    DOES start with 'ptr_', so the warning is incorrect.
+    """
+
+    # ------------------------------------------------------------------
+    # Exact failing signature from the bug report
+    # ------------------------------------------------------------------
+
+    def test_exact_bug_report_signature(self):
+        """Full multiline declaration from the bug report — no violation."""
+        src = (
+            "void\t\t\tAPI_Vibration_PacketGet\t\t(api_vibration_buffer_t p_buffer,\n"
+            "\t\t\t\tapi_vibration_axis_t\tp_sensor_axis,\n"
+            "\t\t\t\tuint8_t*\t\tp_ptr_packet_buffer,\n"
+            "\t\t\t\tuint8_t\t\t\tp_packet_size,\n"
+            "\t\t\t\tuint16_t\t\tp_packet,\n"
+            "\t\t\t\tbool\t\t\tp_hibyte_first) ;\n"
+        )
+        for cfg, label in ((PTR_RULE_ON, "p_prefix enabled"),
+                           (PTR_RULE_OFF, "p_prefix disabled")):
+            with self.subTest(config=label):
+                violations = [v for v in run(src, cfg)
+                              if v.rule == "variable.pointer_prefix"]
+                self.assertEqual(violations, [],
+                    f"False positive with {label}: {violations}")
+
+    # ------------------------------------------------------------------
+    # Single-pointer (*) parameters — p_prefix rule DISABLED (default)
+    # ------------------------------------------------------------------
+
+    def test_ptr_param_rule_off_no_violation(self):
+        """p_ptr_packet_buffer: p_prefix rule off, pointer prefix 'ptr_' → no warn."""
+        src = ("void f(uint8_t * p_ptr_packet_buffer)"
+               "{ (void)p_ptr_packet_buffer; }")
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.pointer_prefix"]
+        self.assertEqual(violations, [],
+            "False positive: pointer_prefix fired on p_ptr_packet_buffer "
+            "when p_prefix rule is disabled")
+
+    def test_ptr_param_rule_on_no_violation(self):
+        """p_ptr_buf: p_prefix rule ON, pointer prefix 'ptr_' → no warn."""
+        src = "void f(uint8_t * p_ptr_buf){ (void)p_ptr_buf; }"
+        violations = [v for v in run(src, PTR_RULE_ON)
+                      if v.rule == "variable.pointer_prefix"]
+        self.assertEqual(violations, [],
+            "False positive: pointer_prefix fired on p_ptr_buf "
+            "when p_prefix rule is enabled")
+
+    def test_ptr_param_missing_type_pfx_rule_off_flags(self):
+        """p_buffer: param prefix present but no 'ptr_' → should flag."""
+        src = "void f(uint8_t * p_buffer){ (void)p_buffer; }"
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.pointer_prefix"]
+        self.assertTrue(violations,
+            "pointer_prefix should fire: local 'buffer' missing 'ptr_'")
+
+    def test_ptr_param_no_param_prefix_but_type_pfx_present(self):
+        """ptr_buffer: only type prefix, no param prefix → pointer_prefix passes."""
+        src = "void f(uint8_t * ptr_buffer){ (void)ptr_buffer; }"
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.pointer_prefix"]
+        self.assertEqual(violations, [],
+            "ptr_buffer should satisfy pointer_prefix='ptr_' directly")
+
+    def test_ptr_param_multiline_rule_off_no_false_positive(self):
+        """Multiline declaration with p_ptr_buf — p_prefix rule off."""
+        src = ("void uart_Send(\n"
+               "    uint8_t *  p_ptr_buf,\n"
+               "    uint32_t   p_length)\n"
+               "{ (void)p_ptr_buf; (void)p_length; }\n")
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.pointer_prefix"]
+        self.assertEqual(violations, [],
+            "False positive on multiline p_ptr_buf with p_prefix rule off")
+
+    # ------------------------------------------------------------------
+    # Double-pointer (**) parameters
+    # ------------------------------------------------------------------
+
+    def test_pp_param_rule_off_no_violation(self):
+        """p_pp_table: p_prefix rule off, pp_prefix='pp_' → no warn."""
+        src = "void f(uint8_t ** p_pp_table){ (void)p_pp_table; }"
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.pp_prefix"]
+        self.assertEqual(violations, [],
+            "False positive: pp_prefix fired on p_pp_table when rule off")
+
+    def test_pp_param_missing_pp_pfx_rule_off_flags(self):
+        """p_table: param prefix OK but 'pp_' absent on ** param → violation."""
+        src = "void f(uint8_t ** p_table){ (void)p_table; }"
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.pp_prefix"]
+        self.assertTrue(violations,
+            "pp_prefix should fire: local 'table' missing 'pp_'")
+
+    # ------------------------------------------------------------------
+    # Boolean parameters
+    # ------------------------------------------------------------------
+
+    def test_bool_param_rule_off_no_violation(self):
+        """p_b_enabled: p_prefix rule off, bool_prefix='b_' → no warn."""
+        src = "void f(bool p_b_enabled){ (void)p_b_enabled; }"
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.bool_prefix"]
+        self.assertEqual(violations, [],
+            "False positive: bool_prefix fired on p_b_enabled when rule off")
+
+    def test_bool_param_missing_b_pfx_rule_off_flags(self):
+        """p_enabled: param prefix OK but 'b_' absent on bool param → violation."""
+        src = "void f(bool p_enabled){ (void)p_enabled; }"
+        violations = [v for v in run(src, PTR_RULE_OFF)
+                      if v.rule == "variable.bool_prefix"]
+        self.assertTrue(violations,
+            "bool_prefix should fire: local 'enabled' missing 'b_'")
+
+    # ------------------------------------------------------------------
+    # Default pointer_prefix="p_" — existing convention must still work
+    # ------------------------------------------------------------------
+
+    def test_default_ptr_prefix_p_param_p_buf_passes(self):
+        """pointer_prefix='p_' (default): p_buf satisfies directly — no strip needed."""
+        cfg = _cfg_combined(ptr_pfx="p_", param_prefix_rule_enabled=False)
+        src = "void f(uint8_t * p_buf){ (void)p_buf; }"
+        violations = [v for v in run(src, cfg)
+                      if v.rule == "variable.pointer_prefix"]
+        self.assertEqual(violations, [],
+            "p_buf should satisfy pointer_prefix='p_' without stripping")
+
+    def test_default_ptr_prefix_p_param_p_p_buf_passes(self):
+        """pointer_prefix='p_', p_prefix rule ON: p_p_buf satisfies both."""
+        cfg = _cfg_combined(ptr_pfx="p_", param_prefix_rule_enabled=True)
+        src = "void f(uint8_t * p_p_buf){ (void)p_p_buf; }"
+        violations = [v for v in run(src, cfg)
+                      if v.rule in ("variable.pointer_prefix",
+                                    "variable.parameter.p_prefix")]
+        self.assertEqual(violations, [],
+            "p_p_buf should satisfy both p_prefix and pointer_prefix='p_'")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

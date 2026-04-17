@@ -850,8 +850,14 @@ RE_VAR_DECL = re.compile(
 
 # Match one parameter: type tokens  *?  name  followed by , or ) or [
 RE_FUNCTION_PARAM = re.compile(
+    # Each type token is followed by optional whitespace so that the star can
+    # be written either adjacent to the type ("uint8_t*") or separated from
+    # it ("uint8_t *").  The previous [ \t]+ required at least one space,
+    # which caused "uint8_t*\t\tp_name" to go unmatched, leaving the
+    # parameter absent from param_names and therefore misclassified as a
+    # local variable by RE_VAR_DECL.
     r"(?:(?:const|volatile|unsigned|signed|long|short|int|char|float|double"
-    r"|uint\w+|int\w+|bool|_Bool|size_t|[A-Z_]\w+_[Tt])[ \t]+)+"
+    r"|uint\w+|int\w+|bool|_Bool|size_t|[A-Z_]\w+_[Tt])[ \t]*)+"
     r"\*?[ \t]*([a-z_]\w*)[ \t]*(?:,|\)|\[)",
 )
 
@@ -1154,8 +1160,12 @@ class Checker:
 
         # RE for a parameter with explicit star(s) captured
         _RE_PARAM_STARS = re.compile(
+            # Same [ \t]* fix as RE_FUNCTION_PARAM: allows the star to be
+            # written adjacent to the type ("uint8_t*") as well as separated
+            # ("uint8_t *"), ensuring pointer parameters are checked regardless
+            # of the coding style used for star placement.
             r"(?:(?:const|volatile|unsigned|signed|long|short|int|char|float|double"
-            r"|uint\w+|int\w+|bool|_Bool|size_t|[A-Z_]\w+_[Tt])[ \t]+)+"
+            r"|uint\w+|int\w+|bool|_Bool|size_t|[A-Z_]\w+_[Tt])[ \t]*)+"
             r"(\*{1,2})[ \t]*"      # group 1: star(s)
             r"([a-z_]\w*)"           # group 2: name
             r"[ \t]*(?:,|\)|\[)",
@@ -1215,7 +1225,18 @@ class Checker:
                         if pp_cfg_early.get("enabled", True):
                             pp_pfx = pp_cfg_early.get("prefix", "pp_")
                             pp_sev = pp_cfg_early.get("severity", "warning")
-                            if not p_local.startswith(pp_pfx):
+                            # Accept the double-pointer prefix when it appears
+                            # directly in the local part OR after the parameter
+                            # prefix (e.g. "p_pp_buf" satisfies pp_pfx="pp_").
+                            # This is independent of whether variable.parameter
+                            # .p_prefix is enabled — it reflects the naming
+                            # convention that parameters are prefixed with p_
+                            # and the type prefix follows.
+                            pp_after_param = (
+                                p_local.startswith(_pp_param_pfx) and
+                                p_local[len(_pp_param_pfx):].startswith(pp_pfx)
+                            )
+                            if not (p_local.startswith(pp_pfx) or pp_after_param):
                                 self._v(abs_pos, pp_sev,
                                         "variable.pp_prefix",
                                         f"Double-pointer parameter '{p_name}' "
@@ -1225,7 +1246,18 @@ class Checker:
                         if ptr_cfg_early.get("enabled", True):
                             p_pfx = ptr_cfg_early.get("prefix", "p_")
                             p_sev = ptr_cfg_early.get("severity", "warning")
-                            if not p_local.startswith(p_pfx):
+                            # Accept the pointer prefix when it appears directly
+                            # in the local part OR after the parameter prefix.
+                            # Example: pointer_prefix="ptr_", p_prefix="p_"
+                            #   "p_ptr_packet_buffer" → p_local = "p_ptr_packet_buffer"
+                            #   direct check: startswith("ptr_") → False
+                            #   param-stripped: strip "p_" → "ptr_packet_buffer"
+                            #                  startswith("ptr_") → True  ✓
+                            ptr_after_param = (
+                                p_local.startswith(_pp_param_pfx) and
+                                p_local[len(_pp_param_pfx):].startswith(p_pfx)
+                            )
+                            if not (p_local.startswith(p_pfx) or ptr_after_param):
                                 self._v(abs_pos, p_sev,
                                         "variable.pointer_prefix",
                                         f"Pointer parameter '{p_name}' "
@@ -1241,14 +1273,22 @@ class Checker:
                     if p_stars:   # pointer params already handled above
                         continue
                     if _h_en_early and _h_types_early and p_type in _h_types_early:
-                        if not p_local.startswith(_h_pfx_early):
+                        h_after_param = (
+                            p_local.startswith(_pp_param_pfx) and
+                            p_local[len(_pp_param_pfx):].startswith(_h_pfx_early)
+                        )
+                        if not (p_local.startswith(_h_pfx_early) or h_after_param):
                             self._v(abs_pos, _h_sev_early,
                                     "variable.handle_prefix",
                                     f"Handle parameter '{p_name}' (type '{p_type}') "
                                     f"local part should start with '{_h_pfx_early}' "
                                     f"(BARR-C 7.1.n)")
                     if _b_en_early and p_type in ("bool", "_Bool"):
-                        if not p_local.startswith(_b_pfx_early):
+                        b_after_param = (
+                            p_local.startswith(_pp_param_pfx) and
+                            p_local[len(_pp_param_pfx):].startswith(_b_pfx_early)
+                        )
+                        if not (p_local.startswith(_b_pfx_early) or b_after_param):
                             self._v(abs_pos, _b_sev_early,
                                     "variable.bool_prefix",
                                     f"Boolean parameter '{p_name}' "
@@ -1433,12 +1473,28 @@ class Checker:
             # Single pointer (*) → local part must start with p_
             # Double pointer (**) → local part must start with pp_
             # The stars are captured directly in RE_VAR_DECL (group 3).
+            #
+            # For function parameters the naming convention allows a parameter
+            # prefix (e.g. "p_") to precede the type prefix (e.g. "ptr_"),
+            # giving "p_ptr_name".  Accept the type prefix when it appears
+            # either directly at the start of the local part OR immediately
+            # after the configured parameter prefix.  This is independent of
+            # whether variable.parameter.p_prefix is enabled — it reflects the
+            # physical naming convention used by the project.
+            local_raw = self._strip_any_prefix(name)
+
             if stars == "**":
                 if pp_cfg.get("enabled", True):
                     pp_pfx = pp_cfg.get("prefix", "pp_")
                     pp_sev = pp_cfg.get("severity", "warning")
-                    local  = self._strip_any_prefix(name)
-                    if not local.startswith(pp_pfx):
+                    if scope == "parameter":
+                        pp_ok = local_raw.startswith(pp_pfx) or (
+                            local_raw.startswith(_pp_param_pfx) and
+                            local_raw[len(_pp_param_pfx):].startswith(pp_pfx)
+                        )
+                    else:
+                        pp_ok = local_raw.startswith(pp_pfx)
+                    if not pp_ok:
                         self._v(m.start(), pp_sev, "variable.pp_prefix",
                                 f"Double-pointer variable '{name}' local part "
                                 f"should start with '{pp_pfx}' (BARR-C 7.1.l)")
@@ -1446,8 +1502,14 @@ class Checker:
                 if ptr_cfg.get("enabled"):
                     p_pfx = ptr_cfg.get("prefix", "p_")
                     p_sev = ptr_cfg.get("severity", "warning")
-                    local = self._strip_any_prefix(name)
-                    if not local.startswith(p_pfx):
+                    if scope == "parameter":
+                        ptr_ok = local_raw.startswith(p_pfx) or (
+                            local_raw.startswith(_pp_param_pfx) and
+                            local_raw[len(_pp_param_pfx):].startswith(p_pfx)
+                        )
+                    else:
+                        ptr_ok = local_raw.startswith(p_pfx)
+                    if not ptr_ok:
                         self._v(m.start(), p_sev, "variable.pointer_prefix",
                                 f"Pointer variable '{name}' local part should "
                                 f"start with '{p_pfx}' (BARR-C 7.1.k)")
@@ -1458,8 +1520,14 @@ class Checker:
             if bool_cfg.get("enabled", True) and type_token in ("bool", "_Bool"):
                 b_pfx = bool_cfg.get("prefix", "b_")
                 b_sev = bool_cfg.get("severity", "warning")
-                local = self._strip_any_prefix(name)
-                if not local.startswith(b_pfx):
+                if scope == "parameter":
+                    bool_ok = local_raw.startswith(b_pfx) or (
+                        local_raw.startswith(_pp_param_pfx) and
+                        local_raw[len(_pp_param_pfx):].startswith(b_pfx)
+                    )
+                else:
+                    bool_ok = local_raw.startswith(b_pfx)
+                if not bool_ok:
                     self._v(m.start(), b_sev, "variable.bool_prefix",
                             f"Boolean variable '{name}' local part should "
                             f"start with '{b_pfx}' (BARR-C 7.1.m)")
@@ -1473,8 +1541,14 @@ class Checker:
             if h_cfg.get("enabled", True) and h_types and type_token in h_types:
                 h_pfx = h_cfg.get("prefix", "h_")
                 h_sev = h_cfg.get("severity", "warning")
-                local = self._strip_any_prefix(name)
-                if not local.startswith(h_pfx):
+                if scope == "parameter":
+                    h_ok = local_raw.startswith(h_pfx) or (
+                        local_raw.startswith(_pp_param_pfx) and
+                        local_raw[len(_pp_param_pfx):].startswith(h_pfx)
+                    )
+                else:
+                    h_ok = local_raw.startswith(h_pfx)
+                if not h_ok:
                     self._v(m.start(), h_sev, "variable.handle_prefix",
                             f"Handle variable '{name}' (type '{type_token}') "
                             f"local part should start with '{h_pfx}' (BARR-C 7.1.n)")
