@@ -136,7 +136,11 @@ _TOOL_NAME = "CStyleCheck"
 try:
     from _version import __version__ as _VERSION
 except ImportError:
-    _VERSION = "1.0.0.dev"
+    try:
+        from importlib.metadata import version
+        _VERSION = version("cstylecheck")
+    except Exception:
+        _VERSION = "0.0.0.dev"
 
 _VERSION_STRING = f"{_TOOL_NAME} {_VERSION}"
 
