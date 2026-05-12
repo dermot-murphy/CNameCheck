@@ -1,4 +1,4 @@
-# .github/workflows/rules.yml
+# .github/workflows/cstylecheck_rules.yml
 # =============================================================================
 # Embedded C Style Compliance Checker with trend analysis
 # =============================================================================
@@ -29,7 +29,7 @@ on:
       - "source/**/*.c"
       - "source/**/*.h"
       - "src/**"
-      - ".github/workflows/rules.yml"
+      - ".github/workflows/cstylecheck_rules.yml"
   pull_request:
     paths:
       - "source/**/*.c"

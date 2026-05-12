@@ -31,7 +31,7 @@ on:
     paths:
       - "Dockerfile/**"
       - "src/cstylecheck.py"
-      - "src/cstylecheck_rules.yaml"
+      - "src/rules.yml"
       - "src/_version.py"
       - ".github/workflows/docker_publish.yml"
     tags:
