@@ -222,6 +222,7 @@ jobs:
           repo     = os.environ["REPO"]
           owner, reponame = repo.split("/")
           pages_base = f"https://{owner}.github.io/{reponame}"
+          raw_base   = f"https://raw.githubusercontent.com/{owner}/{reponame}/gh-pages"
 
           # --- Badge JSON (served by shields.io endpoint) ---
           total   = errors + warnings
@@ -308,7 +309,7 @@ jobs:
 
           pathlib.Path("cstylecheck/index.html").write_text(html)
           print(f"Trend page: {pages_base}/cstylecheck/")
-          print(f"Badge URL:  https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json")
+          print(f"Badge URL:  https://img.shields.io/endpoint?url={raw_base}/cstylecheck/badge.json")
         env:
           ERRORS:   ${{ needs.stylecheck.outputs.errors }}
           WARNINGS: ${{ needs.stylecheck.outputs.warnings }}
@@ -344,8 +345,9 @@ jobs:
           repo    = os.environ["REPO"]
           owner, reponame = repo.split("/")
           pages_base = f"https://{owner}.github.io/{reponame}"
+          raw_base   = f"https://raw.githubusercontent.com/{owner}/{reponame}/gh-pages"
           trend_url  = f"{pages_base}/cstylecheck/"
-          badge_url  = f"https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json"
+          badge_url  = f"https://img.shields.io/endpoint?url={raw_base}/cstylecheck/badge.json"
           badge_md   = f"[![Naming Convention]({badge_url})]({trend_url})"
 
           # Operate in the worktree, not in the gh-pages working directory.
