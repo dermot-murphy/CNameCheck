@@ -6,7 +6,7 @@ Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
 Implements **Barr-C:2018** and MISRA-C complementary rules across **50 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
-[![Naming Convention](https://img.shields.io/endpoint?url=https://dermot-murphy.github.io/CStyleCheck/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
+[![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 📖 **[Rules and Configuration Reference](Rules-and-Configuration.md)** — full
