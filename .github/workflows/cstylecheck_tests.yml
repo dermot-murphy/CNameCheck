@@ -39,6 +39,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v6
         with:
@@ -54,13 +56,6 @@ jobs:
           echo "__version__ = \"${VERSION}\"" > _version.py
           echo "Version: ${VERSION}"
 
-      # -----------------------------------------------------------------------
-      # YAML-004: Verify tests/rules.yml only differs from
-      # src/rules.yml in the two documented test-fixture lines:
-      #   - misc.indentation.style   (src: tabs | tests: spaces)
-      #   - variables.allow_loop_vars_short  (src: true | tests: false)
-      # Any other divergence fails the build.
-      # -----------------------------------------------------------------------
       - name: Verify tests/ YAML divergence is intentional
         run: |
           DIFF=$(diff src/rules.yml tests/rules.yml \
@@ -77,19 +72,6 @@ jobs:
           fi
           echo "YAML diff check passed -- only permitted test-fixture differences found."
 
-      # -----------------------------------------------------------------------
-      # ASPICE SWE.4 BP7: coverage must meet the targets documented in
-      # CSC-SWE4-001 (>=90% statement, >=85% branch).
-      #
-      # Current measured coverage: ~72%.  The gap is entirely in main() and
-      # the CLI output helpers (lines 2894-3559) which are exercised only via
-      # subprocess in test_cli.py.  pytest-cov cannot instrument child
-      # processes without COVERAGE_PROCESS_START / sitecustomize.py support.
-      #
-      # Gate is set to 72 (current baseline) to catch any regressions.
-      # Raise to 90 once subprocess coverage instrumentation is added.
-      # See: https://pytest-cov.readthedocs.io/en/latest/subprocess-support.html
-      # -----------------------------------------------------------------------
       - name: Run unit tests with coverage gate
         run: |
           pytest tests/ --ignore=tests/test_cli.py \
@@ -108,4 +90,3 @@ jobs:
           name: coverage-report
           path: coverage.xml
           retention-days: 30
-
