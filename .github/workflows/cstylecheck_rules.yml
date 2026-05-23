@@ -188,7 +188,7 @@ jobs:
           import json, datetime, os, pathlib
 
           record = {
-              "date":     datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "date":     datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
               "run":      int(os.environ["RUN_NUMBER"]),
               "sha":      os.environ["SHA"][:8],
               "errors":   int(os.environ["ERRORS"]),
