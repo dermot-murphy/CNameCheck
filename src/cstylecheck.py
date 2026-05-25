@@ -979,8 +979,7 @@ class Checker:
 
     def _v(self, pos: int, sev: str, rule: str, msg: str) -> None:
         if self._ident_disabled:
-            import re as _re
-            _m = _re.search(r"'([^']+)'", msg)
+            _m = re.search(r"'([^']+)'", msg)
             if _m and rule in self._ident_disabled.get(_m.group(1), frozenset()):
                 return
         self.result.add(self._violation(pos, sev, rule, msg))
