@@ -145,6 +145,37 @@ _VERSION_STRING = f"{_TOOL_NAME} {_VERSION}"
 # Data structures
 # ---------------------------------------------------------------------------
 
+_MISRA_ANNOTATION_RULES = frozenset({
+    "misc.trigraph",
+    "misc.octal_constant",
+    "misc.lowercase_l_suffix",
+})
+
+_NAMING_ANNOTATION_PREFIXES = frozenset({
+    "constant",
+    "enum",
+    "function",
+    "include_guard",
+    "macro",
+    "reserved_name",
+    "struct",
+    "typedef",
+    "variable",
+})
+
+
+def _github_annotation_category(rule: str) -> str:
+    if rule in _MISRA_ANNOTATION_RULES:
+        return "MISRA"
+    if rule == "sign_compatibility":
+        return "SignCompat"
+    if rule == "spell_check":
+        return "SpellCheck"
+    if rule.split(".", 1)[0] in _NAMING_ANNOTATION_PREFIXES:
+        return "NamingConvention"
+    return "Misc"
+
+
 @dataclass
 class Violation:
     filepath: str
@@ -155,10 +186,15 @@ class Violation:
     message: str
 
     def github_annotation(self) -> str:
-        level = self.severity if self.severity in ("error", "warning", "notice") else "notice"
+        level = (
+            self.severity
+            if self.severity in ("error", "warning", "notice")
+            else "notice"
+        )
+        title = _github_annotation_category(self.rule)
         return (
             f"::{level} file={self.filepath},line={self.line},"
-            f"col={self.col},title=NamingConvention[{self.rule}]::"
+            f"col={self.col},title={title}[{self.rule}]::"
             f"{self.message}"
         )
 
