@@ -72,9 +72,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 | UNIT-28 | `Checker._check_structs` | `cstylecheck.py:1739` | COMP-05d |
 | UNIT-29 | `Checker._check_include_guard` | `cstylecheck.py:1879` | COMP-05e |
 | UNIT-30 | `Checker._check_misc` | `cstylecheck.py:1912` | COMP-05f |
-| UNIT-31 | `Checker._check_yoda` | `cstylecheck.py:2245` | COMP-05f |
-| UNIT-32 | `Checker._check_spelling` | `cstylecheck.py:2226` | COMP-05f |
-| UNIT-33 | `Checker._check_reserved_names` | `cstylecheck.py:2348` | COMP-05f |
+| UNIT-31 | `Checker._check_yoda` | `cstylecheck.py:2319` | COMP-05f |
+| UNIT-32 | `Checker._check_reserved_names` | `cstylecheck.py:2528` | COMP-05f |
+| UNIT-33 | `Checker._check_spelling` | `cstylecheck.py:2300` | COMP-05f |
 | UNIT-34 | `SignChecker._check_calls` | `cstylecheck.py:2688` | COMP-05g |
 | UNIT-35 | `load_baseline` | `cstylecheck.py:3006` | COMP-06 |
 | UNIT-36 | `write_baseline` | `cstylecheck.py:3021` | COMP-06 |
@@ -231,7 +231,7 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 **Algorithm:** Call each enabled `_check_*` method in fixed order; each appends to `self.result.violations`. Return `self.result`.
 
-**Order:** `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard`, `_check_misc`, `_check_yoda`, `_check_spelling`, `_check_reserved_names`, `_check_copyright_header`, `_check_block_comment_spacing`, `_check_eof_comment`
+**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` for headers, `_check_misc`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_spelling` when a spelling dictionary is configured.
 
 ---
 
