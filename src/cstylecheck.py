@@ -3488,7 +3488,6 @@ def main() -> int:
     # Discover files
     # Discover files lazily — emit progress immediately rather than
     # blocking until the entire glob tree is walked.
-    _vb_prev_dir = ""
     files: list = []
     for _fp in discover_files(
         args.files,
@@ -3514,7 +3513,6 @@ def main() -> int:
 
     output_format  = getattr(args, "output_format", "text")
     all_violations: list = []
-    _vb_prev_dir = ""
     # Cache source text keyed by filepath to avoid reading each file twice
     # (once for Checker, once for SignChecker).
     source_cache: dict = {}
