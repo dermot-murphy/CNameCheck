@@ -251,8 +251,11 @@ def load_config(path: str) -> dict:
     cfg_path = Path(path)
     if not cfg_path.exists():
         sys.exit(f"Config file not found: {path}")
-    with cfg_path.open(encoding="utf-8") as fh:
-        return yaml.safe_load(fh)
+    try:
+        with cfg_path.open(encoding="utf-8") as fh:
+            return yaml.safe_load(fh)
+    except yaml.YAMLError as e:
+        sys.exit(f"Cannot parse config file '{path}': {e}")
 
 
 def load_spell_words(path: str) -> set:
@@ -3641,4 +3644,13 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except SystemExit as _e:
+        # sys.exit("message") uses a string code → exit 1 by default.
+        # Re-emit as exit 2 so callers can distinguish config errors (2)
+        # from naming violations (1) and clean runs (0).
+        if isinstance(_e.code, str):
+            print(_e.code, file=sys.stderr)
+            sys.exit(2)
+        raise
