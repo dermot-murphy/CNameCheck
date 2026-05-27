@@ -428,6 +428,13 @@ class TestExitCodes(unittest.TestCase):
         self.assertEqual(rc, 2)
         self.assertIn("absent.yml", out)
 
+    def test_exit_zero_when_no_files_match(self):
+        """No matching source files is a valid no-op — must exit 0, not 2."""
+        with tempfile.TemporaryDirectory() as td:
+            rc, out = _run("--include", td + "/**/*.c")
+        self.assertEqual(rc, 0)
+        self.assertIn("No C files to check", out)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

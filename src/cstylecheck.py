@@ -3515,7 +3515,7 @@ def main() -> int:
     if not files:
         print("No C files to check.", file=sys.stderr)
         tee.close()
-        return 2
+        return 0
 
     if getattr(args, "verbose", False):
         _n = len(files)
