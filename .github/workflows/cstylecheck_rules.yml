@@ -38,6 +38,13 @@ on:
 
   workflow_dispatch:
 
+# Serialise runs on the same branch so concurrent pushes cannot race to
+# append trend records, causing data loss or a non-fast-forward gh-pages push.
+# The latest run wins; any in-progress run for the same ref is cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ---------------------------------------------------------------------------
   # Job 1: Run the checker
