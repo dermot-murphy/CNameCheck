@@ -89,8 +89,12 @@ jobs:
             --summary                                          \
             --log        output/cstylecheck/cstylecheck_results.txt \
             --exclude    source/cots/                          \
-            ${{ steps.changed.outputs.all_changed_files }}    \
-          || true
+            ${{ steps.changed.outputs.all_changed_files }}
+          CSC_EXIT=$?
+          if [ $CSC_EXIT -eq 2 ]; then
+            echo "::error::CStyleCheck configuration error (exit 2) — check rules.yml and supplementary config files."
+            exit 2
+          fi
 
       # Push / manual run -- all files
       - name: Run checker (push, all source)
@@ -106,8 +110,12 @@ jobs:
             --log        output/cstylecheck/cstylecheck_results.txt \
             --exclude    source/cots/                          \
             --include    "source/**/*.c"                       \
-            --include    "source/**/*.h"                       \
-          || true
+            --include    "source/**/*.h"
+          CSC_EXIT=$?
+          if [ $CSC_EXIT -eq 2 ]; then
+            echo "::error::CStyleCheck configuration error (exit 2) — check rules.yml and supplementary config files."
+            exit 2
+          fi
 
       - name: Parse summary numbers
         id: parse

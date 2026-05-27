@@ -366,5 +366,75 @@ class TestVerboseFlag(unittest.TestCase):
         self.assertIn("--verbose", out)
 
 
+# ---------------------------------------------------------------------------
+class TestExitCodes(unittest.TestCase):
+    """Exit code contract: 0 = clean, 1 = naming violations, 2 = config error.
+
+    Exit 2 is produced when sys.exit("message") is called (config/file errors).
+    The SystemExit wrapper in __main__ converts string-message exits to code 2
+    so callers (CI, shell scripts) can distinguish config failures from naming
+    failures without parsing output text.
+    """
+
+    def _run_custom_config(self, config_path, *extra_args, files=None):
+        cmd = [sys.executable, CHECKER, "--config", config_path, *extra_args]
+        if files:
+            cmd += [str(f) for f in files]
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        return r.returncode, r.stdout + r.stderr
+
+    def test_exit_zero_on_clean_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            src = _write(td, "main.c", "int main(void){ return 0; }\n")
+            rc, _ = _run(files=[src])
+        self.assertEqual(rc, 0)
+
+    def test_exit_one_on_naming_violation(self):
+        with tempfile.TemporaryDirectory() as td:
+            src = _write(td, "mod.c", "void BadFunc(void){}\n")
+            rc, _ = _run(files=[src])
+        self.assertEqual(rc, 1)
+
+    def test_exit_two_on_missing_config(self):
+        """Missing --config file must exit 2, not 1."""
+        with tempfile.TemporaryDirectory() as td:
+            src = _write(td, "mod.c", "void mod_DoWork(void){}\n")
+            rc, out = self._run_custom_config(
+                str(Path(td) / "nonexistent_rules.yml"), files=[src])
+        self.assertEqual(rc, 2)
+        self.assertIn("not found", out.lower())
+
+    def test_exit_two_on_invalid_yaml_config(self):
+        """Syntactically invalid rules.yml must exit 2."""
+        with tempfile.TemporaryDirectory() as td:
+            bad_cfg = _write(td, "bad_rules.yml", ": : invalid yaml :\n")
+            src = _write(td, "mod.c", "void mod_DoWork(void){}\n")
+            rc, out = self._run_custom_config(str(bad_cfg), files=[src])
+        self.assertEqual(rc, 2)
+
+    def test_exit_two_on_missing_aliases_file(self):
+        """Unreadable --aliases file must exit 2."""
+        with tempfile.TemporaryDirectory() as td:
+            src = _write(td, "mod.c", "void mod_DoWork(void){}\n")
+            rc, _ = _run("--aliases", str(Path(td) / "no_such_aliases.txt"),
+                         files=[src])
+        self.assertEqual(rc, 2)
+
+    def test_exit_two_stderr_includes_path(self):
+        """The error message for a missing config must name the missing file."""
+        with tempfile.TemporaryDirectory() as td:
+            missing = str(Path(td) / "absent.yml")
+            rc, out = self._run_custom_config(missing)
+        self.assertEqual(rc, 2)
+        self.assertIn("absent.yml", out)
+
+    def test_exit_zero_when_no_files_match(self):
+        """No matching source files is a valid no-op — must exit 0, not 2."""
+        with tempfile.TemporaryDirectory() as td:
+            rc, out = _run("--include", td + "/**/*.c")
+        self.assertEqual(rc, 0)
+        self.assertIn("No C files to check", out)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
