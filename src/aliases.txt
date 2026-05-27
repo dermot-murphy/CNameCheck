@@ -1,24 +1,23 @@
 # Module alias file — used with --aliases FILE
 #
-# Format:  alias_stem   actual_module_stem
+# Format:  <stem_a>   <stem_b>
 #
-# Meaning: when checking a file whose stem is actual_module_stem, identifiers
-# that carry the alias_stem prefix are accepted as if they carried the
-# actual module prefix.
+# Either column order is accepted.  The mapping is bidirectional: both
+# stem_a.c and stem_b.c will accept each other's prefix.
 #
-# Example:
-#   api_param  api_param_cfg
+# Common usage — "for file drv_iis3dwb_cfg, also accept the drv_iis3dwb prefix":
+#   drv_iis3dwb_cfg   drv_iis3dwb
 #
-# → in api_param_cfg.c  the prefix api_param_ is accepted alongside
-#   api_param_cfg_.  So API_PARAM_VALUE_NORMAL_SIGNATURE passes even though
-#   the file is called api_param_cfg.c.
+# → in drv_iis3dwb_cfg.c  the prefix DRV_IIS3DWB_ is accepted alongside
+#   DRV_IIS3DWB_CFG_.
+# → in drv_iis3dwb.c  the prefix DRV_IIS3DWB_CFG_ is also accepted.
 #
 # Rules:
-#   • One alias per line.
+#   • One alias pair per line.
 #   • Lines starting with # are comments.
 #   • Blank lines are ignored.
 #   • Both words are treated case-insensitively.
-#   • A module may have multiple alias lines.
+#   • A module may appear in multiple alias lines.
 
 # api_param       api_param_cfg
 # sensor_mgr      sensor_manager
