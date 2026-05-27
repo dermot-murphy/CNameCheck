@@ -277,16 +277,19 @@ def load_alias_file(path: str) -> dict:
     Load the module-alias plain-text file.
 
     Each non-blank, non-comment line must contain exactly two whitespace-
-    separated words::
+    separated words in either column order::
 
         alias_stem   actual_module_stem
+        actual_module_stem   alias_stem
 
-    Returns dict: {actual_module_stem_lower -> [alias_stem_lower, ...]}.
+    Returns dict: {stem_lower -> [other_stem_lower, ...]}, registered
+    bidirectionally so that either column order in the file is accepted.
 
     Example line::
         api_param  api_param_cfg
 
-    → when checking api_param_cfg.c the prefix api_param_ is also accepted.
+    → when checking api_param_cfg.c the prefix api_param_ is also accepted,
+      and when checking api_param.c the prefix api_param_cfg_ is also accepted.
     """
     aliases: dict = {}
     try:
@@ -302,8 +305,12 @@ def load_alias_file(path: str) -> dict:
             print(f"WARNING: alias file line {lineno}: expected 2 words, "
                   f"got {parts!r}", file=sys.stderr)
             continue
-        alias_stem, actual_stem = parts[0].lower(), parts[1].lower()
-        aliases.setdefault(actual_stem, []).append(alias_stem)
+        stem_a, stem_b = parts[0].lower(), parts[1].lower()
+        # Register bidirectionally so either column order is accepted.
+        if stem_b not in aliases.get(stem_a, []):
+            aliases.setdefault(stem_a, []).append(stem_b)
+        if stem_a not in aliases.get(stem_b, []):
+            aliases.setdefault(stem_b, []).append(stem_a)
     return aliases
 
 

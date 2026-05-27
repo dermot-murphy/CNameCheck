@@ -568,5 +568,72 @@ class TestBaselineSuppression(unittest.TestCase):
         self.assertEqual(data["summary"]["total"], 0)
 
 
+# ===========================================================================
+# 11. Alias file bidirectional column order  (issue #69)
+# ===========================================================================
+
+def _alias_cfg():
+    return cfg_only(
+        file_prefix={"enabled": True, "severity": "error",
+                     "separator": "_", "case": "lower",
+                     "exempt_main": False, "exempt_patterns": []},
+        constants={"enabled": True, "severity": "error",
+                   "case": "upper_snake", "max_length": 60,
+                   "min_length": 2, "exempt_patterns": []},
+    )
+
+
+class TestAliasFileBidirectionalColumnOrder(unittest.TestCase):
+    """SWE4-TC-ALIAS-BIDIR-001 to 004 — issue #69 regression suite."""
+
+    def _load(self, content: str) -> dict:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt",
+                                        delete=False, encoding="utf-8") as fh:
+            fh.write(content)
+            name = fh.name
+        try:
+            return _mod.load_alias_file(name)
+        finally:
+            Path(name).unlink(missing_ok=True)
+
+    # SWE4-TC-ALIAS-BIDIR-001
+    def test_documented_order_builds_correct_map(self):
+        """alias_stem  actual_stem → actual_stem maps to alias_stem."""
+        m = self._load("api_param  api_param_cfg\n")
+        self.assertIn("api_param_cfg", m)
+        self.assertIn("api_param", m["api_param_cfg"])
+
+    # SWE4-TC-ALIAS-BIDIR-002
+    def test_reversed_order_builds_correct_map(self):
+        """actual_stem  alias_stem → actual_stem still maps to alias_stem."""
+        m = self._load("drv_iis3dwb_cfg  drv_iis3dwb\n")
+        self.assertIn("drv_iis3dwb_cfg", m)
+        self.assertIn("drv_iis3dwb", m["drv_iis3dwb_cfg"])
+
+    # SWE4-TC-ALIAS-BIDIR-003
+    def test_no_violation_documented_column_order(self):
+        """No constant.prefix violation — documented column order (alias actual)."""
+        alias_pfxs = ["api_param_cfg_", "api_param_"]
+        src = "#define API_PARAM_VALUE (1U)\n"
+        viols = [v for v in run(src, _alias_cfg(),
+                                filepath="api_param_cfg.h",
+                                alias_prefixes=alias_pfxs)
+                 if v.rule == "constant.prefix"]
+        self.assertEqual(viols, [])
+
+    # SWE4-TC-ALIAS-BIDIR-004
+    def test_no_violation_reversed_column_order(self):
+        """No constant.prefix violation — reversed column order (regression for #69)."""
+        m = self._load("drv_iis3dwb_cfg  drv_iis3dwb\n")
+        sep = "_"
+        alias_pfxs = ["drv_iis3dwb_cfg_"] + [a + sep for a in m.get("drv_iis3dwb_cfg", [])]
+        src = "#define DRV_IIS3DWB_REG_ISPU_DUMMYCFG2_INIT_VALUE (0x00U)\n"
+        viols = [v for v in run(src, _alias_cfg(),
+                                filepath="drv_iis3dwb_cfg.h",
+                                alias_prefixes=alias_pfxs)
+                 if v.rule == "constant.prefix"]
+        self.assertEqual(viols, [], f"Unexpected violations: {viols}")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
