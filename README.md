@@ -1,5 +1,12 @@
 # CStyleCheck
 
+The purpose of this project is three-fold:
+- To create a useful tool which sits between a lint and static analyser for C code - especially embedded C code with ASPICE & MISRA
+- As an experiment to prompt Claude to generate all content - eg documents, webpages, issues, code, workflow - no manual correction of files
+- For a human to review all the work - either manually or with the help of an AI
+
+Conributions are very welcome.
+
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
