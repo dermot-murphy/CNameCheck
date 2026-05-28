@@ -77,7 +77,7 @@ jobs:
       - name: Get changed C files (PR only)
         if: github.event_name == 'pull_request'
         id: changed
-        uses: tj-actions/changed-files@d6babd516b1d0b6a8be0e69a3ef3ed4c3737b028 # v44
+        uses: tj-actions/changed-files@2d756ea4c53f7f6b397767d8723b3a10a9f35bf2 # v44
         with:
           files: |
             source/**/*.c
