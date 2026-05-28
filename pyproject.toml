@@ -59,6 +59,7 @@ testpaths = ["tests"]
 
 [tool.coverage.run]
 source = ["src"]
+branch = true
 
 # =============================================================================
 # Ruff lint configuration (issue #66)
