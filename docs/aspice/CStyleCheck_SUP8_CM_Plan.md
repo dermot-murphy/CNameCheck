@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP8-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SUP8-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Dermot Murphy | Add CI-032 (CSC-DEV-002 independent review deviation) and CI-033 (CSC-SVD-001) to CI list — issue #61 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CI-028 (CSC-DEV-001 deviation document) to CI list — issue #52 |
 | 1.1 | 2026-04-12 | Claude | Updated branching strategy to Git Flow; clarified PR/Issue terminology throughout |
 | 1.0 | 2026-04-11 | Claude | Initial release |
@@ -141,6 +142,8 @@ All items in the following table are placed under configuration control.
 | CI-029 | CI trend-record append script | `scripts/ci/append_trend_record.py` | CI script |
 | CI-030 | CI trend HTML and badge generation script | `scripts/ci/generate_trend.py` | CI script |
 | CI-031 | CI README badge update script | `scripts/ci/update_readme_badge.py` | CI script |
+| CI-032 | Independent Review Deviation Record | `docs/aspice/CStyleCheck_DEV002_Independent_Review_Deviation.md` | Documentation |
+| CI-033 | Software Version Description | `docs/aspice/CStyleCheck_SVD_Software_Version_Description.md` | Documentation |
 
 ### 6.2 Identification Scheme
 
@@ -282,7 +285,7 @@ Configuration status shall be accessible at any time via:
 
 Performed prior to each release baseline to verify:
 
-- [ ] All CI-001 to CI-028 items are present and committed
+- [ ] All CI-001 to CI-033 items are present and committed
 - [ ] Version in `_version.py` (CI-002) matches the intended tag
 - [ ] All unit tests pass on Python 3.10, 3.11, 3.12
 - [ ] Naming convention workflow passes on current source

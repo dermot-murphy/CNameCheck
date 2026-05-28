@@ -8,11 +8,13 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.4 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
+
+> **Note — Reviewer independence (CSC-DEV-002):** The Reviewer and Approver are the same person (Dermot Murphy). This is accepted under deviation record **CSC-DEV-002** (`docs/aspice/CStyleCheck_DEV002_Independent_Review_Deviation.md`) on the basis that CStyleCheck has a single human team member.
 
 ---
 
@@ -20,6 +22,9 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-05-28 | Dermot Murphy | §4.2: implement subprocess coverage via COVERAGE_PROCESS_START + sitecustomize.py; raise CI gate to 85% combined; actual v1.2.0 CI: 89.8% stmt, 87.31% combined — closes issue #54 |
+| 1.3 | 2026-05-28 | Dermot Murphy | Populate §6 results table: actual test counts, all PASS; coverage 86% stmt / N/A branch (v1.1.0 CI); add 5 missing test modules — closes issue #53 |
+| 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation footnote to §1 — closes issue #61 |
 | 1.1 | 2026-05-28 | Claude | Added static type check (mypy --ignore-missing-imports) and lint check (ruff) as verification methods in §4.1; updated CI workflow reference |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -57,15 +62,17 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 ### 4.2 Coverage Criteria
 
-| Coverage Type | Long-term Target | Current Baseline (v1.1) | CI Gate | Rationale |
+| Coverage Type | Long-term Target | v1.1.0 Baseline (stmt-only, excl. subprocess) | CI Gate | Rationale |
 |---|---|---|---|---|
-| Statement coverage | ≥ 90% | ~72% | ≥ 72% (see note) | All reachable statements exercised |
-| Branch coverage | ≥ 85% | ~68% | reported only | All major decision branches covered |
+| Statement coverage | ≥ 90% | 89.8% (1,694 stmts, 172 missed — v1.2.0 CI with subprocess) | ≥ 85% combined (see note) | All reachable statements exercised; subprocess coverage via `COVERAGE_PROCESS_START` |
+| Branch coverage | ≥ 85% | 87.31% combined stmt+branch (874 branch pts, 96 partial — v1.2.0 CI) | ≥ 85% combined (see note) | All major decision branches covered |
 | Function coverage | 100% of public functions | ~95% | reported only | Every unit invoked at least once |
 
-Coverage is measured per CI run on Python 3.11 and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact).
+Coverage is measured per CI run on all three Python matrix versions (3.10, 3.11, 3.12) and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact, Python 3.11 build).
 
-> **Coverage gap note (open action):** The `main()` function and CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`) account for approximately 18 percentage points of the 90%–72% gap. These are exercised exclusively through the `test_cli.py` subprocess tests, which spawn child Python processes that `pytest-cov` cannot instrument by default. The CI gate is set at 72% (the current measured baseline) to catch any regressions. It will be raised to 90% once subprocess coverage instrumentation is added via `COVERAGE_PROCESS_START` and `sitecustomize.py` (see [pytest-cov subprocess support](https://pytest-cov.readthedocs.io/en/latest/subprocess-support.html)).
+**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 759 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
+
+> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures.
 
 ### 4.3 Test Infrastructure
 
@@ -307,32 +314,38 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 
 | Test Module | Tests | Pass | Fail | Coverage Contribution |
 |---|---|---|---|---|
-| `test_variables.py` | 32 | \<N\> | \<N\> | `_check_variables` |
-| `test_functions.py` | 14 | \<N\> | \<N\> | `_check_functions` |
-| `test_defines.py` | 16 | \<N\> | \<N\> | `_check_defines` |
-| `test_typedefs.py` | 8 | \<N\> | \<N\> | `_check_typedefs` |
-| `test_enums.py` | 11 | \<N\> | \<N\> | `_check_enums` |
-| `test_structs.py` | 7 | \<N\> | \<N\> | `_check_structs` |
-| `test_include_guards.py` | 8 | \<N\> | \<N\> | `_check_include_guard` |
-| `test_misc.py` | 23 | \<N\> | \<N\> | `_check_misc` |
-| `test_misc_improvements.py` | 65 | \<N\> | \<N\> | `_check_misc`, improvements |
-| `test_yoda_condition.py` | 37 | \<N\> | \<N\> | `_check_yoda` |
-| `test_reserved_name.py` | 40 | \<N\> | \<N\> | `_check_reserved_names` |
-| `test_spell_check.py` | 9 | \<N\> | \<N\> | `_check_spelling` |
-| `test_sign_compatibility.py` | 7 | \<N\> | \<N\> | `SignChecker` |
-| `test_dictionaries.py` | 32 | \<N\> | \<N\> | COMP-03 |
-| `test_improvements.py` | 63 | \<N\> | \<N\> | Multiple |
-| `test_barr_c.py` | 42 | \<N\> | \<N\> | Multiple |
-| `test_cli.py` | 29 | \<N\> | \<N\> | COMP-01, COMP-07 |
-| `test_exclusions.py` | \<N\> | \<N\> | \<N\> | COMP-02 |
-| `test_eof_comment.py` | \<N\> | \<N\> | \<N\> | `_check_eof_comment` |
-| `test_copyright_header.py` | \<N\> | \<N\> | \<N\> | `_check_copyright_header` |
-| `test_parameter_prefix.py` | \<N\> | \<N\> | \<N\> | `_check_variables` |
+| `test_variables.py` | 35 | 35 | 0 | `_check_variables` |
+| `test_functions.py` | 14 | 14 | 0 | `_check_functions` |
+| `test_defines.py` | 16 | 16 | 0 | `_check_defines` |
+| `test_typedefs.py` | 8 | 8 | 0 | `_check_typedefs` |
+| `test_enums.py` | 11 | 11 | 0 | `_check_enums` |
+| `test_structs.py` | 12 | 12 | 0 | `_check_structs` |
+| `test_include_guards.py` | 8 | 8 | 0 | `_check_include_guard` |
+| `test_misc.py` | 28 | 28 | 0 | `_check_misc` |
+| `test_misc_improvements.py` | 77 | 77 | 0 | `_check_misc`, improvements |
+| `test_yoda_condition.py` | 37 | 37 | 0 | `_check_yoda` |
+| `test_reserved_name.py` | 40 | 40 | 0 | `_check_reserved_names` |
+| `test_spell_check.py` | 9 | 9 | 0 | `_check_spelling` |
+| `test_sign_compatibility.py` | 7 | 7 | 0 | `SignChecker` |
+| `test_dictionaries.py` | 32 | 32 | 0 | COMP-03 |
+| `test_improvements.py` | 67 | 67 | 0 | Multiple |
+| `test_barr_c.py` | 42 | 42 | 0 | Multiple |
+| `test_cli.py` | 43 | 43 | 0 | COMP-01, COMP-07 |
+| `test_exclusions.py` | 28 | 28 | 0 | COMP-02 |
+| `test_eof_comment.py` | 33 | 33 | 0 | `_check_eof_comment` |
+| `test_copyright_header.py` | 55 | 55 | 0 | `_check_copyright_header` |
+| `test_parameter_prefix.py` | 42 | 42 | 0 | `_check_variables` |
 | `test_misra_rules.py` | 52 | 52 | 0 | `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_yoda` |
-| **Total** | **692** | **692** | **0** | All rules covered |
+| `test_block_comment_spacing.py` | 29 | 29 | 0 | `_check_block_comment_spacing` |
+| `test_workflow_config.py` | 16 | 16 | 0 | CI workflow configuration regression |
+| `test_github_annotations.py` | 8 | 8 | 0 | GitHub Actions annotation output |
+| `test_case_patterns.py` | 6 | 6 | 0 | Case pattern matching (`_check_case_patterns`) |
+| `test_thread_safe_globals.py` | 4 | 4 | 0 | Thread-safe global state (`C_KEYWORDS`, `C_STDLIB_NAMES`) |
+| **Total** | **759** | **759** | **0** | All rules covered |
 
-**Statement Coverage (unit tests only, excl. test_cli.py):** ~72% (baseline v1.1; see §4.2 for gap explanation)
-**Branch Coverage (unit tests only):** ~68%
+**Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
+**Statement Coverage (v1.2.0 CI — all 759 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
+**Branch Coverage (v1.2.0 CI — all 759 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
 
 **Static Verification (rules.yml):** PASS
 

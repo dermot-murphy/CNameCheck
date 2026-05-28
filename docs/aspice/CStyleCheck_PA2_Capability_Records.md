@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.1 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Dermot Murphy | Update SWE.4 performance objective: subprocess coverage instrumented, gate 85% combined; actual 87.31% combined / 89.8% stmt — closes issue #54 |
+| 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation reference at GP 2.2.3; add CI-028 (SVD) and CI-029 (DEV-002) to §5.4 — closes issue #61 |
 | 1.1 | 2026-05-28 | Dermot Murphy | Add deviation reference at GP 2.1.6 — closes issue #52 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -49,7 +51,7 @@ For each assessed process, performance objectives are defined in the table below
 | SWE.1 | 70 software requirements defined, reviewed, approved; 100% traceable to SYS.2 | CSC-SWE1-001 §4.15 verification criteria | ✅ Defined |
 | SWE.2 | Architecture reviewed; all SWE.1 requirements mapped to components; interfaces defined | CSC-SWE2-001 §10 traceability | ✅ Defined |
 | SWE.3 | All 46 units designed; algorithmic specification complete; resource usage documented | CSC-SWE3-001 §4 unit catalogue | ✅ Defined |
-| SWE.4 | ≥ 90% statement, ≥ 85% branch coverage; all ≥500 unit tests PASS on Python 3.10/11/12 | CSC-SWE4-001 §4.2 coverage criteria | ✅ Defined |
+| SWE.4 | ≥ 85% combined statement + branch coverage (CI gate); ≥ 90% statement / ≥ 85% branch (long-term target); all ≥500 unit tests PASS on Python 3.10/11/12 | CSC-SWE4-001 §4.2 coverage criteria | ✅ Defined |
 | SWE.5 | All 13 SIT integration test cases PASS; all 10 SWA interfaces covered | CSC-SWE5-001 §3.3 verification criteria | ✅ Defined |
 | SWE.6 | All 12 SWQ qualification test cases PASS; 100% SW requirements coverage; release gate met | CSC-SWE6-001 §3.3 qualification criteria | ✅ Defined |
 | MAN.3 | All WBS work packages completed; milestones achieved within schedule | CSC-MAN3-001 §8 schedule | ✅ Defined |
@@ -154,15 +156,17 @@ All work products are defined with content requirements in their respective docu
 
 ### 5.3 GP 2.2.3 — Review and Adjust Work Products
 
+> **Note — Single-Person Reviewer Deviation (CSC-DEV-002):** CStyleCheck has one human team member (Dermot Murphy). All ASPICE work products carry `Reviewer: Dermot Murphy` and `Approver: Dermot Murphy` — the same individual. This deviates from the GP 2.2.3 expectation of an independent reviewer. The deviation is formally accepted under **CSC-DEV-002** (`docs/aspice/CStyleCheck_DEV002_Independent_Review_Deviation.md`), which documents the justification, compensating controls (AI-assisted review, CI quality gates, PR audit trail), and residual risk. Assessors may rate this practice as Largely Achieved rather than Fully Achieved on the independence criterion.
+
 All work products are reviewed before approval according to the following schedule:
 
 | Work Product | Review Type | Reviewer | Review Evidence |
 |---|---|---|---|
-| Source code changes | Pull request review | ≥ 1 peer reviewer | GitHub PR approval record |
-| ASPICE documents | Formal document review | Technical reviewer + QA | Reviewer/Approver table in each document |
-| Test suite additions | Pull request review | ≥ 1 peer reviewer | GitHub PR approval record |
-| CI workflow changes | Pull request review | ≥ 1 peer reviewer | GitHub PR approval record |
-| Release baseline | Pre-release checklist | QA role | CSC-SUP1-001 §5.4 signed checklist |
+| Source code changes | Pull request review | Dermot Murphy (see CSC-DEV-002) | GitHub PR approval record |
+| ASPICE documents | Formal document review | Dermot Murphy (see CSC-DEV-002) | Reviewer/Approver table in each document |
+| Test suite additions | Pull request review | Dermot Murphy (see CSC-DEV-002) | GitHub PR approval record |
+| CI workflow changes | Pull request review | Dermot Murphy (see CSC-DEV-002) | GitHub PR approval record |
+| Release baseline | Pre-release checklist | Dermot Murphy / QA role | CSC-SUP1-001 §5.4 signed checklist |
 
 **Adjustment mechanism:** Any non-conformance found during review is raised as a GitHub Issue (SUP.9) or change request (SUP.10) and tracked to resolution before the work product is approved.
 
@@ -187,7 +191,10 @@ All work products are reviewed before approval according to the following schedu
 | CSC-SUP9-001 | Problem Resolution Plan | 1.0 | Released | v1.0.0 tag |
 | CSC-SUP10-001 | Change Request Plan | 1.0 | Released | v1.0.0 tag |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.0 | Released | v1.0.0 tag |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.2 | Released | v1.1.0 tag |
+| CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
+| CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
+| CSC-SVD-001 | Software Version Description | 1.1 | Released | v1.1.0 tag |
 | CI-001 | `cstylecheck.py` v1.0.0 | 1.0.0 | \<Baselined\> | v1.0.0 tag |
 | CI-017 | Test suite | 1.0.0 | \<Baselined\> | v1.0.0 tag |
 
