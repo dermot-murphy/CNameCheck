@@ -3220,7 +3220,6 @@ def _violations_to_json(violations: list, files_checked: int) -> str:
 def _violations_to_sarif(violations: list, tool_version: str) -> str:
     """Serialise *violations* to a SARIF 2.1.0 JSON string."""
     import json
-    from collections import OrderedDict
 
     # Collect unique rule IDs
     rule_ids = list(dict.fromkeys(v.rule for v in violations))
