@@ -1,4 +1,4 @@
-# Process Deviation — AI-Assisted Authorship of ASPICE Work Products
+﻿# Process Deviation — AI-Assisted Authorship of ASPICE Work Products
 
 *Automotive SPICE® PAM v4.0 | SUP.9 Problem Resolution / Deviation Record*
 
@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-DEV-001 | **Version** | 1.0 |
+| **Document ID** | CSC-DEV-001 | **Version** | 1.1 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Approved | **Classification** | Internal |
 | **Author** | Dermot Murphy | **Reviewer** | Dermot Murphy |

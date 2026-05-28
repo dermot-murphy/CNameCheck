@@ -1,4 +1,4 @@
-# Software Unit Verification Specification
+﻿# Software Unit Verification Specification
 
 *Automotive SPICE® PAM v4.0 | SWE.4 Software Unit Verification*
 
@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.0 |
-| **Project** | CStyleCheck | **Date** | 2026-04-12 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.1 |
+| **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.1 | 2026-05-28 | Claude | Added static type check (mypy --strict) and lint check (ruff) as verification methods in 4.1; reviewed for v1.1.0 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
