@@ -20,7 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.1 | 2026-05-28 | Claude | Added static type check (mypy --strict) and lint check (ruff) as verification methods in 4.1; reviewed for v1.1.0 |
+| 1.1 | 2026-05-28 | Claude | Added static type check (mypy --ignore-missing-imports) and lint check (ruff) as verification methods in §4.1; updated CI workflow reference |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
@@ -50,6 +50,8 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 |---|---|---|
 | Dynamic unit testing | All COMP-05 rule-check methods; COMP-02, COMP-03, COMP-04, COMP-06, COMP-07 utility functions | pytest 7+ |
 | Static verification (naming convention) | `cstylecheck.py` source file itself | `cstylecheck` self-hosted via `rules.yml` CI |
+| Static type check | `src/cstylecheck.py` — import and inferred-type check (`--ignore-missing-imports`; `--strict` deferred until codebase is annotated) | mypy 1.0+ |
+| Lint check | `src/` and `tests/` — style and common error detection | ruff 0.1+ |
 | Code coverage measurement | `src/cstylecheck.py` | pytest-cov |
 | Code review / inspection | `SignChecker` try/finally pattern (SWE1-053); `_data_file()` fallback logic | Manual review during PR |
 

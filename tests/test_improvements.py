@@ -123,9 +123,9 @@ class TestSignedTypesMutation(unittest.TestCase):
         for expect_clean in [True, False, True, False, True]:
             viols = [v for v in self._make_sc(expect_clean) if v.rule == "sign_compatibility"]
             if expect_clean:
-                self.assertEqual(viols, [], f"Expected clean on True iteration")
+                self.assertEqual(viols, [], "Expected clean on True iteration")
             else:
-                self.assertGreaterEqual(len(viols), 1, f"Expected violation on False iteration")
+                self.assertGreaterEqual(len(viols), 1, "Expected violation on False iteration")
 
 
 # ===========================================================================
