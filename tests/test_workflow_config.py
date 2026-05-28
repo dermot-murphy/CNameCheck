@@ -207,5 +207,40 @@ class TestBadgePath(unittest.TestCase):
         )
 
 
+class TestTimezoneAware(unittest.TestCase):
+    """SUP9-TC-TZ-001 to 002 — issue #56 regression suite.
+
+    datetime.datetime.utcnow() is deprecated in Python 3.12 and will be
+    removed in a future release.  The correct replacement is
+    datetime.datetime.now(datetime.timezone.utc), which produces an identical
+    ISO 8601 UTC string when formatted with strftime.  These tests verify the
+    deprecated call is absent and the timezone-aware call is present so neither
+    can silently creep back during future workflow edits.
+    """
+
+    def setUp(self):
+        self._wf_text = _WORKFLOW_RULES.read_text(encoding="utf-8")
+
+    # SUP9-TC-TZ-001
+    def test_utcnow_not_present(self):
+        """cstylecheck_rules.yml must not call the deprecated datetime.utcnow()."""
+        self.assertNotIn(
+            "utcnow()",
+            self._wf_text,
+            "Deprecated datetime.utcnow() found in cstylecheck_rules.yml — "
+            "use datetime.now(datetime.timezone.utc) instead",
+        )
+
+    # SUP9-TC-TZ-002
+    def test_timezone_aware_call_present(self):
+        """cstylecheck_rules.yml must use timezone-aware datetime.now(...)."""
+        self.assertIn(
+            "datetime.timezone.utc",
+            self._wf_text,
+            "datetime.timezone.utc not found in cstylecheck_rules.yml — "
+            "timezone-aware call may have been reverted",
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
