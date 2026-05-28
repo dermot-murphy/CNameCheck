@@ -10,8 +10,6 @@ All names are re-exported here for backward compatibility so that:
 """
 from __future__ import annotations
 
-import sys
-
 # ---------------------------------------------------------------------------
 # Version
 # ---------------------------------------------------------------------------

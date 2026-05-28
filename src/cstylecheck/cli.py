@@ -16,7 +16,6 @@ import sys
 from pathlib import Path
 from typing import Generator
 
-from .models import Violation
 from .config import (
     load_config, load_alias_file, load_exclusions_file,
     _disabled_rules_for_file, load_defines_file,
