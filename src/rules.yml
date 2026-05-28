@@ -513,6 +513,32 @@ misc:
     severity: error   # MISRA C:2023 promotes this to Required
 
   # -----------------------------------------------------------------------
+  # Declared but not defined (issue #114)
+  # -----------------------------------------------------------------------
+  # Cross-file check: identifies C objects that are declared (via 'extern'
+  # or a forward typedef) but for which no matching definition is found in
+  # any of the files passed in the same checker invocation.
+  #
+  # Covers:
+  #   - extern function declarations  →  function body definition
+  #   - extern variable declarations  →  file-scope variable definition
+  #   - typedef struct Tag Tag;       →  full typedef struct { … } Tag;
+  #   - typedef enum  Tag Tag;        →  full typedef enum  { … } Tag;
+  #
+  # Single-file invocations always produce no violations (the definition
+  # may exist in an unscanned translation unit such as a BSP library).
+  #
+  # Symbols intentionally left undefined (e.g. platform HAL stubs) can be
+  # suppressed with an inline comment on the declaration line:
+  #   extern void HAL_UART_Init(void);  /* cstylecheck: disable misc.declared_not_defined */
+  #
+  # Default severity is 'warning' (not 'error') because the definition may
+  # reside in unscanned BSP or COTS files not included in the checker run.
+  declared_not_defined:
+    enabled: false    # opt-in; disabled by default
+    severity: warning
+
+  # -----------------------------------------------------------------------
   # Comment-to-code ratio (issue #68)
   # -----------------------------------------------------------------------
   # Measures the ratio of explanatory comment lines to code lines within
