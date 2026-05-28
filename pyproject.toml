@@ -35,7 +35,10 @@ cstylecheck = "cstylecheck:main"
 # =============================================================================
 
 [tool.setuptools]
-py-modules = ["cstylecheck", "_version"]
+# _version is a standalone top-level module alongside the package.
+# cstylecheck is now a package (src/cstylecheck/) rather than a single module.
+py-modules = ["_version"]
+packages   = ["cstylecheck"]
 
 [tool.setuptools.package-dir]
 "" = "src"
