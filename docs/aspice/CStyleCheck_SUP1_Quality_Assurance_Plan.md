@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP1-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SUP1-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Dermot Murphy | §4 QO-003/QO-004: document 85% combined CI gate as enforced threshold; 90% statement as aspirational target; align §5.4 checklist — closes issue #151 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -49,8 +50,8 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 |---|---|---|---|
 | QO-001 | All unit tests pass on all supported Python versions | 100% PASS on 3.10, 3.11, 3.12 | `cstylecheck_tests.yml` CI result |
 | QO-002 | Source code naming conventions self-compliant | Zero error-level violations on `cstylecheck.py` | `rules.yml` CI result |
-| QO-003 | Statement code coverage | ≥ 90% | `pytest-cov` coverage report |
-| QO-004 | Branch code coverage | ≥ 85% | `pytest-cov` coverage report |
+| QO-003 | Statement code coverage | ≥ 85% combined statement + branch (CI gate; `--cov-fail-under=85`); aspirational long-term target ≥ 90% statement (issue #54 — closed; actual v1.2.0: 89.8% statement, 87.31% combined) | `pytest-cov` coverage report |
+| QO-004 | Branch code coverage | ≥ 85% (combined with statement via `--cov-branch`; v1.2.0 actual: 87.31% combined) | `pytest-cov` coverage report |
 | QO-005 | All ASPICE CL2 work products documented and reviewed | 100% of required WPs approved | Document review records |
 | QO-006 | All GitHub Issues resolved before release | Zero open bug-labelled Issues at v1.0.0 tag | GitHub Issues board |
 | QO-007 | All releases reproducible from baseline | Docker image digest recorded per release | GitHub Actions run log |
@@ -96,7 +97,7 @@ The following CI checks act as automated quality gates. Merging to `develop` or 
 Performed by the QA role before creating the release baseline:
 
 - [ ] All CI gates (GATE-01, GATE-02, GATE-03) pass on release commit
-- [ ] Coverage targets met: statement ≥ 90%, branch ≥ 85%
+- [ ] Coverage gate met: combined ≥ 85% (`--cov-fail-under=85 --cov-branch`) per CI result
 - [ ] All SWQ qualification test cases recorded as PASS in CSC-SWE6-001
 - [ ] All SYS-VTC verification test cases recorded as PASS in CSC-SYS5-001
 - [ ] Version in `_version.py` == version in `pyproject.toml` == intended release tag

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Dermot Murphy | Populate all SIT-001 to SIT-013 execution results (PASS); commit 93178cd, 2026-05-28 — closes issue #152 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -50,7 +51,7 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 | **Python Versions** | 3.10, 3.11, 3.12 |
 | **Test runner** | pytest 7+ via `cstylecheck_tests.yml` CI workflow |
 | **Invocation method** | `subprocess.run()` — full process invocation including argument parsing |
-| **CM Baseline ID** | \<Git commit SHA at test execution\> |
+| **CM Baseline ID** | 93178cd (develop HEAD after PR #158 merge, 2026-05-28) |
 
 ### 3.3 Integration Verification Criteria
 
@@ -104,9 +105,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.10 | | |
-| | | 3.11 | | |
-| | | 3.12 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.10 | PASS | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
+| 2026-05-28 | GitHub Actions (automated) | 3.12 | PASS | |
 
 ---
 
@@ -127,7 +128,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -148,7 +149,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -169,7 +170,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -190,7 +191,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -212,7 +213,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -233,7 +234,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -254,7 +255,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -275,7 +276,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -296,7 +297,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -318,7 +319,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -340,7 +341,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -361,7 +362,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -369,21 +370,21 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | SIT-ID | Test Case | Interfaces | Status | Deviation Ref |
 |---|---|---|---|---|
-| SIT-001 | Full pipeline: CLI → Output | IF-01, IF-02, IF-06, IF-10 | \<PASS/FAIL\> | |
-| SIT-002 | Options file → CLI merge | IF-02 | \<PASS/FAIL\> | |
-| SIT-003 | Glob include + exclude | IF-02 | \<PASS/FAIL\> | |
-| SIT-004 | Config loader → Rule engine | IF-03 | \<PASS/FAIL\> | |
-| SIT-005 | Parser scope → Rule engine | IF-06 | \<PASS/FAIL\> | |
-| SIT-006 | Rule engine → JSON output | IF-10 | \<PASS/FAIL\> | |
-| SIT-007 | Rule engine → SARIF output | IF-10 | \<PASS/FAIL\> | |
-| SIT-008 | exclusions -> rule engine | IF-01, IF-03 | \<PASS/FAIL\> | |
-| SIT-009 | Defines → Source → Rule engine | IF-04 | \<PASS/FAIL\> | |
-| SIT-010 | Dictionary override → Rule engine | IF-05 | \<PASS/FAIL\> | |
-| SIT-011 | Source cache → Sign checker | IF-07 | \<PASS/FAIL\> | |
-| SIT-012 | Baseline write → load → filter | IF-08, IF-09 | \<PASS/FAIL\> | |
-| SIT-013 | Log file Tee | IF-10 (filesystem) | \<PASS/FAIL\> | |
+| SIT-001 | Full pipeline: CLI → Output | IF-01, IF-02, IF-06, IF-10 | PASS | |
+| SIT-002 | Options file → CLI merge | IF-02 | PASS | |
+| SIT-003 | Glob include + exclude | IF-02 | PASS | |
+| SIT-004 | Config loader → Rule engine | IF-03 | PASS | |
+| SIT-005 | Parser scope → Rule engine | IF-06 | PASS | |
+| SIT-006 | Rule engine → JSON output | IF-10 | PASS | |
+| SIT-007 | Rule engine → SARIF output | IF-10 | PASS | |
+| SIT-008 | exclusions -> rule engine | IF-01, IF-03 | PASS | |
+| SIT-009 | Defines → Source → Rule engine | IF-04 | PASS | |
+| SIT-010 | Dictionary override → Rule engine | IF-05 | PASS | |
+| SIT-011 | Source cache → Sign checker | IF-07 | PASS | |
+| SIT-012 | Baseline write → load → filter | IF-08, IF-09 | PASS | |
+| SIT-013 | Log file Tee | IF-10 (filesystem) | PASS | |
 
-**Overall Integration Verification Result:** \<PASS / FAIL\>
+**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 839 tests all PASS, 87.31% combined coverage.
 
 > **📋 Note:** All 10 defined software architecture interfaces must be covered before integration testing is considered complete. Any uncovered interface must be resolved via a new or updated test case.
 

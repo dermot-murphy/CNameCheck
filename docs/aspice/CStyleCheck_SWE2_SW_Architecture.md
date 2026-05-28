@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Claude | Update §3/§4 to reflect package refactor (issue #144): replace "single Python module (cstylecheck.py)" with "Python package (src/cstylecheck/)" — closes issue #146 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -44,10 +45,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 ## 4. Architectural Overview
 
-CStyleCheck is implemented as a **single Python module** (`cstylecheck.py`) with supporting data files. The module is structured into distinct functional components that map directly to the system-level subsystems defined in CSC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
+CStyleCheck is implemented as a **Python package** (`src/cstylecheck/`) comprising 10 sub-modules with supporting data files. The package is structured into distinct functional components that map directly to the system-level subsystems defined in CSC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
 
 ```
-cstylecheck.py
+src/cstylecheck/   (package — 10 sub-modules)
 │
 ├── [COMP-01] CLI & Options Loader     (parse_args, _expand_options_file, discover_files)
 ├── [COMP-02] Configuration Loader     (load_config, load_alias_file, load_exclusions_file,

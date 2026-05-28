@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.4 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.5 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-05-28 | Claude | Add §5.7b whitespace_ratio test catalogue (27 tests); fix §5.1 count 32→35; add §6 row for test_whitespace_ratio.py; update total 759→786; update §7 traceability — closes issues #148 #157 |
 | 1.4 | 2026-05-28 | Dermot Murphy | §4.2: implement subprocess coverage via COVERAGE_PROCESS_START + sitecustomize.py; raise CI gate to 85% combined; actual v1.2.0 CI: 89.8% stmt, 87.31% combined — closes issue #54 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Populate §6 results table: actual test counts, all PASS; coverage 86% stmt / N/A branch (v1.1.0 CI); add 5 missing test modules — closes issue #53 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation footnote to §1 — closes issue #61 |
@@ -70,7 +71,7 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 Coverage is measured per CI run on all three Python matrix versions (3.10, 3.11, 3.12) and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact, Python 3.11 build).
 
-**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 759 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
+**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 839 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
 
 > **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures.
 
@@ -114,7 +115,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.1 Variable Rules — `test_variables.py` (32 tests)
+### 5.1 Variable Rules — `test_variables.py` (35 tests)
 
 | TC-ID | Test Name | Rule Verified | Pass Condition |
 |---|---|---|---|
@@ -213,6 +214,40 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 | UV-YOD-003 | `test_literal_on_left_passes` | `misc.yoda_condition` | `if (0 == count)` passes |
 | UV-YOD-004 | `test_two_variables_exempt` | `misc.yoda_condition` | `if (a == b)` no violation |
 | UV-YOD-005 | `test_not_equal_enforced` | `misc.yoda_condition` | `!= NULL` also enforced |
+
+---
+
+### 5.7b Whitespace Ratio Rules — `test_whitespace_ratio.py` (27 tests)
+
+| TC-ID | Test Name | Rule Verified | Pass Condition |
+|---|---|---|---|
+| UV-WSR-001 | `test_disabled_produces_no_violation` | `misc.whitespace_ratio` | No violation when rule disabled |
+| UV-WSR-002 | `test_zero_blank_lines_raises_violation` | `misc.whitespace_ratio` | Violation when ratio = 0 |
+| UV-WSR-003 | `test_sufficient_blank_lines_passes` | `misc.whitespace_ratio` | No violation when ratio above warning threshold |
+| UV-WSR-004 | `test_exactly_at_warning_threshold_passes` | `misc.whitespace_ratio` | No violation at exactly the warning threshold |
+| UV-WSR-005 | `test_one_below_warning_threshold_fails` | `misc.whitespace_ratio` | Warning violation when one blank line below threshold |
+| UV-WSR-006 | `test_single_violation_emitted_per_file` | `misc.whitespace_ratio` | Exactly one violation emitted per non-compliant file |
+| UV-WSR-007 | `test_below_error_threshold_emits_error` | `misc.whitespace_ratio` | Error severity when ratio below error threshold |
+| UV-WSR-008 | `test_between_thresholds_emits_configured_severity` | `misc.whitespace_ratio` | Configured severity used when between thresholds |
+| UV-WSR-009 | `test_custom_severity_used_between_thresholds` | `misc.whitespace_ratio` | Custom severity key respected |
+| UV-WSR-010 | `test_exactly_at_error_threshold_is_warning_not_error` | `misc.whitespace_ratio` | Warning (not error) when exactly at error threshold |
+| UV-WSR-011 | `test_fewer_than_min_lines_skipped` | `misc.whitespace_ratio` | No violation when code lines below minimum |
+| UV-WSR-012 | `test_exactly_min_lines_is_checked` | `misc.whitespace_ratio` | Checked when code lines equals minimum |
+| UV-WSR-013 | `test_custom_min_lines` | `misc.whitespace_ratio` | Custom min_lines config respected |
+| UV-WSR-014 | `test_comments_do_not_contribute_to_min_lines` | `misc.whitespace_ratio` | Comment lines excluded from minimum code-line count |
+| UV-WSR-015 | `test_blank_lines_in_block_header_not_counted` | `misc.whitespace_ratio` | Header blank lines excluded from ratio |
+| UV-WSR-016 | `test_blank_lines_between_header_comments_not_counted` | `misc.whitespace_ratio` | Header region blank lines excluded |
+| UV-WSR-017 | `test_blank_lines_in_body_counted_after_header` | `misc.whitespace_ratio` | Body blank lines counted correctly |
+| UV-WSR-018 | `test_line_comments_excluded_from_denominator` | `misc.whitespace_ratio` | Line comment lines excluded from code count |
+| UV-WSR-019 | `test_block_comments_excluded_from_denominator` | `misc.whitespace_ratio` | Block comment lines excluded from code count |
+| UV-WSR-020 | `test_code_line_with_trailing_comment_counts_as_code` | `misc.whitespace_ratio` | Trailing-comment lines count as code |
+| UV-WSR-021 | `test_mixed_blanks_and_comments_ratio_correct` | `misc.whitespace_ratio` | Correct ratio when mix of blank, comment, code lines |
+| UV-WSR-022 | `test_message_contains_ratio_and_counts` | `misc.whitespace_ratio` | Violation message includes ratio and counts |
+| UV-WSR-023 | `test_message_mentions_threshold` | `misc.whitespace_ratio` | Violation message includes threshold value |
+| UV-WSR-024 | `test_message_says_error_threshold_when_below_error` | `misc.whitespace_ratio` | Message identifies error threshold when below it |
+| UV-WSR-025 | `test_violation_reported_at_line_1` | `misc.whitespace_ratio` | Violation always at line 1 |
+| UV-WSR-026 | `test_singular_blank_line_grammar` | `misc.whitespace_ratio` | "1 blank line" (not "1 blank lines") in message |
+| UV-WSR-027 | `test_plural_blank_lines_grammar` | `misc.whitespace_ratio` | "N blank lines" (plural) in message |
 
 ---
 
@@ -324,6 +359,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_misc.py` | 28 | 28 | 0 | `_check_misc` |
 | `test_misc_improvements.py` | 77 | 77 | 0 | `_check_misc`, improvements |
 | `test_yoda_condition.py` | 37 | 37 | 0 | `_check_yoda` |
+| `test_whitespace_ratio.py` | 27 | 27 | 0 | `_check_whitespace_ratio` |
 | `test_reserved_name.py` | 40 | 40 | 0 | `_check_reserved_names` |
 | `test_spell_check.py` | 9 | 9 | 0 | `_check_spelling` |
 | `test_sign_compatibility.py` | 7 | 7 | 0 | `SignChecker` |
@@ -341,7 +377,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_github_annotations.py` | 8 | 8 | 0 | GitHub Actions annotation output |
 | `test_case_patterns.py` | 6 | 6 | 0 | Case pattern matching (`_check_case_patterns`) |
 | `test_thread_safe_globals.py` | 4 | 4 | 0 | Thread-safe global state (`C_KEYWORDS`, `C_STDLIB_NAMES`) |
-| **Total** | **759** | **759** | **0** | All rules covered |
+| **Total** | **786** | **786** | **0** | All rules covered |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.2.0 CI — all 759 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
@@ -361,6 +397,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | SWE1-040 to SWE1-042 | Type rules | UV-TYP-001 to UV-TYP-007 |
 | SWE1-043 to SWE1-044 | Include guard rules | UV-INC-001 to UV-INC-005 |
 | SWE1-045 to SWE1-050 | Miscellaneous rules | UV-MSC-001 to UV-MSC-007 |
+| SWE1-071 | Whitespace ratio | UV-WSR-001 to UV-WSR-027 |
 | SWE1-049 | Yoda conditions | UV-YOD-001 to UV-YOD-005 |
 | SWE1-051 to SWE1-053 | Sign compatibility | UV-SGN-001 to UV-SGN-004 |
 | SWE1-054 to SWE1-055 | Reserved names | UV-RES-001 to UV-RES-004 |

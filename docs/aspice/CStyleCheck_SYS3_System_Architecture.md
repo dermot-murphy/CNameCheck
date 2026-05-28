@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS3-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SYS3-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Claude | Update §5/§6/§8 to reflect package refactor (issue #144): replace single `cstylecheck.py` references with package sub-modules — closes issue #146 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -73,18 +74,18 @@ CStyleCheck is a software-only system with no hardware dependencies. It is deplo
 
 ## 5. System Decomposition — Static View
 
-CStyleCheck is decomposed into six functional subsystems, all implemented within the single `cstylecheck.py` module and its supporting configuration and data files.
+CStyleCheck is decomposed into six functional subsystems, all implemented within the `src/cstylecheck/` Python package (10 sub-modules) and its supporting configuration and data files.
 
 ### 5.1 Subsystem Overview
 
 | Subsystem ID | Name | Responsibility | Primary CIs |
 |---|---|---|---|
-| SS-01 | CLI & Options Loader | Parse command-line arguments and options file; resolve file lists from globs | `cstylecheck.py` (main / argparse), `options.txt` |
-| SS-02 | Configuration Loader | Load and validate `rules.yml`; merge project defines and aliases | `cstylecheck.py`, `rules.yml`, `aliases.txt`, `defines.txt` |
+| SS-01 | CLI & Options Loader | Parse command-line arguments and options file; resolve file lists from globs | `cli.py`, `config.py` (_read_options_file, _expand_options_file), `options.txt` |
+| SS-02 | Configuration Loader | Load and validate `rules.yml`; merge project defines and aliases | `config.py`, `rules.yml`, `aliases.txt`, `defines.txt` |
 | SS-03 | Dictionary Manager | Load keyword, stdlib, and spell-check dictionaries; support runtime override | `c_keywords.txt`, `c_stdlib_names.txt`, `c_spell_dict.txt` |
-| SS-04 | Source Parser & Cache | Read each source file once; tokenise identifiers, extract scoped declarations; cache content for cross-file checks | `cstylecheck.py` |
-| SS-05 | Rule Engine | Evaluate all enabled rules against each identifier; classify violations by severity; apply exclusions and baselines | `cstylecheck.py`, `exclusions.yml` |
-| SS-06 | Output Formatter | Render violation results as plain text, JSON, or SARIF; emit GitHub annotations; write log file; print summary | `cstylecheck.py` |
+| SS-04 | Source Parser & Cache | Read each source file once; tokenise identifiers, extract scoped declarations; cache content for cross-file checks | `preprocessor.py` |
+| SS-05 | Rule Engine | Evaluate all enabled rules against each identifier; classify violations by severity; apply exclusions and baselines | `checker.py`, `sign_checker.py`, `exclusions.yml` |
+| SS-06 | Output Formatter | Render violation results as plain text, JSON, or SARIF; emit GitHub annotations; write log file; print summary | `output.py`, `baseline.py` |
 
 ### 5.2 Subsystem Interface Summary
 
@@ -119,7 +120,7 @@ CStyleCheck is decomposed into six functional subsystems, all implemented within
 
 ```
 /app/
-  cstylecheck.py          ← main linter (CI-001)
+  cstylecheck/            ← main linter package (CI-001)
   _version.py            ← version string (CI-002)
   rules.yml ← default rule config (CI-003)
   options.txt     ← default options (CI-004)
@@ -199,7 +200,7 @@ If any configuration or invocation error is detected during steps 1 or 2:
 
 | Decision ID | Decision | Rationale | Alternative Considered |
 |---|---|---|---|
-| AD-001 | Single Python file (`cstylecheck.py`) with no third-party runtime dependencies beyond PyYAML | Maximises portability; trivially usable as a pre-commit hook and GitHub Action without packaging setup | Multi-module package — rejected: adds packaging complexity for minimal benefit at this scale |
+| AD-001 | Python package (`src/cstylecheck/`, 10 sub-modules) with no third-party runtime dependencies beyond PyYAML | Maximises maintainability; package refactor (issue #144) splits the original monolithic file into logical modules while preserving full backward compatibility via `__init__.py` re-exports | Single monolithic file — was v1.0/v1.1 approach; refactored in v1.2 to aid readability and navigation |
 | AD-002 | YAML for rule configuration | Human-readable, widely used in CI/CD toolchains, native Python support via PyYAML | JSON / TOML — rejected: JSON too verbose; TOML less familiar to embedded teams |
 | AD-003 | Source-cache architecture (read each file once) | Eliminates duplicate I/O; required for cross-file sign-compatibility check to share the same parsed content | Re-read files per check pass — rejected: doubles I/O on large repos |
 | AD-004 | Three output formats (text, JSON, SARIF) | Supports human review (text), downstream automation (JSON), and GitHub Code Scanning integration (SARIF) | Single format — rejected: insufficient for CI/CD integration requirements |

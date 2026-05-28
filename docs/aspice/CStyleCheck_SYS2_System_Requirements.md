@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Dermot Murphy | §5.9: formally defer NF-010 and NF-012 to v2.0; classify NF-011 as Out of Scope v1.x — closes issue #153 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -176,11 +177,11 @@ The following table summarises the stakeholder needs from which the system requi
 
 ### 5.9 Non-Functional Requirements — Integration
 
-| REQ-ID | Requirement | Priority | Verification Method | Derived From |
-|---|---|---|---|---|
-| SYS-NF-010 | The system shall integrate with the pre-commit framework via `.pre-commit-hooks.yml` | Mandatory | Test | STK-001 |
-| SYS-NF-011 | The system shall integrate with GitHub Actions via `action.yml` at the repository root | Mandatory | Test | STK-005 |
-| SYS-NF-012 | The GitHub Action shall expose violation counts (`errors`, `warnings`, `info`, `violations`) as step outputs | Mandatory | Test | STK-005 |
+| REQ-ID | Requirement | Priority | Verification Method | Derived From | Disposition |
+|---|---|---|---|---|---|
+| SYS-NF-010 | The system shall integrate with the pre-commit framework via `.pre-commit-hooks.yml` | Mandatory | Test | STK-001 | **Deferred — v2.0 milestone.** `.pre-commit-hooks.yml` exists; automated system-level test not yet scheduled. |
+| SYS-NF-011 | The system shall integrate with GitHub Actions via `action.yml` at the repository root | Out of Scope v1.x | — | STK-005 | **Out of Scope v1.x.** Publishing to GitHub Marketplace is not a linter tool goal; `action.yml` is maintained for manual use only. |
+| SYS-NF-012 | The GitHub Action shall expose violation counts (`errors`, `warnings`, `info`, `violations`) as step outputs | Mandatory | Test | STK-005 | **Deferred — v2.0 milestone.** Step output variables not yet implemented and verified at system level. |
 
 ---
 
@@ -196,7 +197,9 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-NF-001 to SYS-NF-002 | Performance | STK-003 | Source cache | \<SWE.1-REQ-041 to 042\> |
 | SYS-NF-003 to SYS-NF-006 | Portability | STK-001, STK-006 | Build / packaging | \<SWE.1-REQ-043 to 046\> |
 | SYS-NF-007 to SYS-NF-009 | Configurability | STK-002 | Configuration loader | \<SWE.1-REQ-047 to 049\> |
-| SYS-NF-010 to SYS-NF-012 | Integration | STK-005 | Integration layer | \<SWE.1-REQ-050 to 052\> |
+| SYS-NF-010 | Integration (pre-commit) | STK-001 | `.pre-commit-hooks.yml` | Deferred v2.0 |
+| SYS-NF-011 | Integration (GitHub Marketplace) | STK-005 | `action.yml` | Out of Scope v1.x |
+| SYS-NF-012 | Integration (step outputs) | STK-005 | `action.yml` | Deferred v2.0 |
 
 ---
 

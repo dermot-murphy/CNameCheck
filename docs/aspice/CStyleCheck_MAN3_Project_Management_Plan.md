@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-MAN3-001 | **Version** | 1.2 |
+| **Document ID** | CSC-MAN3-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Dermot Murphy | §6 WBS-10 to WBS-16: update status with concrete facts (839 tests, release dates, blocked items) — closes issue #154 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Resolve \<TBD\> milestone dates for v1.0.0; add v1.1.0 milestone row — closes issue #53 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -124,14 +125,14 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | WBS-07 | Test suite (500+ tests) | 40h | Claude | Complete |
 | WBS-08 | Docker packaging and CI | 8h | Claude | Complete |
 | WBS-09 | GitHub Action and pre-commit | 6h | Claude | Complete |
-| WBS-10 | Unit verification (SWE.4) | 4h | Claude | In Progress |
-| WBS-11 | Integration testing (SWE.5) | 4h | Claude | In Progress |
-| WBS-12 | Qualification testing (SWE.6) | 4h | Claude | In Progress |
-| WBS-13 | System integration testing (SYS.4) | 4h | Claude | In Progress |
-| WBS-14 | System verification (SYS.5) | 4h | Claude | In Progress |
-| WBS-15 | Management documents (MAN.3, MAN.5) | 4h | Claude | In Progress |
-| WBS-16 | Support documents (SUP.1, SUP.9, SUP.10, ACQ.4) | 6h | Claude | In Progress |
-| WBS-17 | Release (v1.0.0 tag, GitHub Release) | 2h | Claude | Planned |
+| WBS-10 | Unit verification (SWE.4) | 4h | Claude | Largely Complete — 839 tests exist; remaining gap: SWE4 catalogue update for misc.whitespace_ratio (issue #148) |
+| WBS-11 | Integration testing (SWE.5) | 4h | Claude | In Progress — blocked by #152 (results recording); test execution complete |
+| WBS-12 | Qualification testing (SWE.6) | 4h | Claude | Largely Complete — CI pipeline constitutes qualification execution; result recording open (issue #152) |
+| WBS-13 | System integration testing (SYS.4) | 4h | Claude | In Progress — blocked by #152 (results recording); test execution complete |
+| WBS-14 | System verification (SYS.5) | 4h | Claude | In Progress — blocked by #152 (results recording); test execution complete |
+| WBS-15 | Documentation finalisation | 4h | Claude | In Progress — ongoing; target v1.3.0 (2026-Q3) |
+| WBS-16 | Release | 2h | Claude | v1.0.0 released 2026-04-12; v1.1.0 released ~2026-05-01; v1.2.x In Progress — target 2026-Q3 |
+| WBS-17 | Release (v1.0.0 tag, GitHub Release) | 2h | Claude | Complete — v1.0.0 released 2026-04-12 |
 
 ---
 

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.4 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.5 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-05-28 | Dermot Murphy | §5.4: update all document version numbers to reflect issues #146–#157 changes — closes issue #156 |
 | 1.4 | 2026-05-28 | Claude / Dermot Murphy | Internal audit CSC-AUD-001: populate §6 Assessment Verdicts for all 17 processes (N/P/L/F); update §5.4 document version table to current versions; add audit report reference — closes issue #136 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Update SWE.4 performance objective: subprocess coverage instrumented, gate 85% combined; actual 87.31% combined / 89.8% stmt — closes issue #54 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation reference at GP 2.2.3; add CI-028 (SVD) and CI-029 (DEV-002) to §5.4 — closes issue #61 |
@@ -177,24 +178,24 @@ All work products are reviewed before approval according to the following schedu
 
 | Document ID | Work Product | Version | Baseline Status | CM Baseline |
 |---|---|---|---|---|
-| CSC-SYS2-001 | System Requirements Spec | 1.0 | Released | v1.0.0 tag |
-| CSC-SYS3-001 | System Architecture Description | 1.0 | Released | v1.0.0 tag |
-| CSC-SYS4-001 | System Integration Test Spec | 1.0 | Released | v1.0.0 tag |
-| CSC-SYS5-001 | System Verification Report | 1.0 | Released | v1.0.0 tag |
-| CSC-SWE1-001 | SW Requirements Spec | 1.0 | Released | v1.0.0 tag |
-| CSC-SWE2-001 | SW Architecture Description | 1.0 | Released | v1.0.0 tag |
-| CSC-SWE3-001 | SW Detailed Design | 1.2 | In Development | develop branch |
-| CSC-SWE4-001 | Unit Verification Spec | 1.3 | Released | v1.1.0 tag |
-| CSC-SWE5-001 | Integration Test Spec | 1.0 | Released | v1.0.0 tag |
+| CSC-SYS2-001 | System Requirements Spec | 1.2 | In Development | develop branch |
+| CSC-SYS3-001 | System Architecture Description | 1.2 | In Development | develop branch |
+| CSC-SYS4-001 | System Integration Test Spec | 1.2 | In Development | develop branch |
+| CSC-SYS5-001 | System Verification Report | 1.3 | In Development | develop branch |
+| CSC-SWE1-001 | SW Requirements Spec | 1.3 | In Development | develop branch |
+| CSC-SWE2-001 | SW Architecture Description | 1.2 | In Development | develop branch |
+| CSC-SWE3-001 | SW Detailed Design | 1.3 | In Development | develop branch |
+| CSC-SWE4-001 | Unit Verification Spec | 1.5 | In Development | develop branch |
+| CSC-SWE5-001 | Integration Test Spec | 1.2 | In Development | develop branch |
 | CSC-SWE6-001 | Qualification Test Spec | 1.3 | Released | v1.1.0 tag |
-| CSC-MAN3-001 | Project Management Plan | 1.2 | Released | v1.1.0 tag |
-| CSC-MAN5-001 | Risk Management Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-SUP8-001 | Configuration Management Plan | 1.3 | Released | v1.1.0 tag |
+| CSC-MAN3-001 | Project Management Plan | 1.3 | In Development | develop branch |
+| CSC-MAN5-001 | Risk Management Plan | 1.2 | In Development | develop branch |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.2 | In Development | develop branch |
+| CSC-SUP8-001 | Configuration Management Plan | 1.4 | In Development | develop branch |
 | CSC-SUP9-001 | Problem Resolution Plan | 1.0 | Released | v1.0.0 tag |
 | CSC-SUP10-001 | Change Request Plan | 1.0 | Released | v1.0.0 tag |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.4 | In Development | develop branch |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.5 | In Development | develop branch |
 | CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
 | CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
 | CSC-SVD-001 | Software Version Description | 1.1 | Released | v1.1.0 tag |
