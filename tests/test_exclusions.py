@@ -211,8 +211,6 @@ class TestDisabledRulesForFile(unittest.TestCase):
         self.assertIn("function.prefix", fd)
 
     def test_multiple_patterns_union(self):
-        yaml = ('"mod.c":\n  disabled_rules:\n    - function.prefix\n'
-                '"mod.c":\n  disabled_rules:\n    - function.style\n')
         # Note: YAML duplicate keys — second overwrites first in most parsers
         # but patterns are different keys in practice
         fd, _ = self._get("/src/mod.c",

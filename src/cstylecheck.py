@@ -1072,7 +1072,6 @@ class Checker:
             return
 
         # Build the full list of accepted prefixes: canonical + any aliases
-        sep = _cfg(self.cfg, "file_prefix", "separator", default="_")
         accepted = list(self._alias_prefixes)  # already includes canonical
         if not accepted:
             accepted = [self._prefix()]
@@ -1084,7 +1083,7 @@ class Checker:
         # Report using the canonical prefix in the message
         pfx = accepted[0]
         alias_hint = (
-            f" (or alias prefix(es): "
+            " (or alias prefix(es): "
             + ", ".join(f"'{a}'" for a in accepted[1:])
             + ")"
             if len(accepted) > 1 else ""

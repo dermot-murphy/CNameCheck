@@ -105,13 +105,13 @@ class TestEofCommentPasses(unittest.TestCase):
         """filename_case=preserve keeps the filename as-is."""
         cfg = _cfg(filename_case="preserve")
         # filepath has mixed case
-        src = f"int x;\n/* EOF: MyModule.c */\n\n"
+        src = "int x;\n/* EOF: MyModule.c */\n\n"
         self.assertTrue(_clean(src, cfg=cfg, filepath="MyModule.c"))
 
     def test_custom_template(self):
         """User-configured template is respected."""
         cfg = _cfg(template="// end of {filename}")
-        src = f"int x;\n// end of module.c\n\n"
+        src = "int x;\n// end of module.c\n\n"
         self.assertTrue(_clean(src, cfg=cfg))
 
     def test_template_without_placeholder(self):
@@ -129,7 +129,7 @@ class TestEofCommentWrongContent(unittest.TestCase):
 
     def test_wrong_comment_text(self):
         """EOF comment with wrong text."""
-        src = f"int x;\n/* EOF: wrong.c */\n\n"
+        src = "int x;\n/* EOF: wrong.c */\n\n"
         self.assertTrue(_has(src))
 
     def test_wrong_comment_no_colon(self):
@@ -139,7 +139,7 @@ class TestEofCommentWrongContent(unittest.TestCase):
 
     def test_wrong_comment_wrong_case(self):
         """filename in comment is uppercase but filename_case is lower."""
-        src = f"int x;\n/* EOF: MODULE.C */\n\n"
+        src = "int x;\n/* EOF: MODULE.C */\n\n"
         self.assertTrue(_has(src))
 
     def test_no_eof_comment_at_all(self):
@@ -149,7 +149,7 @@ class TestEofCommentWrongContent(unittest.TestCase):
 
     def test_eof_comment_is_code_line(self):
         """Last non-blank line is a code line, not the EOF comment."""
-        src = f"int x = 0;\nreturn 0;\n\n"
+        src = "int x = 0;\nreturn 0;\n\n"
         self.assertTrue(_has(src))
 
     def test_violation_message_content(self):
@@ -274,7 +274,7 @@ class TestEofCommentEdgeCases(unittest.TestCase):
 
     def test_filepath_with_directory(self):
         """Only the basename is substituted — directory components ignored."""
-        src = f"int x;\n/* EOF: module.c */\n\n"
+        src = "int x;\n/* EOF: module.c */\n\n"
         # filepath contains directory prefix
         self.assertTrue(_clean(src, filepath="src/drivers/module.c"))
 
