@@ -223,7 +223,38 @@ suppressed rule, delete its entries from the baseline and commit.
 
 ## New in this release
 
-### New rules
+### New in v1.1.0 (2026-05-28)
+
+#### CI quality gates
+
+- **mypy static type-checking gate** — `mypy src/cstylecheck.py --ignore-missing-imports --implicit-optional`
+  runs on Python 3.11 in CI and fails the build on type errors.
+- **ruff lint gate** — `ruff check src/ tests/` runs on Python 3.11 in CI; project-specific
+  ignores configured in `pyproject.toml` (`E501`, `E741`, etc.).
+
+#### MISRA C coverage matrix
+
+`Rules-and-Configuration.md` now includes a coverage matrix mapping each of the 50 CStyleCheck
+rule IDs to the corresponding MISRA C:2012 and MISRA C:2023 rules they implement or support.
+
+#### Bug fixes (v1.1.0)
+
+- **`--spell-words` with disabled spell check** now emits a warning instead of silently ignoring the flag.
+- **Digit segments in `lower_snake` names** now accepted — `buf16`, `i2c_bus`, `spi1_tx` are all valid.
+- **Single-quoted char literals** (e.g. `'\n'`, `'a'`) correctly stripped from analysis input.
+- **CRLF line endings** normalised once at construction; no false positives on Windows-formatted files.
+- **`lower`/`upper` case patterns** corrected — underscores are now rejected where the rule requires
+  purely lower-case or upper-case letters.
+- **Global mutation of `C_KEYWORDS`/`C_STDLIB_NAMES`** eliminated; checker is safe to import and
+  call multiple times in the same process.
+- **GitHub Actions annotations** now use the correct severity title (Error/Warning/Info).
+- **Bidirectional alias map** — either column order in `aliases.txt` is accepted.
+- **`datetime.utcnow()`** replaced with `datetime.now(timezone.utc)` (Python 3.12 compatibility).
+- **CI supply-chain hardening** — `tj-actions/changed-files` and `moby/buildkit` pinned to full SHA/version.
+
+---
+
+### New in v1.0.0
 
 #### `misc.copyright_header` — enforced copyright block comment
 
