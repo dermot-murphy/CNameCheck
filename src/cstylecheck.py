@@ -3520,6 +3520,14 @@ def main() -> int:
         cfg_exempt  = sp_cfg.get("exempt_values", [])
         extra_words = load_spell_words(args.spell_words) if args.spell_words else set()
         spell_words = _build_spell_dict(cfg_exempt, extra_words, base_dict=spell_base)
+    elif getattr(args, "spell_words", None):
+        # spell_check is disabled but the user passed --spell-words; warn rather
+        # than silently discarding the file (issue #90).
+        print(
+            f"WARNING: --spell-words '{args.spell_words}' supplied but "
+            "spell_check.enabled is false in config — words file ignored.",
+            file=sys.stderr,
+        )
 
     # Project defines map: list of (pattern, replacement) for token substitution
     defines: list = load_defines_file(args.defines) if args.defines else []
