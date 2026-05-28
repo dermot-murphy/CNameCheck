@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Claude | Update all 89 Source Location values to reflect package refactor (issue #144); add UNIT-90 (_check_whitespace_ratio); update §4.1 to show completed refactor; update run_all order — closes issues #146 #147 #148 |
 | 1.2 | 2026-05-28 | Claude | Added ~25 units missing from v1.1 (load_spell_words, load_banned_names_file, load_copyright_file, to_case, is_exempt, _cfg, extract_comments, all Checker helper methods, _check_copyright_header, _body_is_object_verb, _check_comment_ratio, _check_lowercase_l_suffix, _check_octal_constants, _check_trigraphs, _is_reserved, _check_name_reserved, _ParamSig, _FuncSig, sign-checker helpers, SignChecker, DeclaredNotDefinedChecker, _strip_module_prefix, Tee, parse_args, _build_parser, _github_annotation_category, _is_constant_token, _is_variable_token). Updated all source line numbers to match v1.2.x source. Added Section 4.1 Target Package Structure documenting planned refactor (issue #65). Updated purpose to reference v1.2.x. |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -42,105 +43,106 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 ## 4. Unit Catalogue
 
-All source locations refer to `src/cstylecheck.py` in the monolithic layout (pre-package-split). After the package refactor (issue #65, Section 4.1) the **Target Module** column shows where each unit will reside.
+All source locations refer to the current package layout under `src/cstylecheck/` (post-package-split, issue #144). The **Target Module** column is now the **actual** module; the old monolithic `src/cstylecheck.py` no longer exists.
 
-| Unit ID | Unit Name | Source Location | Component | Target Module |
+| Unit ID | Unit Name | Source Location | Component | Module |
 |---|---|---|---|---|
-| UNIT-01 | `_read_options_file` | `cstylecheck.py:228` | COMP-01 | `cli.py` |
-| UNIT-02 | `_expand_options_file` | `cstylecheck.py:259` | COMP-01 | `cli.py` |
-| UNIT-03 | `discover_files` | `cstylecheck.py:3428` | COMP-01 | `cli.py` |
-| UNIT-04 | `_path_matches_exclude` | `cstylecheck.py:3354` | COMP-01 | `cli.py` |
-| UNIT-05 | `load_config` | `cstylecheck.py:291` | COMP-02 | `config.py` |
-| UNIT-06 | `load_alias_file` | `cstylecheck.py:319` | COMP-02 | `config.py` |
-| UNIT-07 | `load_exclusions_file` | `cstylecheck.py:365` | COMP-02 | `config.py` |
-| UNIT-08 | `_disabled_rules_for_file` | `cstylecheck.py:414` | COMP-02 | `config.py` |
-| UNIT-09 | `load_defines_file` | `cstylecheck.py:443` | COMP-02 | `config.py` |
-| UNIT-10 | `apply_defines` | `cstylecheck.py:492` | COMP-02 | `config.py` |
-| UNIT-11 | `_load_dict_file` | `cstylecheck.py:509` | COMP-03 | `config.py` |
-| UNIT-12 | `_data_file` | `cstylecheck.py:528` | COMP-03 | `config.py` |
-| UNIT-13 | `_build_spell_dict` | `cstylecheck.py:963` | COMP-03 | `config.py` |
-| UNIT-14 | `strip_comments` | `cstylecheck.py:734` | COMP-04 | `preprocessor.py` |
-| UNIT-15 | `strip_strings` | `cstylecheck.py:744` | COMP-04 | `preprocessor.py` |
-| UNIT-16 | `preprocess` | `cstylecheck.py:759` | COMP-04 | `preprocessor.py` |
-| UNIT-17 | `build_line_map` | `cstylecheck.py:938` | COMP-04 | `preprocessor.py` |
-| UNIT-18 | `offset_to_line_col` | `cstylecheck.py:945` | COMP-04 | `preprocessor.py` |
-| UNIT-19 | `_build_brace_depths` | `cstylecheck.py:808` | COMP-04 | `preprocessor.py` |
-| UNIT-20 | `_comment_only_lines` | `cstylecheck.py:763` | COMP-04 | `preprocessor.py` |
-| UNIT-21 | `Checker.__init__` | `cstylecheck.py:977` | COMP-05 | `checker.py` |
-| UNIT-22 | `Checker.run_all` | `cstylecheck.py:1121` | COMP-05 | `checker.py` |
-| UNIT-23 | `Checker._check_variables` | `cstylecheck.py:1200` | COMP-05a | `checker.py` |
-| UNIT-24 | `Checker._check_functions` | `cstylecheck.py:1710` | COMP-05b | `checker.py` |
-| UNIT-25 | `Checker._check_defines` | `cstylecheck.py:1152` | COMP-05c | `checker.py` |
-| UNIT-26 | `Checker._check_typedefs` | `cstylecheck.py:1800` | COMP-05d | `checker.py` |
-| UNIT-27 | `Checker._check_enums` | `cstylecheck.py:1824` | COMP-05d | `checker.py` |
-| UNIT-28 | `Checker._check_structs` | `cstylecheck.py:1887` | COMP-05d | `checker.py` |
-| UNIT-29 | `Checker._check_include_guard` | `cstylecheck.py:2026` | COMP-05e | `checker.py` |
-| UNIT-30 | `Checker._check_misc` | `cstylecheck.py:2059` | COMP-05f | `checker.py` |
-| UNIT-31 | `Checker._check_yoda` | `cstylecheck.py:2530` | COMP-05f | `checker.py` |
-| UNIT-32 | `Checker._check_reserved_names` | `cstylecheck.py:2757` | COMP-05f | `checker.py` |
-| UNIT-33 | `Checker._check_spelling` | `cstylecheck.py:2511` | COMP-05f | `checker.py` |
-| UNIT-34 | `SignChecker._check_calls` | `cstylecheck.py:3101` | COMP-05g | `sign_checker.py` |
-| UNIT-35 | `load_baseline` | `cstylecheck.py:3615` | COMP-06 | `baseline.py` |
-| UNIT-36 | `write_baseline` | `cstylecheck.py:3630` | COMP-06 | `baseline.py` |
-| UNIT-37 | `_baseline_key` | `cstylecheck.py:3610` | COMP-06 | `baseline.py` |
-| UNIT-38 | `_violations_to_json` | `cstylecheck.py:3527` | COMP-07 | `output.py` |
-| UNIT-39 | `_violations_to_sarif` | `cstylecheck.py:3559` | COMP-07 | `output.py` |
-| UNIT-40 | `print_summary` | `cstylecheck.py:3654` | COMP-07 | `output.py` |
-| UNIT-41 | `Violation.__str__` | `cstylecheck.py:206` | COMP-07 | `models.py` |
-| UNIT-42 | `Violation.github_annotation` | `cstylecheck.py:193` | COMP-07 | `models.py` |
-| UNIT-43 | `matches_case` | `cstylecheck.py:669` | COMP-05 (shared) | `utils.py` |
-| UNIT-44 | `matches_case_abbrev` | `cstylecheck.py:674` | COMP-05 (shared) | `utils.py` |
-| UNIT-45 | `module_name` | `cstylecheck.py:705` | COMP-05 (shared) | `utils.py` |
-| UNIT-46 | `main` | `cstylecheck.py:3805` | Entry point | `cli.py` |
+| UNIT-01 | `_read_options_file` | `config.py:30` | COMP-01 | `config.py` |
+| UNIT-02 | `_expand_options_file` | `config.py:61` | COMP-01 | `config.py` |
+| UNIT-03 | `discover_files` | `cli.py:112` | COMP-01 | `cli.py` |
+| UNIT-04 | `_path_matches_exclude` | `cli.py:38` | COMP-01 | `cli.py` |
+| UNIT-05 | `load_config` | `config.py:93` | COMP-02 | `config.py` |
+| UNIT-06 | `load_alias_file` | `config.py:121` | COMP-02 | `config.py` |
+| UNIT-07 | `load_exclusions_file` | `config.py:167` | COMP-02 | `config.py` |
+| UNIT-08 | `_disabled_rules_for_file` | `config.py:216` | COMP-02 | `config.py` |
+| UNIT-09 | `load_defines_file` | `config.py:245` | COMP-02 | `config.py` |
+| UNIT-10 | `apply_defines` | `config.py:294` | COMP-02 | `config.py` |
+| UNIT-11 | `_load_dict_file` | `config.py:311` | COMP-03 | `config.py` |
+| UNIT-12 | `_data_file` | `config.py:330` | COMP-03 | `config.py` |
+| UNIT-13 | `_build_spell_dict` | `config.py:469` | COMP-03 | `config.py` |
+| UNIT-14 | `strip_comments` | `preprocessor.py:19` | COMP-04 | `preprocessor.py` |
+| UNIT-15 | `strip_strings` | `preprocessor.py:29` | COMP-04 | `preprocessor.py` |
+| UNIT-16 | `preprocess` | `preprocessor.py:44` | COMP-04 | `preprocessor.py` |
+| UNIT-17 | `build_line_map` | `preprocessor.py:110` | COMP-04 | `preprocessor.py` |
+| UNIT-18 | `offset_to_line_col` | `preprocessor.py:117` | COMP-04 | `preprocessor.py` |
+| UNIT-19 | `_build_brace_depths` | `preprocessor.py:93` | COMP-04 | `preprocessor.py` |
+| UNIT-20 | `_comment_only_lines` | `preprocessor.py:48` | COMP-04 | `preprocessor.py` |
+| UNIT-21 | `Checker.__init__` | `checker.py:142` | COMP-05 | `checker.py` |
+| UNIT-22 | `Checker.run_all` | `checker.py:286` | COMP-05 | `checker.py` |
+| UNIT-23 | `Checker._check_variables` | `checker.py:366` | COMP-05a | `checker.py` |
+| UNIT-24 | `Checker._check_functions` | `checker.py:876` | COMP-05b | `checker.py` |
+| UNIT-25 | `Checker._check_defines` | `checker.py:318` | COMP-05c | `checker.py` |
+| UNIT-26 | `Checker._check_typedefs` | `checker.py:966` | COMP-05d | `checker.py` |
+| UNIT-27 | `Checker._check_enums` | `checker.py:990` | COMP-05d | `checker.py` |
+| UNIT-28 | `Checker._check_structs` | `checker.py:1053` | COMP-05d | `checker.py` |
+| UNIT-29 | `Checker._check_include_guard` | `checker.py:1192` | COMP-05e | `checker.py` |
+| UNIT-30 | `Checker._check_misc` | `checker.py:1225` | COMP-05f | `checker.py` |
+| UNIT-31 | `Checker._check_yoda` | `checker.py:1823` | COMP-05f | `checker.py` |
+| UNIT-32 | `Checker._check_reserved_names` | `checker.py:2050` | COMP-05f | `checker.py` |
+| UNIT-33 | `Checker._check_spelling` | `checker.py:1804` | COMP-05f | `checker.py` |
+| UNIT-34 | `SignChecker._check_calls` | `sign_checker.py:272` | COMP-05g | `sign_checker.py` |
+| UNIT-35 | `load_baseline` | `baseline.py:25` | COMP-06 | `baseline.py` |
+| UNIT-36 | `write_baseline` | `baseline.py:40` | COMP-06 | `baseline.py` |
+| UNIT-37 | `_baseline_key` | `baseline.py:20` | COMP-06 | `baseline.py` |
+| UNIT-38 | `_violations_to_json` | `output.py:40` | COMP-07 | `output.py` |
+| UNIT-39 | `_violations_to_sarif` | `output.py:72` | COMP-07 | `output.py` |
+| UNIT-40 | `print_summary` | `output.py:125` | COMP-07 | `output.py` |
+| UNIT-41 | `Violation.__str__` | `models.py:59` | COMP-07 | `models.py` |
+| UNIT-42 | `Violation.github_annotation` | `models.py:45` | COMP-07 | `models.py` |
+| UNIT-43 | `matches_case` | `utils.py:48` | COMP-05 (shared) | `utils.py` |
+| UNIT-44 | `matches_case_abbrev` | `utils.py:53` | COMP-05 (shared) | `utils.py` |
+| UNIT-45 | `module_name` | `utils.py:84` | COMP-05 (shared) | `utils.py` |
+| UNIT-46 | `main` | `cli.py:311` | Entry point | `cli.py` |
 | UNIT-47 | `append_trend_record` (script) | `scripts/ci/append_trend_record.py` | CI script | (unchanged) |
 | UNIT-48 | `generate_trend` (script) | `scripts/ci/generate_trend.py` | CI script | (unchanged) |
 | UNIT-49 | `update_readme_badge` (script) | `scripts/ci/update_readme_badge.py` | CI script | (unchanged) |
-| UNIT-50 | `load_spell_words` | `cstylecheck.py:302` | COMP-02 | `config.py` |
-| UNIT-51 | `load_banned_names_file` | `cstylecheck.py:560` | COMP-02 | `config.py` |
-| UNIT-52 | `load_copyright_file` | `cstylecheck.py:595` | COMP-02 | `config.py` |
-| UNIT-53 | `to_case` | `cstylecheck.py:696` | COMP-05 (shared) | `utils.py` |
-| UNIT-54 | `is_exempt` | `cstylecheck.py:709` | COMP-05 (shared) | `utils.py` |
-| UNIT-55 | `_cfg` | `cstylecheck.py:719` | COMP-05 (shared) | `utils.py` |
-| UNIT-56 | `extract_comments` | `cstylecheck.py:784` | COMP-04 | `preprocessor.py` |
-| UNIT-57 | `Checker._violation` | `cstylecheck.py:1048` | COMP-05 | `checker.py` |
-| UNIT-58 | `Checker._v` | `cstylecheck.py:1052` | COMP-05 | `checker.py` |
-| UNIT-59 | `Checker._prefix` | `cstylecheck.py:1059` | COMP-05 | `checker.py` |
-| UNIT-60 | `Checker._require_module_prefix` | `cstylecheck.py:1065` | COMP-05 | `checker.py` |
-| UNIT-61 | `Checker._depth_at` | `cstylecheck.py:1098` | COMP-05 | `checker.py` |
-| UNIT-62 | `Checker._strip_any_prefix` | `cstylecheck.py:1103` | COMP-05 | `checker.py` |
-| UNIT-63 | `Checker._check_copyright_header` | `cstylecheck.py:1928` | COMP-05e | `checker.py` |
-| UNIT-64 | `Checker._body_is_object_verb` | `cstylecheck.py:1678` | COMP-05b | `checker.py` |
-| UNIT-65 | `Checker._check_comment_ratio` | `cstylecheck.py:2373` | COMP-05f | `checker.py` |
-| UNIT-66 | `Checker._check_lowercase_l_suffix` | `cstylecheck.py:2642` | COMP-05f | `checker.py` |
-| UNIT-67 | `Checker._check_octal_constants` | `cstylecheck.py:2680` | COMP-05f | `checker.py` |
-| UNIT-68 | `Checker._check_trigraphs` | `cstylecheck.py:2719` | COMP-05f | `checker.py` |
-| UNIT-69 | `Checker._is_reserved` | `cstylecheck.py:2739` | COMP-05f | `checker.py` |
-| UNIT-70 | `Checker._check_name_reserved` | `cstylecheck.py:2749` | COMP-05f | `checker.py` |
-| UNIT-71 | `Checker._is_constant_token` | `cstylecheck.py:2601` | COMP-05f | `checker.py` |
-| UNIT-72 | `Checker._is_variable_token` | `cstylecheck.py:2615` | COMP-05f | `checker.py` |
-| UNIT-73 | `_ParamSig` | `cstylecheck.py:2844` | COMP-05g | `models.py` |
-| UNIT-74 | `_FuncSig` | `cstylecheck.py:2852` | COMP-05g | `models.py` |
-| UNIT-75 | `_classify_tokens` | `cstylecheck.py:2898` | COMP-05g | `sign_checker.py` |
-| UNIT-76 | `_signedness_of_type` | `cstylecheck.py:2923` | COMP-05g | `sign_checker.py` |
-| UNIT-77 | `_classify_arg` | `cstylecheck.py:2938` | COMP-05g | `sign_checker.py` |
-| UNIT-78 | `_extract_call_args` | `cstylecheck.py:2947` | COMP-05g | `sign_checker.py` |
-| UNIT-79 | `SignChecker.__init__` | `cstylecheck.py:2987` | COMP-05g | `sign_checker.py` |
-| UNIT-80 | `SignChecker.ingest` | `cstylecheck.py:2994` | COMP-05g | `sign_checker.py` |
-| UNIT-81 | `SignChecker.check` | `cstylecheck.py:2997` | COMP-05g | `sign_checker.py` |
-| UNIT-82 | `SignChecker._build_typedef_map` | `cstylecheck.py:3020` | COMP-05g | `sign_checker.py` |
-| UNIT-83 | `SignChecker._build_signatures` | `cstylecheck.py:3059` | COMP-05g | `sign_checker.py` |
-| UNIT-84 | `DeclaredNotDefinedChecker` (class) | `cstylecheck.py:3147` | COMP-05g | `sign_checker.py` |
-| UNIT-85 | `_strip_module_prefix` | `cstylecheck.py:3343` | COMP-05 (shared) | `utils.py` |
-| UNIT-86 | `Tee` | `cstylecheck.py:3504` | COMP-07 | `output.py` |
-| UNIT-87 | `parse_args` | `cstylecheck.py:3678` | COMP-01 | `cli.py` |
-| UNIT-88 | `_build_parser` | `cstylecheck.py:3683` | COMP-01 | `cli.py` |
-| UNIT-89 | `_github_annotation_category` | `cstylecheck.py:171` | COMP-07 | `utils.py` |
+| UNIT-50 | `load_spell_words` | `config.py:104` | COMP-02 | `config.py` |
+| UNIT-51 | `load_banned_names_file` | `config.py:367` | COMP-02 | `config.py` |
+| UNIT-52 | `load_copyright_file` | `config.py:402` | COMP-02 | `config.py` |
+| UNIT-53 | `to_case` | `utils.py:75` | COMP-05 (shared) | `utils.py` |
+| UNIT-54 | `is_exempt` | `utils.py:88` | COMP-05 (shared) | `utils.py` |
+| UNIT-55 | `_cfg` | `utils.py:98` | COMP-05 (shared) | `utils.py` |
+| UNIT-56 | `extract_comments` | `preprocessor.py:69` | COMP-04 | `preprocessor.py` |
+| UNIT-57 | `Checker._violation` | `checker.py:213` | COMP-05 | `checker.py` |
+| UNIT-58 | `Checker._v` | `checker.py:217` | COMP-05 | `checker.py` |
+| UNIT-59 | `Checker._prefix` | `checker.py:224` | COMP-05 | `checker.py` |
+| UNIT-60 | `Checker._require_module_prefix` | `checker.py:230` | COMP-05 | `checker.py` |
+| UNIT-61 | `Checker._depth_at` | `checker.py:263` | COMP-05 | `checker.py` |
+| UNIT-62 | `Checker._strip_any_prefix` | `checker.py:268` | COMP-05 | `checker.py` |
+| UNIT-63 | `Checker._check_copyright_header` | `checker.py:1094` | COMP-05e | `checker.py` |
+| UNIT-64 | `Checker._body_is_object_verb` | `checker.py:844` | COMP-05b | `checker.py` |
+| UNIT-65 | `Checker._check_comment_ratio` | `checker.py:1539` | COMP-05f | `checker.py` |
+| UNIT-66 | `Checker._check_lowercase_l_suffix` | `checker.py:1935` | COMP-05f | `checker.py` |
+| UNIT-67 | `Checker._check_octal_constants` | `checker.py:1973` | COMP-05f | `checker.py` |
+| UNIT-68 | `Checker._check_trigraphs` | `checker.py:2012` | COMP-05f | `checker.py` |
+| UNIT-69 | `Checker._is_reserved` | `checker.py:2032` | COMP-05f | `checker.py` |
+| UNIT-70 | `Checker._check_name_reserved` | `checker.py:2042` | COMP-05f | `checker.py` |
+| UNIT-71 | `Checker._is_constant_token` | `checker.py:1894` | COMP-05f | `checker.py` |
+| UNIT-72 | `Checker._is_variable_token` | `checker.py:1908` | COMP-05f | `checker.py` |
+| UNIT-73 | `_ParamSig` | `models.py:106` | COMP-05g | `models.py` |
+| UNIT-74 | `_FuncSig` | `models.py:114` | COMP-05g | `models.py` |
+| UNIT-75 | `_classify_tokens` | `sign_checker.py:69` | COMP-05g | `sign_checker.py` |
+| UNIT-76 | `_signedness_of_type` | `sign_checker.py:94` | COMP-05g | `sign_checker.py` |
+| UNIT-77 | `_classify_arg` | `sign_checker.py:109` | COMP-05g | `sign_checker.py` |
+| UNIT-78 | `_extract_call_args` | `sign_checker.py:118` | COMP-05g | `sign_checker.py` |
+| UNIT-79 | `SignChecker.__init__` | `sign_checker.py:158` | COMP-05g | `sign_checker.py` |
+| UNIT-80 | `SignChecker.ingest` | `sign_checker.py:165` | COMP-05g | `sign_checker.py` |
+| UNIT-81 | `SignChecker.check` | `sign_checker.py:168` | COMP-05g | `sign_checker.py` |
+| UNIT-82 | `SignChecker._build_typedef_map` | `sign_checker.py:191` | COMP-05g | `sign_checker.py` |
+| UNIT-83 | `SignChecker._build_signatures` | `sign_checker.py:230` | COMP-05g | `sign_checker.py` |
+| UNIT-84 | `DeclaredNotDefinedChecker` (class) | `sign_checker.py:318` | COMP-05g | `sign_checker.py` |
+| UNIT-85 | `_strip_module_prefix` | `utils.py:113` | COMP-05 (shared) | `utils.py` |
+| UNIT-86 | `Tee` | `output.py:17` | COMP-07 | `output.py` |
+| UNIT-87 | `parse_args` | `cli.py:184` | COMP-01 | `cli.py` |
+| UNIT-88 | `_build_parser` | `cli.py:189` | COMP-01 | `cli.py` |
+| UNIT-89 | `_github_annotation_category` | `utils.py:21` | COMP-07 | `utils.py` |
+| UNIT-90 | `Checker._check_whitespace_ratio` | `checker.py:1677` | COMP-05f | `checker.py` |
 
 ---
 
-## 4.1 Target Package Structure
+## 4.1 Package Structure
 
-Issue #65 refactors `src/cstylecheck.py` (4,077 lines) into a Python package. The planned layout is:
+Issue #144 completed the refactor of `src/cstylecheck.py` into a Python package. The current layout is:
 
 ```
 src/cstylecheck/
@@ -173,7 +175,7 @@ src/cstylecheck/
                      _build_parser, main
 ```
 
-`_version.py` remains a top-level module in `src/` (not inside the package) because it is generated by the build/CI system independently of the package tree.
+`_version.py` remains a top-level module in `src/` (not inside the package) because it is generated by the build/CI system independently of the package tree. `_read_options_file` and `_expand_options_file` reside in `config.py` (not `cli.py`) in the current implementation.
 
 **Dependency order (no circular imports):**
 
@@ -332,7 +334,7 @@ src/cstylecheck/
 
 **Algorithm:** Call each enabled `_check_*` method in fixed order; each appends to `self.result.violations`. Return `self.result`.
 
-**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_comment_ratio`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_spelling` (when dictionary configured)
+**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_comment_ratio`, `_check_whitespace_ratio`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_spelling` (when dictionary configured)
 
 ---
 
@@ -746,6 +748,20 @@ src/cstylecheck/
 
 ---
 
+### UNIT-90 — `Checker._check_whitespace_ratio() → None`
+
+**Purpose:** Enforce a minimum ratio of blank lines to code lines (issue #143), measuring code "airiness".
+
+**Algorithm:**
+1. Skip if `misc.whitespace_ratio.enabled` is false
+2. Identify and exclude the file header region (leading comment/blank lines before first code line)
+3. Classify remaining lines as blank, comment-only, or code; exclude comment-only lines from both counts
+4. Skip if `code_lines < min_lines` (configurable minimum)
+5. Compute `ratio = blank_lines / code_lines`
+6. Emit `misc.whitespace_ratio` violation if ratio is below the error or warning threshold
+
+---
+
 ## 6. Data Design
 
 ### 6.1 Configuration Schema (YAML)
@@ -770,6 +786,10 @@ The top-level configuration keys and their types:
 | `misc.comment_ratio.enabled` | `bool` | `false` | Enforce minimum comment-to-code ratio |
 | `misc.comment_ratio.warning_threshold` | `float` | `0.15` | Ratio below which a warning is emitted |
 | `misc.comment_ratio.error_threshold` | `float` | `0.05` | Ratio below which an error is emitted |
+| `misc.whitespace_ratio.enabled` | `bool` | `false` | Enforce minimum blank-line-to-code-line ratio |
+| `misc.whitespace_ratio.warning_threshold` | `float` | `0.10` | Ratio below which a warning is emitted |
+| `misc.whitespace_ratio.error_threshold` | `float` | `0.02` | Ratio below which an error is emitted |
+| `misc.whitespace_ratio.min_lines` | `int` | `10` | Minimum code lines before ratio is enforced |
 | `misc.lowercase_l_suffix.enabled` | `bool` | `true` | Detect `l` suffix on integer literals (MISRA 7.3) |
 | `misc.octal_constant.enabled` | `bool` | `true` | Detect octal constants (MISRA 7.1) |
 | `misc.trigraph.enabled` | `bool` | `true` | Detect trigraph sequences (MISRA 4.2) |
@@ -831,7 +851,7 @@ Violation:
 | SWE1-035 to SWE1-039 | Constant/macro rules | UNIT-25 |
 | SWE1-040 to SWE1-042 | Type rules | UNIT-26, UNIT-27, UNIT-28 |
 | SWE1-043 to SWE1-044 | Include guard rules | UNIT-29 |
-| SWE1-045 to SWE1-050 | Miscellaneous rules | UNIT-30, UNIT-31, UNIT-65, UNIT-66, UNIT-67, UNIT-68 |
+| SWE1-045 to SWE1-050, SWE1-071 | Miscellaneous rules | UNIT-30, UNIT-31, UNIT-65, UNIT-66, UNIT-67, UNIT-68, UNIT-90 |
 | SWE1-051 to SWE1-053 | Cross-file sign check | UNIT-34, UNIT-73, UNIT-74, UNIT-75, UNIT-76, UNIT-77, UNIT-78, UNIT-79, UNIT-80, UNIT-81, UNIT-82, UNIT-83 |
 | SWE1-054 to SWE1-056 | Reserved names / spell | UNIT-32, UNIT-33, UNIT-51, UNIT-69, UNIT-70 |
 | SWE1-057 | Text output | UNIT-41 |

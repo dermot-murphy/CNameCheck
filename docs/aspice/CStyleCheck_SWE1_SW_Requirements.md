@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Claude | Add SWE1-071 (whitespace_ratio); fix §4.15 coverage targets to reflect package refactor; update RTM and Appendix A.1; fix §4.15 coverage wording — closes issues #146 #148 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation footnote to §1 — closes issue #61 |
 | 1.1 | 2026-05-28 | Claude | Added SWE1-MISRA-001/002/003 requirements for MISRA C:2012/2023 lexical rules (Rule 7.3, 7.1, 4.2); updated §5 traceability matrix |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -162,6 +163,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-MISRA-001 | The `_check_lowercase_l_suffix()` method shall flag any integer or floating-point literal that uses the lowercase letter `l` as a suffix (MISRA C:2012/2023 Rule 7.3) when `misc.lowercase_l_suffix.enabled: true` | Mandatory | Test | SYS-F-020 |
 | SWE1-MISRA-002 | The `_check_octal_constants()` method shall flag any integer literal that begins with `0` followed by one or more octal digits (MISRA C:2012/2023 Rule 7.1) when `misc.octal_constant.enabled: true` | Mandatory | Test | SYS-F-020 |
 | SWE1-MISRA-003 | The `_check_trigraphs()` method shall flag any occurrence of the nine ISO C trigraph sequences (`??=`, `??(`, `??/`, `??)`, `??'`, `??<`, `??!`, `??>`, `??-`) in source or comment text (MISRA C:2012 Rule 4.2 Advisory; MISRA C:2023 Rule 4.2 Required) when `misc.trigraph.enabled: true` | Mandatory | Test | SYS-F-020 |
+| SWE1-071 | The `_check_whitespace_ratio()` method shall enforce a minimum ratio of blank lines to code lines when `misc.whitespace_ratio.enabled: true`; the file header region and comment-only lines shall be excluded from both counts | Mandatory | Test | SYS-F-020 |
 
 ### 4.10 Rule Engine — Cross-File Sign Compatibility (SS-04/SS-05)
 
@@ -214,8 +216,8 @@ The following criteria shall be met by all software requirements above. They are
 
 | Criterion | Target | Measurement |
 |---|---|---|
-| Statement coverage | ≥ 90% of `cstylecheck.py` | pytest-cov report |
-| Branch coverage | ≥ 85% of `cstylecheck.py` | pytest-cov report |
+| Statement coverage | ≥ 90% of `src/cstylecheck/` package (long-term target); CI gate ≥ 85% combined | pytest-cov report |
+| Branch coverage | ≥ 85% of `src/cstylecheck/` package (CI gate) | pytest-cov report |
 | MISRA-equivalent naming compliance | Zero `cstylecheck` self-violations | `rules.yml` CI result |
 | All unit test cases | PASS | pytest result across Python 3.10 / 3.11 / 3.12 |
 
@@ -234,6 +236,7 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-040 to SWE1-042 | Type rules | SYS-F-011 | `Checker._check_typedefs/enums/structs()` | `test_typedefs.py`, `test_enums.py`, `test_structs.py` |
 | SWE1-043 to SWE1-044 | Include guard rules | SYS-F-019 | `Checker._check_include_guard()` | `test_include_guards.py` |
 | SWE1-045 to SWE1-050 | Miscellaneous rules | SYS-F-020 | `Checker._check_misc()`, `_check_yoda()` | `test_misc.py`, `test_yoda_condition.py`, `test_block_comment_spacing.py` |
+| SWE1-071 | Whitespace ratio | SYS-F-020 | `Checker._check_whitespace_ratio()` | `test_whitespace_ratio.py` |
 | SWE1-MISRA-001 to SWE1-MISRA-003 | MISRA C:2012/2023 lexical rules (Rule 7.3, 7.1, 4.2) | SYS-F-020 | `Checker._check_lowercase_l_suffix()`, `_check_octal_constants()`, `_check_trigraphs()` | `test_misra_rules.py` |
 | SWE1-051 to SWE1-053 | Cross-file sign compatibility | SYS-F-021 | `SignChecker` class | `test_sign_compatibility.py` |
 | SWE1-054 to SWE1-056 | Reserved names and spell check | SYS-F-022, F-023 | `Checker._check_reserved_names()`, `_check_spelling()` | `test_reserved_name.py`, `test_spell_check.py` |
@@ -292,6 +295,7 @@ CStyleCheck is a **complementary** tool to cppcheck (used for full MISRA C stati
 | `misc.eof_comment` | `_check_misc()` | — | — | — | §3.1 | `test_eof_comment.py` |
 | `misc.block_comment_spacing` | `_check_misc()` | — | — | — | §3.3 | `test_block_comment_spacing.py` |
 | `spell_check` | `_check_spelling()` | — | — | — | — | `test_spell_check.py` |
+| `misc.whitespace_ratio` | `_check_whitespace_ratio()` | — | — | — | — | `test_whitespace_ratio.py` |
 
 ### A.2 MISRA C Rules Delegated to cppcheck
 

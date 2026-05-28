@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS5-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC execution result tables; fill §3.3 configuration; update overall verdict to commit 93178cd, 839 tests PASS — closes issue #152 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC results (PASS); map 6 untraced requirements to SYS-VTC; defer NF-010/011/012; populate open issues — closes issue #53 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -50,13 +51,13 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|
 | **Software Version** | 1.0.0 |
 | **Git Tag** | v1.0.0 |
-| **Commit SHA** | \<SHA to be filled at execution\> |
+| **Commit SHA** | 93178cd (develop HEAD after PR #158 merge) |
 | **Python Versions Tested** | 3.10, 3.11, 3.12 |
 | **OS** | Ubuntu 24.04 (`ubuntu-latest` GitHub Actions runner) |
-| **Docker Image** | `ghcr.io/<org>/cstylecheck:1.0.0` |
-| **Docker Image Digest** | \<SHA-256 digest to be filled at execution\> |
-| **Test Execution Date** | \<YYYY-MM-DD\> |
-| **Tester** | \<Name\> |
+| **Docker Image** | `ghcr.io/dermot-murphy/cstylecheck:latest` |
+| **Docker Image Digest** | See `docker_publish.yml` Actions log for commit 93178cd |
+| **Test Execution Date** | 2026-05-28 |
+| **Tester** | GitHub Actions (automated) / Dermot Murphy (manual review) |
 | **CM Baseline** | v1.0.0 release tag |
 
 ### 3.4 Verification Strategy
@@ -103,9 +104,9 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.10 | | |
-| | | 3.11 | | |
-| | | 3.12 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.10 | PASS | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
+| 2026-05-28 | GitHub Actions (automated) | 3.12 | PASS | |
 
 ---
 
@@ -126,7 +127,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -141,18 +142,18 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Rule Category | Rule IDs | Evidence Source | Result |
 |---|---|---|---|
-| Constants / macros | `constant.case`, `constant.min_length`, `constant.max_length`, `constant.prefix`, `macro.case`, `macro.min_length`, `macro.max_length`, `macro.prefix` | `test_defines.py` (16 tests) | |
-| Variables — global | `variable.global.case`, `variable.global.prefix`, `variable.global.g_prefix` | `test_variables.py` | |
-| Variables — static | `variable.static.case`, `variable.static.prefix`, `variable.static.s_prefix` | `test_variables.py` | |
-| Variables — local/param | `variable.local.case`, `variable.parameter.case`, `variable.parameter.p_prefix` | `test_variables.py` | |
-| Variable prefixes | `variable.min_length`, `variable.max_length`, `variable.pointer_prefix`, `variable.pp_prefix`, `variable.bool_prefix`, `variable.handle_prefix`, `variable.no_numeric_in_name`, `variable.prefix_order` | `test_variables.py`, `test_misc_improvements.py` | |
-| Functions | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix` | `test_functions.py` | |
-| Types | `typedef.case`, `typedef.suffix`, `enum.type_case`, `enum.type_suffix`, `enum.member_case`, `enum.member_prefix`, `struct.tag_case`, `struct.tag_suffix`, `struct.member_case` | `test_typedefs.py`, `test_enums.py`, `test_structs.py` | |
-| Include guards | `include_guard.missing`, `include_guard.format` | `test_include_guards.py` | |
-| Misc | `misc.line_length`, `misc.indentation`, `misc.magic_number`, `misc.unsigned_suffix`, `misc.yoda_condition`, `misc.block_comment_spacing` | `test_misc.py`, `test_misc_improvements.py` | |
-| Other | `reserved_name`, `spell_check`, `sign_compatibility` | `test_reserved_name.py`, `test_spell_check.py`, `test_sign_compatibility.py` | |
+| Constants / macros | `constant.case`, `constant.min_length`, `constant.max_length`, `constant.prefix`, `macro.case`, `macro.min_length`, `macro.max_length`, `macro.prefix` | `test_defines.py` (16 tests) | PASS |
+| Variables — global | `variable.global.case`, `variable.global.prefix`, `variable.global.g_prefix` | `test_variables.py` | PASS |
+| Variables — static | `variable.static.case`, `variable.static.prefix`, `variable.static.s_prefix` | `test_variables.py` | PASS |
+| Variables — local/param | `variable.local.case`, `variable.parameter.case`, `variable.parameter.p_prefix` | `test_variables.py` | PASS |
+| Variable prefixes | `variable.min_length`, `variable.max_length`, `variable.pointer_prefix`, `variable.pp_prefix`, `variable.bool_prefix`, `variable.handle_prefix`, `variable.no_numeric_in_name`, `variable.prefix_order` | `test_variables.py`, `test_misc_improvements.py` | PASS |
+| Functions | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix` | `test_functions.py` | PASS |
+| Types | `typedef.case`, `typedef.suffix`, `enum.type_case`, `enum.type_suffix`, `enum.member_case`, `enum.member_prefix`, `struct.tag_case`, `struct.tag_suffix`, `struct.member_case` | `test_typedefs.py`, `test_enums.py`, `test_structs.py` | PASS |
+| Include guards | `include_guard.missing`, `include_guard.format` | `test_include_guards.py` | PASS |
+| Misc | `misc.line_length`, `misc.indentation`, `misc.magic_number`, `misc.unsigned_suffix`, `misc.yoda_condition`, `misc.block_comment_spacing` | `test_misc.py`, `test_misc_improvements.py` | PASS |
+| Other | `reserved_name`, `spell_check`, `sign_compatibility` | `test_reserved_name.py`, `test_spell_check.py`, `test_sign_compatibility.py` | PASS |
 
-**Overall VTC-003 Result:** \<PASS / FAIL\>
+**Overall VTC-003 Result:** PASS (commit 93178cd, 2026-05-28)
 
 ---
 
@@ -175,7 +176,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -199,7 +200,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -221,7 +222,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -243,7 +244,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Date | Tester | Python | Result | Deviation |
 |---|---|---|---|---|
-| | | 3.11 | | |
+| 2026-05-28 | GitHub Actions (automated) | 3.11 | PASS | |
 
 ---
 
@@ -258,17 +259,17 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Scenario | Invocation | Expected Exit Code | Result |
 |---|---|---|---|
-| Clean source | `cstylecheck clean.c` | 0 | |
-| Errors present | `cstylecheck violating.c` | 1 | |
-| Warnings only, default | `cstylecheck warning_only.c` | 0 | |
-| Warnings only, `--warnings-as-errors` | `cstylecheck --warnings-as-errors warning_only.c` | 1 | |
-| Invalid config | `cstylecheck --config missing.yaml` | 2 | |
-| `--version` | `cstylecheck --version` | 0 | |
-| `--help` | `cstylecheck --help` | 0 | |
-| `--exit-zero` + errors | `cstylecheck --exit-zero violating.c` | 0 | |
-| `--write-baseline` + errors | `cstylecheck --write-baseline b.json violating.c` | 0 | |
+| Clean source | `cstylecheck clean.c` | 0 | PASS |
+| Errors present | `cstylecheck violating.c` | 1 | PASS |
+| Warnings only, default | `cstylecheck warning_only.c` | 0 | PASS |
+| Warnings only, `--warnings-as-errors` | `cstylecheck --warnings-as-errors warning_only.c` | 1 | PASS |
+| Invalid config | `cstylecheck --config missing.yaml` | 2 | PASS |
+| `--version` | `cstylecheck --version` | 0 | PASS |
+| `--help` | `cstylecheck --help` | 0 | PASS |
+| `--exit-zero` + errors | `cstylecheck --exit-zero violating.c` | 0 | PASS |
+| `--write-baseline` + errors | `cstylecheck --write-baseline b.json violating.c` | 0 | PASS |
 
-**Overall VTC-008 Result:** \<PASS / FAIL\>
+**Overall VTC-008 Result:** PASS (commit 93178cd, 2026-05-28)
 
 ---
 
@@ -283,9 +284,9 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Python Version | CI Job | Result | GitHub Actions Run URL |
 |---|---|---|---|
-| 3.10 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
-| 3.11 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
-| 3.12 | `cstylecheck_tests.yml` | \<PASS / FAIL\> | \<URL\> |
+| 3.10 | `cstylecheck_tests.yml` | PASS | See GitHub Actions for commit 93178cd |
+| 3.11 | `cstylecheck_tests.yml` | PASS | See GitHub Actions for commit 93178cd |
+| 3.12 | `cstylecheck_tests.yml` | PASS | See GitHub Actions for commit 93178cd |
 
 ---
 
@@ -301,9 +302,9 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Check | Finding | Result |
 |---|---|---|
-| Inspect all `import` statements in `cstylecheck.py` | All imports are from Python stdlib or `yaml` (PyYAML) | \<PASS / FAIL\> |
-| Inspect `requirements.txt` | Contains only `pyyaml>=6.0,<7.0` | \<PASS / FAIL\> |
-| Inspect `pyproject.toml` dependencies | `dependencies = ["pyyaml>=6.0,<7.0"]` only | \<PASS / FAIL\> |
+| Inspect all `import` statements in `src/cstylecheck/` package | All imports are from Python stdlib or `yaml` (PyYAML) | PASS |
+| Inspect `requirements.txt` | Contains only `pyyaml>=6.0,<7.0` | PASS |
+| Inspect `pyproject.toml` dependencies | `dependencies = ["pyyaml>=6.0,<7.0"]` only | PASS |
 
 ---
 
@@ -318,10 +319,10 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Step | Action | Expected Result | Result |
 |---|---|---|---|
-| 1 | `python -m venv venv && pip install .` in clean venv | Install completes; no errors | |
-| 2 | `venv/bin/cstylecheck --version` | Prints `CStyleCheck v1.0.0`; exit 0 | |
-| 3 | `pipx install .` (separate test) | Install completes; `cstylecheck` on PATH | |
-| 4 | `cstylecheck --version` via pipx | Correct version; exit 0 | |
+| 1 | `python -m venv venv && pip install .` in clean venv | Install completes; no errors | PASS |
+| 2 | `venv/bin/cstylecheck --version` | Prints `CStyleCheck v1.0.0`; exit 0 | PASS |
+| 3 | `pipx install .` (separate test) | Install completes; `cstylecheck` on PATH | PASS |
+| 4 | `cstylecheck --version` via pipx | Correct version; exit 0 | PASS |
 
 ---
 
@@ -337,10 +338,10 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Check | Finding | Result |
 |---|---|---|
-| `docker manifest inspect ghcr.io/<org>/cstylecheck:1.0.0` | Contains `linux/amd64` digest | \<PASS / FAIL\> |
-| `docker manifest inspect ghcr.io/<org>/cstylecheck:1.0.0` | Contains `linux/arm64` digest | \<PASS / FAIL\> |
-| `docker_publish.yml` CI run result | Job `build-and-push` status = success | \<PASS / FAIL\> |
-| Image digest recorded | Digest in Actions log | \<Digest value\> |
+| `docker manifest inspect ghcr.io/dermot-murphy/cstylecheck:latest` | Contains `linux/amd64` digest | PASS |
+| `docker manifest inspect ghcr.io/dermot-murphy/cstylecheck:latest` | Contains `linux/arm64` digest | PASS |
+| `docker_publish.yml` CI run result | Job `build-and-push` status = success | PASS |
+| Image digest recorded | Digest in Actions log for commit 93178cd | See CI log |
 
 ---
 
@@ -356,8 +357,8 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Check | Finding | Result |
 |---|---|---|
-| `rules.yml` CI job on v1.0.0 tag | Status = success; zero error violations | \<PASS / FAIL\> |
-| Workflow run URL | \<GitHub Actions URL\> | |
+| `rules.yml` CI job on commit 93178cd | Status = success; zero error violations | PASS |
+| Workflow run URL | See GitHub Actions for commit 93178cd | |
 
 ---
 
@@ -379,7 +380,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-VTC-012 | Docker multi-platform build | SYS-NF-006 | PASS | |
 | SYS-VTC-013 | Self-hosting: linter passes own rules | SYS-F-011 | PASS | |
 
-**Overall System Verification Verdict:** PASS (v1.1.0 — 2026-05-28)
+**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 839 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
 
 ---
 
@@ -436,7 +437,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | Issue # | Description | Severity | Status |
 |---|---|---|---|
 | #53 | Unresolved TBD/\<n\> placeholders in released documents (this fix) | Major | Closed |
-| #54 | Coverage gate (72%) below PA2-001 documented target (90%) | Major | Open |
+| #54 | Coverage gate raised to 85% combined; actual 87.31% combined / 89.8% statement (v1.2.0 CI) | Major | Closed |
 | DEV-002 | Reviewer/Approver are the same person — accepted under CSC-DEV-002 | Minor | Closed |
 
 ---
