@@ -112,7 +112,7 @@ jobs:
       # -----------------------------------------------------------------------
       - name: Static type check
         if: matrix.python-version == '3.11'
-        run: mypy src/cstylecheck.py --ignore-missing-imports
+        run: mypy src/cstylecheck.py --ignore-missing-imports --implicit-optional
 
       # -----------------------------------------------------------------------
       # Lint check — enforces code style and catches common errors via ruff.

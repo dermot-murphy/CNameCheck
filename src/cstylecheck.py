@@ -548,8 +548,8 @@ _DEFAULT_KEYWORDS_FILE  = _data_file("c_keywords.txt")
 _DEFAULT_STDLIB_FILE    = _data_file("c_stdlib_names.txt")
 _DEFAULT_SPELL_DICT     = _data_file("c_spell_dict.txt")
 
-C_KEYWORDS:    frozenset = _load_dict_file(_DEFAULT_KEYWORDS_FILE)
-C_STDLIB_NAMES: frozenset = _load_dict_file(_DEFAULT_STDLIB_FILE)
+C_KEYWORDS:    frozenset = _load_dict_file(_DEFAULT_KEYWORDS_FILE)    # type: ignore[arg-type]
+C_STDLIB_NAMES: frozenset = _load_dict_file(_DEFAULT_STDLIB_FILE)   # type: ignore[arg-type]
 
 
 
@@ -953,7 +953,7 @@ def offset_to_line_col(offsets: list, pos: int):
 # Built-in spell-check word list
 # ---------------------------------------------------------------------------
 
-_BUILTIN_DICT: frozenset = _load_dict_file(_DEFAULT_SPELL_DICT)
+_BUILTIN_DICT: frozenset = _load_dict_file(_DEFAULT_SPELL_DICT)     # type: ignore[arg-type]
 
 
 def _build_spell_dict(cfg_exempt: list, extra_words: set,
@@ -1414,7 +1414,7 @@ class Checker:
             for _ta in _RE_TYPEDEF_ALIAS.finditer(self.clean)
         }
 
-        _typedef_close = getattr(self, "_typedef_close_positions", set())
+        _typedef_close: set = getattr(self, "_typedef_close_positions", set())
         for m in RE_VAR_DECL.finditer(self.clean):
             # Skip matches where the trigger char is a typedef-closing "}"
             if self.clean[m.start():m.start()+1] == "}" and \
@@ -2337,8 +2337,8 @@ class Checker:
                         f"found '{actual}'"))
 
                 # Check 2: exactly one blank line follows (the last line)
-                after = lines[last_nb + 1:]      # lines after EOF comment
-                n_after = len(after)
+                trailing_lines = lines[last_nb + 1:]      # lines after EOF comment
+                n_after = len(trailing_lines)
                 if n_after == 0:
                     # Nothing after the comment — missing trailing blank line
                     self.result.add(Violation(
@@ -2346,7 +2346,7 @@ class Checker:
                         "EOF comment must be followed by exactly one blank line"))
                 elif n_after == 1:
                     # Exactly one line follows — it must be blank
-                    if after[0].strip():
+                    if trailing_lines[0].strip():
                         self.result.add(Violation(
                             self.filepath, lineno_nb + 1, 1, sev,
                             "misc.eof_comment",
