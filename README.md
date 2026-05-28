@@ -1,12 +1,19 @@
 # CStyleCheck
 
+The purpose of this project is three-fold:
+- To create a useful tool which sits between a lint and static analyser for C code - especially embedded C code with ASPICE & MISRA
+- As an experiment to prompt Claude to generate all content - eg documents, webpages, issues, code, workflow - no manual correction of files
+- For a human to review all the work - either manually or with the help of an AI
+
+Conributions are very welcome.
+
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
 Implements **Barr-C:2018** and MISRA-C complementary rules across **50 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
-[![Naming Convention](https://img.shields.io/endpoint?url=https://dermot-murphy.github.io/CStyleCheck/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
+[![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 📖 **[Rules and Configuration Reference](Rules-and-Configuration.md)** — full
