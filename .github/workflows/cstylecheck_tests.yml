@@ -104,6 +104,21 @@ jobs:
       - name: Run CLI integration tests
         run: pytest tests/test_cli.py -v --tb=short
 
+      # -----------------------------------------------------------------------
+      # Static type check — enforces type correctness under mypy --strict.
+      # Only run on a single Python version to avoid redundant matrix noise.
+      # -----------------------------------------------------------------------
+      - name: Static type check
+        if: matrix.python-version == '3.11'
+        run: mypy src/cstylecheck.py --strict
+
+      # -----------------------------------------------------------------------
+      # Lint check — enforces code style and catches common errors via ruff.
+      # -----------------------------------------------------------------------
+      - name: Lint check
+        if: matrix.python-version == '3.11'
+        run: ruff check src/ tests/
+
       - name: Upload coverage
         if: matrix.python-version == '3.11'
         uses: actions/upload-artifact@v6
