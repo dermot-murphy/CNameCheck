@@ -34,6 +34,7 @@ files    = os.environ["FILES"]
 repo     = os.environ["REPO"]
 owner, reponame = repo.split("/")
 pages_base = f"https://{owner}.github.io/{reponame}"
+raw_base   = f"https://raw.githubusercontent.com/{owner}/{reponame}/gh-pages"
 
 # ---------------------------------------------------------------------------
 # Badge JSON (served by shields.io endpoint)
@@ -127,4 +128,4 @@ new Chart(document.getElementById('chart'), {{
 
 pathlib.Path("cstylecheck/index.html").write_text(html)
 print(f"Trend page: {pages_base}/cstylecheck/")
-print(f"Badge URL:  https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json")
+print(f"Badge URL:  https://img.shields.io/endpoint?url={raw_base}/cstylecheck/badge.json")

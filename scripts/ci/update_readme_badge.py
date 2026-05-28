@@ -30,8 +30,9 @@ worktree_path = pathlib.Path(sys.argv[1])
 repo          = os.environ["REPO"]
 owner, reponame = repo.split("/")
 pages_base = f"https://{owner}.github.io/{reponame}"
+raw_base   = f"https://raw.githubusercontent.com/{owner}/{reponame}/gh-pages"
 trend_url  = f"{pages_base}/cstylecheck/"
-badge_url  = f"https://img.shields.io/endpoint?url={pages_base}/cstylecheck/badge.json"
+badge_url  = f"https://img.shields.io/endpoint?url={raw_base}/cstylecheck/badge.json"
 badge_md   = f"[![Naming Convention]({badge_url})]({trend_url})"
 
 readme = worktree_path / "README.md"
