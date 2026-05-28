@@ -8,16 +8,35 @@ import re
 import unittest
 from pathlib import Path
 
-_REPO_ROOT   = Path(__file__).resolve().parent.parent
-_WORKFLOW    = _REPO_ROOT / ".github" / "workflows" / "cstylecheck_rules.yml"
+_REPO_ROOT        = Path(__file__).resolve().parent.parent
+_WORKFLOWS_DIR    = _REPO_ROOT / ".github" / "workflows"
+_WORKFLOW_RULES   = _WORKFLOWS_DIR / "cstylecheck_rules.yml"
+_WORKFLOW_TESTS   = _WORKFLOWS_DIR / "cstylecheck_tests.yml"
+_WORKFLOW_DOCKER  = _WORKFLOWS_DIR / "docker_publish.yml"
+_WORKFLOW_WIKI    = _WORKFLOWS_DIR / "wiki_publish.yml"
+
+# Back-compat alias used by existing TestConcurrencyControl
+_WORKFLOW = _WORKFLOW_RULES
 
 
-def _load_yaml():
+def _load_yaml(path=None):
     try:
         import yaml
     except ImportError:
         return None
-    return yaml.safe_load(_WORKFLOW.read_text(encoding="utf-8"))
+    return yaml.safe_load((path or _WORKFLOW_RULES).read_text(encoding="utf-8"))
+
+
+def _checkout_steps(wf_dict):
+    """Return all checkout step dicts found anywhere in a parsed workflow."""
+    import re
+    steps = []
+    for job in (wf_dict or {}).get("jobs", {}).values():
+        for step in job.get("steps", []):
+            uses = step.get("uses", "") or ""
+            if re.match(r"actions/checkout@", uses):
+                steps.append(step)
+    return steps
 
 
 class TestConcurrencyControl(unittest.TestCase):
@@ -62,6 +81,62 @@ class TestConcurrencyControl(unittest.TestCase):
         )
 
 
+class TestCheckoutToken(unittest.TestCase):
+    """SUP9-TC-CHKOUT-001 to 008 — issue #55 regression suite.
+
+    Verifies that every actions/checkout step in all three affected workflows
+    carries an explicit token so checkout@v6 credential changes cannot cause
+    silent authentication failures.
+    """
+
+    def _assert_all_have_token(self, path):
+        wf = _load_yaml(path)
+        if wf is None:
+            self.skipTest("PyYAML not available")
+        steps = _checkout_steps(wf)
+        self.assertTrue(steps, f"No checkout steps found in {path.name}")
+        for step in steps:
+            token = (step.get("with") or {}).get("token", "")
+            self.assertTrue(
+                token,
+                f"Checkout step in {path.name} is missing explicit token: {step}",
+            )
+
+    # SUP9-TC-CHKOUT-001
+    def test_rules_workflow_all_checkouts_have_token(self):
+        """Every checkout in cstylecheck_rules.yml must have an explicit token."""
+        self._assert_all_have_token(_WORKFLOW_RULES)
+
+    # SUP9-TC-CHKOUT-002
+    def test_tests_workflow_all_checkouts_have_token(self):
+        """Every checkout in cstylecheck_tests.yml must have an explicit token."""
+        self._assert_all_have_token(_WORKFLOW_TESTS)
+
+    # SUP9-TC-CHKOUT-003
+    def test_docker_workflow_all_checkouts_have_token(self):
+        """Every checkout in docker_publish.yml must have an explicit token."""
+        self._assert_all_have_token(_WORKFLOW_DOCKER)
+
+    # SUP9-TC-CHKOUT-004
+    def test_wiki_workflow_all_checkouts_have_token(self):
+        """Every checkout in wiki_publish.yml must have an explicit token."""
+        self._assert_all_have_token(_WORKFLOW_WIKI)
+
+    # SUP9-TC-CHKOUT-005 — spot-check token value format
+    def test_token_references_github_token_secret(self):
+        """Token value must reference secrets.GITHUB_TOKEN (not a hardcoded value)."""
+        for path in (_WORKFLOW_RULES, _WORKFLOW_TESTS, _WORKFLOW_DOCKER, _WORKFLOW_WIKI):
+            wf = _load_yaml(path)
+            if wf is None:
+                self.skipTest("PyYAML not available")
+            for step in _checkout_steps(wf):
+                token = (step.get("with") or {}).get("token", "")
+                self.assertIn(
+                    "secrets.GITHUB_TOKEN", token,
+                    f"Token in {path.name} does not reference secrets.GITHUB_TOKEN: {token!r}",
+                )
+
+
 class TestBadgePath(unittest.TestCase):
     """SUP9-TC-BADGE-001 to 005 — issue #42 regression suite.
 
@@ -77,7 +152,7 @@ class TestBadgePath(unittest.TestCase):
             self._yaml = _yaml
         except ImportError:
             self.skipTest("PyYAML not available")
-        self._wf_text  = _WORKFLOW.read_text(encoding="utf-8")
+        self._wf_text  = _WORKFLOW_RULES.read_text(encoding="utf-8")
         self._wf       = self._yaml.safe_load(self._wf_text)
         self._readme   = (_REPO_ROOT / "README.md").read_text(encoding="utf-8")
 
