@@ -63,6 +63,9 @@ _ALL_OFF: dict = {
         # Comment ratio check (issue #68) -- disabled so existing tests
         # are not affected by the new per-file comment density check.
         "comment_ratio":         {"enabled": False},
+        # Whitespace ratio check (issue #143) -- disabled so existing tests
+        # are not affected by the new blank-line density check.
+        "whitespace_ratio":      {"enabled": False},
     },
     "reserved_names":    {"enabled": False},
     "sign_compatibility":{"enabled": False},

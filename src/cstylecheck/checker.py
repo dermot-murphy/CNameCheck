@@ -295,6 +295,7 @@ class Checker:
             self._check_include_guard()
         self._check_misc()
         self._check_comment_ratio()
+        self._check_whitespace_ratio()
         self._check_yoda()
         self._check_reserved_names()
         self._check_lowercase_l_suffix()   # MISRA C:2012/2023 Rule 7.3
@@ -1670,7 +1671,134 @@ class Checker:
         ))
 
     # -----------------------------------------------------------------------
-    # 15. Comment spell-check
+    # 15. Whitespace (blank-line) ratio  (misc.whitespace_ratio)
+    # -----------------------------------------------------------------------
+
+    def _check_whitespace_ratio(self) -> None:
+        """Enforce a minimum ratio of blank lines to code lines (issue #143).
+
+        Measures how 'airy' the file body is relative to its code density.
+        Very few blank lines relative to code lines indicates dense,
+        hard-to-read code.
+
+        Excluded from both counts:
+          - The file header: all leading comment/blank lines before the first
+            non-comment, non-blank line (copyright notices, licence blocks)
+          - Comment-only lines (// and /* … */) — they are not blank and are
+            not code, so they are excluded from both counts
+
+        Counted as blank lines (numerator):
+          - Empty lines and whitespace-only lines in the code body
+
+        Counted as code lines (denominator):
+          - Every non-blank, non-comment line (code, preprocessor, etc.)
+          - A line with a trailing // comment counts as a CODE line
+        """
+        misc   = self.cfg.get("misc", {})
+        wr_cfg = misc.get("whitespace_ratio", {})
+        if not wr_cfg.get("enabled", False):
+            return
+
+        sev       = wr_cfg.get("severity", "warning")
+        warn_thr  = float(wr_cfg.get("warning_threshold", 0.10))
+        err_thr   = float(wr_cfg.get("error_threshold",  0.01))
+        min_lines = int(wr_cfg.get("min_lines", 20))
+
+        lines = self.source.splitlines()
+
+        # ----------------------------------------------------------------
+        # Phase 1: locate the end of the file header.
+        # Same logic as _check_comment_ratio: the header region is all
+        # leading comment/blank lines before the first code line.
+        # ----------------------------------------------------------------
+        header_end_idx = 0
+        in_hdr_block   = False
+        found_code     = False
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if not stripped:                      # blank — skip during header scan
+                continue
+            if in_hdr_block:
+                if "*/" in line:
+                    in_hdr_block = False
+                continue
+            if stripped.startswith("/*"):
+                if "*/" not in stripped[2:]:      # multi-line block comment
+                    in_hdr_block = True
+                continue                           # still in header
+            if stripped.startswith("//"):
+                continue                           # line comment — still header
+            # First actual code line: header ends here
+            header_end_idx = i
+            found_code     = True
+            break
+
+        if not found_code:
+            return   # entire file is comments/blank — nothing to measure
+
+        # ----------------------------------------------------------------
+        # Phase 2: classify lines from header_end_idx onwards.
+        # ----------------------------------------------------------------
+        blank_lines  = 0
+        code_lines   = 0
+        in_block_cmt = False
+
+        for i, line in enumerate(lines):
+            if i < header_end_idx:
+                continue
+
+            stripped = line.strip()
+
+            if in_block_cmt:
+                if "*/" in line:
+                    in_block_cmt = False
+                continue   # block comment continuation — excluded from both
+
+            if not stripped:
+                blank_lines += 1   # blank line — counts toward numerator
+                continue
+
+            # Opening of a block comment (/* or /**)
+            if stripped.startswith("/*"):
+                if "*/" not in stripped[2:]:
+                    in_block_cmt = True
+                continue   # comment-only line — excluded from denominator
+
+            # Line comment
+            if stripped.startswith("//"):
+                continue   # excluded from denominator
+
+            # Non-blank, non-comment line — this is code
+            code_lines += 1
+
+        # Guard: skip files with too few code lines (trivial files, stubs)
+        if code_lines < min_lines:
+            return
+
+        ratio = blank_lines / code_lines
+
+        if ratio < err_thr:
+            emit_sev        = "error"
+            threshold       = err_thr
+            threshold_label = "error"
+        elif ratio < warn_thr:
+            emit_sev        = sev
+            threshold       = warn_thr
+            threshold_label = "warning"
+        else:
+            return   # ratio meets the warning threshold — all good
+
+        pl = lambda n: "s" if n != 1 else ""  # noqa: E731
+        self.result.add(Violation(
+            self.filepath, 1, 1, emit_sev, "misc.whitespace_ratio",
+            f"whitespace ratio {ratio:.2f} is below {threshold_label} threshold "
+            f"{threshold} "
+            f"({blank_lines} blank line{pl(blank_lines)} / "
+            f"{code_lines} code line{pl(code_lines)})"
+        ))
+
+    # -----------------------------------------------------------------------
+    # 16. Comment spell-check
     # -----------------------------------------------------------------------
 
     def _check_spelling(self) -> None:
