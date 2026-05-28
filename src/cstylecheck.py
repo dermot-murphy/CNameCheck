@@ -2186,7 +2186,7 @@ class Checker:
                         f"'U' or 'u' suffix (or assign to a signed type)"))
 
     # -----------------------------------------------------------------------
-    # 9. Block-comment spacing
+    # 8a. Block-comment spacing
     # Checks that the number of blank lines between the closing */ of a
     # multi-line block comment and the next non-blank line is within the
     # configured [min, max] range.
@@ -2231,7 +2231,7 @@ class Checker:
                         f"Block comment has {_blanks} blank line(s) after '*/'; "
                         f"maximum is {bcs_max}"))
 
-        # EOF comment
+        # 8b. EOF comment
         # The last non-blank line must equal the configured template string
         # (with {filename} replaced by the file's base name, case-adjusted).
         # Exactly one blank line must follow it as the final line of the file.
@@ -2307,7 +2307,7 @@ class Checker:
                         f"line; found {n_after}"))
 
     # -----------------------------------------------------------------------
-    # 10. Comment spell-check
+    # 14. Comment spell-check
     # -----------------------------------------------------------------------
 
     def _check_spelling(self) -> None:
@@ -2326,7 +2326,7 @@ class Checker:
 
 
     # -----------------------------------------------------------------------
-    # 11. Yoda conditions  (constant on the LHS of == and !=)
+    # 9. Yoda conditions  (constant on the LHS of == and !=)
     # -----------------------------------------------------------------------
 
     def _check_yoda(self) -> None:
@@ -2422,7 +2422,7 @@ class Checker:
         return bool(re.fullmatch(r"[a-z_][a-zA-Z0-9_]*", t))
 
     # -----------------------------------------------------------------------
-    # 12. MISRA C:2012/2023 Rule 7.3 — lowercase 'l' suffix forbidden
+    # 11. MISRA C:2012/2023 Rule 7.3 — lowercase 'l' suffix forbidden
     #
     # The letter 'l' (lowercase L) is visually indistinguishable from the
     # digit '1' in many fonts.  MISRA C:2012 Rule 7.3 and MISRA C:2023
@@ -2458,7 +2458,7 @@ class Checker:
                 )
 
     # -----------------------------------------------------------------------
-    # 13. MISRA C:2012/2023 Rule 7.1 — octal integer constants forbidden
+    # 12. MISRA C:2012/2023 Rule 7.1 — octal integer constants forbidden
     #
     # An integer literal that starts with '0' followed by one or more
     # octal digits (0–7) is an octal constant.  This is a common source
@@ -2498,7 +2498,7 @@ class Checker:
             )
 
     # -----------------------------------------------------------------------
-    # 14. MISRA C:2012/2023 Rule 4.2 — trigraphs forbidden
+    # 13. MISRA C:2012/2023 Rule 4.2 — trigraphs forbidden
     #
     # Trigraphs are three-character sequences beginning with '??' that the
     # C preprocessor replaces with a single character before parsing.  They
@@ -2535,7 +2535,7 @@ class Checker:
             ))
 
     # -----------------------------------------------------------------------
-    # 11. Reserved / banned name check
+    # 10. Reserved / banned name check
     # -----------------------------------------------------------------------
 
     def _is_reserved(self, name: str) -> tuple:
