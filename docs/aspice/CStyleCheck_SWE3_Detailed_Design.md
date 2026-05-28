@@ -1,4 +1,4 @@
-# Software Detailed Design
+﻿# Software Detailed Design
 
 *Automotive SPICE® PAM v4.0 | SWE.3 Software Detailed Design and Unit Construction*
 
@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.0 |
-| **Project** | CStyleCheck | **Date** | 2026-04-12 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.1 |
+| **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
@@ -88,6 +89,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 | UNIT-44 | `matches_case_abbrev` | `cstylecheck.py:623` | COMP-05 (shared) |
 | UNIT-45 | `module_name` | `cstylecheck.py:654` | COMP-05 (shared) |
 | UNIT-46 | `main` | `cstylecheck.py:3191` | Entry point |
+| UNIT-47 | `append_trend_record` (script) | `scripts/ci/append_trend_record.py` | CI script |
+| UNIT-48 | `generate_trend` (script) | `scripts/ci/generate_trend.py` | CI script |
+| UNIT-49 | `update_readme_badge` (script) | `scripts/ci/update_readme_badge.py` | CI script |
 
 ---
 

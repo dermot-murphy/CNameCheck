@@ -436,5 +436,37 @@ class TestExitCodes(unittest.TestCase):
         self.assertIn("No C files to check", out)
 
 
+# ---------------------------------------------------------------------------
+class TestSpellWordsWarning(unittest.TestCase):
+    """SUP9-TC-SPELL-001 to 002 — issue #90 regression suite.
+
+    --spell-words must emit a warning to stderr when spell_check is disabled
+    in config rather than silently discarding the words file.
+    """
+
+    # SUP9-TC-SPELL-001
+    def test_spell_words_with_disabled_check_warns_on_stderr(self):
+        """WARNING appears on stderr when --spell-words is passed but spell_check
+        is disabled (spell_check.enabled: false in tests/rules.yml)."""
+        with tempfile.TemporaryDirectory() as td:
+            words = _write(td, "extra.txt", "myproject\n")
+            src   = _write(td, "main.c",    "int main(void){ return 0; }\n")
+            cmd   = [sys.executable, CHECKER, "--config", YAML,
+                     "--spell-words", str(words), str(src)]
+            r = subprocess.run(cmd, capture_output=True, text=True)
+        self.assertIn("WARNING", r.stderr)
+        self.assertIn("spell-words", r.stderr)
+        self.assertIn("spell_check.enabled is false", r.stderr)
+
+    # SUP9-TC-SPELL-002
+    def test_spell_words_warning_does_not_affect_exit_code(self):
+        """The warning must not change the exit code — it is informational only."""
+        with tempfile.TemporaryDirectory() as td:
+            words = _write(td, "extra.txt", "myproject\n")
+            src   = _write(td, "main.c",    "int main(void){ return 0; }\n")
+            rc, _ = _run("--spell-words", str(words), files=[src])
+        self.assertEqual(rc, 0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

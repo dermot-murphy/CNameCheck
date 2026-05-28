@@ -1,4 +1,4 @@
-# Software Requirements Specification
+﻿# Software Requirements Specification
 
 *Automotive SPICE® PAM v4.0 | SWE.1 Software Requirements Analysis*
 
@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.0 |
-| **Project** | CStyleCheck | **Date** | 2026-04-12 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.1 |
+| **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.1 | 2026-05-28 | Claude | Added SWE1-MISRA-001/002/003 requirements for MISRA C:2012/2023 lexical rules (Rule 7.3, 7.1, 4.2); updated §5 traceability matrix |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
@@ -155,6 +156,9 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-048 | The software shall require the `U`/`UL` unsigned suffix on numeric integer constants when `misc.unsigned_suffix.enabled: true` | Mandatory | Test | SYS-F-020 |
 | SWE1-049 | The `_check_yoda()` method shall enforce Yoda-condition ordering in `==` and `!=` comparisons | Mandatory | Test | SYS-F-020 |
 | SWE1-050 | The software shall enforce block comment spacing rules when `misc.block_comment_spacing.enabled: true` | Mandatory | Test | SYS-F-020 |
+| SWE1-MISRA-001 | The `_check_lowercase_l_suffix()` method shall flag any integer or floating-point literal that uses the lowercase letter `l` as a suffix (MISRA C:2012/2023 Rule 7.3) when `misc.lowercase_l_suffix.enabled: true` | Mandatory | Test | SYS-F-020 |
+| SWE1-MISRA-002 | The `_check_octal_constants()` method shall flag any integer literal that begins with `0` followed by one or more octal digits (MISRA C:2012/2023 Rule 7.1) when `misc.octal_constant.enabled: true` | Mandatory | Test | SYS-F-020 |
+| SWE1-MISRA-003 | The `_check_trigraphs()` method shall flag any occurrence of the nine ISO C trigraph sequences (`??=`, `??(`, `??/`, `??)`, `??'`, `??<`, `??!`, `??>`, `??-`) in source or comment text (MISRA C:2012 Rule 4.2 Advisory; MISRA C:2023 Rule 4.2 Required) when `misc.trigraph.enabled: true` | Mandatory | Test | SYS-F-020 |
 
 ### 4.10 Rule Engine — Cross-File Sign Compatibility (SS-04/SS-05)
 
@@ -227,6 +231,7 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-040 to SWE1-042 | Type rules | SYS-F-011 | `Checker._check_typedefs/enums/structs()` | `test_typedefs.py`, `test_enums.py`, `test_structs.py` |
 | SWE1-043 to SWE1-044 | Include guard rules | SYS-F-019 | `Checker._check_include_guard()` | `test_include_guards.py` |
 | SWE1-045 to SWE1-050 | Miscellaneous rules | SYS-F-020 | `Checker._check_misc()`, `_check_yoda()` | `test_misc.py`, `test_yoda_condition.py`, `test_block_comment_spacing.py` |
+| SWE1-MISRA-001 to SWE1-MISRA-003 | MISRA C:2012/2023 lexical rules (Rule 7.3, 7.1, 4.2) | SYS-F-020 | `Checker._check_lowercase_l_suffix()`, `_check_octal_constants()`, `_check_trigraphs()` | `test_misra_rules.py` |
 | SWE1-051 to SWE1-053 | Cross-file sign compatibility | SYS-F-021 | `SignChecker` class | `test_sign_compatibility.py` |
 | SWE1-054 to SWE1-056 | Reserved names and spell check | SYS-F-022, F-023 | `Checker._check_reserved_names()`, `_check_spelling()` | `test_reserved_name.py`, `test_spell_check.py` |
 | SWE1-057 to SWE1-064 | Output formatting | SYS-F-027 to F-033 | Output Formatter / `Tee` | `test_cli.py` |

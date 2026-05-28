@@ -552,8 +552,8 @@ _DEFAULT_KEYWORDS_FILE  = _data_file("c_keywords.txt")
 _DEFAULT_STDLIB_FILE    = _data_file("c_stdlib_names.txt")
 _DEFAULT_SPELL_DICT     = _data_file("c_spell_dict.txt")
 
-C_KEYWORDS:    frozenset = _load_dict_file(_DEFAULT_KEYWORDS_FILE)
-C_STDLIB_NAMES: frozenset = _load_dict_file(_DEFAULT_STDLIB_FILE)
+C_KEYWORDS:    frozenset = _load_dict_file(_DEFAULT_KEYWORDS_FILE)    # type: ignore[arg-type]
+C_STDLIB_NAMES: frozenset = _load_dict_file(_DEFAULT_STDLIB_FILE)   # type: ignore[arg-type]
 
 
 
@@ -957,7 +957,7 @@ def offset_to_line_col(offsets: list, pos: int):
 # Built-in spell-check word list
 # ---------------------------------------------------------------------------
 
-_BUILTIN_DICT: frozenset = _load_dict_file(_DEFAULT_SPELL_DICT)
+_BUILTIN_DICT: frozenset = _load_dict_file(_DEFAULT_SPELL_DICT)     # type: ignore[arg-type]
 
 
 def _build_spell_dict(cfg_exempt: list, extra_words: set,
@@ -1076,7 +1076,6 @@ class Checker:
             return
 
         # Build the full list of accepted prefixes: canonical + any aliases
-        sep = _cfg(self.cfg, "file_prefix", "separator", default="_")
         accepted = list(self._alias_prefixes)  # already includes canonical
         if not accepted:
             accepted = [self._prefix()]
@@ -1088,7 +1087,7 @@ class Checker:
         # Report using the canonical prefix in the message
         pfx = accepted[0]
         alias_hint = (
-            f" (or alias prefix(es): "
+            " (or alias prefix(es): "
             + ", ".join(f"'{a}'" for a in accepted[1:])
             + ")"
             if len(accepted) > 1 else ""
@@ -1418,7 +1417,7 @@ class Checker:
             for _ta in _RE_TYPEDEF_ALIAS.finditer(self.clean)
         }
 
-        _typedef_close = getattr(self, "_typedef_close_positions", set())
+        _typedef_close: set = getattr(self, "_typedef_close_positions", set())
         for m in RE_VAR_DECL.finditer(self.clean):
             # Skip matches where the trigger char is a typedef-closing "}"
             if self.clean[m.start():m.start()+1] == "}" and \
@@ -2341,8 +2340,8 @@ class Checker:
                         f"found '{actual}'"))
 
                 # Check 2: exactly one blank line follows (the last line)
-                after = lines[last_nb + 1:]      # lines after EOF comment
-                n_after = len(after)
+                trailing_lines = lines[last_nb + 1:]      # lines after EOF comment
+                n_after = len(trailing_lines)
                 if n_after == 0:
                     # Nothing after the comment — missing trailing blank line
                     self.result.add(Violation(
@@ -2350,7 +2349,7 @@ class Checker:
                         "EOF comment must be followed by exactly one blank line"))
                 elif n_after == 1:
                     # Exactly one line follows — it must be blank
-                    if after[0].strip():
+                    if trailing_lines[0].strip():
                         self.result.add(Violation(
                             self.filepath, lineno_nb + 1, 1, sev,
                             "misc.eof_comment",
@@ -3225,7 +3224,6 @@ def _violations_to_json(violations: list, files_checked: int) -> str:
 def _violations_to_sarif(violations: list, tool_version: str) -> str:
     """Serialise *violations* to a SARIF 2.1.0 JSON string."""
     import json
-    from collections import OrderedDict
 
     # Collect unique rule IDs
     rule_ids = list(dict.fromkeys(v.rule for v in violations))
@@ -3524,6 +3522,14 @@ def main() -> int:
         cfg_exempt  = sp_cfg.get("exempt_values", [])
         extra_words = load_spell_words(args.spell_words) if args.spell_words else set()
         spell_words = _build_spell_dict(cfg_exempt, extra_words, base_dict=spell_base)
+    elif getattr(args, "spell_words", None):
+        # spell_check is disabled but the user passed --spell-words; warn rather
+        # than silently discarding the file (issue #90).
+        print(
+            f"WARNING: --spell-words '{args.spell_words}' supplied but "
+            "spell_check.enabled is false in config — words file ignored.",
+            file=sys.stderr,
+        )
 
     # Project defines map: list of (pattern, replacement) for token substitution
     defines: list = load_defines_file(args.defines) if args.defines else []
