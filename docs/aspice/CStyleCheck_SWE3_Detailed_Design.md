@@ -89,6 +89,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 | UNIT-44 | `matches_case_abbrev` | `cstylecheck.py:623` | COMP-05 (shared) |
 | UNIT-45 | `module_name` | `cstylecheck.py:654` | COMP-05 (shared) |
 | UNIT-46 | `main` | `cstylecheck.py:3191` | Entry point |
+| UNIT-47 | `append_trend_record` (script) | `scripts/ci/append_trend_record.py` | CI script |
+| UNIT-48 | `generate_trend` (script) | `scripts/ci/generate_trend.py` | CI script |
+| UNIT-49 | `update_readme_badge` (script) | `scripts/ci/update_readme_badge.py` | CI script |
 
 ---
 

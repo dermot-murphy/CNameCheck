@@ -138,6 +138,9 @@ All items in the following table are placed under configuration control.
 | CI-026 | Project README | `README.md` | Documentation |
 | CI-027 | This CM Plan | `CStyleCheck_SUP8_CM_Plan.md` | Documentation |
 | CI-028 | AI Authorship Deviation Record | `docs/aspice/CStyleCheck_DEV001_AI_Authorship_Deviation.md` | Documentation |
+| CI-029 | CI trend-record append script | `scripts/ci/append_trend_record.py` | CI script |
+| CI-030 | CI trend HTML and badge generation script | `scripts/ci/generate_trend.py` | CI script |
+| CI-031 | CI README badge update script | `scripts/ci/update_readme_badge.py` | CI script |
 
 ### 6.2 Identification Scheme
 
