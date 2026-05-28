@@ -9,5 +9,6 @@ pytest>=7.4,<9.0          # test runner
 pytest-cov>=4.1,<6.0      # coverage reporting
 
 # Static analysis (optional — only needed for CI static checks)
-mypy>=1.0                  # strict static type checking
+mypy>=1.0                  # static type checking
+types-PyYAML>=6.0          # mypy stubs for PyYAML
 ruff>=0.1                  # fast Python linter
