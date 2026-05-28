@@ -39,7 +39,7 @@ variables:
   # NOTE: intentionally set to false in tests/ copy -- TestAllowLoopVarsShort
   # in test_misc_improvements.py verifies default-is-false behaviour.
   # src/ canonical copy sets this to true (project default).
-  allow_loop_vars_short: false
+  allow_loop_vars_short: false  # TEST FIXTURE: must stay false (default-is-false test)
 
   # Uppercase abbreviations that are allowed anywhere in an otherwise
   # lower_snake name.  Add any project-standard abbreviations here.
@@ -537,6 +537,39 @@ misc:
   declared_not_defined:
     enabled: false    # opt-in; disabled by default
     severity: warning
+
+  # TEST FIXTURE: comment_ratio disabled (intentionally matches src/rules.yml)
+  # -----------------------------------------------------------------------
+  # Comment-to-code ratio (issue #68)
+  # -----------------------------------------------------------------------
+  # Measures the ratio of explanatory comment lines to code lines within
+  # each scanned file.  Violations are raised when the ratio falls below
+  # the configured thresholds.
+  #
+  # Excluded from both counts:
+  #   - Blank lines
+  #   - The file header: all leading comment/blank lines before the first
+  #     non-comment, non-blank line (copyright notices, licence blocks)
+  #   - Doxygen blocks: /** … */ are documentation, not explanatory comments
+  #
+  # Counted as comment lines:
+  #   // line comments and /* … */ regular block comment lines
+  #
+  # Counted as code lines:
+  #   Every non-blank, non-comment line (code, preprocessor, etc.)
+  #   A line with a trailing // comment still counts as a code line
+  #
+  # Example violation messages:
+  #   uart.c:1: warning [misc.comment_ratio] comment ratio 0.08 is below
+  #             warning threshold 0.15 (8 comment lines / 96 code lines)
+  #   spi.c:1:  error   [misc.comment_ratio] comment ratio 0.02 is below
+  #             error threshold 0.05 (1 comment line / 48 code lines)
+  comment_ratio:
+    enabled: false          # opt-in; disabled by default
+    severity: warning       # severity for below-warning-threshold violations
+    warning_threshold: 0.15 # ratio below which a WARNING is raised  (15%)
+    error_threshold: 0.05   # ratio below which an ERROR is raised    (5%)
+    min_code_lines: 10      # skip files with fewer code lines (avoids trivial-file false positives)
 
 # --- Reserved / banned identifier names ---
 # Checks that no declared variable, function, macro, or constant name

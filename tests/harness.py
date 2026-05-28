@@ -60,6 +60,9 @@ _ALL_OFF: dict = {
         "octal_constant":        {"enabled": False},
         "trigraph":              {"enabled": False},
         "declared_not_defined":  {"enabled": False},
+        # Comment ratio check (issue #68) -- disabled so existing tests
+        # are not affected by the new per-file comment density check.
+        "comment_ratio":         {"enabled": False},
     },
     "reserved_names":    {"enabled": False},
     "sign_compatibility":{"enabled": False},
