@@ -30,6 +30,7 @@ _build_spell_dict       = _mod._build_spell_dict
 _BUILTIN_DICT           = _mod._BUILTIN_DICT
 _load_dict_file         = _mod._load_dict_file
 SignChecker             = _mod.SignChecker
+DeclaredNotDefinedChecker = _mod.DeclaredNotDefinedChecker
 
 
 # ---------------------------------------------------------------------------
@@ -58,6 +59,10 @@ _ALL_OFF: dict = {
         "lowercase_l_suffix":    {"enabled": False},
         "octal_constant":        {"enabled": False},
         "trigraph":              {"enabled": False},
+        "declared_not_defined":  {"enabled": False},
+        # Comment ratio check (issue #68) -- disabled so existing tests
+        # are not affected by the new per-file comment density check.
+        "comment_ratio":         {"enabled": False},
     },
     "reserved_names":    {"enabled": False},
     "sign_compatibility":{"enabled": False},

@@ -1129,6 +1129,7 @@ class Checker:
         if self._is_header:
             self._check_include_guard()
         self._check_misc()
+        self._check_comment_ratio()
         self._check_yoda()
         self._check_reserved_names()
         self._check_lowercase_l_suffix()   # MISRA C:2012/2023 Rule 7.3
@@ -2366,7 +2367,145 @@ class Checker:
                         f"line; found {n_after}"))
 
     # -----------------------------------------------------------------------
-    # 14. Comment spell-check
+    # 14. Comment ratio (misc.comment_ratio)
+    # -----------------------------------------------------------------------
+
+    def _check_comment_ratio(self) -> None:
+        """Enforce a minimum ratio of comment lines to code lines (issue #68).
+
+        Excluded from both counts:
+          - Blank lines
+          - The file header: all leading comment/blank lines before the first
+            non-comment, non-blank line (copyright notices, licence blocks)
+          - Doxygen blocks: /** … */ are documentation, not explanatory comments
+
+        Counted as comment lines:
+          - // line comments
+          - /* … */ regular block comments (not Doxygen)
+
+        Counted as code lines:
+          - Every non-blank, non-comment line (code, preprocessor, etc.)
+          - A line with a trailing // comment counts as a CODE line
+        """
+        misc   = self.cfg.get("misc", {})
+        cr_cfg = misc.get("comment_ratio", {})
+        if not cr_cfg.get("enabled", False):
+            return
+
+        sev      = cr_cfg.get("severity", "warning")
+        warn_thr = float(cr_cfg.get("warning_threshold", 0.15))
+        err_thr  = float(cr_cfg.get("error_threshold",  0.05))
+        min_code = int(cr_cfg.get("min_code_lines", 10))
+
+        lines = self.source.splitlines()
+
+        # ----------------------------------------------------------------
+        # Phase 1: locate the end of the file header.
+        # The header region = all leading comment/blank lines before the
+        # first non-comment, non-blank line.
+        # ----------------------------------------------------------------
+        header_end_idx = 0
+        in_hdr_block   = False
+        found_code     = False
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if not stripped:                      # blank
+                continue
+            if in_hdr_block:
+                if "*/" in line:
+                    in_hdr_block = False
+                continue
+            if stripped.startswith("/*"):
+                if "*/" not in stripped[2:]:      # multi-line block comment
+                    in_hdr_block = True
+                continue                           # still in header
+            if stripped.startswith("//"):
+                continue                           # line comment — still header
+            # First actual code line: header ends here
+            header_end_idx = i
+            found_code     = True
+            break
+
+        if not found_code:
+            return   # entire file is comments/blank — nothing to measure
+
+        # ----------------------------------------------------------------
+        # Phase 2: classify lines from header_end_idx onwards.
+        # ----------------------------------------------------------------
+        comment_lines = 0
+        code_lines    = 0
+        in_doxygen    = False
+        in_block_cmt  = False
+
+        for i, line in enumerate(lines):
+            if i < header_end_idx:
+                continue
+
+            stripped = line.strip()
+            if not stripped:
+                continue   # blank — excluded
+
+            if in_doxygen:
+                if "*/" in line:
+                    in_doxygen = False
+                continue   # doxygen continuation — excluded
+
+            if in_block_cmt:
+                comment_lines += 1
+                if "*/" in line:
+                    in_block_cmt = False
+                continue
+
+            # Opening of a Doxygen block ( /** … )
+            if stripped.startswith("/**"):
+                if "*/" not in stripped[3:]:
+                    in_doxygen = True
+                # Doxygen opener line itself is excluded
+                continue
+
+            # Opening of a regular block comment ( /* … )
+            if stripped.startswith("/*"):
+                comment_lines += 1
+                if "*/" not in stripped[2:]:
+                    in_block_cmt = True
+                continue
+
+            # Line comment
+            if stripped.startswith("//"):
+                comment_lines += 1
+                continue
+
+            # Non-blank, non-comment line (code, preprocessor, …)
+            code_lines += 1
+
+        # Guard: skip files with too few code lines (trivial files, stubs, etc.)
+        if code_lines < min_code:
+            return
+
+        ratio = comment_lines / code_lines
+
+        if ratio < err_thr:
+            emit_sev        = "error"
+            threshold       = err_thr
+            threshold_label = "error"
+        elif ratio < warn_thr:
+            emit_sev        = sev
+            threshold       = warn_thr
+            threshold_label = "warning"
+        else:
+            return   # ratio meets the warning threshold — all good
+
+        pl = lambda n: "s" if n != 1 else ""  # noqa: E731
+        self.result.add(Violation(
+            self.filepath, 1, 1, emit_sev, "misc.comment_ratio",
+            f"comment ratio {ratio:.2f} is below {threshold_label} threshold "
+            f"{threshold} "
+            f"({comment_lines} comment line{pl(comment_lines)} / "
+            f"{code_lines} code line{pl(code_lines)})"
+        ))
+
+    # -----------------------------------------------------------------------
+    # 15. Comment spell-check
     # -----------------------------------------------------------------------
 
     def _check_spelling(self) -> None:
@@ -2998,6 +3137,202 @@ class SignChecker:
                             f"('{param.type_str}') expects {param.signedness}; "
                             f"call to '{fn_name}'",
                         ))
+        return violations
+
+
+# ---------------------------------------------------------------------------
+# DeclaredNotDefinedChecker (cross-file declared-but-not-defined check)
+# ---------------------------------------------------------------------------
+
+class DeclaredNotDefinedChecker:
+    """
+    Cross-file declared-but-not-defined checker (misc.declared_not_defined).
+
+    Identifies C objects that are declared (via 'extern' or a forward typedef)
+    but for which no matching definition can be found across all files in a
+    single checker invocation.
+
+    Single-file runs always emit no violations — the definition may exist in
+    an unscanned translation unit (e.g. a BSP provided at link time).
+
+    Usage:
+        dndc = DeclaredNotDefinedChecker(cfg)
+        for filepath, source in all_files:
+            dndc.ingest(filepath, source)
+        violations = dndc.check()
+    """
+
+    # extern <type> <name> ;  — variable/constant declaration (no parens → not a function)
+    _RE_EXTERN_VAR = re.compile(
+        r"(?:^|\n)[ \t]*extern[ \t]+"
+        r"(?:(?:const|volatile|unsigned|signed|long|short"
+        r"|struct|enum|union)[ \t]+)*"
+        r"[A-Za-z_]\w*(?:[ \t]*\*+)?[ \t]*"
+        r"([A-Za-z_]\w*)"               # variable name — group 1
+        r"(?![ \t]*\()"                  # NOT followed by ( → not a function
+        r"[ \t]*(?:\[[^\]]*\][ \t]*)*"  # optional array brackets
+        r"[ \t]*;",
+        re.MULTILINE,
+    )
+
+    # typedef struct Tag Tag;  — forward struct typedef (no body brace between names)
+    _RE_FWD_STRUCT = re.compile(
+        r"(?:^|\n)[ \t]*typedef[ \t]+struct[ \t]+"
+        r"([A-Za-z_]\w*)[ \t]+"         # struct tag name — group 1
+        r"([A-Za-z_]\w*)[ \t]*;",       # alias name — group 2
+        re.MULTILINE,
+    )
+
+    # typedef enum Tag Tag;  — forward enum typedef (no body brace between names)
+    _RE_FWD_ENUM = re.compile(
+        r"(?:^|\n)[ \t]*typedef[ \t]+enum[ \t]+"
+        r"([A-Za-z_]\w*)[ \t]+"         # enum tag name — group 1
+        r"([A-Za-z_]\w*)[ \t]*;",       # alias name — group 2
+        re.MULTILINE,
+    )
+
+    # Non-extern, non-static file-scope variable definition (any identifier casing).
+    # Ends with = ; or [ so function definitions (ending with {) are excluded.
+    _RE_VAR_DEF = re.compile(
+        r"(?:^|\n)[ \t]*"
+        r"(?!(?:extern|static|typedef|if|else|while|for|do|switch|return"
+        r"|break|continue|goto|sizeof|case|assert)\b)"
+        r"(?:(?:volatile|const|unsigned|signed|long|short"
+        r"|struct|enum|union)[ \t]+)*"
+        r"(?:(?:long[ \t]+long|long|short)[ \t]+)?"
+        r"[A-Za-z_]\w*(?:[ \t]*\*+)?[ \t]*"
+        r"([A-Za-z_]\w*)"               # defined name — group 1
+        r"(?![ \t]*\()"                  # NOT a function definition
+        r"[ \t]*(?:=|;|\[)",
+        re.MULTILINE,
+    )
+
+    def __init__(self, cfg: dict):
+        self._cfg:         dict = cfg
+        self._decls:       list = []   # (filepath, line, col, name, kind)
+        self._func_defs:   set  = set()
+        self._var_defs:    set  = set()
+        self._struct_defs: set  = set()
+        self._enum_defs:   set  = set()
+        self._file_count:  int  = 0
+
+    def ingest(self, filepath: str, source: str) -> None:
+        """Scan one file for declarations and definitions."""
+        self._file_count += 1
+        clean        = preprocess(source)
+        line_map     = build_line_map(clean)
+        brace_depths = _build_brace_depths(clean)
+        src_lines    = source.splitlines()
+
+        def _suppressed(lineno: int) -> bool:
+            raw = src_lines[lineno - 1] if 0 < lineno <= len(src_lines) else ""
+            return "cstylecheck: disable misc.declared_not_defined" in raw
+
+        # --- Collect definitions (satisfy declarations) ---
+
+        for m in RE_FUNCTION_DEF.finditer(clean):
+            self._func_defs.add(m.group(1))
+
+        for m in RE_TYPEDEF_STRUCT.finditer(clean):
+            name = m.group(3)
+            if name:
+                self._struct_defs.add(name)
+
+        for m in RE_TYPEDEF_ENUM.finditer(clean):
+            name = m.group(2)
+            if name:
+                self._enum_defs.add(name)
+
+        # File-scope non-extern/non-static variable definitions (brace depth 0)
+        for m in self._RE_VAR_DEF.finditer(clean):
+            pos = m.start()
+            if pos < len(brace_depths) and brace_depths[pos] == 0:
+                self._var_defs.add(m.group(1))
+
+        # RE_VAR_DECL captures lowercase names; also add them for completeness.
+        for m in RE_VAR_DECL.finditer(clean):
+            if "extern" not in m.group(1) and "static" not in m.group(1):
+                pos = m.start()
+                if pos < len(brace_depths) and brace_depths[pos] == 0:
+                    self._var_defs.add(m.group(4))
+
+        # --- Collect declarations (to be satisfied by definitions) ---
+
+        # Extern function declarations
+        for m in RE_FUNCTION_DECL.finditer(clean):
+            if not re.search(r"\bextern\b", m.group(0)):
+                continue
+            pos = m.start()
+            if pos < len(brace_depths) and brace_depths[pos] != 0:
+                continue   # inside a nested scope — skip
+            fname  = m.group(1)
+            line, col = offset_to_line_col(line_map, m.start(1))
+            if _suppressed(line):
+                continue
+            self._decls.append((filepath, line, col, fname, "function"))
+
+        # Extern variable declarations
+        for m in self._RE_EXTERN_VAR.finditer(clean):
+            pos = m.start()
+            if pos < len(brace_depths) and brace_depths[pos] != 0:
+                continue
+            vname  = m.group(1)
+            line, col = offset_to_line_col(line_map, m.start(1))
+            if _suppressed(line):
+                continue
+            self._decls.append((filepath, line, col, vname, "variable"))
+
+        # Forward typedef struct declarations
+        for m in self._RE_FWD_STRUCT.finditer(clean):
+            pos = m.start()
+            if pos < len(brace_depths) and brace_depths[pos] != 0:
+                continue
+            tname  = m.group(2)   # the typedef alias name
+            line, col = offset_to_line_col(line_map, m.start(2))
+            if _suppressed(line):
+                continue
+            self._decls.append((filepath, line, col, tname, "typedef_struct"))
+
+        # Forward typedef enum declarations
+        for m in self._RE_FWD_ENUM.finditer(clean):
+            pos = m.start()
+            if pos < len(brace_depths) and brace_depths[pos] != 0:
+                continue
+            tname  = m.group(2)   # the typedef alias name
+            line, col = offset_to_line_col(line_map, m.start(2))
+            if _suppressed(line):
+                continue
+            self._decls.append((filepath, line, col, tname, "typedef_enum"))
+
+    def check(self) -> list:
+        """Return violations for all declared-but-not-defined objects."""
+        cfg = self._cfg.get("misc", {}).get("declared_not_defined", {})
+        if not cfg.get("enabled", False):
+            return []
+        if self._file_count < 2:
+            # Single-file run: definition may exist in an unscanned TU
+            return []
+        sev        = cfg.get("severity", "warning")
+        seen:       set  = set()
+        violations: list = []
+        for filepath, line, col, name, kind in self._decls:
+            if name in seen:
+                continue
+            seen.add(name)
+            if kind == "function":
+                defined = name in self._func_defs
+            elif kind == "variable":
+                defined = name in self._var_defs
+            elif kind == "typedef_struct":
+                defined = name in self._struct_defs
+            else:   # typedef_enum
+                defined = name in self._enum_defs
+            if not defined:
+                violations.append(Violation(
+                    filepath, line, col, sev,
+                    "misc.declared_not_defined",
+                    f"'{name}' is declared but no definition found in scanned files",
+                ))
         return violations
 
 
@@ -3660,6 +3995,23 @@ def main() -> int:
         all_violations.extend(sign_violations)
         if output_format == "text":
             for v in sorted(sign_violations, key=lambda x: (x.filepath, x.line, x.col)):
+                if args.github_actions:
+                    tee.print(v.github_annotation())
+                else:
+                    tee.print(v)
+
+    # Cross-file declared-but-not-defined check (needs all files ingested first).
+    dnd_cfg = cfg.get("misc", {}).get("declared_not_defined", {})
+    if dnd_cfg.get("enabled", False):
+        dndc = DeclaredNotDefinedChecker(cfg)
+        for filepath in files:
+            src = source_cache.get(filepath)
+            if src is not None:
+                dndc.ingest(filepath, src)
+        dnd_violations = dndc.check()
+        all_violations.extend(dnd_violations)
+        if output_format == "text":
+            for v in sorted(dnd_violations, key=lambda x: (x.filepath, x.line, x.col)):
                 if args.github_actions:
                     tee.print(v.github_annotation())
                 else:
