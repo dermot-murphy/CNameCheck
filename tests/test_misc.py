@@ -28,6 +28,23 @@ class TestLineLength(unittest.TestCase):
         line = "/* " + "x" * 100 + " */"
         self.assertFalse(has(line + "\n", LL_CFG, "misc.line_length"))
 
+    # SWE4-TC-CRLF-001
+    def test_crlf_line_exactly_at_limit_passes(self):
+        """An 80-char line with CRLF ending must not be falsely flagged.
+
+        Without normalisation, \\r counts as an extra character making a
+        visually-80-char line appear to be 81 chars long.
+        """
+        line = "x" * 80
+        self.assertFalse(has(line + "\r\n", LL_CFG, "misc.line_length"))
+
+    # SWE4-TC-CRLF-002
+    def test_crlf_over_limit_still_fails(self):
+        """An 81-char line with CRLF ending must still be flagged."""
+        line = "x" * 81
+        self.assertTrue(has(line + "\r\n", LL_CFG, "misc.line_length"))
+
+
 class TestIndentation(unittest.TestCase):
     def test_spaces_pass_when_spaces_required(self):
         self.assertTrue(clean("    int x = 0;\n", IND_CFG))

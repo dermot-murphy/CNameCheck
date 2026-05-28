@@ -947,9 +947,13 @@ class Checker:
         copyright_header=None,
     ):
         self.filepath      = filepath
-        self.source        = source
+        # Normalise line endings once at construction time so all check
+        # methods operate on LF-only source.  Without this, CRLF files from
+        # Windows produce off-by-one line-length results (\r counts as a
+        # character) and multi-line regex anchors behave unexpectedly.
+        self.source        = source.replace('\r\n', '\n').replace('\r', '\n')
         # Step 1: strip comments and string literals
-        self.clean         = preprocess(source)
+        self.clean         = preprocess(self.source)
         # Track positions of "}" that close a typedef struct/union/enum
         # body so _check_variables can exclude them from RE_VAR_DECL.
         _RE_TYPEDEF_CLOSE = re.compile(
@@ -1881,10 +1885,9 @@ class Checker:
         sev              = cr_cfg.get("severity", "error")
         template, pattern = self._copyright
 
-        # Normalise line endings so the regex (built from the template,
-        # which was also normalised) can match reliably.
-        source = self.source.replace('\r\n', '\n').replace('\r', '\n')
-
+        # self.source is already LF-normalised in __init__; no further
+        # normalisation needed here.
+        source = self.source
         m = pattern.match(source)
 
         if m is None:
