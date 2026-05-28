@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP8-001 | **Version** | 1.1 |
-| **Project** | CStyleCheck | **Date** | 2026-04-12 |
+| **Document ID** | CSC-SUP8-001 | **Version** | 1.2 |
+| **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,8 +20,9 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.0 | 2026-04-11 | Claude | Initial release |
+| 1.2 | 2026-05-28 | Dermot Murphy | Add CI-028 (CSC-DEV-001 deviation document) to CI list — issue #52 |
 | 1.1 | 2026-04-12 | Claude | Updated branching strategy to Git Flow; clarified PR/Issue terminology throughout |
+| 1.0 | 2026-04-11 | Claude | Initial release |
 
 ---
 
@@ -136,6 +137,7 @@ All items in the following table are placed under configuration control.
 | CI-025 | CI — Docker publish workflow | `.github/workflows/docker_publish.yml` | CI/CD |
 | CI-026 | Project README | `README.md` | Documentation |
 | CI-027 | This CM Plan | `CStyleCheck_SUP8_CM_Plan.md` | Documentation |
+| CI-028 | AI Authorship Deviation Record | `docs/aspice/CStyleCheck_DEV001_AI_Authorship_Deviation.md` | Documentation |
 
 ### 6.2 Identification Scheme
 
@@ -277,7 +279,7 @@ Configuration status shall be accessible at any time via:
 
 Performed prior to each release baseline to verify:
 
-- [ ] All CI-001 to CI-027 items are present and committed
+- [ ] All CI-001 to CI-028 items are present and committed
 - [ ] Version in `_version.py` (CI-002) matches the intended tag
 - [ ] All unit tests pass on Python 3.10, 3.11, 3.12
 - [ ] Naming convention workflow passes on current source

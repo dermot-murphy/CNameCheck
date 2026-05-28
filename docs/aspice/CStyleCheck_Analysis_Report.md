@@ -149,18 +149,15 @@ The gap is acknowledged in a comment but no GitHub Issue is linked. Must be form
 
 ## 2 · ASPICE V4 Level 2 Compliance
 
-### 🔴 Critical — AI listed as Author / Reviewer / Role-holder across all 18 work products
+### ✅ Resolved — AI listed as Author / Role-holder across all 18 work products (issue #52)
 
-Every ASPICE document carries **Author: Claude**. PA2-001 GP 2.1.6 lists *"Lead Developer: Claude"* and *"Project Manager: Claude"*. ASPICE requires **human accountable persons** for all defined roles. An assessor will reject this without named individuals.
+Every ASPICE document carries **Author: Claude**. PA2-001 GP 2.1.6 listed *"Lead Developer: Claude"* and *"Project Manager: Claude"*.
 
-**Fix — in all documents:**
+**Resolution:** Rather than replacing all `Author: Claude` entries (which would falsify the authorship record), a formal **process deviation** has been raised and approved:
 
-```markdown
-| Author | Dermot Murphy |   ← replace "Claude" in every document
-
-# PA2-001 GP 2.1.6 — replace all Claude role entries
-| Lead Developer | <Human Name> |
-```
+> **CSC-DEV-001** — `docs/aspice/CStyleCheck_DEV001_AI_Authorship_Deviation.md`
+>
+> Claude is accepted as the *authoring tool* for all 18 work products. Dermot Murphy is the accountable human responsible party in all cases; the Reviewer/Approver fields throughout correctly name Dermot Murphy. CSC-PA2-001 §4.4 GP 2.1.6 has been updated to v1.1 with a note directing assessors to the deviation record.
 
 ---
 

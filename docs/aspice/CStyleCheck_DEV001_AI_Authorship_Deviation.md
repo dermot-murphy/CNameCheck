@@ -1,0 +1,137 @@
+# Process Deviation — AI-Assisted Authorship of ASPICE Work Products
+
+*Automotive SPICE® PAM v4.0 | SUP.9 Problem Resolution / Deviation Record*
+
+---
+
+## 1. Document Identification & Control
+
+| Field | Value | Field | Value |
+|---|---|---|---|
+| **Document ID** | CSC-DEV-001 | **Version** | 1.0 |
+| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Status** | Approved | **Classification** | Internal |
+| **Author** | Dermot Murphy | **Reviewer** | Dermot Murphy |
+| **Approver** | Dermot Murphy | **Related Process** | PA 2.1, GP 2.1.6 |
+
+---
+
+## 2. Revision History
+
+| Version | Date | Author | Description of Change |
+|---|---|---|---|
+| 1.0 | 2026-05-28 | Dermot Murphy | Initial deviation record — closes issue #52 |
+
+---
+
+## 3. Deviation Summary
+
+| Field | Value |
+|---|---|
+| **Deviation ID** | CSC-DEV-001 |
+| **Problem Record** | CSC-SUP9 Issue #52 |
+| **Severity** | SEV-2 Major |
+| **Standard Clause** | ASPICE PAM v4.0, GP 2.1.6 — Define Responsibilities |
+| **Affected Documents** | All 18 ASPICE work products in `docs/aspice/` |
+| **Disposition** | **Accepted with justification** |
+
+---
+
+## 4. Non-Conformance Description
+
+### 4.1 What the Standard Requires
+
+ASPICE PAM v4.0, Generic Practice **GP 2.1.6 — Define Responsibilities** requires that:
+
+> *"Responsibilities and authorities for performing the defined activities of the process are assigned to individuals and/or groups."*
+
+ASPICE assessment practice interprets this as requiring **named, accountable human persons** for all defined roles. An assessor expects to find human names against Author, Reviewer, and role-holder fields in all work products so that accountability can be traced.
+
+### 4.2 Actual State
+
+All 18 ASPICE work products in `docs/aspice/` carry:
+
+- `Author: Claude` in the Document Identification header
+- `Claude` in Revision History Author column (initial release entries)
+- `Claude` as role-holder in CSC-PA2-001 GP 2.1.6 role table (Project Manager / CM Manager, Lead Developer, Test Lead)
+- `Claude` as responsible party in activity/monitoring tables (CSC-ACQ4-001, CSC-MAN3-001, CSC-MAN5-001)
+- `Claude` in approval signature blocks
+
+Claude is an AI assistant (Anthropic Claude), not a human individual.
+
+### 4.3 Root Cause
+
+CStyleCheck was developed using Claude as an AI-assisted authoring tool throughout the ASPICE documentation phase. The AI-generated content was reviewed and accepted by the human responsible (Dermot Murphy), but the Author fields were not updated to reflect the human accountable party.
+
+---
+
+## 5. Justification for Acceptance
+
+### 5.1 Project Context
+
+CStyleCheck is a personal open-source project with a **single human developer and decision-maker: Dermot Murphy**. There are no other human team members. In this context:
+
+- Claude is a **tool**, not a team member. Its role is analogous to a word processor, a code generator, or a documentation template system. The outputs it produces carry no independent authority.
+- Every work product listed in §4.2 was **reviewed and approved by Dermot Murphy** before release. The `Reviewer` and `Approver` fields on all 18 documents correctly name Dermot Murphy.
+- All ASPICE work products are committed to a Git repository under Dermot Murphy's GitHub account (`dermot-murphy`). The commit history constitutes an audit trail of human acceptance.
+- All decisions — requirements, architecture, design, risk treatment, and process definitions — were made by Dermot Murphy. Claude provided drafts; Dermot Murphy accepted, modified, or rejected each.
+
+### 5.2 Accountability Chain
+
+| Role per GP 2.1.6 | Nominal Entry | Actual Accountable Person |
+|---|---|---|
+| Project Manager / CM Manager | Claude | Dermot Murphy |
+| Lead Developer | Claude | Dermot Murphy |
+| Test Lead | Claude | Dermot Murphy |
+| Author (all documents) | Claude | Dermot Murphy |
+| Reviewer (all documents) | Dermot Murphy | Dermot Murphy ✅ |
+| Approver (all documents) | Dermot Murphy | Dermot Murphy ✅ |
+
+The human accountability chain is intact. "Claude" entries reflect the authoring tool, not an independent actor.
+
+### 5.3 Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| Assessor rejects evidence due to AI author field | Medium | High | This deviation document constitutes the formal acceptance record; assessor may be directed to it |
+| Traceability gap if Claude AI is unavailable | Low | Low | All accepted content is version-controlled; no dependency on Claude for future work |
+| Misunderstanding of AI role in project | Low | Medium | §5.1 and §5.2 above clarify the tool vs. person distinction |
+
+**Residual risk: MEDIUM** — an ASPICE assessor may still raise an observation. This deviation provides the formal basis for rebuttal.
+
+---
+
+## 6. Corrective Action
+
+No change is made to the work product Author fields. The `Author: Claude` entries are accepted as a record of the authoring tool used. This is consistent with the practice of noting document generation tools (e.g., "Generated by Doxygen") without implying the tool holds accountability.
+
+**Actions required:**
+
+| Action | Owner | Target Date | Status |
+|---|---|---|---|
+| Create this deviation document (CSC-DEV-001) | Dermot Murphy | 2026-05-28 | ✅ Complete |
+| Add CSC-DEV-001 to CSC-PA2-001 GP 2.1.6 section with explanatory note | Dermot Murphy | 2026-05-28 | ✅ Complete |
+| Add CSC-DEV-001 to CSC-SUP8-001 Configuration Item list | Dermot Murphy | 2026-05-28 | ✅ Complete |
+| Reference deviation in Analysis Report finding for issue #52 | Dermot Murphy | 2026-05-28 | ✅ Complete |
+
+---
+
+## 7. Approval
+
+This deviation is accepted on the basis that Dermot Murphy is the sole accountable human for all work products, the authoring tool ("Claude") has no independent authority, and the Reviewer/Approver fields correctly identify the human responsible party throughout.
+
+| Role | Name | Signature | Date |
+|---|---|---|---|
+| Author | Dermot Murphy | Approved | 2026-05-28 |
+| Approver | Dermot Murphy | Approved | 2026-05-28 |
+
+---
+
+## 8. Referenced Documents
+
+| Document ID | Title | Version |
+|---|---|---|
+| CSC-PA2-001 | Process Capability Records | 1.1 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
+| GitHub Issue #52 | AI listed as Author across all 18 ASPICE work products | — |
