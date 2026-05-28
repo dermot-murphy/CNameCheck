@@ -70,6 +70,8 @@ jobs:
       # ── 1. Checkout source repository ──────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # ── 2. Clone wiki repository ────────────────────────────────────────────
       #
