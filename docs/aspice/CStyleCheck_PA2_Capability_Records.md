@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.1 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation reference at GP 2.2.3; add CI-028 (SVD) and CI-029 (DEV-002) to §5.4 — closes issue #61 |
 | 1.1 | 2026-05-28 | Dermot Murphy | Add deviation reference at GP 2.1.6 — closes issue #52 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -154,15 +155,17 @@ All work products are defined with content requirements in their respective docu
 
 ### 5.3 GP 2.2.3 — Review and Adjust Work Products
 
+> **Note — Single-Person Reviewer Deviation (CSC-DEV-002):** CStyleCheck has one human team member (Dermot Murphy). All ASPICE work products carry `Reviewer: Dermot Murphy` and `Approver: Dermot Murphy` — the same individual. This deviates from the GP 2.2.3 expectation of an independent reviewer. The deviation is formally accepted under **CSC-DEV-002** (`docs/aspice/CStyleCheck_DEV002_Independent_Review_Deviation.md`), which documents the justification, compensating controls (AI-assisted review, CI quality gates, PR audit trail), and residual risk. Assessors may rate this practice as Largely Achieved rather than Fully Achieved on the independence criterion.
+
 All work products are reviewed before approval according to the following schedule:
 
 | Work Product | Review Type | Reviewer | Review Evidence |
 |---|---|---|---|
-| Source code changes | Pull request review | ≥ 1 peer reviewer | GitHub PR approval record |
-| ASPICE documents | Formal document review | Technical reviewer + QA | Reviewer/Approver table in each document |
-| Test suite additions | Pull request review | ≥ 1 peer reviewer | GitHub PR approval record |
-| CI workflow changes | Pull request review | ≥ 1 peer reviewer | GitHub PR approval record |
-| Release baseline | Pre-release checklist | QA role | CSC-SUP1-001 §5.4 signed checklist |
+| Source code changes | Pull request review | Dermot Murphy (see CSC-DEV-002) | GitHub PR approval record |
+| ASPICE documents | Formal document review | Dermot Murphy (see CSC-DEV-002) | Reviewer/Approver table in each document |
+| Test suite additions | Pull request review | Dermot Murphy (see CSC-DEV-002) | GitHub PR approval record |
+| CI workflow changes | Pull request review | Dermot Murphy (see CSC-DEV-002) | GitHub PR approval record |
+| Release baseline | Pre-release checklist | Dermot Murphy / QA role | CSC-SUP1-001 §5.4 signed checklist |
 
 **Adjustment mechanism:** Any non-conformance found during review is raised as a GitHub Issue (SUP.9) or change request (SUP.10) and tracked to resolution before the work product is approved.
 
@@ -187,7 +190,10 @@ All work products are reviewed before approval according to the following schedu
 | CSC-SUP9-001 | Problem Resolution Plan | 1.0 | Released | v1.0.0 tag |
 | CSC-SUP10-001 | Change Request Plan | 1.0 | Released | v1.0.0 tag |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.0 | Released | v1.0.0 tag |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.2 | Released | v1.1.0 tag |
+| CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
+| CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
+| CSC-SVD-001 | Software Version Description | 1.1 | Released | v1.1.0 tag |
 | CI-001 | `cstylecheck.py` v1.0.0 | 1.0.0 | \<Baselined\> | v1.0.0 tag |
 | CI-017 | Test suite | 1.0.0 | \<Baselined\> | v1.0.0 tag |
 
