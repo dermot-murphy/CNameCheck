@@ -647,7 +647,7 @@ def matches_case_abbrev(name: str, style: str, abbrevs: set) -> bool:
             continue
         if seg.upper() in abbrevs:
             continue   # allowed abbreviation — any capitalisation
-        if not re.match(r"^[a-z][a-z0-9]*$", seg):
+        if not re.match(r"^[a-z0-9]+$", seg):
             return False
     return True
 
