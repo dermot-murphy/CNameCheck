@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-MAN3-001 | **Version** | 1.1 |
+| **Document ID** | CSC-MAN3-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Dermot Murphy | Resolve \<TBD\> milestone dates for v1.0.0; add v1.1.0 milestone row — closes issue #53 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -156,9 +157,11 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | Docker image published to GHCR | 2026-04-11 | ✅ Complete | 2026-04-11 |
 | SYS.2–SYS.5 documentation complete | 2026-04-12 | ✅ Complete | 2026-04-12 |
 | SWE.1–SWE.6 documentation complete | 2026-04-12 | ✅ Complete | 2026-04-12 |
-| Remaining ASPICE CL2 documents complete | 2026-04-12 | 🔄 In Progress | |
-| All documents reviewed and approved | \<TBD\> | Planned | |
-| v1.0.0 release baseline created | \<TBD\> | Planned | |
+| Remaining ASPICE CL2 documents complete | 2026-04-12 | ✅ Complete | 2026-04-15 |
+| All documents reviewed and approved (v1.0.0) | 2026-04-15 | ✅ Complete | 2026-04-15 |
+| v1.0.0 release baseline created | 2026-04-15 | ✅ Complete | 2026-04-15 |
+| All documents reviewed and approved (v1.1.0) | 2026-05-28 | ✅ Complete | 2026-05-28 |
+| v1.1.0 release baseline created | 2026-06-30 | ✅ Complete | 2026-05-28 |
 
 ---
 

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS5-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC results (PASS); map 6 untraced requirements to SYS-VTC; defer NF-010/011/012; populate open issues — closes issue #53 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -364,21 +365,21 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | SYS-VTC-ID | Test Case | SYS REQ Coverage | Result | Deviation Ref |
 |---|---|---|---|---|
-| SYS-VTC-001 | Input: multiple files and globs | SYS-F-001, F-004, F-005 | \<PASS/FAIL\> | |
-| SYS-VTC-002 | Configuration and rule enablement | SYS-F-002, F-025, F-026, NF-007 | \<PASS/FAIL\> | |
-| SYS-VTC-003 | Full rule coverage (48 rule IDs) | SYS-F-011 to F-024 | \<PASS/FAIL\> | |
-| SYS-VTC-004 | Module prefix enforcement | SYS-F-012 | \<PASS/FAIL\> | |
-| SYS-VTC-005 | Pointer and scope prefix rules | SYS-F-013, F-014 | \<PASS/FAIL\> | |
-| SYS-VTC-006 | Output formats: text, JSON, SARIF | SYS-F-027, F-028, F-029 | \<PASS/FAIL\> | |
-| SYS-VTC-007 | Baseline suppression | SYS-F-034, F-035, F-036 | \<PASS/FAIL\> | |
-| SYS-VTC-008 | Exit code verification | SYS-F-037, F-038, F-039, F-040 | \<PASS/FAIL\> | |
-| SYS-VTC-009 | Python version portability | SYS-NF-003 | \<PASS/FAIL\> | |
-| SYS-VTC-010 | Third-party dependency constraint | SYS-NF-004 | \<PASS/FAIL\> | |
-| SYS-VTC-011 | pip and pipx installation | SYS-NF-005 | \<PASS/FAIL\> | |
-| SYS-VTC-012 | Docker multi-platform build | SYS-NF-006 | \<PASS/FAIL\> | |
-| SYS-VTC-013 | Self-hosting: linter passes own rules | SYS-F-011 | \<PASS/FAIL\> | |
+| SYS-VTC-001 | Input: multiple files and globs | SYS-F-001, F-004, F-005, F-033 | PASS | |
+| SYS-VTC-002 | Configuration and rule enablement | SYS-F-002, F-006, F-007, F-009, F-025, F-026, NF-007 | PASS | |
+| SYS-VTC-003 | Full rule coverage (50 rule IDs) | SYS-F-011 to F-024 | PASS | |
+| SYS-VTC-004 | Module prefix enforcement | SYS-F-012 | PASS | |
+| SYS-VTC-005 | Pointer and scope prefix rules | SYS-F-013, F-014 | PASS | |
+| SYS-VTC-006 | Output formats: text, JSON, SARIF | SYS-F-027, F-028, F-029, F-032 | PASS | |
+| SYS-VTC-007 | Baseline suppression | SYS-F-034, F-035, F-036 | PASS | |
+| SYS-VTC-008 | Exit code verification | SYS-F-037, F-038, F-039, F-040 | PASS | |
+| SYS-VTC-009 | Python version portability + performance | SYS-NF-002, SYS-NF-003 | PASS | |
+| SYS-VTC-010 | Third-party dependency constraint | SYS-NF-004 | PASS | |
+| SYS-VTC-011 | pip and pipx installation | SYS-NF-005 | PASS | |
+| SYS-VTC-012 | Docker multi-platform build | SYS-NF-006 | PASS | |
+| SYS-VTC-013 | Self-hosting: linter passes own rules | SYS-F-011 | PASS | |
 
-**Overall System Verification Verdict:** \<PASS / FAIL\>
+**Overall System Verification Verdict:** PASS (v1.1.0 — 2026-05-28)
 
 ---
 
@@ -386,47 +387,47 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | SYS REQ-ID | Requirement Summary | Covered By | Status |
 |---|---|---|---|
-| SYS-F-001 | Accept `.c`/`.h` files as arguments | SYS-VTC-001 | \<Covered\> |
-| SYS-F-002 | Accept `--config` YAML file | SYS-VTC-002 | \<Covered\> |
-| SYS-F-003 | Accept `--options-file` | SITC-003 | \<Covered\> |
-| SYS-F-004 | `--include` glob patterns | SYS-VTC-001 | \<Covered\> |
-| SYS-F-005 | `--exclude` glob patterns | SYS-VTC-001 | \<Covered\> |
-| SYS-F-006 | `--defines` file | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-F-007 | `--aliases` file | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-F-008 | `--exclusions` file | SITC-009 | \<Covered\> |
-| SYS-F-009 | Dictionary override flags | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | \<Covered\> |
-| SYS-F-011 to F-024 | All 48 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | \<Covered\> |
-| SYS-F-025 | Rule `enabled` toggle | SYS-VTC-002 | \<Covered\> |
-| SYS-F-026 | Per-rule severity | SYS-VTC-002 | \<Covered\> |
-| SYS-F-027 | Text output format | SYS-VTC-006 | \<Covered\> |
-| SYS-F-028 | JSON output format | SYS-VTC-006 | \<Covered\> |
-| SYS-F-029 | SARIF output format | SYS-VTC-006 | \<Covered\> |
-| SYS-F-030 | GitHub Actions annotations | SITC-013 | \<Covered\> |
-| SYS-F-031 | `--log` file output | SITC-006 | \<Covered\> |
-| SYS-F-032 | `--summary` table | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-F-033 | `--verbose` progress | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-F-034 | `--write-baseline` | SYS-VTC-007 | \<Covered\> |
-| SYS-F-035 | `--baseline-file` suppression | SYS-VTC-007 | \<Covered\> |
-| SYS-F-036 | Baseline file is plain JSON | SYS-VTC-007 | \<Covered\> |
-| SYS-F-037 | Exit code 0 (clean) | SYS-VTC-008 | \<Covered\> |
-| SYS-F-038 | Exit code 1 (errors) | SYS-VTC-008 | \<Covered\> |
-| SYS-F-039 | Exit code 2 (config error) | SYS-VTC-008 | \<Covered\> |
-| SYS-F-040 | `--warnings-as-errors` | SYS-VTC-008, SITC-014 | \<Covered\> |
-| SYS-NF-001 | Single file read | SITC-008 | \<Covered\> |
-| SYS-NF-002 | Performance (100 files / 30s) | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-NF-003 | Python 3.10, 3.11, 3.12 | SYS-VTC-009 | \<Covered\> |
-| SYS-NF-004 | stdlib only + PyYAML | SYS-VTC-010 | \<Covered\> |
-| SYS-NF-005 | pip/pipx install | SYS-VTC-011 | \<Covered\> |
-| SYS-NF-006 | Multi-platform Docker | SYS-VTC-012 | \<Covered\> |
-| SYS-NF-007 | YAML configuration | SYS-VTC-002 | \<Covered\> |
-| SYS-NF-008 | Options file precedence | SITC-003 | \<Covered\> |
-| SYS-NF-009 | Per-file exclusions | SITC-009 | \<Covered\> |
-| SYS-NF-010 | pre-commit integration | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-NF-011 | GitHub Action `action.yml` | \<SYS-VTC-xxx\> | \<TBD\> |
-| SYS-NF-012 | GitHub Action step outputs | \<SYS-VTC-xxx\> | \<TBD\> |
+| SYS-F-001 | Accept `.c`/`.h` files as arguments | SYS-VTC-001 | Covered |
+| SYS-F-002 | Accept `--config` YAML file | SYS-VTC-002 | Covered |
+| SYS-F-003 | Accept `--options-file` | SITC-003 | Covered |
+| SYS-F-004 | `--include` glob patterns | SYS-VTC-001 | Covered |
+| SYS-F-005 | `--exclude` glob patterns | SYS-VTC-001 | Covered |
+| SYS-F-006 | `--defines` file | SYS-VTC-002 | Covered |
+| SYS-F-007 | `--aliases` file | SYS-VTC-002 | Covered |
+| SYS-F-008 | `--exclusions` file | SITC-009 | Covered |
+| SYS-F-009 | Dictionary override flags | SYS-VTC-002 | Covered |
+| SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | Covered |
+| SYS-F-011 to F-024 | All 48 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
+| SYS-F-025 | Rule `enabled` toggle | SYS-VTC-002 | Covered |
+| SYS-F-026 | Per-rule severity | SYS-VTC-002 | Covered |
+| SYS-F-027 | Text output format | SYS-VTC-006 | Covered |
+| SYS-F-028 | JSON output format | SYS-VTC-006 | Covered |
+| SYS-F-029 | SARIF output format | SYS-VTC-006 | Covered |
+| SYS-F-030 | GitHub Actions annotations | SITC-013 | Covered |
+| SYS-F-031 | `--log` file output | SITC-006 | Covered |
+| SYS-F-032 | `--summary` table | SYS-VTC-006 | Covered |
+| SYS-F-033 | `--verbose` progress | SYS-VTC-001 | Covered |
+| SYS-F-034 | `--write-baseline` | SYS-VTC-007 | Covered |
+| SYS-F-035 | `--baseline-file` suppression | SYS-VTC-007 | Covered |
+| SYS-F-036 | Baseline file is plain JSON | SYS-VTC-007 | Covered |
+| SYS-F-037 | Exit code 0 (clean) | SYS-VTC-008 | Covered |
+| SYS-F-038 | Exit code 1 (errors) | SYS-VTC-008 | Covered |
+| SYS-F-039 | Exit code 2 (config error) | SYS-VTC-008 | Covered |
+| SYS-F-040 | `--warnings-as-errors` | SYS-VTC-008, SITC-014 | Covered |
+| SYS-NF-001 | Single file read | SITC-008 | Covered |
+| SYS-NF-002 | Performance (100 files / 30s) | SYS-VTC-009 | Covered |
+| SYS-NF-003 | Python 3.10, 3.11, 3.12 | SYS-VTC-009 | Covered |
+| SYS-NF-004 | stdlib only + PyYAML | SYS-VTC-010 | Covered |
+| SYS-NF-005 | pip/pipx install | SYS-VTC-011 | Covered |
+| SYS-NF-006 | Multi-platform Docker | SYS-VTC-012 | Covered |
+| SYS-NF-007 | YAML configuration | SYS-VTC-002 | Covered |
+| SYS-NF-008 | Options file precedence | SITC-003 | Covered |
+| SYS-NF-009 | Per-file exclusions | SITC-009 | Covered |
+| SYS-NF-010 | pre-commit integration | — | Deferred — not separately verified at system level; covered by unit test suite only |
+| SYS-NF-011 | GitHub Action `action.yml` | — | Deferred — not separately verified at system level |
+| SYS-NF-012 | GitHub Action step outputs | — | Deferred — not separately verified at system level |
 
-> **📋 Note:** Requirements marked \<TBD\> require additional test cases to be added in a subsequent version of this document before the system verification can be closed. These shall be tracked as GitHub Issues.
+> **📋 Note:** SYS-NF-010/011/012 are deferred — no dedicated system-level test case exists. These will be addressed in a future SYS5 revision when a GitHub Action integration test environment is available.
 
 ---
 
@@ -434,7 +435,9 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Issue # | Description | Severity | Status |
 |---|---|---|---|
-| \<#\> | \<Description of any open issue or test deviation\> | \<Critical / Major / Minor\> | \<Open / Closed\> |
+| #53 | Unresolved TBD/\<n\> placeholders in released documents (this fix) | Major | Closed |
+| #54 | Coverage gate (72%) below PA2-001 documented target (90%) | Major | Open |
+| DEV-002 | Reviewer/Approver are the same person — accepted under CSC-DEV-002 | Minor | Closed |
 
 ---
 
