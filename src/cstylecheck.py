@@ -149,6 +149,38 @@ _VERSION_STRING = f"{_TOOL_NAME} {_VERSION}"
 # Data structures
 # ---------------------------------------------------------------------------
 
+_MISRA_ANNOTATION_RULES: frozenset = frozenset({
+    "misc.trigraph",
+    "misc.octal_constant",
+    "misc.lowercase_l_suffix",
+})
+
+_NAMING_ANNOTATION_PREFIXES: frozenset = frozenset({
+    "constant",
+    "enum",
+    "function",
+    "include_guard",
+    "macro",
+    "reserved_name",
+    "struct",
+    "typedef",
+    "variable",
+})
+
+
+def _github_annotation_category(rule: str) -> str:
+    """Return the GitHub Actions annotation title category for *rule*."""
+    if rule in _MISRA_ANNOTATION_RULES:
+        return "MISRA"
+    if rule == "sign_compatibility":
+        return "SignCompat"
+    if rule == "spell_check":
+        return "SpellCheck"
+    if rule.split(".", 1)[0] in _NAMING_ANNOTATION_PREFIXES:
+        return "NamingConvention"
+    return "Misc"
+
+
 @dataclass
 class Violation:
     filepath: str
@@ -159,10 +191,15 @@ class Violation:
     message: str
 
     def github_annotation(self) -> str:
-        level = self.severity if self.severity in ("error", "warning", "notice") else "notice"
+        level = (
+            self.severity
+            if self.severity in ("error", "warning", "notice")
+            else "notice"
+        )
+        title = _github_annotation_category(self.rule)
         return (
             f"::{level} file={self.filepath},line={self.line},"
-            f"col={self.col},title=NamingConvention[{self.rule}]::"
+            f"col={self.col},title={title}[{self.rule}]::"
             f"{self.message}"
         )
 
@@ -624,8 +661,8 @@ _CASE_PATTERNS = {
     "upper_snake": re.compile(r"^[A-Z][A-Z0-9_]*$"),
     "camel":       re.compile(r"^[a-z][a-zA-Z0-9]*$"),
     "pascal":      re.compile(r"^[A-Z][a-zA-Z0-9]*$"),
-    "lower":       re.compile(r"^[a-z][a-z0-9_]*$"),
-    "upper":       re.compile(r"^[A-Z][A-Z0-9_]*$"),
+    "lower":       re.compile(r"^[a-z][a-z0-9]*$"),    # no underscores
+    "upper":       re.compile(r"^[A-Z][A-Z0-9]*$"),    # no underscores
 }
 
 
@@ -651,7 +688,7 @@ def matches_case_abbrev(name: str, style: str, abbrevs: set) -> bool:
             continue
         if seg.upper() in abbrevs:
             continue   # allowed abbreviation — any capitalisation
-        if not re.match(r"^[a-z][a-z0-9]*$", seg):
+        if not re.match(r"^[a-z0-9]+$", seg):
             return False
     return True
 
@@ -705,11 +742,18 @@ def strip_comments(source: str) -> str:
 
 
 def strip_strings(source: str) -> str:
-    return re.sub(
+    # Blank double-quoted string literals (preserve length for offset tracking)
+    source = re.sub(
         r'"(?:[^"\\]|\\.)*"',
         lambda m: '""' + " " * (len(m.group()) - 2),
         source,
     )
+    # Normalise single-quoted character literals to 'x' so tokens inside them
+    # cannot trigger unsigned-suffix or other digit-sensitive checks, while
+    # preserving the char-literal shape so the yoda checker still recognises
+    # 'x' as a constant token (its RHS scanner skips spaces but not letters).
+    source = re.sub(r"'(?:[^'\\]|\\.)'", lambda m: "'x'", source)
+    return source
 
 
 def preprocess(source: str) -> str:
@@ -942,11 +986,17 @@ class Checker:
         defines: list = None,
         extra_banned: frozenset = None,
         copyright_header=None,
+        c_keywords: frozenset = None,
+        c_stdlib_names: frozenset = None,
     ):
         self.filepath      = filepath
-        self.source        = source
+        # Normalise line endings once at construction time so all check
+        # methods operate on LF-only source.  Without this, CRLF files from
+        # Windows produce off-by-one line-length results (\r counts as a
+        # character) and multi-line regex anchors behave unexpectedly.
+        self.source        = source.replace('\r\n', '\n').replace('\r', '\n')
         # Step 1: strip comments and string literals
-        self.clean         = preprocess(source)
+        self.clean         = preprocess(self.source)
         # Track positions of "}" that close a typedef struct/union/enum
         # body so _check_variables can exclude them from RE_VAR_DECL.
         _RE_TYPEDEF_CLOSE = re.compile(
@@ -982,6 +1032,14 @@ class Checker:
         self._extra_banned: frozenset = extra_banned or frozenset()
         # tuple (template_text, compiled_re) from --copyright, or None
         self._copyright = copyright_header
+        # Keyword / stdlib sets — use explicit overrides when provided so that
+        # main() does not need to mutate the module-level globals (issue #79).
+        self._c_keywords: frozenset = (
+            c_keywords if c_keywords is not None else C_KEYWORDS
+        )
+        self._c_stdlib_names: frozenset = (
+            c_stdlib_names if c_stdlib_names is not None else C_STDLIB_NAMES
+        )
 
     # -----------------------------------------------------------------------
     # Internal helpers
@@ -993,8 +1051,7 @@ class Checker:
 
     def _v(self, pos: int, sev: str, rule: str, msg: str) -> None:
         if self._ident_disabled:
-            import re as _re
-            _m = _re.search(r"'([^']+)'", msg)
+            _m = re.search(r"'([^']+)'", msg)
             if _m and rule in self._ident_disabled.get(_m.group(1), frozenset()):
                 return
         self.result.add(self._violation(pos, sev, rule, msg))
@@ -1878,10 +1935,9 @@ class Checker:
         sev              = cr_cfg.get("severity", "error")
         template, pattern = self._copyright
 
-        # Normalise line endings so the regex (built from the template,
-        # which was also normalised) can match reliably.
-        source = self.source.replace('\r\n', '\n').replace('\r', '\n')
-
+        # self.source is already LF-normalised in __init__; no further
+        # normalisation needed here.
+        source = self.source
         m = pattern.match(source)
 
         if m is None:
@@ -2190,7 +2246,7 @@ class Checker:
                         f"'U' or 'u' suffix (or assign to a signed type)"))
 
     # -----------------------------------------------------------------------
-    # 9. Block-comment spacing
+    # 8a. Block-comment spacing
     # Checks that the number of blank lines between the closing */ of a
     # multi-line block comment and the next non-blank line is within the
     # configured [min, max] range.
@@ -2235,7 +2291,7 @@ class Checker:
                         f"Block comment has {_blanks} blank line(s) after '*/'; "
                         f"maximum is {bcs_max}"))
 
-        # EOF comment
+        # 8b. EOF comment
         # The last non-blank line must equal the configured template string
         # (with {filename} replaced by the file's base name, case-adjusted).
         # Exactly one blank line must follow it as the final line of the file.
@@ -2311,7 +2367,7 @@ class Checker:
                         f"line; found {n_after}"))
 
     # -----------------------------------------------------------------------
-    # 10. Comment spell-check
+    # 14. Comment spell-check
     # -----------------------------------------------------------------------
 
     def _check_spelling(self) -> None:
@@ -2330,7 +2386,7 @@ class Checker:
 
 
     # -----------------------------------------------------------------------
-    # 11. Yoda conditions  (constant on the LHS of == and !=)
+    # 9. Yoda conditions  (constant on the LHS of == and !=)
     # -----------------------------------------------------------------------
 
     def _check_yoda(self) -> None:
@@ -2426,7 +2482,7 @@ class Checker:
         return bool(re.fullmatch(r"[a-z_][a-zA-Z0-9_]*", t))
 
     # -----------------------------------------------------------------------
-    # 12. MISRA C:2012/2023 Rule 7.3 — lowercase 'l' suffix forbidden
+    # 11. MISRA C:2012/2023 Rule 7.3 — lowercase 'l' suffix forbidden
     #
     # The letter 'l' (lowercase L) is visually indistinguishable from the
     # digit '1' in many fonts.  MISRA C:2012 Rule 7.3 and MISRA C:2023
@@ -2462,7 +2518,7 @@ class Checker:
                 )
 
     # -----------------------------------------------------------------------
-    # 13. MISRA C:2012/2023 Rule 7.1 — octal integer constants forbidden
+    # 12. MISRA C:2012/2023 Rule 7.1 — octal integer constants forbidden
     #
     # An integer literal that starts with '0' followed by one or more
     # octal digits (0–7) is an octal constant.  This is a common source
@@ -2502,7 +2558,7 @@ class Checker:
             )
 
     # -----------------------------------------------------------------------
-    # 14. MISRA C:2012/2023 Rule 4.2 — trigraphs forbidden
+    # 13. MISRA C:2012/2023 Rule 4.2 — trigraphs forbidden
     #
     # Trigraphs are three-character sequences beginning with '??' that the
     # C preprocessor replaces with a single character before parsing.  They
@@ -2539,14 +2595,14 @@ class Checker:
             ))
 
     # -----------------------------------------------------------------------
-    # 11. Reserved / banned name check
+    # 10. Reserved / banned name check
     # -----------------------------------------------------------------------
 
     def _is_reserved(self, name: str) -> tuple:
         """Return (True, category_string) if *name* is a reserved identifier."""
-        if name in C_KEYWORDS:
+        if name in self._c_keywords:
             return True, "C/C++ keyword"
-        if name in C_STDLIB_NAMES:
+        if name in self._c_stdlib_names:
             return True, "C standard library name"
         if name in self._extra_banned:
             return True, "project-banned name"
@@ -3448,16 +3504,19 @@ def main() -> int:
     cfg  = load_config(args.config)
 
     # Spell-check word set — None means the check is entirely disabled
-    # Override dictionary files from CLI if provided
-    global C_KEYWORDS, C_STDLIB_NAMES, _BUILTIN_DICT
-    if getattr(args, "keywords_file", None):
-        C_KEYWORDS = _load_dict_file(args.keywords_file)
-    if getattr(args, "stdlib_file", None):
-        C_STDLIB_NAMES = _load_dict_file(args.stdlib_file)
+    # Build local overrides from CLI flags without mutating module-level globals
+    # (mutating globals is not thread-safe — issue #79).
+    keywords_set = (
+        _load_dict_file(args.keywords_file)
+        if getattr(args, "keywords_file", None) else C_KEYWORDS
+    )
+    stdlib_set = (
+        _load_dict_file(args.stdlib_file)
+        if getattr(args, "stdlib_file", None) else C_STDLIB_NAMES
+    )
     spell_base = None
     if getattr(args, "spell_dict", None):
         spell_base = _load_dict_file(args.spell_dict)
-        _BUILTIN_DICT = spell_base
 
     spell_words = None
     sp_cfg = cfg.get("spell_check", {})
@@ -3502,7 +3561,6 @@ def main() -> int:
     # Discover files
     # Discover files lazily — emit progress immediately rather than
     # blocking until the entire glob tree is walked.
-    _vb_prev_dir = ""
     files: list = []
     for _fp in discover_files(
         args.files,
@@ -3528,7 +3586,6 @@ def main() -> int:
 
     output_format  = getattr(args, "output_format", "text")
     all_violations: list = []
-    _vb_prev_dir = ""
     # Cache source text keyed by filepath to avoid reading each file twice
     # (once for Checker, once for SignChecker).
     source_cache: dict = {}
@@ -3568,6 +3625,8 @@ def main() -> int:
             defines=defines,
             extra_banned=extra_banned,
             copyright_header=copyright_header,
+            c_keywords=keywords_set,
+            c_stdlib_names=stdlib_set,
         )
         result  = checker.run_all()
         all_violations.extend(result.violations)

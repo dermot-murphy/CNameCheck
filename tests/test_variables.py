@@ -102,6 +102,27 @@ class TestLocalVariables(unittest.TestCase):
         self.assertFalse(has(src, VARS_NOFP, "variable.local.case",
                              filepath=f"{MOD}.c"))
 
+    # SWE4-TC-CASE-DIGIT-001
+    def test_lower_snake_trailing_digit_passes(self):
+        """pll_ctrl_1 is valid lower_snake — trailing digit segment must pass."""
+        src = "void f(void){ uint32_t pll_ctrl_1 = 0U; (void)pll_ctrl_1; }"
+        self.assertFalse(has(src, VARS_NOFP, "variable.local.case",
+                             filepath=f"{MOD}.c"))
+
+    # SWE4-TC-CASE-DIGIT-002
+    def test_lower_snake_digit_in_middle_passes(self):
+        """state_1_active is valid lower_snake — mid-name digit segment must pass."""
+        src = "void f(void){ uint32_t state_1_active = 0U; (void)state_1_active; }"
+        self.assertFalse(has(src, VARS_NOFP, "variable.local.case",
+                             filepath=f"{MOD}.c"))
+
+    # SWE4-TC-CASE-DIGIT-003
+    def test_lower_snake_digit_letter_segment_passes(self):
+        """i2c_bus_2 is valid lower_snake — digit-leading segment must pass."""
+        src = "void f(void){ uint8_t i2c_bus_2 = 0U; (void)i2c_bus_2; }"
+        self.assertFalse(has(src, VARS_NOFP, "variable.local.case",
+                             filepath=f"{MOD}.c"))
+
 
 class TestParameterVariables(unittest.TestCase):
     """Parameter case is only caught via RE_VAR_DECL, which requires a

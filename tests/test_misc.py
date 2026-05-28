@@ -28,6 +28,23 @@ class TestLineLength(unittest.TestCase):
         line = "/* " + "x" * 100 + " */"
         self.assertFalse(has(line + "\n", LL_CFG, "misc.line_length"))
 
+    # SWE4-TC-CRLF-001
+    def test_crlf_line_exactly_at_limit_passes(self):
+        """An 80-char line with CRLF ending must not be falsely flagged.
+
+        Without normalisation, \\r counts as an extra character making a
+        visually-80-char line appear to be 81 chars long.
+        """
+        line = "x" * 80
+        self.assertFalse(has(line + "\r\n", LL_CFG, "misc.line_length"))
+
+    # SWE4-TC-CRLF-002
+    def test_crlf_over_limit_still_fails(self):
+        """An 81-char line with CRLF ending must still be flagged."""
+        line = "x" * 81
+        self.assertTrue(has(line + "\r\n", LL_CFG, "misc.line_length"))
+
+
 class TestIndentation(unittest.TestCase):
     def test_spaces_pass_when_spaces_required(self):
         self.assertTrue(clean("    int x = 0;\n", IND_CFG))
@@ -100,6 +117,25 @@ class TestUnsignedSuffix(unittest.TestCase):
     def test_array_subscript_exempt(self):
         self.assertFalse(has("void f(void){ buf[2] = 0U; }\n",
                               US_CFG, "misc.unsigned_suffix"))
+
+    # SWE4-TC-STRIP-001
+    def test_char_literal_null_no_unsigned_suffix_violation(self):
+        """'\\0' inside a char literal must not trigger unsigned-suffix check."""
+        src = "void f(void){ char c = '\\0'; (void)c; }\n"
+        self.assertFalse(has(src, US_CFG, "misc.unsigned_suffix"))
+
+    # SWE4-TC-STRIP-002
+    def test_char_literal_letter_no_unsigned_suffix_violation(self):
+        """'a' inside a char literal must not trigger unsigned-suffix check."""
+        src = "void f(void){ char c = 'a'; (void)c; }\n"
+        self.assertFalse(has(src, US_CFG, "misc.unsigned_suffix"))
+
+    # SWE4-TC-STRIP-003
+    def test_char_literal_newline_no_unsigned_suffix_violation(self):
+        """'\\n' inside a char literal must not trigger unsigned-suffix check."""
+        src = "void f(void){ char c = '\\n'; (void)c; }\n"
+        self.assertFalse(has(src, US_CFG, "misc.unsigned_suffix"))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

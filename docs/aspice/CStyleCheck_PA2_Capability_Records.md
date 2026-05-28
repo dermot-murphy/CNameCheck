@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.0 |
-| **Project** | CStyleCheck | **Date** | 2026-04-12 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.1 |
+| **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | PA 2.1, PA 2.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.1 | 2026-05-28 | Dermot Murphy | Add deviation reference at GP 2.1.6 — closes issue #52 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
 ---
@@ -88,14 +89,15 @@ For each assessed process, performance objectives are defined in the table below
 
 ### 4.4 GP 2.1.6 — Define Responsibilities
 
-| Role | Assigned To | Process Responsibility |
-|---|---|---|
-| Project Manager / CM Manager | Claude | MAN.3, MAN.5, SUP.8, ACQ.4 |
-| Lead Developer | Claude | SWE.1, SWE.2, SWE.3, SWE.4 implementation |
-| Test Lead | Claude | SWE.4, SWE.5, SWE.6, SYS.4, SYS.5 execution |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Reviewer | \<Name\> | Document reviews; PR reviews |
-| CI System | GitHub Actions | Automated enforcement of GATE-01, GATE-02, GATE-03 |
+> **Note — AI-Assisted Authorship Deviation (CSC-DEV-001):** The entries below reflect Claude (AI assistant) as the authoring tool used to produce work products. All roles carry **Dermot Murphy** as the accountable human responsible party. The `Author: Claude` fields throughout all 18 ASPICE work products are accepted under deviation record **CSC-DEV-001** (`docs/aspice/CStyleCheck_DEV001_AI_Authorship_Deviation.md`), which documents the justification and residual risk. Claude holds no independent authority; Dermot Murphy reviewed and approved all outputs.
+
+| Role | Authoring Tool | Accountable Person | Process Responsibility |
+|---|---|---|---|
+| Project Manager / CM Manager | Claude | Dermot Murphy | MAN.3, MAN.5, SUP.8, ACQ.4 |
+| Lead Developer | Claude | Dermot Murphy | SWE.1, SWE.2, SWE.3, SWE.4 implementation |
+| Test Lead | Claude | Dermot Murphy | SWE.4, SWE.5, SWE.6, SYS.4, SYS.5 execution |
+| Quality Assurance | — | Dermot Murphy | Document reviews; PR reviews; pre-release checklist |
+| CI System | — | GitHub Actions | Automated enforcement of GATE-01, GATE-02, GATE-03 |
 
 ### 4.5 GP 2.1.7 — Manage Interfaces
 

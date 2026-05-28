@@ -2,10 +2,12 @@
 #
 # Format:  <stem_a>   <stem_b>
 #
-# Either column order is accepted.  The mapping is bidirectional: both
-# stem_a.c and stem_b.c will accept each other's prefix.
+# Either column order is accepted — the mapping is BIDIRECTIONAL (issue #69).
+# Writing "drv_iis3dwb_cfg  drv_iis3dwb" and "drv_iis3dwb  drv_iis3dwb_cfg"
+# produce identical results.  Both stem_a.c and stem_b.c accept each other's
+# module prefix.
 #
-# Common usage — "for file drv_iis3dwb_cfg, also accept the drv_iis3dwb prefix":
+# Example:
 #   drv_iis3dwb_cfg   drv_iis3dwb
 #
 # → in drv_iis3dwb_cfg.c  the prefix DRV_IIS3DWB_ is accepted alongside
@@ -18,6 +20,10 @@
 #   • Blank lines are ignored.
 #   • Both words are treated case-insensitively.
 #   • A module may appear in multiple alias lines.
+#
+# The entries below are sample pairs — uncomment and adapt to your project.
+# (They are commented out here to avoid false matches in projects that do not
+# have modules named api_param or sensor_mgr.)
 
 # api_param       api_param_cfg
 # sensor_mgr      sensor_manager
