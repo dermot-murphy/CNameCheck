@@ -38,6 +38,13 @@ on:
 
   workflow_dispatch:
 
+# Serialise runs on the same branch so concurrent pushes cannot race to
+# append trend records, causing data loss or a non-fast-forward gh-pages push.
+# The latest run wins; any in-progress run for the same ref is cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ---------------------------------------------------------------------------
   # Job 1: Run the checker
@@ -55,6 +62,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -89,8 +98,12 @@ jobs:
             --summary                                          \
             --log        output/cstylecheck/cstylecheck_results.txt \
             --exclude    source/cots/                          \
-            ${{ steps.changed.outputs.all_changed_files }}    \
-          || true
+            ${{ steps.changed.outputs.all_changed_files }}
+          CSC_EXIT=$?
+          if [ $CSC_EXIT -eq 2 ]; then
+            echo "::error::CStyleCheck configuration error (exit 2) — check rules.yml and supplementary config files."
+            exit 2
+          fi
 
       # Push / manual run -- all files
       - name: Run checker (push, all source)
@@ -106,8 +119,12 @@ jobs:
             --log        output/cstylecheck/cstylecheck_results.txt \
             --exclude    source/cots/                          \
             --include    "source/**/*.c"                       \
-            --include    "source/**/*.h"                       \
-          || true
+            --include    "source/**/*.h"
+          CSC_EXIT=$?
+          if [ $CSC_EXIT -eq 2 ]; then
+            echo "::error::CStyleCheck configuration error (exit 2) — check rules.yml and supplementary config files."
+            exit 2
+          fi
 
       - name: Parse summary numbers
         id: parse
