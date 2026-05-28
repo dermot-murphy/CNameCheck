@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Dermot Murphy | Populate §6 results table: actual test counts, all PASS; coverage 86% stmt / N/A branch (v1.1.0 CI); add 5 missing test modules — closes issue #53 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation footnote to §1 — closes issue #61 |
 | 1.1 | 2026-05-28 | Claude | Added static type check (mypy --ignore-missing-imports) and lint check (ruff) as verification methods in §4.1; updated CI workflow reference |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -310,32 +311,37 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 
 | Test Module | Tests | Pass | Fail | Coverage Contribution |
 |---|---|---|---|---|
-| `test_variables.py` | 32 | \<N\> | \<N\> | `_check_variables` |
-| `test_functions.py` | 14 | \<N\> | \<N\> | `_check_functions` |
-| `test_defines.py` | 16 | \<N\> | \<N\> | `_check_defines` |
-| `test_typedefs.py` | 8 | \<N\> | \<N\> | `_check_typedefs` |
-| `test_enums.py` | 11 | \<N\> | \<N\> | `_check_enums` |
-| `test_structs.py` | 7 | \<N\> | \<N\> | `_check_structs` |
-| `test_include_guards.py` | 8 | \<N\> | \<N\> | `_check_include_guard` |
-| `test_misc.py` | 23 | \<N\> | \<N\> | `_check_misc` |
-| `test_misc_improvements.py` | 65 | \<N\> | \<N\> | `_check_misc`, improvements |
-| `test_yoda_condition.py` | 37 | \<N\> | \<N\> | `_check_yoda` |
-| `test_reserved_name.py` | 40 | \<N\> | \<N\> | `_check_reserved_names` |
-| `test_spell_check.py` | 9 | \<N\> | \<N\> | `_check_spelling` |
-| `test_sign_compatibility.py` | 7 | \<N\> | \<N\> | `SignChecker` |
-| `test_dictionaries.py` | 32 | \<N\> | \<N\> | COMP-03 |
-| `test_improvements.py` | 63 | \<N\> | \<N\> | Multiple |
-| `test_barr_c.py` | 42 | \<N\> | \<N\> | Multiple |
-| `test_cli.py` | 29 | \<N\> | \<N\> | COMP-01, COMP-07 |
-| `test_exclusions.py` | \<N\> | \<N\> | \<N\> | COMP-02 |
-| `test_eof_comment.py` | \<N\> | \<N\> | \<N\> | `_check_eof_comment` |
-| `test_copyright_header.py` | \<N\> | \<N\> | \<N\> | `_check_copyright_header` |
-| `test_parameter_prefix.py` | \<N\> | \<N\> | \<N\> | `_check_variables` |
+| `test_variables.py` | 35 | 35 | 0 | `_check_variables` |
+| `test_functions.py` | 14 | 14 | 0 | `_check_functions` |
+| `test_defines.py` | 16 | 16 | 0 | `_check_defines` |
+| `test_typedefs.py` | 8 | 8 | 0 | `_check_typedefs` |
+| `test_enums.py` | 11 | 11 | 0 | `_check_enums` |
+| `test_structs.py` | 12 | 12 | 0 | `_check_structs` |
+| `test_include_guards.py` | 8 | 8 | 0 | `_check_include_guard` |
+| `test_misc.py` | 28 | 28 | 0 | `_check_misc` |
+| `test_misc_improvements.py` | 77 | 77 | 0 | `_check_misc`, improvements |
+| `test_yoda_condition.py` | 37 | 37 | 0 | `_check_yoda` |
+| `test_reserved_name.py` | 40 | 40 | 0 | `_check_reserved_names` |
+| `test_spell_check.py` | 9 | 9 | 0 | `_check_spelling` |
+| `test_sign_compatibility.py` | 7 | 7 | 0 | `SignChecker` |
+| `test_dictionaries.py` | 32 | 32 | 0 | COMP-03 |
+| `test_improvements.py` | 67 | 67 | 0 | Multiple |
+| `test_barr_c.py` | 42 | 42 | 0 | Multiple |
+| `test_cli.py` | 43 | 43 | 0 | COMP-01, COMP-07 |
+| `test_exclusions.py` | 28 | 28 | 0 | COMP-02 |
+| `test_eof_comment.py` | 33 | 33 | 0 | `_check_eof_comment` |
+| `test_copyright_header.py` | 55 | 55 | 0 | `_check_copyright_header` |
+| `test_parameter_prefix.py` | 42 | 42 | 0 | `_check_variables` |
 | `test_misra_rules.py` | 52 | 52 | 0 | `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_yoda` |
-| **Total** | **692** | **692** | **0** | All rules covered |
+| `test_block_comment_spacing.py` | 29 | 29 | 0 | `_check_block_comment_spacing` |
+| `test_workflow_config.py` | 16 | 16 | 0 | CI workflow configuration regression |
+| `test_github_annotations.py` | 8 | 8 | 0 | GitHub Actions annotation output |
+| `test_case_patterns.py` | 6 | 6 | 0 | Case pattern matching (`_check_case_patterns`) |
+| `test_thread_safe_globals.py` | 4 | 4 | 0 | Thread-safe global state (`C_KEYWORDS`, `C_STDLIB_NAMES`) |
+| **Total** | **759** | **759** | **0** | All rules covered |
 
-**Statement Coverage (unit tests only, excl. test_cli.py):** ~72% (baseline v1.1; see §4.2 for gap explanation)
-**Branch Coverage (unit tests only):** ~68%
+**Statement Coverage (v1.1.0 CI — unit tests excl. test_cli.py):** 86% (1,694 statements, 243 missed)
+**Branch Coverage:** N/A — `--cov-branch` not enabled in CI gate (see issue #54)
 
 **Static Verification (rules.yml):** PASS
 
