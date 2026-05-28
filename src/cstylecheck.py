@@ -620,8 +620,8 @@ _CASE_PATTERNS = {
     "upper_snake": re.compile(r"^[A-Z][A-Z0-9_]*$"),
     "camel":       re.compile(r"^[a-z][a-zA-Z0-9]*$"),
     "pascal":      re.compile(r"^[A-Z][a-zA-Z0-9]*$"),
-    "lower":       re.compile(r"^[a-z][a-z0-9_]*$"),
-    "upper":       re.compile(r"^[A-Z][A-Z0-9_]*$"),
+    "lower":       re.compile(r"^[a-z][a-z0-9]*$"),    # no underscores
+    "upper":       re.compile(r"^[A-Z][A-Z0-9]*$"),    # no underscores
 }
 
 
