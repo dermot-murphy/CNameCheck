@@ -92,7 +92,9 @@ def run(source: str,
         disabled_rules: frozenset = frozenset(),
         defines: list = None,
         extra_banned: frozenset = frozenset(),
-        copyright_header=None) -> list:
+        copyright_header=None,
+        c_keywords: frozenset = None,
+        c_stdlib_names: frozenset = None) -> list:
     """Run checker on *source* and return Violation list."""
     c = Checker(
         filepath, source, cfg,
@@ -102,6 +104,8 @@ def run(source: str,
         defines=defines,
         extra_banned=extra_banned,
         copyright_header=copyright_header,
+        c_keywords=c_keywords,
+        c_stdlib_names=c_stdlib_names,
     )
     return c.run_all().violations
 

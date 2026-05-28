@@ -938,6 +938,8 @@ class Checker:
         defines: list = None,
         extra_banned: frozenset = None,
         copyright_header=None,
+        c_keywords: frozenset = None,
+        c_stdlib_names: frozenset = None,
     ):
         self.filepath      = filepath
         self.source        = source
@@ -978,6 +980,14 @@ class Checker:
         self._extra_banned: frozenset = extra_banned or frozenset()
         # tuple (template_text, compiled_re) from --copyright, or None
         self._copyright = copyright_header
+        # Keyword / stdlib sets — use explicit overrides when provided so that
+        # main() does not need to mutate the module-level globals (issue #79).
+        self._c_keywords: frozenset = (
+            c_keywords if c_keywords is not None else C_KEYWORDS
+        )
+        self._c_stdlib_names: frozenset = (
+            c_stdlib_names if c_stdlib_names is not None else C_STDLIB_NAMES
+        )
 
     # -----------------------------------------------------------------------
     # Internal helpers
@@ -2540,9 +2550,9 @@ class Checker:
 
     def _is_reserved(self, name: str) -> tuple:
         """Return (True, category_string) if *name* is a reserved identifier."""
-        if name in C_KEYWORDS:
+        if name in self._c_keywords:
             return True, "C/C++ keyword"
-        if name in C_STDLIB_NAMES:
+        if name in self._c_stdlib_names:
             return True, "C standard library name"
         if name in self._extra_banned:
             return True, "project-banned name"
@@ -3444,16 +3454,19 @@ def main() -> int:
     cfg  = load_config(args.config)
 
     # Spell-check word set — None means the check is entirely disabled
-    # Override dictionary files from CLI if provided
-    global C_KEYWORDS, C_STDLIB_NAMES, _BUILTIN_DICT
-    if getattr(args, "keywords_file", None):
-        C_KEYWORDS = _load_dict_file(args.keywords_file)
-    if getattr(args, "stdlib_file", None):
-        C_STDLIB_NAMES = _load_dict_file(args.stdlib_file)
+    # Build local overrides from CLI flags without mutating module-level globals
+    # (mutating globals is not thread-safe — issue #79).
+    keywords_set = (
+        _load_dict_file(args.keywords_file)
+        if getattr(args, "keywords_file", None) else C_KEYWORDS
+    )
+    stdlib_set = (
+        _load_dict_file(args.stdlib_file)
+        if getattr(args, "stdlib_file", None) else C_STDLIB_NAMES
+    )
     spell_base = None
     if getattr(args, "spell_dict", None):
         spell_base = _load_dict_file(args.spell_dict)
-        _BUILTIN_DICT = spell_base
 
     spell_words = None
     sp_cfg = cfg.get("spell_check", {})
@@ -3564,6 +3577,8 @@ def main() -> int:
             defines=defines,
             extra_banned=extra_banned,
             copyright_header=copyright_header,
+            c_keywords=keywords_set,
+            c_stdlib_names=stdlib_set,
         )
         result  = checker.run_all()
         all_violations.extend(result.violations)
