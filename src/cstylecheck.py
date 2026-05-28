@@ -701,11 +701,18 @@ def strip_comments(source: str) -> str:
 
 
 def strip_strings(source: str) -> str:
-    return re.sub(
+    # Blank double-quoted string literals (preserve length for offset tracking)
+    source = re.sub(
         r'"(?:[^"\\]|\\.)*"',
         lambda m: '""' + " " * (len(m.group()) - 2),
         source,
     )
+    # Normalise single-quoted character literals to 'x' so tokens inside them
+    # cannot trigger unsigned-suffix or other digit-sensitive checks, while
+    # preserving the char-literal shape so the yoda checker still recognises
+    # 'x' as a constant token (its RHS scanner skips spaces but not letters).
+    source = re.sub(r"'(?:[^'\\]|\\.)'", lambda m: "'x'", source)
+    return source
 
 
 def preprocess(source: str) -> str:

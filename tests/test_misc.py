@@ -101,5 +101,24 @@ class TestUnsignedSuffix(unittest.TestCase):
         self.assertFalse(has("void f(void){ buf[2] = 0U; }\n",
                               US_CFG, "misc.unsigned_suffix"))
 
+    # SWE4-TC-STRIP-001
+    def test_char_literal_null_no_unsigned_suffix_violation(self):
+        """'\\0' inside a char literal must not trigger unsigned-suffix check."""
+        src = "void f(void){ char c = '\\0'; (void)c; }\n"
+        self.assertFalse(has(src, US_CFG, "misc.unsigned_suffix"))
+
+    # SWE4-TC-STRIP-002
+    def test_char_literal_letter_no_unsigned_suffix_violation(self):
+        """'a' inside a char literal must not trigger unsigned-suffix check."""
+        src = "void f(void){ char c = 'a'; (void)c; }\n"
+        self.assertFalse(has(src, US_CFG, "misc.unsigned_suffix"))
+
+    # SWE4-TC-STRIP-003
+    def test_char_literal_newline_no_unsigned_suffix_violation(self):
+        """'\\n' inside a char literal must not trigger unsigned-suffix check."""
+        src = "void f(void){ char c = '\\n'; (void)c; }\n"
+        self.assertFalse(has(src, US_CFG, "misc.unsigned_suffix"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
