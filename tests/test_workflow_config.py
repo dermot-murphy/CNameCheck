@@ -14,6 +14,8 @@ _WORKFLOW_RULES   = _WORKFLOWS_DIR / "cstylecheck_rules.yml"
 _WORKFLOW_TESTS   = _WORKFLOWS_DIR / "cstylecheck_tests.yml"
 _WORKFLOW_DOCKER  = _WORKFLOWS_DIR / "docker_publish.yml"
 _WORKFLOW_WIKI    = _WORKFLOWS_DIR / "wiki_publish.yml"
+_SCRIPTS_CI_DIR   = _REPO_ROOT / "scripts" / "ci"
+_APPEND_TREND     = _SCRIPTS_CI_DIR / "append_trend_record.py"
 
 # Back-compat alias used by existing TestConcurrencyControl
 _WORKFLOW = _WORKFLOW_RULES
@@ -216,28 +218,40 @@ class TestTimezoneAware(unittest.TestCase):
     ISO 8601 UTC string when formatted with strftime.  These tests verify the
     deprecated call is absent and the timezone-aware call is present so neither
     can silently creep back during future workflow edits.
+
+    After issue #63 (PR #132), the inline Python that constructs the trend
+    record was extracted to scripts/ci/append_trend_record.py.  The datetime
+    call therefore lives in the script rather than in cstylecheck_rules.yml
+    itself, so TZ-002 now checks the script file.
     """
 
     def setUp(self):
-        self._wf_text = _WORKFLOW_RULES.read_text(encoding="utf-8")
+        self._wf_text     = _WORKFLOW_RULES.read_text(encoding="utf-8")
+        self._script_text = _APPEND_TREND.read_text(encoding="utf-8")
 
     # SUP9-TC-TZ-001
     def test_utcnow_not_present(self):
-        """cstylecheck_rules.yml must not call the deprecated datetime.utcnow()."""
+        """Neither cstylecheck_rules.yml nor append_trend_record.py may call utcnow()."""
         self.assertNotIn(
             "utcnow()",
             self._wf_text,
             "Deprecated datetime.utcnow() found in cstylecheck_rules.yml — "
             "use datetime.now(datetime.timezone.utc) instead",
         )
+        self.assertNotIn(
+            "utcnow()",
+            self._script_text,
+            "Deprecated datetime.utcnow() found in scripts/ci/append_trend_record.py — "
+            "use datetime.now(datetime.timezone.utc) instead",
+        )
 
     # SUP9-TC-TZ-002
     def test_timezone_aware_call_present(self):
-        """cstylecheck_rules.yml must use timezone-aware datetime.now(...)."""
+        """append_trend_record.py must use timezone-aware datetime.now(datetime.timezone.utc)."""
         self.assertIn(
             "datetime.timezone.utc",
-            self._wf_text,
-            "datetime.timezone.utc not found in cstylecheck_rules.yml — "
+            self._script_text,
+            "datetime.timezone.utc not found in scripts/ci/append_trend_record.py — "
             "timezone-aware call may have been reverted",
         )
 
