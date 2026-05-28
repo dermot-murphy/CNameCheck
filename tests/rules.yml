@@ -512,6 +512,14 @@ misc:
     enabled: true
     severity: error   # MISRA C:2023 promotes this to Required
 
+  # TEST FIXTURE: comment_ratio disabled (intentionally matches src/rules.yml)
+  comment_ratio:
+    enabled: false
+    severity: warning
+    warning_threshold: 0.15
+    error_threshold: 0.05
+    min_code_lines: 10
+
 # --- Reserved / banned identifier names ---
 # Checks that no declared variable, function, macro, or constant name
 # shadows a C keyword, C++ keyword, or C standard library name.

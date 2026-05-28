@@ -1129,6 +1129,7 @@ class Checker:
         if self._is_header:
             self._check_include_guard()
         self._check_misc()
+        self._check_comment_ratio()
         self._check_yoda()
         self._check_reserved_names()
         self._check_lowercase_l_suffix()   # MISRA C:2012/2023 Rule 7.3
@@ -2366,7 +2367,145 @@ class Checker:
                         f"line; found {n_after}"))
 
     # -----------------------------------------------------------------------
-    # 14. Comment spell-check
+    # 14. Comment ratio (misc.comment_ratio)
+    # -----------------------------------------------------------------------
+
+    def _check_comment_ratio(self) -> None:
+        """Enforce a minimum ratio of comment lines to code lines (issue #68).
+
+        Excluded from both counts:
+          - Blank lines
+          - The file header: all leading comment/blank lines before the first
+            non-comment, non-blank line (copyright notices, licence blocks)
+          - Doxygen blocks: /** … */ are documentation, not explanatory comments
+
+        Counted as comment lines:
+          - // line comments
+          - /* … */ regular block comments (not Doxygen)
+
+        Counted as code lines:
+          - Every non-blank, non-comment line (code, preprocessor, etc.)
+          - A line with a trailing // comment counts as a CODE line
+        """
+        misc   = self.cfg.get("misc", {})
+        cr_cfg = misc.get("comment_ratio", {})
+        if not cr_cfg.get("enabled", False):
+            return
+
+        sev      = cr_cfg.get("severity", "warning")
+        warn_thr = float(cr_cfg.get("warning_threshold", 0.15))
+        err_thr  = float(cr_cfg.get("error_threshold",  0.05))
+        min_code = int(cr_cfg.get("min_code_lines", 10))
+
+        lines = self.source.splitlines()
+
+        # ----------------------------------------------------------------
+        # Phase 1: locate the end of the file header.
+        # The header region = all leading comment/blank lines before the
+        # first non-comment, non-blank line.
+        # ----------------------------------------------------------------
+        header_end_idx = 0
+        in_hdr_block   = False
+        found_code     = False
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if not stripped:                      # blank
+                continue
+            if in_hdr_block:
+                if "*/" in line:
+                    in_hdr_block = False
+                continue
+            if stripped.startswith("/*"):
+                if "*/" not in stripped[2:]:      # multi-line block comment
+                    in_hdr_block = True
+                continue                           # still in header
+            if stripped.startswith("//"):
+                continue                           # line comment — still header
+            # First actual code line: header ends here
+            header_end_idx = i
+            found_code     = True
+            break
+
+        if not found_code:
+            return   # entire file is comments/blank — nothing to measure
+
+        # ----------------------------------------------------------------
+        # Phase 2: classify lines from header_end_idx onwards.
+        # ----------------------------------------------------------------
+        comment_lines = 0
+        code_lines    = 0
+        in_doxygen    = False
+        in_block_cmt  = False
+
+        for i, line in enumerate(lines):
+            if i < header_end_idx:
+                continue
+
+            stripped = line.strip()
+            if not stripped:
+                continue   # blank — excluded
+
+            if in_doxygen:
+                if "*/" in line:
+                    in_doxygen = False
+                continue   # doxygen continuation — excluded
+
+            if in_block_cmt:
+                comment_lines += 1
+                if "*/" in line:
+                    in_block_cmt = False
+                continue
+
+            # Opening of a Doxygen block ( /** … )
+            if stripped.startswith("/**"):
+                if "*/" not in stripped[3:]:
+                    in_doxygen = True
+                # Doxygen opener line itself is excluded
+                continue
+
+            # Opening of a regular block comment ( /* … )
+            if stripped.startswith("/*"):
+                comment_lines += 1
+                if "*/" not in stripped[2:]:
+                    in_block_cmt = True
+                continue
+
+            # Line comment
+            if stripped.startswith("//"):
+                comment_lines += 1
+                continue
+
+            # Non-blank, non-comment line (code, preprocessor, …)
+            code_lines += 1
+
+        # Guard: skip files with too few code lines (trivial files, stubs, etc.)
+        if code_lines < min_code:
+            return
+
+        ratio = comment_lines / code_lines
+
+        if ratio < err_thr:
+            emit_sev        = "error"
+            threshold       = err_thr
+            threshold_label = "error"
+        elif ratio < warn_thr:
+            emit_sev        = sev
+            threshold       = warn_thr
+            threshold_label = "warning"
+        else:
+            return   # ratio meets the warning threshold — all good
+
+        pl = lambda n: "s" if n != 1 else ""  # noqa: E731
+        self.result.add(Violation(
+            self.filepath, 1, 1, emit_sev, "misc.comment_ratio",
+            f"comment ratio {ratio:.2f} is below {threshold_label} threshold "
+            f"{threshold} "
+            f"({comment_lines} comment line{pl(comment_lines)} / "
+            f"{code_lines} code line{pl(code_lines)})"
+        ))
+
+    # -----------------------------------------------------------------------
+    # 15. Comment spell-check
     # -----------------------------------------------------------------------
 
     def _check_spelling(self) -> None:
