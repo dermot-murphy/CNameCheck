@@ -53,6 +53,7 @@ and `info`.
 11. [Spell check](#11-spell-check)
 12. [Sign compatibility](#12-sign-compatibility)
 13. [Quick reference table](#13-quick-reference-table)
+14. [MISRA C:2012/2023 coverage matrix](#14-misra-c20122023-coverage-matrix)
 
 ---
 
@@ -1361,3 +1362,34 @@ uart_driver_Send(-1);    /* sign_compatibility */
 | `reserved_name` | error | `reserved_names.enabled` | `true` |
 | `spell_check` | info | `spell_check.enabled` | `false` |
 | `sign_compatibility` | error | `sign_compatibility.enabled` | `true` |
+| `misc.lowercase_l_suffix` | warning | `misc.lowercase_l_suffix.enabled` | `true` |
+| `misc.octal_constant` | error | `misc.octal_constant.enabled` | `true` |
+| `misc.trigraph` | error | `misc.trigraph.enabled` | `true` |
+
+---
+
+## 14. MISRA C:2012/2023 coverage matrix
+
+CStyleCheck provides complementary support for a subset of MISRA C:2012/2023 rules.
+It is **not** a full MISRA compliance checker.  The table below documents which rules
+are implemented, which are partially addressed, and which are explicitly out of scope.
+
+| MISRA C:2012 Rule | Topic | CStyleCheck Support | Rule ID |
+|---|---|---|---|
+| Rule 4.2 | Trigraphs shall not be used | **Implemented** | `misc.trigraph` |
+| Rule 5.1 | External identifiers shall be distinct | Partial — naming rules reduce collision risk | `variable.*`, `function.*` |
+| Rule 5.2 | Identifiers declared in the same scope shall be distinct | Partial — naming convention enforcement | `variable.*` |
+| Rule 5.3–5.9 | Identifier visibility, linkage and reserved names | Partial — reserved-name check covers C keywords and stdlib names | `reserved_name` |
+| Rule 7.1 | Octal constants shall not be used | **Implemented** | `misc.octal_constant` |
+| Rule 7.3 | The lowercase character 'l' shall not be used in a literal suffix | **Implemented** | `misc.lowercase_l_suffix` |
+| Rule 7.4 | A string literal shall not be assigned to an object unless the type is `const char *` | Out of scope | — |
+| Rule 10.x | Essential type model (implicit conversions, composite expressions) | Out of scope | — |
+| Rule 14.x / 15.x | Control flow (unreachable code, goto, switch) | Out of scope | — |
+| Rule 17.x | Function usage (recursion, variable-argument functions) | Out of scope | — |
+| Rule 18.x | Pointer type conversion and arithmetic | Out of scope | — |
+| Rule 21.x | Standard library usage | Out of scope | — |
+
+> **Note:** "Partial" means the rule's intent is partially addressed by CStyleCheck's
+> naming-convention rules, but full MISRA compliance requires a dedicated MISRA checker
+> (e.g. PC-lint, Polyspace, LDRA).  Rules listed as "Out of scope" require data-flow or
+> control-flow analysis that is beyond a naming-convention linter.
