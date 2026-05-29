@@ -21,6 +21,7 @@ from .config import (
     _disabled_rules_for_file, load_defines_file,
     load_banned_names_file, load_copyright_file, load_spell_words,
     _build_spell_dict, _load_dict_file, _expand_options_file,
+    update_config,
     C_KEYWORDS, C_STDLIB_NAMES,
 )
 from .utils import module_name, _cfg
@@ -301,6 +302,13 @@ def _build_parser() -> argparse.ArgumentParser:
                         "the year on the '(C) Copyright YEAR' line may "
                         "differ (any 4-digit year or YYYY-YYYY range is "
                         "accepted).  Enables the misc.copyright_header rule.")
+    p.add_argument("--update-config", action="store_true",
+                   help="Merge any new default keys into --config FILE and exit. "
+                        "User values are preserved; keys present in the current "
+                        "defaults but absent from the file are added with their "
+                        "default values.  Exits 0 on success.  "
+                        "NOTE: YAML comments are not preserved — keep the "
+                        "original file in version control before running.")
     return p
 
 
@@ -340,6 +348,11 @@ def main() -> int:
     if getattr(args, "version", False):
         print(_VERSION_STRING)
         return 0
+
+    # --update-config: merge new defaults into the config file and exit.
+    if getattr(args, "update_config", False):
+        return update_config(args.config)
+
     cfg  = load_config(args.config)
 
     # Spell-check word set — None means the check is entirely disabled
