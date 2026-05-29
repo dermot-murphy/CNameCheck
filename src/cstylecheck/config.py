@@ -90,13 +90,186 @@ def _expand_options_file(argv: list) -> list:
 # Configuration loader
 # ---------------------------------------------------------------------------
 
+def _find_default_rules() -> Path:
+    """
+    Locate the bundled ``src/rules.yml`` default configuration file.
+
+    Lookup order:
+    1. ``src/rules.yml`` in the source tree (source checkout / editable install).
+    2. Alongside this module's package directory.
+    3. ``{data_dir}/share/cstylecheck/rules.yml`` (pip install).
+    """
+    # Source checkout: src/cstylecheck/../rules.yml → src/rules.yml
+    candidate = _HERE.parent / "rules.yml"
+    if candidate.exists():
+        return candidate
+    # Alongside the package
+    candidate2 = _HERE / "rules.yml"
+    if candidate2.exists():
+        return candidate2
+    import sysconfig as _sysconfig
+    return Path(_sysconfig.get_path("data")) / "share" / "cstylecheck" / "rules.yml"
+
+
+def _deep_merge(base: dict, override: dict) -> dict:
+    """
+    Return a new dict that deep-merges *override* on top of *base*.
+
+    Rules:
+      - Keys present in *override* take priority.
+      - Keys present only in *base* are kept (these are default values missing
+        from the user's config — they will be added).
+      - When both dicts have the same key and both values are dicts, merge
+        recursively.  All other types use the *override* value.
+
+    This is intentionally a pure function (no side effects on the inputs).
+    """
+    result = dict(base)
+    for key, override_val in override.items():
+        if key in result and isinstance(result[key], dict) \
+                and isinstance(override_val, dict):
+            result[key] = _deep_merge(result[key], override_val)
+        else:
+            result[key] = override_val
+    return result
+
+
+def _collect_paths(d: dict, prefix: str = "") -> list:
+    """Return a sorted list of dotted key-paths present in *d*."""
+    paths: list = []
+    for k, v in d.items():
+        full = f"{prefix}.{k}" if prefix else k
+        paths.append(full)
+        if isinstance(v, dict):
+            paths.extend(_collect_paths(v, full))
+    return sorted(paths)
+
+
+def update_config(config_path: str) -> int:
+    """
+    Merge new default keys into an existing ``rules.yml`` file.
+
+    This function implements the ``--update-config`` CLI flag.  It:
+
+    1. Loads the user's current config from *config_path*.
+    2. Loads the bundled default ``rules.yml``.
+    3. Deep-merges the default **into** the user's config (user values win;
+       keys missing from the user's file are added with default values).
+    4. Warns about top-level keys in the user's config that are not in the
+       default (may indicate renamed/removed settings).
+    5. Writes the merged YAML back to *config_path* (overwrites in-place).
+    6. Prints a human-readable change summary to stdout.
+
+    Returns 0 on success, 2 on error (suitable for ``sys.exit``).
+
+    .. note::
+        YAML comments are **not** preserved — this is a limitation of
+        ``yaml.safe_load`` / ``yaml.dump``.  Keep your original file in
+        version control so you can diff and restore comments manually.
+    """
+    cfg_path = Path(config_path)
+    if not cfg_path.exists():
+        print(f"ERROR: Config file not found: {config_path}", file=sys.stderr)
+        return 2
+
+    # Load user config
+    try:
+        raw = cfg_path.read_bytes()
+    except OSError as e:
+        print(f"ERROR: Cannot read '{config_path}': {e}", file=sys.stderr)
+        return 2
+    try:
+        user_cfg = yaml.safe_load(raw.decode("utf-8"))
+    except (UnicodeDecodeError, yaml.YAMLError) as e:
+        print(f"ERROR: Cannot parse '{config_path}': {e}", file=sys.stderr)
+        return 2
+    if not isinstance(user_cfg, dict):
+        print(f"ERROR: '{config_path}' does not contain a YAML mapping.",
+              file=sys.stderr)
+        return 2
+
+    # Load bundled default
+    default_path = _find_default_rules()
+    if not default_path.exists():
+        print(
+            f"ERROR: Bundled default rules.yml not found at '{default_path}'.\n"
+            "       Run from a source checkout or install via pip.",
+            file=sys.stderr,
+        )
+        return 2
+    try:
+        default_cfg = yaml.safe_load(default_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as e:
+        print(f"ERROR: Cannot read default rules: {e}", file=sys.stderr)
+        return 2
+    if not isinstance(default_cfg, dict):
+        print("ERROR: Bundled rules.yml is not a YAML mapping.", file=sys.stderr)
+        return 2
+
+    # Compute what is new (in default but not in user)
+    user_paths    = set(_collect_paths(user_cfg))
+    default_paths = set(_collect_paths(default_cfg))
+    added   = sorted(default_paths - user_paths)
+    unknown = sorted(user_paths    - default_paths)
+
+    # Deep-merge: default as the base, user values override
+    merged = _deep_merge(default_cfg, user_cfg)
+
+    # Serialise and write back
+    try:
+        out_text = yaml.dump(
+            merged,
+            default_flow_style=False,
+            allow_unicode=True,
+            sort_keys=True,
+            width=120,
+        )
+        cfg_path.write_text(out_text, encoding="utf-8")
+    except OSError as e:
+        print(f"ERROR: Cannot write '{config_path}': {e}", file=sys.stderr)
+        return 2
+
+    # Summary
+    print(f"Updated '{config_path}'")
+    if added:
+        print(f"  Added {len(added)} new key(s) from current defaults:")
+        for p in added:
+            print(f"    + {p}")
+    else:
+        print("  No new keys to add — config is already up to date.")
+    if unknown:
+        print(f"  WARNING: {len(unknown)} key(s) in your config not found in defaults")
+        print("           (may be renamed or removed settings — review manually):")
+        for p in unknown:
+            print(f"    ? {p}")
+    print(
+        "\n  NOTE: YAML comments were not preserved.  Restore them from version control."
+    )
+    return 0
+
+
 def load_config(path: str) -> dict:
     cfg_path = Path(path)
     if not cfg_path.exists():
         sys.exit(f"Config file not found: {path}")
     try:
-        with cfg_path.open(encoding="utf-8") as fh:
-            return yaml.safe_load(fh)
+        raw = cfg_path.read_bytes()
+    except OSError as e:
+        sys.exit(f"Cannot read config file '{path}': {e}")
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as e:
+        # Provide a clear, actionable error rather than a raw Python traceback.
+        # Common cause: Windows text editor saved the file as Windows-1252 or
+        # Latin-1 (e.g. an ellipsis character U+2026 encoded as 0x85).
+        bad_byte = raw[e.start] if e.start < len(raw) else 0
+        sys.exit(
+            f"Config file '{path}' contains a non-UTF-8 byte "
+            f"0x{bad_byte:02X} at offset {e.start}. "
+            f"Save the file as UTF-8 (without BOM) and try again."
+        )
+    try:
+        return yaml.safe_load(text)
     except yaml.YAMLError as e:
         sys.exit(f"Cannot parse config file '{path}': {e}")
 

@@ -1,0 +1,33 @@
+# .codespellrc — codespell configuration for CStyleCheck
+# See: https://github.com/codespell-project/codespell#using-a-config-file
+#
+# Run manually:  codespell
+# CI gate:       codespell --check-filenames (see .github/workflows/cstylecheck_tests.yml)
+
+[codespell]
+# Files and directories to skip
+skip = .git,__pycache__,.pytest_cache,*.pyc,*.json,*.xml,coverage.xml
+
+# Words to ignore (false positives in this codebase):
+#
+#   statics     — C language concept: file-scope static variables and functions.
+#                 Many comments and rule descriptions use "statics" correctly.
+#
+#   statu       — Intentional code examples in docs and tests showing the
+#                 possessive-stripping bug fix (status → statu after bad strip).
+#
+#   HSI,HSE,    — STM32 microcontroller clock source acronyms listed in the
+#   LSI,LSE       spell-check exempt_words in rules.yml.  These are valid
+#                 hardware identifiers, not typos.
+#
+#   Initilise   — Intentional misspelling in Rules-and-Configuration.md showing
+#                 an example of what spell-check is designed to catch.
+#
+#   recive      — Intentional misspelling in SWE6 qualification test description
+#                 (uart_recive_data test fixture).
+#
+#   unparseable — Accepted alternative spelling of "unparsable"; used in SWE1.
+ignore-words-list = statics,statu,HSI,HSE,LSI,LSE,Initilise,recive,unparseable
+
+# Quiet level 2: only report errors, not warnings
+quiet-level = 2
