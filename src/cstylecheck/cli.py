@@ -509,7 +509,7 @@ def main() -> int:
     # Cross-file declared-but-not-defined check (needs all files ingested first).
     dnd_cfg = cfg.get("misc", {}).get("declared_not_defined", {})
     if dnd_cfg.get("enabled", False):
-        dndc = DeclaredNotDefinedChecker(cfg)
+        dndc = DeclaredNotDefinedChecker(cfg, defines=defines)
         for filepath in files:
             src = source_cache.get(filepath)
             if src is not None:

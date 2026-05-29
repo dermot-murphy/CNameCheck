@@ -537,6 +537,13 @@ misc:
   declared_not_defined:
     enabled: false    # opt-in; disabled by default
     severity: warning
+    # extern_macros: list of project-specific macros that expand to 'extern'
+    # (or equivalent linkage specifiers such as __declspec(dllimport)).
+    # Add the macro name here so that declarations like:
+    #   API_WDT_EXTERN void WDT_Init(void);
+    # are treated as extern declarations by this rule (issue #168).
+    # Alternative: add the macro to your --defines file with 'API_WDT_EXTERN extern'.
+    extern_macros: []
 
   # -----------------------------------------------------------------------
   # Comment-to-code ratio (issue #68)

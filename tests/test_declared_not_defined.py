@@ -353,5 +353,164 @@ class TestDndLocation(unittest.TestCase):
         self.assertEqual(violations[0].line, 2)
 
 
+# ---------------------------------------------------------------------------
+# 8. Extern-macro detection (issue #168)
+# ---------------------------------------------------------------------------
+
+def _check_with_defines(files, defines_list, enabled=True, severity="warning"):
+    """
+    Ingest all (filepath, source) pairs with a defines list and return violations.
+
+    *defines_list* is a list of ``(compiled_pattern, replacement)`` tuples as
+    returned by ``load_defines_file()``.  The list is passed to the checker's
+    ``defines`` argument so that extern-alias macros are substituted before
+    pattern matching (e.g. ``API_WDT_EXTERN`` → ``extern``).
+    """
+    dndc = DeclaredNotDefinedChecker(_cfg(enabled=enabled, severity=severity),
+                                     defines=defines_list)
+    for fp, src in files:
+        dndc.ingest(fp, src)
+    return dndc.check()
+
+
+def _check_with_extern_macros(files, extern_macros, enabled=True, severity="warning"):
+    """Ingest files with extern_macros configured in the YAML config."""
+    cfg = {"misc": {"declared_not_defined": {
+        "enabled": enabled, "severity": severity,
+        "extern_macros": extern_macros,
+    }}}
+    dndc = DeclaredNotDefinedChecker(cfg)
+    for fp, src in files:
+        dndc.ingest(fp, src)
+    return dndc.check()
+
+
+class TestDndExternMacro(unittest.TestCase):
+    """
+    Tests for the extern-macro substitution feature (issue #168).
+
+    Projects commonly hide linkage specifiers behind macros such as:
+        API_WDT_EXTERN void WDT_Init(void);
+    where API_WDT_EXTERN expands to 'extern' (or __declspec(dllimport) etc.).
+
+    The rule supports two ways to teach the checker about such macros:
+      1. --defines file: 'API_WDT_EXTERN  extern' expands the macro before
+         pattern matching (applies to all rules, not just declared_not_defined).
+      2. misc.declared_not_defined.extern_macros: [API_WDT_EXTERN] in rules.yml
+         (targeted config, only affects this rule).
+    """
+
+    def _make_defines(self, macro: str, expansion: str = "extern") -> list:
+        """Build a minimal defines list like load_defines_file() produces."""
+        import re as _re
+        pattern = _re.compile(r'\b' + _re.escape(macro) + r'\b')
+        return [(pattern, expansion)]
+
+    # --- via --defines mechanism ---
+
+    def test_extern_macro_via_defines_unsatisfied(self):
+        """Macro that expands to extern (via defines) + no definition → violation."""
+        defines = self._make_defines("API_WDT_EXTERN")
+        files = [
+            ("wdt.h", "API_WDT_EXTERN void WDT_Init(void);\n"),
+            ("wdt.c", "int g_dummy = 0;\n"),
+        ]
+        rules = [v.rule for v in _check_with_defines(files, defines)]
+        self.assertIn("misc.declared_not_defined", rules)
+
+    def test_extern_macro_via_defines_satisfied(self):
+        """Macro that expands to extern (via defines) + matching definition → no violation."""
+        defines = self._make_defines("API_WDT_EXTERN")
+        files = [
+            ("wdt.h", "API_WDT_EXTERN void WDT_Init(void);\n"),
+            ("wdt.c", "void WDT_Init(void) { return; }\n"),
+        ]
+        self.assertEqual(_check_with_defines(files, defines), [])
+
+    def test_extern_macro_via_defines_no_false_positive_without_defines(self):
+        """Without defines configured the macro-pattern is NOT flagged (no spurious detect)."""
+        files = [
+            ("wdt.h", "API_WDT_EXTERN void WDT_Init(void);\n"),
+            ("wdt.c", "int g_dummy = 0;\n"),
+        ]
+        # No defines passed — bare macro not recognised as extern declaration
+        rules = [v.rule for v in _check(files)]
+        self.assertNotIn("misc.declared_not_defined", rules)
+
+    def test_defines_with_complex_expansion(self):
+        """Macro that expands to a linkage specifier other than bare 'extern' is still handled."""
+        # Some platforms use: #define API_EXTERN extern __attribute__((visibility("default")))
+        # After defines substitution the token 'extern' is present, which satisfies the filter.
+        import re as _re
+        pattern = _re.compile(r'\bAPI_EXTERN\b')
+        defines = [(pattern, 'extern __attribute__((visibility("default")))')]
+        files = [
+            ("hal.h", "API_EXTERN int HAL_Read(void);\n"),
+            ("hal.c", "int g_dummy = 0;\n"),
+        ]
+        rules = [v.rule for v in _check_with_defines(files, defines)]
+        self.assertIn("misc.declared_not_defined", rules)
+
+    # --- via extern_macros config ---
+
+    def test_extern_macros_config_unsatisfied(self):
+        """extern_macros list in config: unsatisfied declaration → violation."""
+        files = [
+            ("wdt.h", "API_WDT_EXTERN void WDT_Init(void);\n"),
+            ("wdt.c", "int g_dummy = 0;\n"),
+        ]
+        rules = [v.rule for v in _check_with_extern_macros(files, ["API_WDT_EXTERN"])]
+        self.assertIn("misc.declared_not_defined", rules)
+
+    def test_extern_macros_config_satisfied(self):
+        """extern_macros list in config: satisfied declaration → no violation."""
+        files = [
+            ("wdt.h", "API_WDT_EXTERN void WDT_Init(void);\n"),
+            ("wdt.c", "void WDT_Init(void) { return; }\n"),
+        ]
+        self.assertEqual(_check_with_extern_macros(files, ["API_WDT_EXTERN"]), [])
+
+    def test_extern_macros_empty_list_no_change(self):
+        """Empty extern_macros list: behaviour is unchanged from default."""
+        files = [
+            ("uart.h", "extern void UART_Init(void);\n"),
+            ("uart.c", "int g_dummy = 0;\n"),
+        ]
+        rules = [v.rule for v in _check_with_extern_macros(files, [])]
+        self.assertIn("misc.declared_not_defined", rules)
+
+    def test_extern_macros_multiple_macros(self):
+        """Multiple macros in extern_macros list are all recognised."""
+        files = [
+            ("a.h", "API_WDT_EXTERN void WDT_Init(void);\n"
+                    "DLL_IMPORT void HAL_Init(void);\n"),
+            ("a.c", "int g_dummy = 0;\n"),
+        ]
+        violations = _check_with_extern_macros(files, ["API_WDT_EXTERN", "DLL_IMPORT"])
+        names = [v.message for v in violations]
+        self.assertTrue(any("WDT_Init" in m for m in names))
+        self.assertTrue(any("HAL_Init" in m for m in names))
+
+    def test_extern_macros_does_not_affect_other_rules(self):
+        """extern_macros substitution only impacts declared_not_defined detection."""
+        # The satisfaction check is still about actual definitions.
+        files = [
+            ("wdt.h", "API_WDT_EXTERN void WDT_Init(void);\n"),
+            ("wdt.c", "void WDT_Init(void) { return; }\n"),
+        ]
+        violations = _check_with_extern_macros(files, ["API_WDT_EXTERN"])
+        self.assertEqual(violations, [])
+
+    def test_extern_macros_suppression_still_works(self):
+        """Inline suppression still silences an extern-macro declaration."""
+        files = [
+            ("wdt.h",
+             "API_WDT_EXTERN void WDT_Init(void);"
+             "  /* cstylecheck: disable misc.declared_not_defined */\n"),
+            ("wdt.c", "int g_dummy = 0;\n"),
+        ]
+        self.assertEqual(_check_with_extern_macros(files, ["API_WDT_EXTERN"]), [])
+
+
 if __name__ == "__main__":
     unittest.main()

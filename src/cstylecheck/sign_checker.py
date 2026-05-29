@@ -25,6 +25,7 @@ from .checker import (
     RE_TYPEDEF_STRUCT, RE_TYPEDEF_ENUM,
     RE_VAR_DECL,
 )
+from .config import apply_defines
 
 # --- Regex patterns for sign analysis ---
 
@@ -378,19 +379,58 @@ class DeclaredNotDefinedChecker:
         re.MULTILINE,
     )
 
-    def __init__(self, cfg: dict):
+    def __init__(self, cfg: dict, defines: list = None):
         self._cfg:         dict = cfg
+        self._defines:     list = defines or []
         self._decls:       list = []   # (filepath, line, col, name, kind)
         self._func_defs:   set  = set()
         self._var_defs:    set  = set()
         self._struct_defs: set  = set()
         self._enum_defs:   set  = set()
         self._file_count:  int  = 0
+        # Pre-compile extern_macros patterns for fast substitution in ingest().
+        dnd_cfg = cfg.get("misc", {}).get("declared_not_defined", {})
+        self._extern_macro_res: list = [
+            re.compile(r'\b' + re.escape(m) + r'\b')
+            for m in dnd_cfg.get("extern_macros", [])
+        ]
+
+    def _apply_extern_substitutions(self, clean: str) -> str:
+        """
+        Substitute extern-alias macros so pattern matching can find them.
+
+        Two mechanisms are supported (applied in order):
+
+        1. **``--defines`` file** — if the user already lists the macro in
+           their project defines file (e.g. ``API_WDT_EXTERN  extern``),
+           ``apply_defines()`` performs whole-word substitution.  The
+           DeclaredNotDefinedChecker receives the same defines list as the
+           main Checker, so no extra configuration is required.
+
+        2. **``misc.declared_not_defined.extern_macros``** — a YAML list of
+           macro names that represent ``extern`` linkage for the purposes of
+           this rule only.  Useful when the macro is not in the project defines
+           file or expands to something more complex (e.g.
+           ``__declspec(dllimport)``).
+
+        Both mechanisms replace the macro with the literal token ``extern``
+        so that ``RE_FUNCTION_DECL`` and the ``extern``-keyword filter in
+        ``ingest()`` work unchanged.
+        """
+        if self._defines:
+            clean = apply_defines(clean, self._defines)
+        for pat in self._extern_macro_res:
+            clean = pat.sub("extern", clean)
+        return clean
 
     def ingest(self, filepath: str, source: str) -> None:
         """Scan one file for declarations and definitions."""
         self._file_count += 1
         clean        = preprocess(source)
+        # Apply --defines and extern_macros substitutions so that macros such
+        # as API_WDT_EXTERN (which expand to 'extern') are recognised as
+        # extern declarations by the pattern matchers below (issue #168).
+        clean        = self._apply_extern_substitutions(clean)
         line_map     = build_line_map(clean)
         brace_depths = _build_brace_depths(clean)
         src_lines    = source.splitlines()
