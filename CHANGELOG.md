@@ -7,6 +7,18 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.1] — 2026-05-29
+
+### Fixed
+
+- **Docker image broken in v1.2.0** — `Dockerfile` was missing `COPY src/cstylecheck/ ./cstylecheck/`.
+  The shim `cstylecheck.py` does `from cstylecheck.cli import main` which requires the package
+  directory to be present alongside the shim inside `/app/`. Without it, Python resolved
+  `cstylecheck` to the shim file itself, producing
+  `ModuleNotFoundError: No module named 'cstylecheck.cli'; 'cstylecheck' is not a package`.
+
+---
+
 ## [1.2.0] — 2026-05-29
 
 ### Added
