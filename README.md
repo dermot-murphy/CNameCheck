@@ -5,7 +5,7 @@ The purpose of this project is three-fold:
 - As an experiment to prompt Claude to generate all content - eg documents, webpages, issues, code, workflow - no manual correction of files
 - For a human to review all the work - either manually or with the help of an AI
 
-Conributions are very welcome.
+Contributions are very welcome.
 
 ![Logo](logo/cstylecheck.jpg)
 
