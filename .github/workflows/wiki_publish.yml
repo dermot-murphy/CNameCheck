@@ -284,7 +284,7 @@ jobs:
           idx_lines = [
               "# ASPICE CL2 Documentation",
               "",
-              "**CStyleCheck v1.0.0** | Automotive SPICE PAM v4.0 | Capability Level 2",
+              "**CStyleCheck v1.2.0** | Automotive SPICE PAM v4.0 | Capability Level 2",
               "",
               f"*Auto-generated from docs/aspice/ on {now}.*",
               "",
