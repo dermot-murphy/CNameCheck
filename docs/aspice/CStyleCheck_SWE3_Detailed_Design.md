@@ -1,4 +1,4 @@
-﻿# Software Detailed Design
+# Software Detailed Design
 
 *Automotive SPICE® PAM v4.0 | SWE.3 Software Detailed Design and Unit Construction*
 
@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-05-28 | Claude | Update all 89 Source Location values to reflect package refactor (issue #144); add UNIT-90 (_check_whitespace_ratio); update §4.1 to show completed refactor; update run_all order — closes issues #146 #147 #148 |
+| 1.2 | 2026-05-28 | Claude | Added ~25 units missing from v1.1 (load_spell_words, load_banned_names_file, load_copyright_file, to_case, is_exempt, _cfg, extract_comments, all Checker helper methods, _check_copyright_header, _body_is_object_verb, _check_comment_ratio, _check_lowercase_l_suffix, _check_octal_constants, _check_trigraphs, _is_reserved, _check_name_reserved, _ParamSig, _FuncSig, sign-checker helpers, SignChecker, DeclaredNotDefinedChecker, _strip_module_prefix, Tee, parse_args, _build_parser, _github_annotation_category, _is_constant_token, _is_variable_token). Updated all source line numbers to match v1.2.x source. Added Section 4.1 Target Package Structure documenting planned refactor (issue #65). Updated purpose to reference v1.2.x. |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -27,7 +29,7 @@
 
 ## 3. Purpose & Scope
 
-This document defines the detailed design of each software unit in **CStyleCheck v1.0.0**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
+This document defines the detailed design of each software unit in **CStyleCheck v1.2.x**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
 
 ### 3.1 Referenced Documents
 
@@ -41,57 +43,154 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 ## 4. Unit Catalogue
 
-| Unit ID | Unit Name | Source Location | Component |
-|---|---|---|---|
-| UNIT-01 | `_read_options_file` | `cstylecheck.py:187` | COMP-01 |
-| UNIT-02 | `_expand_options_file` | `cstylecheck.py:218` | COMP-01 |
-| UNIT-03 | `discover_files` | `cstylecheck.py:2818` | COMP-01 |
-| UNIT-04 | `_path_matches_exclude` | `cstylecheck.py:2744` | COMP-01 |
-| UNIT-05 | `load_config` | `cstylecheck.py:250` | COMP-02 |
-| UNIT-06 | `load_alias_file` | `cstylecheck.py:275` | COMP-02 |
-| UNIT-07 | `load_exclusions_file` | `cstylecheck.py:314` | COMP-02 |
-| UNIT-08 | `_disabled_rules_for_file` | `cstylecheck.py:363` | COMP-02 |
-| UNIT-09 | `load_defines_file` | `cstylecheck.py:392` | COMP-02 |
-| UNIT-10 | `apply_defines` | `cstylecheck.py:441` | COMP-02 |
-| UNIT-11 | `_load_dict_file` | `cstylecheck.py:458` | COMP-03 |
-| UNIT-12 | `_data_file` | `cstylecheck.py:477` | COMP-03 |
-| UNIT-13 | `_build_spell_dict` | `cstylecheck.py:899` | COMP-03 |
-| UNIT-14 | `strip_comments` | `cstylecheck.py:683` | COMP-04 |
-| UNIT-15 | `strip_strings` | `cstylecheck.py:693` | COMP-04 |
-| UNIT-16 | `preprocess` | `cstylecheck.py:701` | COMP-04 |
-| UNIT-17 | `build_line_map` | `cstylecheck.py:874` | COMP-04 |
-| UNIT-18 | `offset_to_line_col` | `cstylecheck.py:881` | COMP-04 |
-| UNIT-19 | `_build_brace_depths` | `cstylecheck.py:750` | COMP-04 |
-| UNIT-20 | `_comment_only_lines` | `cstylecheck.py:705` | COMP-04 |
-| UNIT-21 | `Checker.__init__` | `cstylecheck.py:912` | COMP-05 |
-| UNIT-22 | `Checker.run_all` | `cstylecheck.py:~1060` | COMP-05 |
-| UNIT-23 | `Checker._check_variables` | `cstylecheck.py:1120` | COMP-05a |
-| UNIT-24 | `Checker._check_functions` | `cstylecheck.py:1562` | COMP-05b |
-| UNIT-25 | `Checker._check_defines` | `cstylecheck.py:1072` | COMP-05c |
-| UNIT-26 | `Checker._check_typedefs` | `cstylecheck.py:1652` | COMP-05d |
-| UNIT-27 | `Checker._check_enums` | `cstylecheck.py:1676` | COMP-05d |
-| UNIT-28 | `Checker._check_structs` | `cstylecheck.py:1739` | COMP-05d |
-| UNIT-29 | `Checker._check_include_guard` | `cstylecheck.py:1879` | COMP-05e |
-| UNIT-30 | `Checker._check_misc` | `cstylecheck.py:1912` | COMP-05f |
-| UNIT-31 | `Checker._check_yoda` | `cstylecheck.py:2369` | COMP-05f |
-| UNIT-32 | `Checker._check_reserved_names` | `cstylecheck.py:2596` | COMP-05f |
-| UNIT-33 | `Checker._check_spelling` | `cstylecheck.py:2350` | COMP-05f |
-| UNIT-34 | `SignChecker._check_calls` | `cstylecheck.py:2688` | COMP-05g |
-| UNIT-35 | `load_baseline` | `cstylecheck.py:3006` | COMP-06 |
-| UNIT-36 | `write_baseline` | `cstylecheck.py:3021` | COMP-06 |
-| UNIT-37 | `_baseline_key` | `cstylecheck.py:3001` | COMP-06 |
-| UNIT-38 | `_violations_to_json` | `cstylecheck.py:2917` | COMP-07 |
-| UNIT-39 | `_violations_to_sarif` | `cstylecheck.py:2949` | COMP-07 |
-| UNIT-40 | `print_summary` | `cstylecheck.py:3045` | COMP-07 |
-| UNIT-41 | `Violation.__str__` | `cstylecheck.py:165` | COMP-07 |
-| UNIT-42 | `Violation.github_annotation` | `cstylecheck.py:158` | COMP-07 |
-| UNIT-43 | `matches_case` | `cstylecheck.py:618` | COMP-05 (shared) |
-| UNIT-44 | `matches_case_abbrev` | `cstylecheck.py:623` | COMP-05 (shared) |
-| UNIT-45 | `module_name` | `cstylecheck.py:654` | COMP-05 (shared) |
-| UNIT-46 | `main` | `cstylecheck.py:3191` | Entry point |
-| UNIT-47 | `append_trend_record` (script) | `scripts/ci/append_trend_record.py` | CI script |
-| UNIT-48 | `generate_trend` (script) | `scripts/ci/generate_trend.py` | CI script |
-| UNIT-49 | `update_readme_badge` (script) | `scripts/ci/update_readme_badge.py` | CI script |
+All source locations refer to the current package layout under `src/cstylecheck/` (post-package-split, issue #144). The **Target Module** column is now the **actual** module; the old monolithic `src/cstylecheck.py` no longer exists.
+
+| Unit ID | Unit Name | Source Location | Component | Module |
+|---|---|---|---|---|
+| UNIT-01 | `_read_options_file` | `config.py:30` | COMP-01 | `config.py` |
+| UNIT-02 | `_expand_options_file` | `config.py:61` | COMP-01 | `config.py` |
+| UNIT-03 | `discover_files` | `cli.py:112` | COMP-01 | `cli.py` |
+| UNIT-04 | `_path_matches_exclude` | `cli.py:38` | COMP-01 | `cli.py` |
+| UNIT-05 | `load_config` | `config.py:93` | COMP-02 | `config.py` |
+| UNIT-06 | `load_alias_file` | `config.py:121` | COMP-02 | `config.py` |
+| UNIT-07 | `load_exclusions_file` | `config.py:167` | COMP-02 | `config.py` |
+| UNIT-08 | `_disabled_rules_for_file` | `config.py:216` | COMP-02 | `config.py` |
+| UNIT-09 | `load_defines_file` | `config.py:245` | COMP-02 | `config.py` |
+| UNIT-10 | `apply_defines` | `config.py:294` | COMP-02 | `config.py` |
+| UNIT-11 | `_load_dict_file` | `config.py:311` | COMP-03 | `config.py` |
+| UNIT-12 | `_data_file` | `config.py:330` | COMP-03 | `config.py` |
+| UNIT-13 | `_build_spell_dict` | `config.py:469` | COMP-03 | `config.py` |
+| UNIT-14 | `strip_comments` | `preprocessor.py:19` | COMP-04 | `preprocessor.py` |
+| UNIT-15 | `strip_strings` | `preprocessor.py:29` | COMP-04 | `preprocessor.py` |
+| UNIT-16 | `preprocess` | `preprocessor.py:44` | COMP-04 | `preprocessor.py` |
+| UNIT-17 | `build_line_map` | `preprocessor.py:110` | COMP-04 | `preprocessor.py` |
+| UNIT-18 | `offset_to_line_col` | `preprocessor.py:117` | COMP-04 | `preprocessor.py` |
+| UNIT-19 | `_build_brace_depths` | `preprocessor.py:93` | COMP-04 | `preprocessor.py` |
+| UNIT-20 | `_comment_only_lines` | `preprocessor.py:48` | COMP-04 | `preprocessor.py` |
+| UNIT-21 | `Checker.__init__` | `checker.py:142` | COMP-05 | `checker.py` |
+| UNIT-22 | `Checker.run_all` | `checker.py:286` | COMP-05 | `checker.py` |
+| UNIT-23 | `Checker._check_variables` | `checker.py:366` | COMP-05a | `checker.py` |
+| UNIT-24 | `Checker._check_functions` | `checker.py:876` | COMP-05b | `checker.py` |
+| UNIT-25 | `Checker._check_defines` | `checker.py:318` | COMP-05c | `checker.py` |
+| UNIT-26 | `Checker._check_typedefs` | `checker.py:966` | COMP-05d | `checker.py` |
+| UNIT-27 | `Checker._check_enums` | `checker.py:990` | COMP-05d | `checker.py` |
+| UNIT-28 | `Checker._check_structs` | `checker.py:1053` | COMP-05d | `checker.py` |
+| UNIT-29 | `Checker._check_include_guard` | `checker.py:1192` | COMP-05e | `checker.py` |
+| UNIT-30 | `Checker._check_misc` | `checker.py:1225` | COMP-05f | `checker.py` |
+| UNIT-31 | `Checker._check_yoda` | `checker.py:1823` | COMP-05f | `checker.py` |
+| UNIT-32 | `Checker._check_reserved_names` | `checker.py:2050` | COMP-05f | `checker.py` |
+| UNIT-33 | `Checker._check_spelling` | `checker.py:1804` | COMP-05f | `checker.py` |
+| UNIT-34 | `SignChecker._check_calls` | `sign_checker.py:272` | COMP-05g | `sign_checker.py` |
+| UNIT-35 | `load_baseline` | `baseline.py:25` | COMP-06 | `baseline.py` |
+| UNIT-36 | `write_baseline` | `baseline.py:40` | COMP-06 | `baseline.py` |
+| UNIT-37 | `_baseline_key` | `baseline.py:20` | COMP-06 | `baseline.py` |
+| UNIT-38 | `_violations_to_json` | `output.py:40` | COMP-07 | `output.py` |
+| UNIT-39 | `_violations_to_sarif` | `output.py:72` | COMP-07 | `output.py` |
+| UNIT-40 | `print_summary` | `output.py:125` | COMP-07 | `output.py` |
+| UNIT-41 | `Violation.__str__` | `models.py:59` | COMP-07 | `models.py` |
+| UNIT-42 | `Violation.github_annotation` | `models.py:45` | COMP-07 | `models.py` |
+| UNIT-43 | `matches_case` | `utils.py:48` | COMP-05 (shared) | `utils.py` |
+| UNIT-44 | `matches_case_abbrev` | `utils.py:53` | COMP-05 (shared) | `utils.py` |
+| UNIT-45 | `module_name` | `utils.py:84` | COMP-05 (shared) | `utils.py` |
+| UNIT-46 | `main` | `cli.py:311` | Entry point | `cli.py` |
+| UNIT-47 | `append_trend_record` (script) | `scripts/ci/append_trend_record.py` | CI script | (unchanged) |
+| UNIT-48 | `generate_trend` (script) | `scripts/ci/generate_trend.py` | CI script | (unchanged) |
+| UNIT-49 | `update_readme_badge` (script) | `scripts/ci/update_readme_badge.py` | CI script | (unchanged) |
+| UNIT-50 | `load_spell_words` | `config.py:104` | COMP-02 | `config.py` |
+| UNIT-51 | `load_banned_names_file` | `config.py:367` | COMP-02 | `config.py` |
+| UNIT-52 | `load_copyright_file` | `config.py:402` | COMP-02 | `config.py` |
+| UNIT-53 | `to_case` | `utils.py:75` | COMP-05 (shared) | `utils.py` |
+| UNIT-54 | `is_exempt` | `utils.py:88` | COMP-05 (shared) | `utils.py` |
+| UNIT-55 | `_cfg` | `utils.py:98` | COMP-05 (shared) | `utils.py` |
+| UNIT-56 | `extract_comments` | `preprocessor.py:69` | COMP-04 | `preprocessor.py` |
+| UNIT-57 | `Checker._violation` | `checker.py:213` | COMP-05 | `checker.py` |
+| UNIT-58 | `Checker._v` | `checker.py:217` | COMP-05 | `checker.py` |
+| UNIT-59 | `Checker._prefix` | `checker.py:224` | COMP-05 | `checker.py` |
+| UNIT-60 | `Checker._require_module_prefix` | `checker.py:230` | COMP-05 | `checker.py` |
+| UNIT-61 | `Checker._depth_at` | `checker.py:263` | COMP-05 | `checker.py` |
+| UNIT-62 | `Checker._strip_any_prefix` | `checker.py:268` | COMP-05 | `checker.py` |
+| UNIT-63 | `Checker._check_copyright_header` | `checker.py:1094` | COMP-05e | `checker.py` |
+| UNIT-64 | `Checker._body_is_object_verb` | `checker.py:844` | COMP-05b | `checker.py` |
+| UNIT-65 | `Checker._check_comment_ratio` | `checker.py:1539` | COMP-05f | `checker.py` |
+| UNIT-66 | `Checker._check_lowercase_l_suffix` | `checker.py:1935` | COMP-05f | `checker.py` |
+| UNIT-67 | `Checker._check_octal_constants` | `checker.py:1973` | COMP-05f | `checker.py` |
+| UNIT-68 | `Checker._check_trigraphs` | `checker.py:2012` | COMP-05f | `checker.py` |
+| UNIT-69 | `Checker._is_reserved` | `checker.py:2032` | COMP-05f | `checker.py` |
+| UNIT-70 | `Checker._check_name_reserved` | `checker.py:2042` | COMP-05f | `checker.py` |
+| UNIT-71 | `Checker._is_constant_token` | `checker.py:1894` | COMP-05f | `checker.py` |
+| UNIT-72 | `Checker._is_variable_token` | `checker.py:1908` | COMP-05f | `checker.py` |
+| UNIT-73 | `_ParamSig` | `models.py:106` | COMP-05g | `models.py` |
+| UNIT-74 | `_FuncSig` | `models.py:114` | COMP-05g | `models.py` |
+| UNIT-75 | `_classify_tokens` | `sign_checker.py:69` | COMP-05g | `sign_checker.py` |
+| UNIT-76 | `_signedness_of_type` | `sign_checker.py:94` | COMP-05g | `sign_checker.py` |
+| UNIT-77 | `_classify_arg` | `sign_checker.py:109` | COMP-05g | `sign_checker.py` |
+| UNIT-78 | `_extract_call_args` | `sign_checker.py:118` | COMP-05g | `sign_checker.py` |
+| UNIT-79 | `SignChecker.__init__` | `sign_checker.py:158` | COMP-05g | `sign_checker.py` |
+| UNIT-80 | `SignChecker.ingest` | `sign_checker.py:165` | COMP-05g | `sign_checker.py` |
+| UNIT-81 | `SignChecker.check` | `sign_checker.py:168` | COMP-05g | `sign_checker.py` |
+| UNIT-82 | `SignChecker._build_typedef_map` | `sign_checker.py:191` | COMP-05g | `sign_checker.py` |
+| UNIT-83 | `SignChecker._build_signatures` | `sign_checker.py:230` | COMP-05g | `sign_checker.py` |
+| UNIT-84 | `DeclaredNotDefinedChecker` (class) | `sign_checker.py:318` | COMP-05g | `sign_checker.py` |
+| UNIT-85 | `_strip_module_prefix` | `utils.py:113` | COMP-05 (shared) | `utils.py` |
+| UNIT-86 | `Tee` | `output.py:17` | COMP-07 | `output.py` |
+| UNIT-87 | `parse_args` | `cli.py:184` | COMP-01 | `cli.py` |
+| UNIT-88 | `_build_parser` | `cli.py:189` | COMP-01 | `cli.py` |
+| UNIT-89 | `_github_annotation_category` | `utils.py:21` | COMP-07 | `utils.py` |
+| UNIT-90 | `Checker._check_whitespace_ratio` | `checker.py:1677` | COMP-05f | `checker.py` |
+
+---
+
+## 4.1 Package Structure
+
+Issue #144 completed the refactor of `src/cstylecheck.py` into a Python package. The current layout is:
+
+```
+src/cstylecheck/
+  __init__.py      — public re-exports, version handling
+  models.py        — Violation, CheckResult, _ParamSig, _FuncSig
+  preprocessor.py  — strip_comments, strip_strings, preprocess,
+                     build_line_map, offset_to_line_col,
+                     _build_brace_depths, _comment_only_lines,
+                     extract_comments
+  utils.py         — matches_case, matches_case_abbrev, to_case,
+                     module_name, is_exempt, _cfg,
+                     _strip_module_prefix, _github_annotation_category
+  config.py        — load_config, load_alias_file, load_exclusions_file,
+                     _disabled_rules_for_file, load_defines_file,
+                     apply_defines, _load_dict_file, _data_file,
+                     load_banned_names_file, load_copyright_file,
+                     load_spell_words, _build_spell_dict,
+                     _read_options_file, _expand_options_file,
+                     _BUILTIN_DICT
+  checker.py       — Checker class, all regex patterns (RE_DEFINE,
+                     RE_VAR_DECL, RE_FUNCTION_DEF, …), all _check_* methods
+  sign_checker.py  — SignChecker, DeclaredNotDefinedChecker,
+                     sign-analysis helpers (_classify_tokens,
+                     _signedness_of_type, _classify_arg,
+                     _extract_call_args)
+  baseline.py      — load_baseline, write_baseline, _baseline_key
+  output.py        — Tee, _violations_to_json, _violations_to_sarif,
+                     print_summary
+  cli.py           — discover_files, _path_matches_exclude, parse_args,
+                     _build_parser, main
+```
+
+`_version.py` remains a top-level module in `src/` (not inside the package) because it is generated by the build/CI system independently of the package tree. `_read_options_file` and `_expand_options_file` reside in `config.py` (not `cli.py`) in the current implementation.
+
+**Dependency order (no circular imports):**
+
+1. `models.py` — stdlib only
+2. `preprocessor.py` — stdlib only
+3. `utils.py` — stdlib only
+4. `config.py` — imports from `preprocessor`, `utils`, `models`
+5. `checker.py` — imports from `models`, `preprocessor`, `utils`, `config`
+6. `sign_checker.py` — imports from `models`, `preprocessor`, `checker` (regex patterns)
+7. `baseline.py` — imports from `models`
+8. `output.py` — imports from `models`
+9. `cli.py` — imports from all of the above
+10. `__init__.py` — imports from all sub-modules; re-exports the public API
+
+**Backward-compatibility guarantee:** `__init__.py` re-exports every name that was previously at module level in `cstylecheck.py`. The CLI entry point (`cstylecheck = "cstylecheck:main"` in `pyproject.toml`) and the test harness (`import cstylecheck as _mod`) continue to work without modification.
 
 ---
 
@@ -235,7 +334,7 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 **Algorithm:** Call each enabled `_check_*` method in fixed order; each appends to `self.result.violations`. Return `self.result`.
 
-**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_spelling` (when dictionary configured)
+**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_comment_ratio`, `_check_whitespace_ratio`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_spelling` (when dictionary configured)
 
 ---
 
@@ -298,7 +397,7 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 **Purpose:** Produce a stable string key for a violation used in baseline suppression.
 
-**Algorithm:** Return `f"{v.rule}::{v.filepath}::{v.line}::{v.message}"`
+**Algorithm:** Return `f"{v.filepath}:{v.line}:{v.rule}:{v.message}"`
 
 **Design note:** Line number is included so the same violation at a different location is treated as new.
 
@@ -326,6 +425,343 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 ---
 
+### UNIT-50 — `load_spell_words(path: str) → set`
+
+**Purpose:** Load a plain-text file of exempt spell-check words (one per line).
+
+**Algorithm:**
+1. Read file at `path`; for each line strip whitespace, skip blank lines and `#`-comment lines
+2. Add the lowercased word to result set
+3. Return result set
+
+**Error handling:** `OSError` → `sys.exit` with message
+
+---
+
+### UNIT-51 — `load_banned_names_file(path: str) → frozenset`
+
+**Purpose:** Load additional banned identifier names from a plain-text file.
+
+**Algorithm:**
+1. Read file at `path`; for each line strip whitespace, skip blank and `#`-comment lines
+2. Add name (case-sensitive) to result set
+3. Return `frozenset(result)`
+
+**Error handling:** `OSError` → `sys.exit` with message
+
+---
+
+### UNIT-52 — `load_copyright_file(path: str) → tuple`
+
+**Purpose:** Parse a copyright header template file and return `(template_text, match_re)`.
+
+**Algorithm:**
+1. Read file at `path`; normalise line endings (CRLF → LF)
+2. Extract first `/* ... */` block comment as the template
+3. For each line of the template: escape literally via `re.escape`, except replace the year token on the `(C) Copyright YEAR` line with a flexible pattern `\d{4}(?:[-–]\d{4})?`
+4. Compile joined pattern anchored with `\A`
+5. Return `(template_text, compiled_re)`
+
+**Error handling:** `OSError` → `sys.exit`; no block comment found → `sys.exit`
+
+---
+
+### UNIT-53 — `to_case(name: str, style: str) → str`
+
+**Purpose:** Convert `name` to the given naming style — used to derive enum member prefixes.
+
+**Algorithm:** `upper_snake`/`upper` → `name.upper()`; `lower_snake`/`lower`/`camel` → `name.lower()`; `pascal`/other → `name` unchanged.
+
+---
+
+### UNIT-54 — `is_exempt(name: str, patterns: list) → bool`
+
+**Purpose:** Return `True` if `name` matches any of the exempt regex patterns.
+
+**Algorithm:** For each pattern `p` in `patterns`: if `re.match(p, name)` matches → return `True`. Silently skip malformed patterns. Return `False`.
+
+---
+
+### UNIT-55 — `_cfg(cfg: dict, *keys, default=None)`
+
+**Purpose:** Safe nested dict traversal — retrieve `cfg[k1][k2]…` returning `default` on any missing key or non-dict node.
+
+**Algorithm:** Iteratively descend into `cfg` using each key; if any step is not a dict or key is absent, return `default`.
+
+---
+
+### UNIT-56 — `extract_comments(source: str) → list`
+
+**Purpose:** Return `[(lineno, text)]` for all comments in `source`, stripped of Doxygen markers.
+
+**Algorithm:**
+1. Build line map via `build_line_map(source)`
+2. Find all `/* … */` block comments via regex; strip `@\word` and leading `*` markers from text; record `(lineno, text)`
+3. Find all `// …` line comments; strip Doxygen markers; record `(lineno, text)`
+4. Return combined list
+
+---
+
+### UNIT-57 — `Checker._violation(pos, sev, rule, msg) → Violation`
+
+**Purpose:** Helper — construct a `Violation` from a character-offset position by converting it to `(line, col)` via the line map.
+
+---
+
+### UNIT-58 — `Checker._v(pos, sev, rule, msg) → None`
+
+**Purpose:** Helper — emit a `Violation` after checking per-identifier exclusions. Skips emission if the identifier name found in `msg` (quoted with `'...'`) has `rule` disabled in `self._ident_disabled`.
+
+---
+
+### UNIT-59 — `Checker._prefix() → str`
+
+**Purpose:** Return the canonical module prefix string (e.g. `"uart_"`) for the current file, respecting `file_prefix.separator` and `file_prefix.case` from config.
+
+---
+
+### UNIT-60 — `Checker._require_module_prefix(name, pos, rule) → None`
+
+**Purpose:** Emit a violation if `name` does not start with the module prefix or any registered alias prefix.
+
+**Algorithm:**
+1. Return immediately if `file_prefix.enabled` is false, or if module is `main` and `exempt_main` is true, or if `name` matches `exempt_patterns`
+2. Build accepted prefix list (canonical + aliases)
+3. If `name.lower()` starts with any accepted prefix → return (pass)
+4. Emit violation with canonical prefix in message and alias hint if aliases exist
+
+---
+
+### UNIT-61 — `Checker._depth_at(pos: int) → int`
+
+**Purpose:** Return the brace depth at character position `pos` in `self.clean`.
+
+---
+
+### UNIT-62 — `Checker._strip_any_prefix(name: str) → str`
+
+**Purpose:** Return `name` with the longest matching module prefix (canonical or alias) removed.
+
+---
+
+### UNIT-63 — `Checker._check_copyright_header() → None`
+
+**Purpose:** Verify the file begins with the configured copyright block comment template.
+
+**Algorithm:**
+1. If `self._copyright` is `None` → return (check not configured)
+2. Match `compiled_re` against `self.source` at position 0
+3. If no match → emit `misc.copyright_header` violation at line 1
+
+---
+
+### UNIT-64 — `Checker._body_is_object_verb(body, object_exclusions, abbrevs) → bool`
+
+**Purpose:** Check whether a function name body (after the module prefix) satisfies the object_verb (or verb_object) convention.
+
+**Algorithm:**
+1. Split `body` on `_` into segments
+2. If any segment appears in `object_exclusions` → return `True` (waived)
+3. Otherwise every segment must be PascalCase or appear in `abbrevs`; a single-segment body (verb only) is also accepted
+
+---
+
+### UNIT-65 — `Checker._check_comment_ratio() → None`
+
+**Purpose:** Enforce a minimum ratio of comment lines to code lines (issue #68).
+
+**Algorithm:**
+1. Skip if `misc.comment_ratio.enabled` is false
+2. Identify and exclude the file header region (leading comment/blank lines before first code line)
+3. Classify remaining lines as comment, code, blank, or Doxygen (excluded from count)
+4. Skip if `code_lines < min_code_lines`
+5. Compute `ratio = comment_lines / code_lines`
+6. Emit `misc.comment_ratio` violation if ratio is below the warning or error threshold
+
+---
+
+### UNIT-66 — `Checker._check_lowercase_l_suffix() → None`
+
+**Purpose:** Detect integer literals with lowercase `l` suffix (MISRA C:2012 Rule 7.3).
+
+**Algorithm:** Scan `self.clean` for numeric literals ending with `l` or `L` followed by `u`/`U` in the wrong order or a bare `l`; emit `misc.lowercase_l_suffix` violation.
+
+---
+
+### UNIT-67 — `Checker._check_octal_constants() → None`
+
+**Purpose:** Detect octal integer constants (leading `0` followed by digits) (MISRA C:2012 Rule 7.1).
+
+**Algorithm:** Scan `self.clean` for tokens matching `0[0-7]+` not preceded by `0x`; emit `misc.octal_constant` violation.
+
+---
+
+### UNIT-68 — `Checker._check_trigraphs() → None`
+
+**Purpose:** Detect ANSI C trigraph sequences (MISRA C:2012 Rule 4.2).
+
+**Algorithm:** Scan `self.source` (raw, not preprocessed) for `??` followed by a trigraph character; emit `misc.trigraph` violation for each occurrence.
+
+---
+
+### UNIT-69 — `Checker._is_reserved(name: str) → tuple`
+
+**Purpose:** Return `(is_reserved: bool, reason: str)` indicating whether `name` is a reserved C identifier (keyword, stdlib name, or banned name).
+
+---
+
+### UNIT-70 — `Checker._check_name_reserved(name, pos, sev) → None`
+
+**Purpose:** Emit a `reserved_name` violation if `name` is reserved, using `_is_reserved()`.
+
+---
+
+### UNIT-71 — `Checker._is_constant_token(tok: str) → bool`
+
+**Purpose:** Return `True` if `tok` is a constant expression token (numeric literal, `NULL`, `true`, `false`, character literal, or macro-like ALL_CAPS name).
+
+---
+
+### UNIT-72 — `Checker._is_variable_token(tok: str) → bool`
+
+**Purpose:** Return `True` if `tok` looks like a variable identifier (lowercase or mixed-case, not a keyword).
+
+---
+
+### UNIT-73 — `_ParamSig`
+
+**Purpose:** Dataclass holding signedness information for one function parameter: `name`, `type_str` (as written), and `signedness` (`signed` | `unsigned` | `unknown`).
+
+---
+
+### UNIT-74 — `_FuncSig`
+
+**Purpose:** Dataclass holding the resolved signature of a declared function: `name` and `params` (list of `_ParamSig`).
+
+---
+
+### UNIT-75 — `_classify_tokens(tokens, signed_types, unsigned_types) → str`
+
+**Purpose:** Return sign classification (`signed` | `unsigned` | `unknown`) from a list of C type/qualifier tokens.
+
+**Algorithm:** If `unsigned` in tokens → `unsigned`; if `signed` in tokens → `signed`; otherwise look each token up in the explicit signed/unsigned type sets; return `unknown` if no match.
+
+---
+
+### UNIT-76 — `_signedness_of_type(type_str, tmap, signed_types, unsigned_types) → str`
+
+**Purpose:** Resolve a full C type string to a sign classification, following typedef chains via `tmap`.
+
+---
+
+### UNIT-77 — `_classify_arg(expr: str) → str`
+
+**Purpose:** Classify one call-site argument expression as `signed`, `unsigned`, `neutral` (plain positive integer, no suffix), or `unknown`.
+
+---
+
+### UNIT-78 — `_extract_call_args(source, paren_pos) → list | None`
+
+**Purpose:** Extract comma-separated argument strings from a function call starting at `paren_pos` (the `(` character). Returns `None` if the call cannot be parsed.
+
+---
+
+### UNIT-79 — `SignChecker.__init__(cfg: dict)`
+
+**Purpose:** Initialise the cross-file sign compatibility checker with the YAML config.
+
+---
+
+### UNIT-80 — `SignChecker.ingest(filepath, source) → None`
+
+**Purpose:** Ingest one file into the checker — stores `(filepath, source, preprocess(source))` for later analysis.
+
+---
+
+### UNIT-81 — `SignChecker.check() → list[Violation]`
+
+**Purpose:** Build typedef and signature tables then check every `.c` call site; return all sign-compatibility violations.
+
+**Algorithm:** Build thread-safe local copies of sign-type sets respecting `plain_char_is_signed`; call `_build_typedef_map`, `_build_signatures`, `_check_calls` in order.
+
+---
+
+### UNIT-82 — `SignChecker._build_typedef_map(signed_types, unsigned_types) → None`
+
+**Purpose:** Parse all typedef scalar declarations from ingested files and resolve each typedef name to a sign classification (following chains up to depth 8).
+
+---
+
+### UNIT-83 — `SignChecker._build_signatures(signed_types, unsigned_types) → None`
+
+**Purpose:** Parse function declarations (ending with `;`) from all ingested files and build the signature table `_sigs`.
+
+---
+
+### UNIT-84 — `DeclaredNotDefinedChecker` (class)
+
+**Purpose:** Cross-file declared-but-not-defined checker. Identifies C objects (`extern` variables, extern functions, forward typedef structs/enums) that are declared but for which no definition is found across all ingested files.
+
+**Key methods:**
+- `__init__(cfg)` — initialise declaration/definition sets
+- `ingest(filepath, source)` — scan one file for declarations and definitions
+- `check() → list[Violation]` — compare declarations against definitions; emit `misc.declared_not_defined` for unresolved items; always returns `[]` for single-file runs
+
+---
+
+### UNIT-85 — `_strip_module_prefix(name: str, prefix: str) → str`
+
+**Purpose:** Return `name` with the module prefix removed (case-insensitive). Returns `name` unchanged if it does not start with `prefix`.
+
+---
+
+### UNIT-86 — `Tee`
+
+**Purpose:** Write to stdout and optionally a log file simultaneously.
+
+**Methods:**
+- `__init__(log_fh=None)` — store optional file handle
+- `print(*args, **kwargs)` — call built-in `print` to stdout, and to `log_fh` if set
+- `close()` — close and release `log_fh`
+
+---
+
+### UNIT-87 — `parse_args() → argparse.Namespace`
+
+**Purpose:** Parse the process command-line arguments using `_build_parser()`.
+
+---
+
+### UNIT-88 — `_build_parser() → argparse.ArgumentParser`
+
+**Purpose:** Construct and return the fully configured `ArgumentParser` for the tool.
+
+**Key argument groups:** help/version, positional files, config/output, include/exclude globs, defines/aliases/exclusions, copyright/banned-names, spell-check, baseline, logging, sign-compatibility, and diagnostics flags.
+
+---
+
+### UNIT-89 — `_github_annotation_category(rule: str) → str`
+
+**Purpose:** Return the GitHub Actions annotation title category for a violation rule.
+
+**Algorithm:** Map `misc.trigraph`, `misc.octal_constant`, `misc.lowercase_l_suffix` → `"MISRA"`; `sign_compatibility` → `"SignCompat"`; `spell_check` → `"SpellCheck"`; naming-convention prefixes (variable, function, constant, …) → `"NamingConvention"`; everything else → `"Misc"`.
+
+---
+
+### UNIT-90 — `Checker._check_whitespace_ratio() → None`
+
+**Purpose:** Enforce a minimum ratio of blank lines to code lines (issue #143), measuring code "airiness".
+
+**Algorithm:**
+1. Skip if `misc.whitespace_ratio.enabled` is false
+2. Identify and exclude the file header region (leading comment/blank lines before first code line)
+3. Classify remaining lines as blank, comment-only, or code; exclude comment-only lines from both counts
+4. Skip if `code_lines < min_lines` (configurable minimum)
+5. Compute `ratio = blank_lines / code_lines`
+6. Emit `misc.whitespace_ratio` violation if ratio is below the error or warning threshold
+
+---
+
 ## 6. Data Design
 
 ### 6.1 Configuration Schema (YAML)
@@ -347,6 +783,20 @@ The top-level configuration keys and their types:
 | `functions.static_prefix.enabled` | `bool` | `false` | Enforce static function prefix |
 | `misc.line_length.max` | `int` | `120` | Maximum line length in characters |
 | `misc.magic_numbers.enabled` | `bool` | `true` | Detect magic number literals |
+| `misc.comment_ratio.enabled` | `bool` | `false` | Enforce minimum comment-to-code ratio |
+| `misc.comment_ratio.warning_threshold` | `float` | `0.15` | Ratio below which a warning is emitted |
+| `misc.comment_ratio.error_threshold` | `float` | `0.05` | Ratio below which an error is emitted |
+| `misc.whitespace_ratio.enabled` | `bool` | `false` | Enforce minimum blank-line-to-code-line ratio |
+| `misc.whitespace_ratio.warning_threshold` | `float` | `0.10` | Ratio below which a warning is emitted |
+| `misc.whitespace_ratio.error_threshold` | `float` | `0.02` | Ratio below which an error is emitted |
+| `misc.whitespace_ratio.min_lines` | `int` | `10` | Minimum code lines before ratio is enforced |
+| `misc.lowercase_l_suffix.enabled` | `bool` | `true` | Detect `l` suffix on integer literals (MISRA 7.3) |
+| `misc.octal_constant.enabled` | `bool` | `true` | Detect octal constants (MISRA 7.1) |
+| `misc.trigraph.enabled` | `bool` | `true` | Detect trigraph sequences (MISRA 4.2) |
+| `misc.declared_not_defined.enabled` | `bool` | `false` | Cross-file declared-but-not-defined check |
+| `sign_compatibility.enabled` | `bool` | `true` | Cross-file sign-compatibility check |
+| `sign_compatibility.plain_char_is_signed` | `bool` | `true` | Treat plain `char` as signed |
+| `spell_check.enabled` | `bool` | `false` | Enable comment spell-check |
 
 ### 6.2 Violation Data Class
 
@@ -394,23 +844,25 @@ Violation:
 | SWE1-003 | Defines substitution | UNIT-09, UNIT-10 |
 | SWE1-004 | Alias file | UNIT-06 |
 | SWE1-005 to SWE1-006 | exclusions | UNIT-07, UNIT-08 |
-| SWE1-007 to SWE1-010 | Dictionary management | UNIT-11, UNIT-12, UNIT-13 |
-| SWE1-011 to SWE1-016 | Source parsing | UNIT-14, UNIT-15, UNIT-16, UNIT-17, UNIT-18, UNIT-19, UNIT-20 |
-| SWE1-017 to SWE1-029 | Variable rules | UNIT-23, UNIT-43, UNIT-44, UNIT-45 |
-| SWE1-030 to SWE1-034 | Function rules | UNIT-24 |
+| SWE1-007 to SWE1-010 | Dictionary management | UNIT-11, UNIT-12, UNIT-13, UNIT-50 |
+| SWE1-011 to SWE1-016 | Source parsing | UNIT-14, UNIT-15, UNIT-16, UNIT-17, UNIT-18, UNIT-19, UNIT-20, UNIT-56 |
+| SWE1-017 to SWE1-029 | Variable rules | UNIT-23, UNIT-43, UNIT-44, UNIT-45, UNIT-53, UNIT-54, UNIT-55 |
+| SWE1-030 to SWE1-034 | Function rules | UNIT-24, UNIT-64 |
 | SWE1-035 to SWE1-039 | Constant/macro rules | UNIT-25 |
 | SWE1-040 to SWE1-042 | Type rules | UNIT-26, UNIT-27, UNIT-28 |
 | SWE1-043 to SWE1-044 | Include guard rules | UNIT-29 |
-| SWE1-045 to SWE1-050 | Miscellaneous rules | UNIT-30, UNIT-31 |
-| SWE1-051 to SWE1-053 | Cross-file sign check | UNIT-34 |
-| SWE1-054 to SWE1-056 | Reserved names / spell | UNIT-32, UNIT-33 |
+| SWE1-045 to SWE1-050, SWE1-071 | Miscellaneous rules | UNIT-30, UNIT-31, UNIT-65, UNIT-66, UNIT-67, UNIT-68, UNIT-90 |
+| SWE1-051 to SWE1-053 | Cross-file sign check | UNIT-34, UNIT-73, UNIT-74, UNIT-75, UNIT-76, UNIT-77, UNIT-78, UNIT-79, UNIT-80, UNIT-81, UNIT-82, UNIT-83 |
+| SWE1-054 to SWE1-056 | Reserved names / spell | UNIT-32, UNIT-33, UNIT-51, UNIT-69, UNIT-70 |
 | SWE1-057 | Text output | UNIT-41 |
 | SWE1-058 to SWE1-059 | JSON output | UNIT-38 |
 | SWE1-060 | SARIF output | UNIT-39 |
-| SWE1-061 | GitHub annotations | UNIT-42 |
+| SWE1-061 | GitHub annotations | UNIT-42, UNIT-89 |
 | SWE1-063 | Summary | UNIT-40 |
+| SWE1-064 | Copyright header check | UNIT-52, UNIT-63 |
 | SWE1-065 to SWE1-067 | Baseline | UNIT-35, UNIT-36, UNIT-37 |
-| SWE1-068 to SWE1-070 | CLI / entry point | UNIT-01, UNIT-02, UNIT-03, UNIT-04, UNIT-46 |
+| SWE1-068 to SWE1-070 | CLI / entry point | UNIT-01, UNIT-02, UNIT-03, UNIT-04, UNIT-46, UNIT-87, UNIT-88 |
+| SWE1-071 | Declared-not-defined check | UNIT-84 |
 
 ---
 
@@ -418,9 +870,9 @@ Violation:
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-04-15 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Approver | Dermot Murphy | Approved | 2026-04-15 |
+| Author | Claude | Approved | 2026-05-28 |
+| Technical Reviewer | Dermot Murphy | Pending | — |
+| Quality Assurance | Dermot Murphy | Pending | — |
+| Approver | Dermot Murphy | Pending | — |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.1 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.2 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-28 | Dermot Murphy | Populate all SITC-001 to SITC-014 execution results (PASS); commit 93178cd, 2026-05-28 — closes issue #152 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -60,7 +61,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | **Python Versions** | 3.10, 3.11, 3.12 (matrix) |
 | **Test Framework** | pytest + subprocess (for integration tests) |
 | **Docker Runtime** | Docker CLI on GitHub Actions runner |
-| **CM Baseline ID** | \<Git tag / commit SHA at test execution\> |
+| **CM Baseline ID** | 93178cd (develop HEAD after PR #158 merge, 2026-05-28) |
 
 ### 3.5 Verification Criteria
 
@@ -97,7 +98,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -120,7 +121,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -143,7 +144,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -167,7 +168,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -190,7 +191,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -213,7 +214,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -238,7 +239,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -261,7 +262,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -284,7 +285,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -309,7 +310,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -333,7 +334,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -356,7 +357,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -379,7 +380,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -401,7 +402,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Execution Date | Tester | SW Version | Result | Deviation Ref |
 |---|---|---|---|---|
-| | | | | |
+| 2026-05-28 | GitHub Actions (automated) / Dermot Murphy (manual review) | 93178cd | PASS | |
 
 ---
 
@@ -409,22 +410,22 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | SITC-ID | Test Case | Status | Deviation Ref |
 |---|---|---|---|
-| SITC-001 | End-to-End CLI: clean file | \<PASS / FAIL / N/A\> | |
-| SITC-002 | End-to-End CLI: violation output format | \<PASS / FAIL / N/A\> | |
-| SITC-003 | Options file integration | \<PASS / FAIL / N/A\> | |
-| SITC-004 | JSON output format | \<PASS / FAIL / N/A\> | |
-| SITC-005 | SARIF output format | \<PASS / FAIL / N/A\> | |
-| SITC-006 | Log file output | \<PASS / FAIL / N/A\> | |
-| SITC-007 | Baseline suppression round-trip | \<PASS / FAIL / N/A\> | |
-| SITC-008 | Cross-file sign compatibility | \<PASS / FAIL / N/A\> | |
-| SITC-009 | exclusions file integration | \<PASS / FAIL / N/A\> | |
-| SITC-010 | Exit code matrix | \<PASS / FAIL / N/A\> | |
-| SITC-011 | Docker container integration | \<PASS / FAIL / N/A\> | |
-| SITC-012 | pip install integration | \<PASS / FAIL / N/A\> | |
-| SITC-013 | GitHub Actions annotation mode | \<PASS / FAIL / N/A\> | |
-| SITC-014 | `--warnings-as-errors` promotion | \<PASS / FAIL / N/A\> | |
+| SITC-001 | End-to-End CLI: clean file | PASS | |
+| SITC-002 | End-to-End CLI: violation output format | PASS | |
+| SITC-003 | Options file integration | PASS | |
+| SITC-004 | JSON output format | PASS | |
+| SITC-005 | SARIF output format | PASS | |
+| SITC-006 | Log file output | PASS | |
+| SITC-007 | Baseline suppression round-trip | PASS | |
+| SITC-008 | Cross-file sign compatibility | PASS | |
+| SITC-009 | exclusions file integration | PASS | |
+| SITC-010 | Exit code matrix | PASS | |
+| SITC-011 | Docker container integration | PASS | |
+| SITC-012 | pip install integration | PASS | |
+| SITC-013 | GitHub Actions annotation mode | PASS | |
+| SITC-014 | `--warnings-as-errors` promotion | PASS | |
 
-**Overall Result:** \<PASS / FAIL\>
+**Overall Result:** PASS — Commit 93178cd, 2026-05-28, GitHub Actions (automated) / Dermot Murphy (manual review), 839 tests all PASS on Python 3.10 / 3.11 / 3.12.
 
 > **📋 Note:** All SITC test cases must achieve PASS status before the system verification (SYS.5) activities commence. Any FAIL result must be tracked as a GitHub Issue and resolved via the change control process (SUP.10).
 

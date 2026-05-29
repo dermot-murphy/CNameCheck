@@ -571,6 +571,39 @@ misc:
     error_threshold: 0.05   # ratio below which an ERROR is raised    (5%)
     min_code_lines: 10      # skip files with fewer code lines (avoids trivial-file false positives)
 
+  # -----------------------------------------------------------------------
+  # Whitespace (blank-line) ratio (issue #143)
+  # -----------------------------------------------------------------------
+  # Measures the ratio of blank lines to code lines in the file body.
+  # Very few blank lines relative to code indicates dense, hard-to-read code.
+  #
+  # Excluded from both counts:
+  #   - The file header: all leading comment/blank lines before the first
+  #     non-comment, non-blank line (copyright notices, licence blocks)
+  #   - Comment-only lines (// and /* … */) — excluded from denominator
+  #
+  # Counted as blank lines (numerator):
+  #   Empty and whitespace-only lines in the code body
+  #
+  # Counted as code lines (denominator):
+  #   Every non-blank, non-comment line (code, preprocessor, etc.)
+  #   A line with a trailing // comment still counts as a code line
+  #
+  # Default error threshold is approximately 0.1 × warning threshold,
+  # per the original issue specification ("Error if < 0.1 of warning level").
+  #
+  # Example violation messages:
+  #   uart.c:1: warning [misc.whitespace_ratio] whitespace ratio 0.06 is below
+  #             warning threshold 0.1 (6 blank lines / 95 code lines)
+  #   cfg.c:1:  error   [misc.whitespace_ratio] whitespace ratio 0.008 is below
+  #             error threshold 0.01 (1 blank line / 122 code lines)
+  whitespace_ratio:
+    enabled: false          # opt-in; disabled by default
+    severity: warning       # severity for below-warning-threshold violations
+    warning_threshold: 0.10 # ratio below which a WARNING is raised  (10%)
+    error_threshold: 0.01   # ratio below which an ERROR is raised    (1%)
+    min_lines: 20           # skip files with fewer code lines (avoids trivial-file false positives)
+
 # --- Reserved / banned identifier names ---
 # Checks that no declared variable, function, macro, or constant name
 # shadows a C keyword, C++ keyword, or C standard library name.
