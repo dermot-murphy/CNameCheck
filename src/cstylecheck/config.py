@@ -95,8 +95,23 @@ def load_config(path: str) -> dict:
     if not cfg_path.exists():
         sys.exit(f"Config file not found: {path}")
     try:
-        with cfg_path.open(encoding="utf-8") as fh:
-            return yaml.safe_load(fh)
+        raw = cfg_path.read_bytes()
+    except OSError as e:
+        sys.exit(f"Cannot read config file '{path}': {e}")
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as e:
+        # Provide a clear, actionable error rather than a raw Python traceback.
+        # Common cause: Windows text editor saved the file as Windows-1252 or
+        # Latin-1 (e.g. an ellipsis character U+2026 encoded as 0x85).
+        bad_byte = raw[e.start] if e.start < len(raw) else 0
+        sys.exit(
+            f"Config file '{path}' contains a non-UTF-8 byte "
+            f"0x{bad_byte:02X} at offset {e.start}. "
+            f"Save the file as UTF-8 (without BOM) and try again."
+        )
+    try:
+        return yaml.safe_load(text)
     except yaml.YAMLError as e:
         sys.exit(f"Cannot parse config file '{path}': {e}")
 
