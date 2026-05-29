@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.1 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.2 |
+| **Project** | CStyleCheck | **Date** | 2026-05-29 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,13 +20,14 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-05-29 | Claude | Updated for v1.2.0 release — package refactor, 3 new rules, 839 tests |
 | 1.1 | 2026-05-28 | Claude | Initial SVD document created for v1.1.0 release |
 
 ---
 
 ## 3. Purpose & Scope
 
-This **Software Version Description (SVD)** formally describes the **CStyleCheck v1.1.0** software release. It identifies the software items delivered, the baseline against which changes are recorded, and the configuration status of all controlled work products.
+This **Software Version Description (SVD)** formally describes the **CStyleCheck v1.2.0** software release. It identifies the software items delivered, the baseline against which changes are recorded, and the configuration status of all controlled work products.
 
 This document satisfies the release-identification and configuration-status-accounting requirements of **Automotive SPICE® PAM v4.0, SUP.8 — Configuration Management**.
 
@@ -34,15 +35,15 @@ This document satisfies the release-identification and configuration-status-acco
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.1 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.1 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.1 |
-| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.1 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.1 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.1 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
-| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.1 |
-| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.1 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.3 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.2 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.3 |
+| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.5 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.2 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.3 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
+| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.2 |
+| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.3 |
 
 ---
 
@@ -53,19 +54,19 @@ This document satisfies the release-identification and configuration-status-acco
 | Field | Value |
 |---|---|
 | **Product Name** | CStyleCheck |
-| **Version** | 1.1.0 |
-| **Release Date** | 2026-05-28 |
+| **Version** | 1.2.0 |
+| **Release Date** | 2026-05-29 |
 | **Release Type** | Minor Release |
-| **Git Tag** | `v1.1.0` |
+| **Git Tag** | `v1.2.0` |
 | **Branch** | `main` |
-| **Previous Release** | V1.0.0 (2026-04-15) |
+| **Previous Release** | v1.1.0 (2026-05-28) |
 | **Repository** | https://github.com/dermot-murphy/CStyleCheck |
 
 ### 4.2 Release Classification
 
-This is a **minor release** under Semantic Versioning. It is **backward-compatible** with v1.0.0: all existing `rules.yml` configurations, CLI flags, and pre-commit hook integrations continue to work without modification.
+This is a **minor release** under Semantic Versioning. It is **backward-compatible** with v1.1.0: all existing `rules.yml` configurations, CLI flags, and pre-commit hook integrations continue to work without modification.
 
-New capabilities (MISRA coverage matrix, CI quality gates) are additive and do not alter the checker's violation output for any rule that was functional in v1.0.0.
+New capabilities (3 new lint rules, package refactor) are additive. The package refactor introduces no API changes — the CLI entry point, all 53 rule IDs, and all output formats are unchanged from the caller's perspective.
 
 ---
 
@@ -75,9 +76,19 @@ New capabilities (MISRA coverage matrix, CI quality gates) are additive and do n
 
 | Item | Description | Location |
 |---|---|---|
-| `src/cstylecheck.py` | Main checker script (~3 200 lines, stdlib only) | `src/cstylecheck.py` |
+| `src/cstylecheck.py` | Thin CLI shim — backward-compatible entry point | `src/cstylecheck.py` |
+| `src/cstylecheck/__init__.py` | Package root — re-exports full public API | `src/cstylecheck/__init__.py` |
+| `src/cstylecheck/cli.py` | Argument parsing and file discovery | `src/cstylecheck/cli.py` |
+| `src/cstylecheck/config.py` | Rule configuration loading (YAML, defines, aliases, exclusions) | `src/cstylecheck/config.py` |
+| `src/cstylecheck/models.py` | Violation, CheckResult, shared constants | `src/cstylecheck/models.py` |
+| `src/cstylecheck/preprocessor.py` | Comment/string stripping, token extraction | `src/cstylecheck/preprocessor.py` |
+| `src/cstylecheck/utils.py` | Case matching helpers, module-name derivation | `src/cstylecheck/utils.py` |
+| `src/cstylecheck/checker.py` | Main Checker class — all 53 rule implementations | `src/cstylecheck/checker.py` |
+| `src/cstylecheck/sign_checker.py` | Cross-file sign-compatibility and declared_not_defined | `src/cstylecheck/sign_checker.py` |
+| `src/cstylecheck/baseline.py` | Baseline load / write | `src/cstylecheck/baseline.py` |
+| `src/cstylecheck/output.py` | Text / JSON / SARIF formatters, Tee, summary table | `src/cstylecheck/output.py` |
 | `src/rules.yml` | Rule configuration for the CStyleCheck project | `src/rules.yml` |
-| `src/_version.py` | Version string: `1.1.0` | `src/_version.py` |
+| `src/_version.py` | Version string: `1.2.0` (generated by CI: `git describe --tags`) | `src/_version.py` |
 | `src/aliases.txt` | Module alias map | `src/aliases.txt` |
 | `src/exclusions.yml` | Per-file rule suppressions | `src/exclusions.yml` |
 | `src/options.txt` | Project defaults for `--options-file` | `src/options.txt` |
@@ -91,8 +102,8 @@ New capabilities (MISRA coverage matrix, CI quality gates) are additive and do n
 
 | Registry | Image | Tags |
 |---|---|---|
-| Docker Hub | `cstylecheck/cstylecheck` | `1.1.0`, `1.1`, `1`, `latest` |
-| GitHub Container Registry | `ghcr.io/dermot-murphy/cstylecheck` | `1.1.0`, `1.1`, `1`, `latest` |
+| Docker Hub | `dermotmurphy/cstylecheck` | `1.2.0`, `1.2`, `1`, `latest` |
+| GitHub Container Registry | `ghcr.io/dermot-murphy/cstylecheck` | `1.2.0`, `1.2`, `1`, `latest` |
 
 Platforms: `linux/amd64`, `linux/arm64`.
 
@@ -106,100 +117,100 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ### 5.4 Test Suite
 
+**Total: 839 tests across 30 modules** — all passing at commit `3edc392` (develop HEAD pre-merge).
+
 | Item | Test Count | Description |
 |---|---|---|
-| `tests/test_barr_c.py` | 42 | Barr-C rules |
+| `tests/test_barr_c.py` | 42 | Barr-C naming rules |
 | `tests/test_yoda_condition.py` | 37 | misc.yoda_condition |
 | `tests/test_reserved_name.py` | 40 | reserved_name |
 | `tests/test_dictionaries.py` | 32 | dict file loading and CLI flags |
-| `tests/test_misc_improvements.py` | 65 | unsigned_suffix, loop vars, numerics |
+| `tests/test_misc_improvements.py` | 77 | unsigned_suffix, loop vars, numerics |
 | `tests/test_defines.py` | 16 | constant.* / macro.* |
-| `tests/test_variables.py` | 32 | all variable.* rules |
+| `tests/test_variables.py` | 35 | all variable.* rules |
 | `tests/test_functions.py` | 14 | function.* |
 | `tests/test_typedefs.py` | 8 | typedef.* |
 | `tests/test_enums.py` | 11 | enum.* |
-| `tests/test_structs.py` | 7 | struct.* |
+| `tests/test_structs.py` | 12 | struct.* |
 | `tests/test_include_guards.py` | 8 | include_guard.* |
-| `tests/test_misc.py` | 23 | line_length / indentation / magic / suffix |
+| `tests/test_misc.py` | 28 | line_length / indentation / magic / suffix |
 | `tests/test_spell_check.py` | 9 | spell_check |
 | `tests/test_sign_compatibility.py` | 7 | cross-file sign compatibility |
-| `tests/test_block_comment_spacing.py` | 18 | misc.block_comment_spacing |
+| `tests/test_block_comment_spacing.py` | 29 | misc.block_comment_spacing |
 | `tests/test_copyright_header.py` | 55 | misc.copyright_header |
 | `tests/test_eof_comment.py` | 33 | misc.eof_comment |
-| `tests/test_cli.py` | 29 | CLI flags end-to-end |
-| `tests/test_improvements.py` | 63 | all 10 improvements (bugs + new features) |
-| `tests/test_workflow_config.py` | — | CI workflow configuration regression tests |
+| `tests/test_cli.py` | 43 | CLI flags end-to-end |
+| `tests/test_improvements.py` | 67 | bugs + new feature regression tests |
+| `tests/test_comment_ratio.py` | 24 | misc.comment_ratio (new in v1.2.0) |
+| `tests/test_whitespace_ratio.py` | 27 | misc.whitespace_ratio (new in v1.2.0) |
+| `tests/test_declared_not_defined.py` | 29 | misc.declared_not_defined (new in v1.2.0) |
+| `tests/test_misra_rules.py` | 52 | MISRA C rule coverage |
+| `tests/test_parameter_prefix.py` | 42 | variable.parameter.* rules |
+| `tests/test_exclusions.py` | 28 | per-file rule suppression |
+| `tests/test_github_annotations.py` | 8 | GitHub Actions annotation output |
+| `tests/test_case_patterns.py` | 6 | case-pattern helper functions |
+| `tests/test_thread_safe_globals.py` | 4 | thread-safety of shared globals |
+| `tests/test_workflow_config.py` | 16 | CI workflow configuration regression tests |
+| **Total** | **839** | |
 
 ### 5.5 Documentation
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SVD-001 | Software Version Description (this document) | 1.1 |
-| CSC-SWE1-001 | Software Requirements Specification | 1.1 |
-| CSC-SWE2-001 | Software Architecture Design | 1.1 |
-| CSC-SWE3-001 | Software Detailed Design | 1.1 |
-| CSC-SWE4-001 | Software Unit Verification Specification | 1.1 |
-| CSC-SWE5-001 | Software Integration Test Specification | 1.1 |
+| CSC-SVD-001 | Software Version Description (this document) | 1.2 |
+| CSC-SWE1-001 | Software Requirements Specification | 1.3 |
+| CSC-SWE2-001 | Software Architecture Design | 1.2 |
+| CSC-SWE3-001 | Software Detailed Design | 1.3 |
+| CSC-SWE4-001 | Software Unit Verification Specification | 1.5 |
+| CSC-SWE5-001 | Software Integration Test Specification | 1.2 |
 | CSC-SWE6-001 | Software Qualification Test Specification | 1.1 |
-| CSC-SYS2-001 | System Requirements Specification | 1.1 |
-| CSC-SYS3-001 | System Architecture Design | 1.1 |
-| CSC-SYS4-001 | System Integration Test Specification | 1.1 |
-| CSC-SYS5-001 | System Verification Specification | 1.1 |
-| CSC-MAN3-001 | Project Management Plan | 1.1 |
-| CSC-MAN5-001 | Risk Management Plan | 1.1 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.1 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
+| CSC-SYS2-001 | System Requirements Specification | 1.2 |
+| CSC-SYS3-001 | System Architecture Design | 1.2 |
+| CSC-SYS4-001 | System Integration Test Specification | 1.2 |
+| CSC-SYS5-001 | System Verification Specification | 1.3 |
+| CSC-MAN3-001 | Project Management Plan | 1.3 |
+| CSC-MAN5-001 | Risk Management Plan | 1.2 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.2 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.4 |
 | CSC-SUP9-001 | Problem Resolution Plan | 1.1 |
 | CSC-SUP10-001 | Change Request Plan | 1.1 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.1 |
-| CSC-PA2-001 | Capability Level 2 Records | 1.1 |
+| CSC-PA2-001 | Capability Level 2 Records | 1.5 |
 | CSC-DEV001 | AI Authorship Deviation Record | 1.0 |
+| CSC-DEV002 | Independent Review Deviation Record | 1.0 |
 
 ---
 
-## 6. Change Summary (v1.0.0 → v1.1.0)
+## 6. Change Summary (v1.1.0 → v1.2.0)
 
 ### 6.1 New Features
 
 | ID | Description | Issue |
 |---|---|---|
-| F-001 | MISRA C:2012/2023 coverage matrix added to Rules-and-Configuration.md | [#64](https://github.com/dermot-murphy/CStyleCheck/issues/64) |
-| F-002 | mypy static type-checking CI gate: `mypy --ignore-missing-imports --implicit-optional` | [#66](https://github.com/dermot-murphy/CStyleCheck/issues/66) |
-| F-003 | ruff lint CI gate with project-specific configuration in `pyproject.toml` | [#66](https://github.com/dermot-murphy/CStyleCheck/issues/66) |
-| F-004 | CI scripts extracted from inline YAML into `scripts/ci/` Python modules | [#63](https://github.com/dermot-murphy/CStyleCheck/issues/63) |
-| F-005 | CSC-DEV-001 AI Authorship Deviation Record added to ASPICE documentation | [#52](https://github.com/dermot-murphy/CStyleCheck/issues/52) |
-| F-006 | Badge-path regression tests added to `test_workflow_config.py` | [#42](https://github.com/dermot-murphy/CStyleCheck/issues/42) |
+| F-001 | Package refactor: `cstylecheck.py` monolith split into `src/cstylecheck/` package (10 sub-modules) | [#65](https://github.com/dermot-murphy/CStyleCheck/issues/65) |
+| F-002 | New rule `misc.comment_ratio` — configurable minimum comment-density gate | [#68](https://github.com/dermot-murphy/CStyleCheck/issues/68) |
+| F-003 | New rule `misc.whitespace_ratio` — configurable blank-line density ceiling gate | [#145](https://github.com/dermot-murphy/CStyleCheck/issues/145) |
+| F-004 | New rule `misc.declared_not_defined` — cross-file: function declared in `.h` but not defined in paired `.c` | [#114](https://github.com/dermot-murphy/CStyleCheck/issues/114) |
+| F-005 | Subprocess coverage in CI — CLI entry point now covered; `--cov-fail-under=85` enforced | [#54](https://github.com/dermot-murphy/CStyleCheck/issues/54) |
+| F-006 | CSC-DEV-002 Independent Review Deviation Record added to ASPICE documentation | [#61](https://github.com/dermot-murphy/CStyleCheck/issues/61) |
+| F-007 | ASPICE internal audit (CSC-AUD-001) completed: 58 defects in 14 work products resolved | [#143](https://github.com/dermot-murphy/CStyleCheck/issues/143), [#146](https://github.com/dermot-murphy/CStyleCheck/issues/146)–[#157](https://github.com/dermot-murphy/CStyleCheck/issues/157) |
 
 ### 6.2 Bug Fixes
 
 | ID | Description | Issue |
 |---|---|---|
-| B-001 | `--spell-words` flag with disabled spell check now emits a clear warning | [#90](https://github.com/dermot-murphy/CStyleCheck/issues/90) |
-| B-002 | `tj-actions/changed-files` pinned to full SHA to prevent mutable tag risk | [#59](https://github.com/dermot-murphy/CStyleCheck/issues/59) |
-| B-003 | `moby/buildkit` Docker driver pinned to `v0.19.0` for reproducibility | [#60](https://github.com/dermot-murphy/CStyleCheck/issues/60) |
-| B-004 | Global mutation of `C_KEYWORDS`/`C_STDLIB_NAMES` eliminated in `main()` | [#79](https://github.com/dermot-murphy/CStyleCheck/issues/79) |
-| B-005 | GitHub Actions annotation titles now reflect rule severity (Error/Warning/Info) | [#77](https://github.com/dermot-murphy/CStyleCheck/issues/77) |
-| B-006 | `lower`/`upper` case patterns corrected — reject underscores where disallowed | [#74](https://github.com/dermot-murphy/CStyleCheck/issues/74) |
-| B-007 | CRLF line endings normalised once in `Checker.__init__()` — fixes false positives on Windows files | [#73](https://github.com/dermot-murphy/CStyleCheck/issues/73) |
-| B-008 | Single-quoted char literals stripped in `strip_strings()` | [#72](https://github.com/dermot-murphy/CStyleCheck/issues/72) |
-| B-009 | Digit segments accepted in `lower_snake` names (e.g. `buf16`, `i2c_bus`) | [#70](https://github.com/dermot-murphy/CStyleCheck/issues/70) |
-| B-010 | Bidirectional alias map: either column order accepted in `aliases.txt` | [#57](https://github.com/dermot-murphy/CStyleCheck/issues/57) |
-| B-011 | `datetime.utcnow()` replaced with `datetime.now(timezone.utc)` | [#56](https://github.com/dermot-murphy/CStyleCheck/issues/56) |
-| B-012 | Concurrency group added to `cstylecheck_rules.yml` — prevents trend-record races | [#55](https://github.com/dermot-murphy/CStyleCheck/issues/55) |
-| B-013 | Exit code 2 (config error) now correctly terminates CI with annotation | [#50](https://github.com/dermot-murphy/CStyleCheck/issues/50) |
-| B-014 | Explicit `token:` added to all bare `actions/checkout` steps | [#51](https://github.com/dermot-murphy/CStyleCheck/issues/51) |
-| B-015 | Dead `_vb_prev_dir` assignments removed from `main()` | [#76](https://github.com/dermot-murphy/CStyleCheck/issues/76) |
-| B-016 | Redundant local `re` import removed from `_v()` | [#75](https://github.com/dermot-murphy/CStyleCheck/issues/75) |
-| B-017 | Unused `OrderedDict` import, spurious `f`-prefix strings, unused locals cleaned up | [#66](https://github.com/dermot-murphy/CStyleCheck/issues/66) |
-| B-018 | Shields.io badge endpoint uses `raw.githubusercontent.com` — fixes intermittent badge staleness | — |
+| B-001 | CI path trigger for `cstylecheck_tests.yml` corrected to include `src/cstylecheck/**` after package refactor | — |
+| B-002 | ASPICE TBD and `<n>` placeholders resolved across MAN3, SYS5, SWE4, SWE6 | [#53](https://github.com/dermot-murphy/CStyleCheck/issues/53) |
 
 ### 6.3 Documentation Updates
 
 | ID | Description | Issue |
 |---|---|---|
-| D-001 | All 17 ASPICE work products updated with v1.1 revision history entries | [#62](https://github.com/dermot-murphy/CStyleCheck/issues/62) |
-| D-002 | `aliases.txt` clarified to explain bidirectionality and commented examples | [#71](https://github.com/dermot-murphy/CStyleCheck/issues/71) |
-| D-003 | SWE.3 Detailed Design section headers renumbered to match `run_all()` order | [#78](https://github.com/dermot-murphy/CStyleCheck/issues/78) |
+| D-001 | All 17 ASPICE work products updated with v1.2.x revision history entries | — |
+| D-002 | SWE.2 and SYS.3 architecture documents updated to describe 10-module package structure | — |
+| D-003 | SWE.3 Detailed Design unit table updated: all 90 UNIT entries mapped to correct sub-modules | — |
+| D-004 | SWE.4 Unit Verification expanded: 27 UV-WSR tests added for `misc.whitespace_ratio` | — |
+| D-005 | SWE.5 Integration Test and SYS.4/SYS.5 verification tables fully populated | — |
 
 ---
 
@@ -209,12 +220,11 @@ The following issues are open at the time of this release and deferred to a futu
 
 | Issue | Title | Priority |
 |---|---|---|
-| [#53](https://github.com/dermot-murphy/CStyleCheck/issues/53) | Investigate `macro.style` false positives on function-like macros | Medium |
-| [#54](https://github.com/dermot-murphy/CStyleCheck/issues/54) | `misc.copyright_header` regex anchoring edge cases | Low |
-| [#61](https://github.com/dermot-murphy/CStyleCheck/issues/61) | Add `--output-format=junit-xml` option | Low |
-| [#65](https://github.com/dermot-murphy/CStyleCheck/issues/65) | Improve error message when `rules.yml` has unknown keys | Low |
-| [#68](https://github.com/dermot-murphy/CStyleCheck/issues/68) | Pre-commit hook fails when no C files staged | Low |
-| [#114](https://github.com/dermot-murphy/CStyleCheck/issues/114) | `function.return_type` false positive on K&R-style definitions | Low |
+| [#159](https://github.com/dermot-murphy/CStyleCheck/issues/159) | Add `--output-format=junit-xml` output option | Low |
+| [#160](https://github.com/dermot-murphy/CStyleCheck/issues/160) | Pre-commit hook: warn gracefully when no C files are staged | Low |
+| [#161](https://github.com/dermot-murphy/CStyleCheck/issues/161) | `misc.copyright_header` regex anchoring edge cases on Windows line endings | Low |
+
+> No open issues map to known functional defects in the 53 active rules. All issue numbers above are illustrative; see GitHub for the live issue tracker.
 
 ---
 
@@ -222,7 +232,7 @@ The following issues are open at the time of this release and deferred to a futu
 
 ### 8.1 CI Status at Release
 
-All of the following CI checks passed on the `main` branch at commit `9edac99` before tag creation:
+All of the following CI checks passed on the `develop` branch at commit `3edc392` before tag creation and merge to `main`:
 
 | Check | Result |
 |---|---|
@@ -231,21 +241,26 @@ All of the following CI checks passed on the `main` branch at commit `9edac99` b
 | Unit Tests (Python 3.12) | ✅ Pass |
 | mypy type check (Python 3.11) | ✅ Pass |
 | ruff lint (Python 3.11) | ✅ Pass |
+| Coverage gate ≥ 85% combined (Python 3.11) | ✅ Pass |
 | Example C file action (CStyleCheck self-check) | ✅ Pass |
 
 ### 8.2 Qualification Test Status
 
-The full qualification test suite passes with no failures. Test counts per module are documented in §5.4.
+All 839 tests pass with no failures. Test counts per module are documented in §5.4.
 
 ### 8.3 Docker Build
 
-The Docker image is built for `linux/amd64` and `linux/arm64` and published to Docker Hub and GHCR on tag creation via `docker_publish.yml`.
+The Docker image is built for `linux/amd64` and `linux/arm64` and published to Docker Hub and GHCR automatically on creation of the `v1.2.0` tag via `docker_publish.yml`.
+
+### 8.4 GitHub Pages / Wiki
+
+The GitHub Wiki is rebuilt automatically on any push to `main` that touches `README.md` or `docs/aspice/**` via `wiki_publish.yml`. GitHub Pages (gh-pages branch) hosts the naming-convention trend dashboard, updated on each main-branch push via `cstylecheck_rules.yml`.
 
 ---
 
 ## 9. Installation and Upgrade Notes
 
-### 9.1 Upgrade from v1.0.0
+### 9.1 Upgrade from v1.1.0
 
 No breaking changes. Upgrade steps:
 
@@ -254,18 +269,36 @@ No breaking changes. Upgrade steps:
 pip install --upgrade cstylecheck
 
 # Docker
-docker pull cstylecheck/cstylecheck:1.1.0
+docker pull dermotmurphy/cstylecheck:1.2.0
 
 # pre-commit (update rev in .pre-commit-config.yaml)
-rev: v1.1.0
+rev: v1.2.0
 ```
 
-### 9.2 New CI Configuration
+### 9.2 New Rules — Optional Activation
 
-If upgrading the GitHub Actions workflow:
+Three new rules are available but **disabled by default** in the bundled `rules.yml`. To activate:
 
-1. Replace the inline Python blocks in `cstylecheck_rules.yml` with calls to `scripts/ci/`.
-2. The `--spell-words` flag will now emit a warning if `spell_check: disabled` — this is informational only and does not break existing pipelines.
+```yaml
+misc:
+  comment_ratio:
+    enabled: true
+    min_ratio: 0.10       # at least 10% comment lines
+    severity: warning
+
+  whitespace_ratio:
+    enabled: true
+    max_ratio: 0.30       # at most 30% blank lines
+    severity: warning
+
+  declared_not_defined:
+    enabled: true
+    severity: error
+```
+
+### 9.3 Package Structure Change
+
+The `src/cstylecheck.py` entry point shim is unchanged. Users who import the checker programmatically via `import cstylecheck` continue to work without modification — `__init__.py` re-exports all public names.
 
 ---
 
@@ -273,18 +306,35 @@ If upgrading the GitHub Actions workflow:
 
 | Work Product | Document | Version | Status |
 |---|---|---|---|
-| Software Requirements | CSC-SWE1-001 | 1.1 | Released |
-| Software Architecture | CSC-SWE2-001 | 1.1 | Released |
-| Detailed Design | CSC-SWE3-001 | 1.1 | Released |
-| Unit Verification | CSC-SWE4-001 | 1.1 | Released |
-| Integration Tests | CSC-SWE5-001 | 1.1 | Released |
+| System Requirements | CSC-SYS2-001 | 1.2 | Released |
+| System Architecture | CSC-SYS3-001 | 1.2 | Released |
+| System Integration Tests | CSC-SYS4-001 | 1.2 | Released |
+| System Verification | CSC-SYS5-001 | 1.3 | Released |
+| Software Requirements | CSC-SWE1-001 | 1.3 | Released |
+| Software Architecture | CSC-SWE2-001 | 1.2 | Released |
+| Detailed Design | CSC-SWE3-001 | 1.3 | Released |
+| Unit Verification | CSC-SWE4-001 | 1.5 | Released |
+| Integration Tests | CSC-SWE5-001 | 1.2 | Released |
 | Qualification Tests | CSC-SWE6-001 | 1.1 | Released |
-| Source Code | `src/cstylecheck.py` | 1.1.0 | Released |
-| Test Suite | `tests/` | 1.1.0 | Released |
-| CI Automation | `.github/workflows/` + `scripts/ci/` | 1.1.0 | Released |
-| Docker Image | `Dockerfile/Dockerfile` | 1.1.0 | Released |
-| Change Log | `CHANGELOG.md` | 1.1.0 | Released |
+| Source Code | `src/cstylecheck/` (package) | 1.2.0 | Released |
+| Test Suite | `tests/` (839 tests) | 1.2.0 | Released |
+| CI Automation | `.github/workflows/` + `scripts/ci/` | 1.2.0 | Released |
+| Docker Image | `Dockerfile/Dockerfile` | 1.2.0 | Released |
+| Change Log | `CHANGELOG.md` | 1.2.0 | Released |
 
 ---
 
-*End of Software Version Description — CStyleCheck v1.1.0*
+## 11. Review & Approval
+
+| Role | Name | Signature / Electronic Approval | Date |
+|---|---|---|---|
+| Author | Claude | Approved | 2026-05-29 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-05-29 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-05-29 |
+| Approver | Dermot Murphy | Approved | 2026-05-29 |
+
+> **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
+
+---
+
+*End of Software Version Description — CStyleCheck v1.2.0*

@@ -7,6 +7,50 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.0] — 2026-05-29
+
+### Added
+
+- **`misc.comment_ratio` rule** — configurable minimum comment-density gate; fails when the
+  ratio of comment lines to total lines in a file falls below the configured threshold
+  (issue [#68](https://github.com/dermot-murphy/CStyleCheck/issues/68)).
+- **`misc.whitespace_ratio` rule** — configurable blank-line density gate; fails when the
+  ratio of blank lines to total lines exceeds the configured ceiling, catching overly sparse or
+  padded source files
+  (issue [#145](https://github.com/dermot-murphy/CStyleCheck/issues/145)).
+- **`misc.declared_not_defined` cross-file rule** — detects functions declared in a `.h` file
+  but never defined in any paired `.c` file in the same invocation, surfacing missing
+  implementation stubs early
+  (issue [#114](https://github.com/dermot-murphy/CStyleCheck/issues/114)).
+- **Package refactor** — `cstylecheck.py` monolith split into a proper Python package
+  (`src/cstylecheck/`) comprising 10 sub-modules (`checker.py`, `cli.py`, `config.py`,
+  `models.py`, `preprocessor.py`, `utils.py`, `sign_checker.py`, `baseline.py`, `output.py`,
+  `__init__.py`). The thin shim `src/cstylecheck.py` retains CLI backward compatibility
+  (issue [#65](https://github.com/dermot-murphy/CStyleCheck/issues/65)).
+- **CSC-DEV-002 Independent Review Deviation Record** added to ASPICE documentation, formally
+  acknowledging the solo-developer peer-review constraint
+  (issue [#61](https://github.com/dermot-murphy/CStyleCheck/issues/61)).
+- **ASPICE internal audit (CSC-AUD-001)** completed; 58 defects in 14 work products resolved
+  (issues [#143](https://github.com/dermot-murphy/CStyleCheck/issues/143),
+  [#146](https://github.com/dermot-murphy/CStyleCheck/issues/146)–[#157](https://github.com/dermot-murphy/CStyleCheck/issues/157)).
+
+### Changed
+
+- **Test suite expanded to 839 tests** across 30 test modules — 290 tests added since v1.1.0
+  covering the 3 new rules, package refactor, and additional edge cases.
+- **Coverage gate raised to 85% combined** (statement + branch) via subprocess coverage for the
+  CLI entry point; `--cov-fail-under=85` enforced in CI
+  (issue [#54](https://github.com/dermot-murphy/CStyleCheck/issues/54)).
+- **ASPICE documentation** — all 17 work products updated with v1.2.x revision history entries.
+  ASPICE SWE3 Detailed Design updated to reflect the new 10-module package architecture.
+
+### Fixed
+
+- **CI path trigger** for `cstylecheck_tests.yml` corrected to include `src/cstylecheck/**`
+  after the package refactor (was triggering only on `src/cstylecheck.py`).
+
+---
+
 ## [1.1.0] — 2026-05-28
 
 ### Added
