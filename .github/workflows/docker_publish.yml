@@ -31,8 +31,8 @@ on:
     paths:
       - "Dockerfile/**"
       - "src/cstylecheck.py"
+      - "src/cstylecheck/**"
       - "src/rules.yml"
-      - "src/_version.py"
       - ".github/workflows/docker_publish.yml"
     tags:
       - "v*.*.*"
