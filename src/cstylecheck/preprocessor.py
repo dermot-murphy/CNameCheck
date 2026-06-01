@@ -97,9 +97,12 @@ def _build_brace_depths(clean: str) -> list:
     for ch in clean:
         if ch == "{":
             depth += 1
+            depths.append(depth)
         elif ch == "}":
+            depths.append(depth)
             depth = max(0, depth - 1)
-        depths.append(depth)
+        else:
+            depths.append(depth)
     return depths
 
 

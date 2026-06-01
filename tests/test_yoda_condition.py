@@ -104,9 +104,9 @@ class TestYodaNotChecked(unittest.TestCase):
     def test_ge_not_checked(self):
         self.assertFalse(has("void f(void){ if (val >= MIN_VAL) {} }", YODA_CFG, RULE))
 
-    def test_single_uppercase_not_a_macro(self):
-        """A single uppercase letter is not treated as an ALL_CAPS constant."""
-        self.assertFalse(has("void f(void){ if (x == A) {} }", YODA_CFG, RULE))
+    def test_single_uppercase_is_a_macro(self):
+        """A single uppercase letter is treated as an ALL_CAPS constant (e.g. #define N 10)."""
+        self.assertTrue(has("void f(void){ if (x == A) {} }", YODA_CFG, RULE))
 
 
 class TestYodaExemptContexts(unittest.TestCase):
