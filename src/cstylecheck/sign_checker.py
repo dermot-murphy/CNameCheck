@@ -59,7 +59,7 @@ _RE_ONE_PARAM = re.compile(
 )
 
 _RE_CALL       = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
-_RE_UINT_LIT   = re.compile(r"^\s*(?:0[xX][0-9A-Fa-f]+|[0-9]+)[uU][lL]?\s*$")
+_RE_UINT_LIT   = re.compile(r"^\s*(?:0[xX][0-9A-Fa-f]+|[0-9]+)[uU][lL]{0,2}\s*$")
 _RE_NEG_LIT    = re.compile(r"^\s*-\s*[0-9]+\s*$")
 _RE_PLAIN_INT  = re.compile(r"^\s*(?:0[xX][0-9A-Fa-f]+|[0-9]+)[lL]?\s*$")
 _RE_CHAR_LIT   = re.compile(r"^\s*'[^']*'\s*$")
@@ -234,7 +234,7 @@ class SignChecker:
             r"(?:(?:extern|static|inline|const|volatile)[ \t]+)*"
             r"(?:(?:unsigned|signed)[ \t]+)?"
             r"(?:(?:long[ \t]+long|long|short)[ \t]+)?"
-            r"\w+[ \t]*\*?[ \t]*"
+            r"\w+[ \t]*\**[ \t]*"
             r"([A-Za-z_]\w*)"
             r"[ \t]*\(([^)]*)\)"
             r"[ \t]*;",

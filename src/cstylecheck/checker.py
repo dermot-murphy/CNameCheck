@@ -634,14 +634,8 @@ class Checker:
             if in_sig:
                 scope  = "parameter"
                 sc     = sc_param
-                # variable.parameter.p_prefix via in_sig path
-                if _pp_param_en:
-                    _p_stripped = self._strip_any_prefix(name)
-                    if not _p_stripped.startswith(_pp_param_pfx):
-                        self._v(m.start(), _pp_param_sev,
-                                "variable.parameter.p_prefix",
-                                f"Parameter '{name}' must start with "
-                                f"'{_pp_param_pfx}' (parameter prefix)")
+                # variable.parameter.p_prefix already emitted by _collect_sig
+                # for every parameter in a signature range — no duplicate here.
             elif depth == 0 and is_static:
                 scope  = "static"
                 sc     = sc_static
@@ -736,7 +730,7 @@ class Checker:
                                 f"Double-pointer variable '{name}' local part "
                                 f"should start with '{pp_pfx}' (BARR-C 7.1.l)")
             elif stars == "*":
-                if ptr_cfg.get("enabled"):
+                if ptr_cfg.get("enabled", True):
                     p_pfx = ptr_cfg.get("prefix", "p_")
                     p_sev = ptr_cfg.get("severity", "warning")
                     if scope == "parameter":
@@ -1032,15 +1026,16 @@ class Checker:
             member_pfx = to_case(raw_base, member_case)
 
             # --- member checks ---
+            body_offset = m.start(1)
             for mm in RE_ENUM_MEMBER.finditer(body_str):
                 mname = mm.group(1)
                 if not matches_case(mname, member_case):
-                    self._v(m.start(), type_sev, "enum.member_case",
+                    self._v(body_offset + mm.start(), type_sev, "enum.member_case",
                             f"Enum member '{mname}' must be {member_case}")
                 if (member_pfx_cfg.get("enabled")
                         and not mname.upper().startswith(
                             member_pfx.upper() + "_")):
-                    self._v(m.start(),
+                    self._v(body_offset + mm.start(),
                             member_pfx_cfg.get("severity", "warning"),
                             "enum.member_prefix",
                             f"Enum member '{mname}' should start with "
@@ -1164,9 +1159,12 @@ class Checker:
         #   '\nvoid'     → ['\n', 'void']         → 0 blanks ✗
         #   '\n\n\ncode' → ['\n','\n','\n','code']→ 2 blanks ✗
         after_lines  = after.splitlines(keepends=True)
-        # [0] is the tail of the */ line itself; skip it.
+        # Skip [0] only when it is the tail fragment of the */ line.
+        # When m.end() lands exactly on a '\n' there is no tail — [0] is
+        # already the first post-header line and must not be discarded.
+        skip = 0 if (m.end() > 0 and source[m.end() - 1] == "\n") else 1
         blank_count  = 0
-        for al in after_lines[1:]:
+        for al in after_lines[skip:]:
             if al.strip():
                 break
             blank_count += 1
@@ -1901,7 +1899,7 @@ class Checker:
         if re.fullmatch(r"'[^']*'", t):                    return True  # char
         if t in {"true", "false", "TRUE", "FALSE",
                  "NULL", "nullptr"}:                       return True  # bool/null
-        if re.fullmatch(r"[A-Z_][A-Z0-9_]+", t):          return True  # ALL_CAPS ≥ 2 chars
+        if re.fullmatch(r"[A-Z][A-Z0-9_]*", t):            return True  # ALL_CAPS ≥ 1 char
         return False
 
     @staticmethod
@@ -2016,9 +2014,8 @@ class Checker:
         sev = tg_cfg.get("severity", "error")
 
         # Check raw source so trigraphs inside comments are also caught.
-        line_map = build_line_map(self.source)
         for m in self._RE_TRIGRAPH.finditer(self.source):
-            line, col = offset_to_line_col(line_map, m.start())
+            line, col = offset_to_line_col(self._line_map, m.start())
             self.result.add(Violation(
                 self.filepath, line, col, sev, "misc.trigraph",
                 f"Trigraph '{m.group(0)}' is forbidden "

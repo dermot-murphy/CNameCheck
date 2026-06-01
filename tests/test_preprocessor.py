@@ -364,17 +364,22 @@ class TestBuildBraceDepths(unittest.TestCase):
         self.assertEqual(depths[0], 1)
 
     def test_depth_after_close_brace(self):
-        src = "{}"
+        # The '}' character records the depth of the scope it closes (pre-decrement).
+        # Depth at positions AFTER '}' correctly reflects the outer scope.
+        src = "{} "
         depths = _build_brace_depths(src)
-        self.assertEqual(depths[0], 1)
-        self.assertEqual(depths[1], 0)
+        self.assertEqual(depths[0], 1)  # '{' — inner scope
+        self.assertEqual(depths[1], 1)  # '}' — still inner (closes the scope)
+        self.assertEqual(depths[2], 0)  # space after '}' — outer scope
 
     def test_nested_braces(self):
-        src = "{{}"
+        # '}' records the depth of the scope it closes (pre-decrement).
+        src = "{{} "
         depths = _build_brace_depths(src)
-        self.assertEqual(depths[0], 1)
-        self.assertEqual(depths[1], 2)
-        self.assertEqual(depths[2], 1)
+        self.assertEqual(depths[0], 1)  # outer '{'
+        self.assertEqual(depths[1], 2)  # inner '{'
+        self.assertEqual(depths[2], 2)  # '}' closes depth-2 scope
+        self.assertEqual(depths[3], 1)  # space — back to outer scope
 
     def test_depth_never_negative(self):
         src = "}} int x;"
@@ -389,12 +394,14 @@ class TestBuildBraceDepths(unittest.TestCase):
     def test_function_body(self):
         src = "void f(void) {\n    int x;\n}\n"
         depths = _build_brace_depths(src)
-        open_idx = src.index("{")
+        open_idx  = src.index("{")
         close_idx = src.index("}")
-        # Character at { position should be depth 1
+        # '{' records the depth of the scope it opens (post-increment → 1)
         self.assertEqual(depths[open_idx], 1)
-        # Character at } position should be depth 0
-        self.assertEqual(depths[close_idx], 0)
+        # '}' records the depth of the scope it closes (pre-decrement → 1)
+        self.assertEqual(depths[close_idx], 1)
+        # characters after '}' are back at outer scope (0)
+        self.assertEqual(depths[close_idx + 1], 0)
 
     def test_empty_source(self):
         self.assertEqual(_build_brace_depths(""), [])
