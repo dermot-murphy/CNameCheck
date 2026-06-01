@@ -417,170 +417,167 @@ def main() -> int:
             sys.exit(f"Cannot open log file '{args.log}': {e}")
 
     tee = Tee(log_fh)
+    try:
+        # Discover files lazily — emit progress immediately rather than
+        # blocking until the entire glob tree is walked.
+        files: list = []
+        for _fp in discover_files(
+            args.files,
+            args.include,
+            args.exclude,
+            cfg.get("ignore", {}),
+        ):
+            files.append(_fp)
+            if getattr(args, "verbose", False) and sys.stderr.isatty():
+                _msg = f"Discovering: {_fp}"
+                print(f"{_msg:<79}", end="\r",
+                      file=sys.stderr, flush=True)
 
-    # Discover files
-    # Discover files lazily — emit progress immediately rather than
-    # blocking until the entire glob tree is walked.
-    files: list = []
-    for _fp in discover_files(
-        args.files,
-        args.include,
-        args.exclude,
-        cfg.get("ignore", {}),
-    ):
-        files.append(_fp)
-        if getattr(args, "verbose", False) and sys.stderr.isatty():
-            _msg = f"Discovering: {_fp}"
-            print(f"{_msg:<79}", end="\r",
-                  file=sys.stderr, flush=True)
+        if not files:
+            print("No C files to check.", file=sys.stderr)
+            return 0
 
-    if not files:
-        print("No C files to check.", file=sys.stderr)
-        tee.close()
-        return 0
-
-    if getattr(args, "verbose", False):
-        _n = len(files)
-        _msg = f"Found {_n} file(s) - starting analysis..."
-        print(f"{_msg:<79}", file=sys.stderr, flush=True)
-
-    output_format  = getattr(args, "output_format", "text")
-    all_violations: list = []
-    # Cache source text keyed by filepath to avoid reading each file twice
-    # (once for Checker, once for SignChecker).
-    source_cache: dict = {}
-
-    for filepath in files:
         if getattr(args, "verbose", False):
-            _msg = f"Scanning: {filepath}"
-            if sys.stderr.isatty():
-                print(f"{_msg:<79}", end="\r", file=sys.stderr, flush=True)
-            else:
-                print(_msg, file=sys.stderr, flush=True)
-        try:
-            source = Path(filepath).read_text(encoding="utf-8", errors="replace")
-            source_cache[filepath] = source
-        except OSError as e:
-            tee.print(f"ERROR: Cannot read {filepath}: {e}")
-            continue
+            _n = len(files)
+            _msg = f"Found {_n} file(s) - starting analysis..."
+            print(f"{_msg:<79}", file=sys.stderr, flush=True)
 
-        # Build accepted prefix list for this file (canonical + aliases)
-        mod   = module_name(filepath)
-        sep   = _cfg(cfg, "file_prefix", "separator", default="_")
-        case  = _cfg(cfg, "file_prefix", "case", default="lower")
-        canon = (mod.upper() if case == "upper" else mod.lower()) + sep
-        alias_pfxs = [canon] + [
-            a.lower() + sep for a in alias_map.get(mod.lower(), [])
-        ]
+        output_format  = getattr(args, "output_format", "text")
+        all_violations: list = []
+        # Cache source text keyed by filepath to avoid reading each file twice
+        # (once for Checker, once for SignChecker).
+        source_cache: dict = {}
 
-        # Collect disabled rules for this specific file
-        _file_disabled, _ident_disabled = _disabled_rules_for_file(filepath, exclusions_map)
-
-        checker = Checker(
-            filepath, source, cfg,
-            spell_words=spell_words,
-            alias_prefixes=alias_pfxs,
-            disabled_rules=_file_disabled,
-            ident_disabled_rules=_ident_disabled,
-            defines=defines,
-            extra_banned=extra_banned,
-            copyright_header=copyright_header,
-            c_keywords=keywords_set,
-            c_stdlib_names=stdlib_set,
-        )
-        result  = checker.run_all()
-        all_violations.extend(result.violations)
-
-        if output_format == "text":
-            for v in sorted(result.violations, key=lambda x: (x.line, x.col)):
-                if args.github_actions:
-                    tee.print(v.github_annotation())
-                else:
-                    tee.print(v)
-
-    if getattr(args, "verbose", False) and sys.stderr.isatty():
-        print(" " * 80, end="\r",
-              file=sys.stderr)  # erase last progress line
-    # Cross-file sign-compatibility check (needs all files ingested first).
-    # Uses the source cache so no file is read from disk a second time.
-    sign_cfg = cfg.get("sign_compatibility", {})
-    if sign_cfg.get("enabled", True):
-        sc = SignChecker(cfg)
         for filepath in files:
-            src = source_cache.get(filepath)
-            if src is not None:
-                sc.ingest(filepath, src)
-        sign_violations = sc.check()
-        all_violations.extend(sign_violations)
-        if output_format == "text":
-            for v in sorted(sign_violations, key=lambda x: (x.filepath, x.line, x.col)):
-                if args.github_actions:
-                    tee.print(v.github_annotation())
+            if getattr(args, "verbose", False):
+                _msg = f"Scanning: {filepath}"
+                if sys.stderr.isatty():
+                    print(f"{_msg:<79}", end="\r", file=sys.stderr, flush=True)
                 else:
-                    tee.print(v)
+                    print(_msg, file=sys.stderr, flush=True)
+            try:
+                source = Path(filepath).read_text(encoding="utf-8", errors="replace")
+                source_cache[filepath] = source
+            except OSError as e:
+                tee.print(f"ERROR: Cannot read {filepath}: {e}")
+                continue
 
-    # Cross-file declared-but-not-defined check (needs all files ingested first).
-    dnd_cfg = cfg.get("misc", {}).get("declared_not_defined", {})
-    if dnd_cfg.get("enabled", False):
-        dndc = DeclaredNotDefinedChecker(cfg, defines=defines)
-        for filepath in files:
-            src = source_cache.get(filepath)
-            if src is not None:
-                dndc.ingest(filepath, src)
-        dnd_violations = dndc.check()
-        all_violations.extend(dnd_violations)
-        if output_format == "text":
-            for v in sorted(dnd_violations, key=lambda x: (x.filepath, x.line, x.col)):
-                if args.github_actions:
-                    tee.print(v.github_annotation())
-                else:
-                    tee.print(v)
+            # Build accepted prefix list for this file (canonical + aliases)
+            mod   = module_name(filepath)
+            sep   = _cfg(cfg, "file_prefix", "separator", default="_")
+            case  = _cfg(cfg, "file_prefix", "case", default="lower")
+            canon = (mod.upper() if case == "upper" else mod.lower()) + sep
+            alias_pfxs = [canon] + [
+                a.lower() + sep for a in alias_map.get(mod.lower(), [])
+            ]
 
-    # --write-baseline: dump all violations and exit 0 (no further checks).
-    if getattr(args, "write_baseline", None):
-        write_baseline(all_violations, args.write_baseline)
-        tee.print(f"Baseline written to '{args.write_baseline}' "
-                  f"({len(all_violations)} violation(s)).")
+            # Collect disabled rules for this specific file
+            _file_disabled, _ident_disabled = _disabled_rules_for_file(filepath, exclusions_map)
+
+            checker = Checker(
+                filepath, source, cfg,
+                spell_words=spell_words,
+                alias_prefixes=alias_pfxs,
+                disabled_rules=_file_disabled,
+                ident_disabled_rules=_ident_disabled,
+                defines=defines,
+                extra_banned=extra_banned,
+                copyright_header=copyright_header,
+                c_keywords=keywords_set,
+                c_stdlib_names=stdlib_set,
+            )
+            result  = checker.run_all()
+            all_violations.extend(result.violations)
+
+            if output_format == "text":
+                for v in sorted(result.violations, key=lambda x: (x.line, x.col)):
+                    if args.github_actions:
+                        tee.print(v.github_annotation())
+                    else:
+                        tee.print(v)
+
+        if getattr(args, "verbose", False) and sys.stderr.isatty():
+            print(" " * 80, end="\r",
+                  file=sys.stderr)  # erase last progress line
+        # Cross-file sign-compatibility check (needs all files ingested first).
+        # Uses the source cache so no file is read from disk a second time.
+        sign_cfg = cfg.get("sign_compatibility", {})
+        if sign_cfg.get("enabled", True):
+            sc = SignChecker(cfg)
+            for filepath in files:
+                src = source_cache.get(filepath)
+                if src is not None:
+                    sc.ingest(filepath, src)
+            sign_violations = sc.check()
+            all_violations.extend(sign_violations)
+            if output_format == "text":
+                for v in sorted(sign_violations, key=lambda x: (x.filepath, x.line, x.col)):
+                    if args.github_actions:
+                        tee.print(v.github_annotation())
+                    else:
+                        tee.print(v)
+
+        # Cross-file declared-but-not-defined check (needs all files ingested first).
+        dnd_cfg = cfg.get("misc", {}).get("declared_not_defined", {})
+        if dnd_cfg.get("enabled", False):
+            dndc = DeclaredNotDefinedChecker(cfg, defines=defines)
+            for filepath in files:
+                src = source_cache.get(filepath)
+                if src is not None:
+                    dndc.ingest(filepath, src)
+            dnd_violations = dndc.check()
+            all_violations.extend(dnd_violations)
+            if output_format == "text":
+                for v in sorted(dnd_violations, key=lambda x: (x.filepath, x.line, x.col)):
+                    if args.github_actions:
+                        tee.print(v.github_annotation())
+                    else:
+                        tee.print(v)
+
+        # --write-baseline: dump all violations and exit 0 (no further checks).
+        if getattr(args, "write_baseline", None):
+            write_baseline(all_violations, args.write_baseline)
+            tee.print(f"Baseline written to '{args.write_baseline}' "
+                      f"({len(all_violations)} violation(s)).")
+            return 0
+
+        # --baseline-file: suppress violations that match the saved baseline.
+        if getattr(args, "baseline_file", None):
+            baseline = load_baseline(args.baseline_file)
+            before   = len(all_violations)
+            all_violations = [
+                v for v in all_violations
+                if _baseline_key(v) not in baseline
+            ]
+            suppressed = before - len(all_violations)
+            if suppressed and output_format == "text":
+                tee.print(f"(Baseline suppressed {suppressed} known violation(s))")
+
+        # --warnings-as-errors: promote every warning and info to error.
+        # We do this AFTER collecting and printing all violations so that the
+        # original severity is visible in the output, but the summary and exit
+        # code reflect the promoted level.
+        if getattr(args, "warnings_as_errors", False):
+            for v in all_violations:
+                if v.severity in ("warning", "info"):
+                    v.severity = "error"
+
+        # --output-format json / sarif: emit structured output to stdout or --log.
+        if output_format == "json":
+            json_text = _violations_to_json(all_violations, len(files))
+            tee.print(json_text)
+        elif output_format == "sarif":
+            sarif_text = _violations_to_sarif(all_violations, _VERSION)
+            tee.print(sarif_text)
+
+        if args.summary and output_format == "text":
+            print_summary(all_violations, len(files), tee)
+
+        if args.exit_zero:
+            return 0
+        return 1 if any(v.severity == "error" for v in all_violations) else 0
+    finally:
         tee.close()
-        return 0
-
-    # --baseline-file: suppress violations that match the saved baseline.
-    if getattr(args, "baseline_file", None):
-        baseline = load_baseline(args.baseline_file)
-        before   = len(all_violations)
-        all_violations = [
-            v for v in all_violations
-            if _baseline_key(v) not in baseline
-        ]
-        suppressed = before - len(all_violations)
-        if suppressed and output_format == "text":
-            tee.print(f"(Baseline suppressed {suppressed} known violation(s))")
-
-    # --warnings-as-errors: promote every warning and info to error.
-    # We do this AFTER collecting and printing all violations so that the
-    # original severity is visible in the output, but the summary and exit
-    # code reflect the promoted level.
-    if getattr(args, "warnings_as_errors", False):
-        for v in all_violations:
-            if v.severity in ("warning", "info"):
-                v.severity = "error"
-
-    # --output-format json / sarif: emit structured output to stdout or --log.
-    if output_format == "json":
-        json_text = _violations_to_json(all_violations, len(files))
-        tee.print(json_text)
-    elif output_format == "sarif":
-        sarif_text = _violations_to_sarif(all_violations, _VERSION)
-        tee.print(sarif_text)
-
-    if args.summary and output_format == "text":
-        print_summary(all_violations, len(files), tee)
-
-    tee.close()
-
-    if args.exit_zero:
-        return 0
-    return 1 if any(v.severity == "error" for v in all_violations) else 0
 
 
 if __name__ == "__main__":
