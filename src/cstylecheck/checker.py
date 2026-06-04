@@ -17,6 +17,7 @@ from .models import (
 from .preprocessor import (
     preprocess, build_line_map, offset_to_line_col,
     _build_brace_depths, _comment_only_lines, extract_comments,
+    parse_inline_suppressions,
 )
 from .utils import (
     matches_case, matches_case_abbrev, to_case, module_name,
@@ -148,6 +149,7 @@ class Checker:
         alias_prefixes: list = None,
         disabled_rules: frozenset = None,
         ident_disabled_rules: dict = None,
+        inline_suppressions: dict = None,
         defines: list = None,
         extra_banned: frozenset = None,
         copyright_header=None,
@@ -193,6 +195,11 @@ class Checker:
         # Set of rule IDs that are suppressed for this file.
         self._disabled_rules: frozenset = disabled_rules or frozenset()
         self._ident_disabled: dict = ident_disabled_rules or {}
+        self._inline_suppressions: dict = (
+            parse_inline_suppressions(source)
+            if inline_suppressions is None
+            else inline_suppressions
+        )
         # Extra banned identifier names (from --banned-names file + builtins)
         self._extra_banned: frozenset = extra_banned or frozenset()
         # tuple (template_text, compiled_re) from --copyright, or None
@@ -308,6 +315,14 @@ class Checker:
             self.result.violations = [
                 v for v in self.result.violations
                 if v.rule not in self._disabled_rules
+            ]
+        # Remove violations suppressed by inline comments
+        if self._inline_suppressions:
+            def _not_suppressed(v: Violation) -> bool:
+                s = self._inline_suppressions.get(v.line, frozenset())
+                return "*" not in s and v.rule not in s
+            self.result.violations = [
+                v for v in self.result.violations if _not_suppressed(v)
             ]
         return self.result
 

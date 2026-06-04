@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-MAN3-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-MAN3-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | MAN.3 |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 Purpose version text v1.0.0→v1.2.0, update SWE1-001 version in §3.2 (1.3→1.5) — resolves issue #163 |
+| 1.4 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 version, §4.1 rule count 48→53 and package reference, update test count and module count, update referenced doc versions, update WBS-10 status — resolves issue #163 |
 | 1.3 | 2026-05-28 | Dermot Murphy | §6 WBS-10 to WBS-16: update status with concrete facts (839 tests, release dates, blocked items) — closes issue #154 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Resolve \<TBD\> milestone dates for v1.0.0; add v1.1.0 milestone row — closes issue #53 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
@@ -29,14 +31,14 @@
 
 ## 3. Purpose & Scope
 
-This Project Management Plan (PMP) defines the project scope, lifecycle, work breakdown, resources, schedule, interfaces, and monitoring approach for **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, MAN.3 — Project Management**.
+This Project Management Plan (PMP) defines the project scope, lifecycle, work breakdown, resources, schedule, interfaces, and monitoring approach for **CStyleCheck v1.2.0**. It satisfies **Automotive SPICE® PAM v4.0, MAN.3 — Project Management**.
 
 ### 3.1 Project Overview
 
 | Attribute | Value |
 |---|---|
 | **Product** | CStyleCheck — Embedded C naming-convention linter |
-| **Version** | 1.0.0 |
+| **Version** | 1.2.0 |
 | **Repository** | `https://github.com/dermot-murphy/CStyleCheck` |
 | **Language** | Python 3.10–3.12 |
 | **Deployment** | CLI, pip/pipx, Docker (GHCR + Docker Hub), GitHub Action, pre-commit |
@@ -47,11 +49,11 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | System Requirements Specification | 1.0 |
-| CSC-SWE1-001 | Software Requirements Specification | 1.0 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CSC-MAN5-001 | Risk Management Plan | 1.0 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.0 |
+| CSC-SYS2-001 | System Requirements Specification | 1.4 |
+| CSC-SWE1-001 | Software Requirements Specification | 1.5 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.4 |
+| CSC-MAN5-001 | Risk Management Plan | 1.2 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.2 |
 
 ---
 
@@ -59,8 +61,8 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 
 ### 4.1 In Scope
 
-- Design, implementation, and testing of `cstylecheck.py` (≈2,800 lines) implementing 48 rule IDs
-- Test suite (≥500 pytest tests across 20+ test modules)
+- Design, implementation, and testing of `src/cstylecheck/` package (10 sub-modules) implementing 53 rule IDs
+- Test suite (965 pytest tests across 33 test modules)
 - Docker image build and multi-platform publication to GHCR and Docker Hub
 - GitHub Action integration (`action.yml`)
 - pre-commit hook integration (`.pre-commit-hooks.yml`)
@@ -125,7 +127,7 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | WBS-07 | Test suite (500+ tests) | 40h | Claude | Complete |
 | WBS-08 | Docker packaging and CI | 8h | Claude | Complete |
 | WBS-09 | GitHub Action and pre-commit | 6h | Claude | Complete |
-| WBS-10 | Unit verification (SWE.4) | 4h | Claude | Largely Complete — 839 tests exist; remaining gap: SWE4 catalogue update for misc.whitespace_ratio (issue #148) |
+| WBS-10 | Unit verification (SWE.4) | 4h | Claude | Complete — 965 tests across 33 modules; SWE4 catalogue updated (issues #148, #163 resolved) |
 | WBS-11 | Integration testing (SWE.5) | 4h | Claude | In Progress — blocked by #152 (results recording); test execution complete |
 | WBS-12 | Qualification testing (SWE.6) | 4h | Claude | Largely Complete — CI pipeline constitutes qualification execution; result recording open (issue #152) |
 | WBS-13 | System integration testing (SYS.4) | 4h | Claude | In Progress — blocked by #152 (results recording); test execution complete |

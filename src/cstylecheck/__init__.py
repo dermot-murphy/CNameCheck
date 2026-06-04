@@ -54,6 +54,7 @@ from .preprocessor import (              # noqa: F401, E402
     _build_brace_depths,
     _comment_only_lines,
     extract_comments,
+    parse_inline_suppressions,
 )
 
 from .utils import (                     # noqa: F401, E402
@@ -95,6 +96,9 @@ from .config import (                    # noqa: F401, E402
     _DEFAULT_KEYWORDS_FILE,
     _DEFAULT_STDLIB_FILE,
     _DEFAULT_SPELL_DICT,
+    _PER_DIR_CONFIG_NAME,
+    _walk_per_dir_configs,
+    resolve_per_dir_config,
 )
 
 from .checker import (                   # noqa: F401, E402
@@ -135,7 +139,21 @@ from .output import (                    # noqa: F401, E402
     Tee,
     _violations_to_json,
     _violations_to_sarif,
+    _violations_to_html,
     print_summary,
+)
+
+from .fixer import (                     # noqa: F401, E402
+    apply_fixes,
+    unified_diff,
+    FIXABLE_RULES,
+    SAFE_RULES,
+)
+
+from .wizard import (                    # noqa: F401, E402
+    run_wizard,
+    run_preset,
+    PRESETS,
 )
 
 from .cli import (                       # noqa: F401, E402

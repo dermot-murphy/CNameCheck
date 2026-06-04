@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions §3.1, test count 839→965 in overall result — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SIT-001 to SIT-013 execution results (PASS); commit 93178cd, 2026-05-28 — closes issue #152 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -38,10 +39,10 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.0 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.2 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.6 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.4 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.2 |
 
 ### 3.2 Test Environment
 
@@ -384,7 +385,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-012 | Baseline write → load → filter | IF-08, IF-09 | PASS | |
 | SIT-013 | Log file Tee | IF-10 (filesystem) | PASS | |
 
-**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 839 tests all PASS, 87.31% combined coverage.
+**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 965 tests all PASS, 87.31% combined coverage.
 
 > **📋 Note:** All 10 defined software architecture interfaces must be covered before integration testing is considered complete. Any uncovered interface must be resolved via a new or updated test case.
 

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.5 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.6 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-04 | Claude | Automated accuracy audit: add §6 rows for test_preprocessor.py/test_comment_ratio/test_declared_not_defined/test_update_config/test_config_loading; update total 786→965; fix section header counts (§5.4/§5.6/§5.12/§5.13); update referenced doc versions; fix §3 version text; update coverage note — resolves issue #163 |
 | 1.5 | 2026-05-28 | Claude | Add §5.7b whitespace_ratio test catalogue (27 tests); fix §5.1 count 32→35; add §6 row for test_whitespace_ratio.py; update total 759→786; update §7 traceability — closes issues #148 #157 |
 | 1.4 | 2026-05-28 | Dermot Murphy | §4.2: implement subprocess coverage via COVERAGE_PROCESS_START + sitecustomize.py; raise CI gate to 85% combined; actual v1.2.0 CI: 89.8% stmt, 87.31% combined — closes issue #54 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Populate §6 results table: actual test counts, all PASS; coverage 86% stmt / N/A branch (v1.1.0 CI); add 5 missing test modules — closes issue #53 |
@@ -33,7 +34,7 @@
 
 ## 3. Purpose & Scope
 
-This specification defines the unit verification strategy, coverage criteria, and test case catalogue for **CStyleCheck v1.0.0**. It satisfies **Automotive SPICE® PAM v4.0, SWE.4 — Software Unit Verification**.
+This specification defines the unit verification strategy, coverage criteria, and test case catalogue for **CStyleCheck v1.2.x**. It satisfies **Automotive SPICE® PAM v4.0, SWE.4 — Software Unit Verification**.
 
 Unit verification covers both dynamic testing (pytest test suite) and static verification (naming convention self-check via `rules.yml` CI workflow).
 
@@ -41,10 +42,10 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.0 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.0 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.3 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.3 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.2 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
 
 ---
 
@@ -71,7 +72,7 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 Coverage is measured per CI run on all three Python matrix versions (3.10, 3.11, 3.12) and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact, Python 3.11 build).
 
-**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 839 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
+**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 965 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
 
 > **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures.
 
@@ -165,7 +166,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.4 Type Rules — `test_typedefs.py` (8), `test_enums.py` (11), `test_structs.py` (7)
+### 5.4 Type Rules — `test_typedefs.py` (8), `test_enums.py` (11), `test_structs.py` (12)
 
 | TC-ID | Test Name | Rule Verified | Pass Condition |
 |---|---|---|---|
@@ -191,7 +192,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.6 Miscellaneous Rules — `test_misc.py` (23), `test_misc_improvements.py` (65), `test_block_comment_spacing.py`
+### 5.6 Miscellaneous Rules — `test_misc.py` (28), `test_misc_improvements.py` (77), `test_block_comment_spacing.py`
 
 | TC-ID | Test Name | Rule Verified | Pass Condition |
 |---|---|---|---|
@@ -295,7 +296,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.12 CLI and Integration — `test_cli.py` (29 tests)
+### 5.12 CLI and Integration — `test_cli.py` (43 tests)
 
 | TC-ID | Test Name | Unit Verified | Pass Condition |
 |---|---|---|---|
@@ -312,7 +313,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.13 Bug-Fix and Improvement Tests — `test_improvements.py` (63), `test_barr_c.py` (42), `test_eof_comment.py`, `test_copyright_header.py`, `test_parameter_prefix.py`, `test_exclusions.py`
+### 5.13 Bug-Fix and Improvement Tests — `test_improvements.py` (67), `test_barr_c.py` (42), `test_eof_comment.py`, `test_copyright_header.py`, `test_parameter_prefix.py`, `test_exclusions.py`
 
 These test modules provide regression coverage for previously fixed bugs and new rules. Key cases:
 
@@ -377,11 +378,16 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_github_annotations.py` | 8 | 8 | 0 | GitHub Actions annotation output |
 | `test_case_patterns.py` | 6 | 6 | 0 | Case pattern matching (`_check_case_patterns`) |
 | `test_thread_safe_globals.py` | 4 | 4 | 0 | Thread-safe global state (`C_KEYWORDS`, `C_STDLIB_NAMES`) |
-| **Total** | **786** | **786** | **0** | All rules covered |
+| `test_preprocessor.py` | 76 | 76 | 0 | COMP-04 (`preprocessor.py`) — strip_comments, strip_strings, preprocess, build_line_map, brace depths, extract_comments |
+| `test_comment_ratio.py` | 24 | 24 | 0 | `_check_comment_ratio` |
+| `test_declared_not_defined.py` | 39 | 39 | 0 | `DeclaredNotDefinedChecker` |
+| `test_config_loading.py` | 13 | 13 | 0 | COMP-02 (`load_config` — UTF-8, missing file, YAML errors) |
+| `test_update_config.py` | 27 | 27 | 0 | COMP-02 (`_deep_merge`) |
+| **Total** | **965** | **965** | **0** | All rules covered |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
-**Statement Coverage (v1.2.0 CI — all 759 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
-**Branch Coverage (v1.2.0 CI — all 759 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
+**Statement Coverage (v1.2.0 CI — 839 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
+**Branch Coverage (v1.2.0 CI — 839 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
 
 **Static Verification (rules.yml):** PASS
 

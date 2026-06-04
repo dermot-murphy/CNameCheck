@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.2 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
@@ -20,6 +20,9 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-04 | Claude | Add SYS-F-041 to SYS-F-045 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output); update §6 RTM — issues #188 #189 #190 #193 #192 |
+| 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.2 "three modes" text (listed 4 modes), update §3.3 referenced doc versions — resolves issue #163 |
+| 1.3 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 and SYS-F-011 rule count 48→53; update referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | §5.9: formally defer NF-010 and NF-012 to v2.0; classify NF-011 as Out of Scope v1.x — closes issue #153 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -30,7 +33,7 @@
 
 ### 3.1 Purpose
 
-This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.0.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 48 rule IDs.
+This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.2.x** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 53 rule IDs.
 
 This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2 — System Requirements Analysis**.
 
@@ -38,7 +41,7 @@ This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2
 
 CStyleCheck is a software-only system. It operates as a static analysis tool that accepts C source files and a rule-configuration file as inputs, evaluates each identifier in those files against the configured naming rules, and produces a structured violation report as output.
 
-The system is deployed in three integration modes:
+The system is deployed in four integration modes:
 
 1. **Command-line tool** — invoked directly via Python or as a pip-installed entry point
 2. **GitHub Action** — integrated into GitHub Actions CI workflows via `action.yml`
@@ -51,8 +54,8 @@ The system is deployed in three integration modes:
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.6 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
 
 ### 3.4 Glossary
 
@@ -105,7 +108,7 @@ The following table summarises the stakeholder needs from which the system requi
 
 | REQ-ID | Requirement | Priority | Verification Method | Derived From |
 |---|---|---|---|---|
-| SYS-F-011 | The system shall enforce naming rules across 48 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules | Mandatory | Test | STK-001, STK-002 |
+| SYS-F-011 | The system shall enforce naming rules across 53 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules | Mandatory | Test | STK-001, STK-002 |
 | SYS-F-012 | The system shall enforce module-prefix requirements on global variables, file-scope static variables, public functions, macros, and constants | Mandatory | Test | STK-001 |
 | SYS-F-013 | The system shall enforce scope-aware variable rules: global (`g_` prefix), file-static (`s_` prefix), local, and parameter — each independently configurable | Mandatory | Test | STK-001 |
 | SYS-F-014 | The system shall enforce pointer-prefix rules: single pointer (`p_`), double pointer (`pp_`), boolean (`b_`), and handle variables (`h_`) | Mandatory | Test | STK-001 |
@@ -175,6 +178,16 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-NF-008 | The system shall apply CLI arguments specified in `--options-file` before direct CLI arguments, allowing direct arguments to override | Mandatory | Test | STK-002 |
 | SYS-NF-009 | The system shall support per-file rule suppression via a YAML exclusions file | Mandatory | Test | STK-002 |
 
+### 5.8a Functional Requirements — New Features (v1.3.x)
+
+| REQ-ID | Requirement | Priority | Verification Method | Derived From |
+|---|---|---|---|---|
+| SYS-F-041 | The system shall support inline suppression comments in C source using `// cstylecheck: disable=rule.id` (same-line), `// cstylecheck: disable-next-line=rule.id` (next line), and paired `disable=`/`enable=` block directives; directives shall be case-insensitive and support comma-separated rule ID lists | Mandatory | Test | STK-002 |
+| SYS-F-042 | The system shall apply safe mechanical fixes in-place when `--fix` is specified; `--dry-run` shall show a unified diff without modifying files; `--safe-only` shall restrict to zero-risk fixes; fixable rules shall include at minimum `misc.unsigned_suffix` and `misc.lowercase_l_suffix` | Mandatory | Test | STK-001 |
+| SYS-F-043 | The system shall provide an interactive configuration wizard (`--init`) that generates `.cstylecheck.yml` through a Q&A session; `--preset barr-c\|minimal\|misra` shall write a pre-built config without wizard interaction; `--init-output FILE` shall set the output path; `--overwrite` shall allow replacing an existing config file | Mandatory | Test | STK-002 |
+| SYS-F-044 | The system shall support per-directory configuration overrides when `--per-dir-config` is specified; the system shall walk upward from each source file's directory, deep-merging any `.cstylecheck.yml` found along the path; the nearest config wins; a `root: true` entry shall stop the upward search; per-directory resolution results shall be cached | Mandatory | Test | STK-002 |
+| SYS-F-045 | The system shall produce a self-contained HTML report when `--output-format html` is specified; the report shall include inline CSS, summary cards (errors/warnings/info/total/files checked), and per-file violation tables; the HTML shall be written to `--log FILE` if provided, otherwise to stdout | Mandatory | Test | STK-007 |
+
 ### 5.9 Non-Functional Requirements — Integration
 
 | REQ-ID | Requirement | Priority | Verification Method | Derived From | Disposition |
@@ -200,6 +213,11 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-NF-010 | Integration (pre-commit) | STK-001 | `.pre-commit-hooks.yml` | Deferred v2.0 |
 | SYS-NF-011 | Integration (GitHub Marketplace) | STK-005 | `action.yml` | Out of Scope v1.x |
 | SYS-NF-012 | Integration (step outputs) | STK-005 | `action.yml` | Deferred v2.0 |
+| SYS-F-041 | Inline suppression | STK-002 | `preprocessor.parse_inline_suppressions()` | SWE1-072, SWE1-073 |
+| SYS-F-042 | Auto-fix mode | STK-001 | `fixer.py` Fixer module | SWE1-074 |
+| SYS-F-043 | Config wizard and presets | STK-002 | `wizard.py` Wizard module | SWE1-075 |
+| SYS-F-044 | Per-directory config | STK-002 | `config.resolve_per_dir_config()` | SWE1-076 |
+| SYS-F-045 | HTML report output | STK-007 | `output._violations_to_html()` | SWE1-077 |
 
 ---
 
