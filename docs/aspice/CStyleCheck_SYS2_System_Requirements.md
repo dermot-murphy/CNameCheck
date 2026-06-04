@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.4 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.5 |
 | **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-04 | Claude | Add SYS-F-041 to SYS-F-045 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output); update §6 RTM — issues #188 #189 #190 #193 #192 |
 | 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.2 "three modes" text (listed 4 modes), update §3.3 referenced doc versions — resolves issue #163 |
 | 1.3 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 and SYS-F-011 rule count 48→53; update referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | §5.9: formally defer NF-010 and NF-012 to v2.0; classify NF-011 as Out of Scope v1.x — closes issue #153 |
@@ -177,6 +178,16 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-NF-008 | The system shall apply CLI arguments specified in `--options-file` before direct CLI arguments, allowing direct arguments to override | Mandatory | Test | STK-002 |
 | SYS-NF-009 | The system shall support per-file rule suppression via a YAML exclusions file | Mandatory | Test | STK-002 |
 
+### 5.8a Functional Requirements — New Features (v1.3.x)
+
+| REQ-ID | Requirement | Priority | Verification Method | Derived From |
+|---|---|---|---|---|
+| SYS-F-041 | The system shall support inline suppression comments in C source using `// cstylecheck: disable=rule.id` (same-line), `// cstylecheck: disable-next-line=rule.id` (next line), and paired `disable=`/`enable=` block directives; directives shall be case-insensitive and support comma-separated rule ID lists | Mandatory | Test | STK-002 |
+| SYS-F-042 | The system shall apply safe mechanical fixes in-place when `--fix` is specified; `--dry-run` shall show a unified diff without modifying files; `--safe-only` shall restrict to zero-risk fixes; fixable rules shall include at minimum `misc.unsigned_suffix` and `misc.lowercase_l_suffix` | Mandatory | Test | STK-001 |
+| SYS-F-043 | The system shall provide an interactive configuration wizard (`--init`) that generates `.cstylecheck.yml` through a Q&A session; `--preset barr-c\|minimal\|misra` shall write a pre-built config without wizard interaction; `--init-output FILE` shall set the output path; `--overwrite` shall allow replacing an existing config file | Mandatory | Test | STK-002 |
+| SYS-F-044 | The system shall support per-directory configuration overrides when `--per-dir-config` is specified; the system shall walk upward from each source file's directory, deep-merging any `.cstylecheck.yml` found along the path; the nearest config wins; a `root: true` entry shall stop the upward search; per-directory resolution results shall be cached | Mandatory | Test | STK-002 |
+| SYS-F-045 | The system shall produce a self-contained HTML report when `--output-format html` is specified; the report shall include inline CSS, summary cards (errors/warnings/info/total/files checked), and per-file violation tables; the HTML shall be written to `--log FILE` if provided, otherwise to stdout | Mandatory | Test | STK-007 |
+
 ### 5.9 Non-Functional Requirements — Integration
 
 | REQ-ID | Requirement | Priority | Verification Method | Derived From | Disposition |
@@ -202,6 +213,11 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-NF-010 | Integration (pre-commit) | STK-001 | `.pre-commit-hooks.yml` | Deferred v2.0 |
 | SYS-NF-011 | Integration (GitHub Marketplace) | STK-005 | `action.yml` | Out of Scope v1.x |
 | SYS-NF-012 | Integration (step outputs) | STK-005 | `action.yml` | Deferred v2.0 |
+| SYS-F-041 | Inline suppression | STK-002 | `preprocessor.parse_inline_suppressions()` | SWE1-072, SWE1-073 |
+| SYS-F-042 | Auto-fix mode | STK-001 | `fixer.py` Fixer module | SWE1-074 |
+| SYS-F-043 | Config wizard and presets | STK-002 | `wizard.py` Wizard module | SWE1-075 |
+| SYS-F-044 | Per-directory config | STK-002 | `config.resolve_per_dir_config()` | SWE1-076 |
+| SYS-F-045 | HTML report output | STK-007 | `output._violations_to_html()` | SWE1-077 |
 
 ---
 
