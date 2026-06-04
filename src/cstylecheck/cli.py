@@ -24,6 +24,7 @@ from .config import (
     update_config,
     C_KEYWORDS, C_STDLIB_NAMES,
 )
+from .fixer import apply_fixes, unified_diff, FIXABLE_RULES, SAFE_RULES
 from .utils import module_name, _cfg
 from .checker import Checker
 from .sign_checker import SignChecker, DeclaredNotDefinedChecker
@@ -309,6 +310,22 @@ def _build_parser() -> argparse.ArgumentParser:
                         "default values.  Exits 0 on success.  "
                         "NOTE: YAML comments are not preserved — keep the "
                         "original file in version control before running.")
+
+    fix_group = p.add_argument_group("auto-fix")
+    fix_group.add_argument(
+        "--fix", action="store_true",
+        help="Automatically apply safe, mechanical fixes to source files in-place. "
+             f"Fixable rules: {', '.join(sorted(FIXABLE_RULES))}. "
+             "Use --dry-run to preview changes without writing files.")
+    fix_group.add_argument(
+        "--dry-run", action="store_true",
+        help="With --fix: print a unified diff of what would change without "
+             "modifying any files.")
+    fix_group.add_argument(
+        "--safe-only", action="store_true",
+        help=f"With --fix: apply only zero-risk fixes "
+             f"({', '.join(sorted(SAFE_RULES))}). "
+             "Implied by default; all current fixes are safe.")
     return p
 
 
@@ -533,6 +550,38 @@ def main() -> int:
                         tee.print(v.github_annotation())
                     else:
                         tee.print(v)
+
+        # --fix / --dry-run: apply mechanical fixes to source files.
+        if getattr(args, "fix", False):
+            safe_only = getattr(args, "safe_only", False)
+            dry_run   = getattr(args, "dry_run", False)
+            total_fixed = 0
+            for filepath in files:
+                original = source_cache.get(filepath)
+                if original is None:
+                    continue
+                file_violations = [
+                    v for v in all_violations if v.filepath == filepath
+                ]
+                fixed, count = apply_fixes(original, file_violations,
+                                           safe_only=safe_only)
+                if fixed == original:
+                    continue
+                if dry_run:
+                    diff_text = unified_diff(original, fixed, filepath)
+                    if diff_text:
+                        tee.print(diff_text)
+                else:
+                    try:
+                        Path(filepath).write_text(fixed, encoding="utf-8")
+                        tee.print(f"Fixed {count} issue(s) in {filepath}")
+                    except OSError as exc:
+                        tee.print(f"ERROR: Cannot write {filepath}: {exc}")
+                total_fixed += count
+            if total_fixed and not dry_run:
+                tee.print(f"Total: {total_fixed} fix(es) applied.")
+            elif dry_run and not total_fixed:
+                tee.print("No fixable violations found.")
 
         # --write-baseline: dump all violations and exit 0 (no further checks).
         if getattr(args, "write_baseline", None):

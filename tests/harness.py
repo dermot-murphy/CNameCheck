@@ -32,6 +32,8 @@ _load_dict_file             = _mod._load_dict_file
 SignChecker                 = _mod.SignChecker
 DeclaredNotDefinedChecker   = _mod.DeclaredNotDefinedChecker
 parse_inline_suppressions   = _mod.parse_inline_suppressions
+apply_fixes                 = _mod.apply_fixes
+unified_diff                = _mod.unified_diff
 
 
 # ---------------------------------------------------------------------------
