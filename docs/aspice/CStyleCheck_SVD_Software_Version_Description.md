@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-05-29 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.4 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-04 | Claude | Deep accuracy audit: update §3.1, §5.5, §10 document version tables to reflect post-audit versions — resolves issue #163 |
 | 1.3 | 2026-06-04 | Claude | Automated accuracy audit: test count 839→965 (33 modules), add missing test modules to §5.4, fix SWE6 version in §5.5, update §8.2 and §10 — resolves issue #163 |
 | 1.2 | 2026-05-29 | Claude | Updated for v1.2.0 release — package refactor, 3 new rules, 839 tests |
 | 1.1 | 2026-05-28 | Claude | Initial SVD document created for v1.1.0 release |
@@ -36,15 +37,15 @@ This document satisfies the release-identification and configuration-status-acco
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.4 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.3 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.4 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.5 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.4 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.5 |
 | CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.6 |
 | CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.3 |
 | CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.4 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
-| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.2 |
-| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.4 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.6 |
+| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.3 |
+| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.5 |
 
 ---
 
@@ -161,25 +162,25 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SVD-001 | Software Version Description (this document) | 1.3 |
-| CSC-SWE1-001 | Software Requirements Specification | 1.4 |
-| CSC-SWE2-001 | Software Architecture Design | 1.3 |
-| CSC-SWE3-001 | Software Detailed Design | 1.4 |
+| CSC-SVD-001 | Software Version Description (this document) | 1.4 |
+| CSC-SWE1-001 | Software Requirements Specification | 1.5 |
+| CSC-SWE2-001 | Software Architecture Design | 1.4 |
+| CSC-SWE3-001 | Software Detailed Design | 1.5 |
 | CSC-SWE4-001 | Software Unit Verification Specification | 1.6 |
 | CSC-SWE5-001 | Software Integration Test Specification | 1.3 |
 | CSC-SWE6-001 | Software Qualification Test Specification | 1.4 |
-| CSC-SYS2-001 | System Requirements Specification | 1.3 |
-| CSC-SYS3-001 | System Architecture Design | 1.2 |
-| CSC-SYS4-001 | System Integration Test Specification | 1.2 |
-| CSC-SYS5-001 | System Verification Specification | 1.3 |
-| CSC-MAN3-001 | Project Management Plan | 1.4 |
+| CSC-SYS2-001 | System Requirements Specification | 1.4 |
+| CSC-SYS3-001 | System Architecture Design | 1.3 |
+| CSC-SYS4-001 | System Integration Test Specification | 1.3 |
+| CSC-SYS5-001 | System Verification Specification | 1.4 |
+| CSC-MAN3-001 | Project Management Plan | 1.5 |
 | CSC-MAN5-001 | Risk Management Plan | 1.2 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.2 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.5 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.3 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.6 |
 | CSC-SUP9-001 | Problem Resolution Plan | 1.1 |
 | CSC-SUP10-001 | Change Request Plan | 1.1 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.1 |
-| CSC-PA2-001 | Capability Level 2 Records | 1.7 |
+| CSC-PA2-001 | Capability Level 2 Records | 1.8 |
 | CSC-DEV001 | AI Authorship Deviation Record | 1.0 |
 | CSC-DEV002 | Independent Review Deviation Record | 1.0 |
 
@@ -310,13 +311,13 @@ The `src/cstylecheck.py` entry point shim is unchanged. Users who import the che
 
 | Work Product | Document | Version | Status |
 |---|---|---|---|
-| System Requirements | CSC-SYS2-001 | 1.3 | Released |
-| System Architecture | CSC-SYS3-001 | 1.2 | Released |
-| System Integration Tests | CSC-SYS4-001 | 1.2 | Released |
-| System Verification | CSC-SYS5-001 | 1.3 | Released |
-| Software Requirements | CSC-SWE1-001 | 1.4 | Released |
-| Software Architecture | CSC-SWE2-001 | 1.3 | Released |
-| Detailed Design | CSC-SWE3-001 | 1.4 | Released |
+| System Requirements | CSC-SYS2-001 | 1.4 | Released |
+| System Architecture | CSC-SYS3-001 | 1.3 | Released |
+| System Integration Tests | CSC-SYS4-001 | 1.3 | Released |
+| System Verification | CSC-SYS5-001 | 1.4 | Released |
+| Software Requirements | CSC-SWE1-001 | 1.5 | Released |
+| Software Architecture | CSC-SWE2-001 | 1.4 | Released |
+| Detailed Design | CSC-SWE3-001 | 1.5 | Released |
 | Unit Verification | CSC-SWE4-001 | 1.6 | Released |
 | Integration Tests | CSC-SWE5-001 | 1.3 | Released |
 | Qualification Tests | CSC-SWE6-001 | 1.4 | Released |

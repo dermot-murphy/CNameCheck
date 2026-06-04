@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.2 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.3 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.3 referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SITC-001 to SITC-014 execution results (PASS); commit 93178cd, 2026-05-28 — closes issue #152 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -30,7 +31,7 @@
 
 ### 3.1 Purpose
 
-This System Integration Test Specification defines the integration test cases that verify the correct assembly, interface behaviour, and end-to-end operation of the **CStyleCheck v1.0.0** system across its six subsystems and four deployment modes. It satisfies **Automotive SPICE® PAM v4.0, SYS.4 — System Integration and Integration Verification**.
+This System Integration Test Specification defines the integration test cases that verify the correct assembly, interface behaviour, and end-to-end operation of the **CStyleCheck v1.2.x** system across its six subsystems and five deployment modes. It satisfies **Automotive SPICE® PAM v4.0, SYS.4 — System Integration and Integration Verification**.
 
 ### 3.2 Scope
 
@@ -39,7 +40,7 @@ Integration testing at the system level verifies the interfaces and data flows *
 - The complete CLI invocation path (SS-01 → SS-02 → SS-03 → SS-04 → SS-05 → SS-06)
 - Cross-subsystem data flows (configuration loader feeding rule engine; source cache feeding cross-file check)
 - All three output format pipelines (text, JSON, SARIF)
-- All four deployment modes (CLI Python, pip install, Docker, GitHub Action)
+- All five deployment modes (CLI Python, pip install, Docker, GitHub Action, pre-commit)
 - Integration with pre-commit framework
 
 SWE.4/SWE.5 unit and component-level tests are documented in the software test specifications.
@@ -48,9 +49,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.0 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
+| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.4 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
 ### 3.4 Test Environment

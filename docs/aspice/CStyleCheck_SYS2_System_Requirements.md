@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.4 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.2 "three modes" text (listed 4 modes), update §3.3 referenced doc versions — resolves issue #163 |
 | 1.3 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 and SYS-F-011 rule count 48→53; update referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | §5.9: formally defer NF-010 and NF-012 to v2.0; classify NF-011 as Out of Scope v1.x — closes issue #153 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
@@ -39,7 +40,7 @@ This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2
 
 CStyleCheck is a software-only system. It operates as a static analysis tool that accepts C source files and a rule-configuration file as inputs, evaluates each identifier in those files against the configured naming rules, and produces a structured violation report as output.
 
-The system is deployed in three integration modes:
+The system is deployed in four integration modes:
 
 1. **Command-line tool** — invoked directly via Python or as a pip-installed entry point
 2. **GitHub Action** — integrated into GitHub Actions CI workflows via `action.yml`
@@ -52,8 +53,8 @@ The system is deployed in three integration modes:
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.2 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.6 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
 
 ### 3.4 Glossary
 
