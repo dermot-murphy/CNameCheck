@@ -34,6 +34,9 @@ DeclaredNotDefinedChecker   = _mod.DeclaredNotDefinedChecker
 parse_inline_suppressions   = _mod.parse_inline_suppressions
 apply_fixes                 = _mod.apply_fixes
 unified_diff                = _mod.unified_diff
+run_wizard                  = _mod.run_wizard
+run_preset                  = _mod.run_preset
+PRESETS                     = _mod.PRESETS
 
 
 # ---------------------------------------------------------------------------

@@ -30,6 +30,7 @@ from .checker import Checker
 from .sign_checker import SignChecker, DeclaredNotDefinedChecker
 from .baseline import load_baseline, write_baseline, _baseline_key
 from .output import Tee, _violations_to_json, _violations_to_sarif, print_summary
+from .wizard import run_wizard, run_preset, PRESETS
 from . import _TOOL_NAME, _VERSION, _VERSION_STRING
 
 
@@ -326,6 +327,24 @@ def _build_parser() -> argparse.ArgumentParser:
         help=f"With --fix: apply only zero-risk fixes "
              f"({', '.join(sorted(SAFE_RULES))}). "
              "Implied by default; all current fixes are safe.")
+    init_group = p.add_argument_group("config generation")
+    init_group.add_argument(
+        "--init", action="store_true",
+        help="Interactively generate a .cstylecheck.yml starter config in the "
+             "current directory.  Asks a short Q&A and writes a commented YAML "
+             "file.  Use --preset to skip the wizard.")
+    init_group.add_argument(
+        "--preset", choices=list(PRESETS),
+        metavar="PRESET",
+        help=f"Write a pre-built config without the wizard.  "
+             f"Available presets: {', '.join(PRESETS)}.  "
+             "Writes .cstylecheck.yml in the current directory.")
+    init_group.add_argument(
+        "--init-output", metavar="FILE", default=None,
+        help="Output path for --init / --preset (default: .cstylecheck.yml).")
+    init_group.add_argument(
+        "--overwrite", action="store_true",
+        help="Overwrite existing config file when using --init or --preset.")
     return p
 
 
@@ -369,6 +388,19 @@ def main() -> int:
     # --update-config: merge new defaults into the config file and exit.
     if getattr(args, "update_config", False):
         return update_config(args.config)
+
+    # --init / --preset: generate a starter config and exit.
+    if getattr(args, "preset", None):
+        return run_preset(
+            args.preset,
+            output_path=getattr(args, "init_output", None),
+            overwrite=getattr(args, "overwrite", False),
+        )
+    if getattr(args, "init", False):
+        return run_wizard(
+            output_path=getattr(args, "init_output", None),
+            overwrite=getattr(args, "overwrite", False),
+        )
 
     cfg  = load_config(args.config)
 
