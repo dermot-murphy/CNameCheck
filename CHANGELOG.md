@@ -40,6 +40,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+
 ## [1.2.1] — 2026-05-29
 
 ### Fixed

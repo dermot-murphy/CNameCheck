@@ -412,6 +412,7 @@ def main() -> int:
             overwrite=getattr(args, "overwrite", False),
         )
 
+
     cfg  = load_config(args.config)
 
     # Spell-check word set — None means the check is entirely disabled
@@ -633,6 +634,7 @@ def main() -> int:
                 tee.print(f"Total: {total_fixed} fix(es) applied.")
             elif dry_run and not total_fixed:
                 tee.print("No fixable violations found.")
+
 
         # --write-baseline: dump all violations and exit 0 (no further checks).
         if getattr(args, "write_baseline", None):
