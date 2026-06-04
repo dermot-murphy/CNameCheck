@@ -37,6 +37,9 @@ unified_diff                = _mod.unified_diff
 run_wizard                  = _mod.run_wizard
 run_preset                  = _mod.run_preset
 PRESETS                     = _mod.PRESETS
+resolve_per_dir_config      = _mod.resolve_per_dir_config
+_walk_per_dir_configs       = _mod._walk_per_dir_configs
+_PER_DIR_CONFIG_NAME        = _mod._PER_DIR_CONFIG_NAME
 
 
 # ---------------------------------------------------------------------------
