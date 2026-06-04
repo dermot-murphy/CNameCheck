@@ -540,6 +540,7 @@ def main() -> int:
                 a.lower() + sep for a in alias_map.get(mod.lower(), [])
             ]
 
+
             # Collect disabled rules for this specific file
             _file_disabled, _ident_disabled = _disabled_rules_for_file(filepath, exclusions_map)
 
