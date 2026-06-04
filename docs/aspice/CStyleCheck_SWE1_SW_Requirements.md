@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.5 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.6 |
 | **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-04 | Claude | Add SWE1-072 to SWE1-076 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output) — issues #188 #189 #190 #193 #192 |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions (SWE2 1.2→1.3, SUP8 1.4→1.5) — resolves issue #163 |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.2 — resolves issue #163 |
 | 1.3 | 2026-05-28 | Claude | Add SWE1-071 (whitespace_ratio); fix §4.15 coverage targets to reflect package refactor; update RTM and Appendix A.1; fix §4.15 coverage wording — closes issues #146 #148 |

@@ -148,7 +148,7 @@ pytest tests/ --cov=src --cov-report=term-missing
 | `--spell-words FILE` | Extra spell-check exempt words |
 | `--include GLOB` | Source glob to scan (repeatable) |
 | `--exclude GLOB` | Path/directory to exclude (repeatable) |
-| `--output-format FORMAT` | Output format: `text` (default), `json`, or `sarif` |
+| `--output-format FORMAT` | Output format: `text` (default), `json`, `sarif`, or `html` |
 | `--baseline-file FILE` | Suppress violations present in a saved baseline |
 | `--write-baseline FILE` | Write all current violations to FILE as a baseline, exit 0 |
 | `--github-actions` | Emit `::error`/`::warning` GitHub Actions annotations |
@@ -156,6 +156,14 @@ pytest tests/ --cov=src --cov-report=term-missing
 | `--summary` | Print violation summary table (text mode only) |
 | `--log FILE` | Write output to file as well as stdout |
 | `--verbose` | Print the file being scanned — prevents apparent hangs on large filesets |
+| `--fix` | Auto-fix safe mechanical violations in-place |
+| `--dry-run` | With `--fix`: show a unified diff without writing to disk |
+| `--safe-only` | With `--fix`: apply only zero-risk fixes (currently all fixes qualify) |
+| `--init` | Launch the interactive config wizard; writes `.cstylecheck.yml` |
+| `--preset PRESET` | Write a pre-built config without the wizard (`barr-c`, `minimal`, or `misra`) |
+| `--init-output FILE` | Output path for `--init` / `--preset` (default: `.cstylecheck.yml`) |
+| `--overwrite` | Overwrite an existing config file when using `--init` or `--preset` |
+| `--per-dir-config` | Walk upward from each source file looking for `.cstylecheck.yml` overrides |
 | `--exit-zero` | Always exit 0 (useful for warning-only CI steps) |
 | `--version` | Print tool name and version, exit 0 |
 | `--help` / `-h` | Print help, exit 0 |
@@ -219,6 +227,171 @@ annotations without a custom action parsing step:
   uses: github/codeql-action/upload-sarif@v3
   with:
     sarif_file: results.sarif
+```
+
+### HTML (`--output-format html`)
+
+Self-contained HTML report with inline CSS — no external dependencies.  Suitable for
+archiving as a build artefact or opening directly in a browser.
+
+```bash
+python src/cstylecheck.py --output-format html --include "source/**" \
+    --log report.html
+```
+
+The report includes summary cards (errors, warnings, info, total, files checked) and
+per-file violation tables.  When `--log FILE` is provided the HTML is written to that
+file; without `--log` it is written to stdout.
+
+---
+
+## Inline suppression comments
+
+Violations can be suppressed on a per-line or per-block basis using structured inline
+comments.  The comments are case-insensitive and are processed by
+`preprocessor.parse_inline_suppressions`.
+
+### Suppress the current line
+
+```c
+uint32_t g_counter = 42;  // cstylecheck: disable=variable.global.g_prefix
+```
+
+### Suppress the next line only
+
+```c
+// cstylecheck: disable-next-line=misc.magic_number
+uint8_t mask = 0xA5;
+```
+
+### Suppress a block
+
+```c
+// cstylecheck: disable=misc.unsigned_suffix
+uint32_t raw_a = 1;
+uint32_t raw_b = 2;
+// cstylecheck: enable=misc.unsigned_suffix
+```
+
+### Suppress multiple rules at once
+
+Comma-separate rule IDs in any of the forms above:
+
+```c
+uint32_t val = 100;  // cstylecheck: disable=misc.unsigned_suffix,misc.magic_number
+```
+
+### Notes
+
+- The `disable=` directive on the same line suppresses that line only.
+- `disable-next-line=` suppresses the immediately following non-blank line.
+- A `disable=` without a matching `enable=` suppresses the rule for the rest of the
+  file.
+- Block suppressions nest correctly; the nearest enclosing `enable=` re-activates
+  the rule.
+- Inline suppressions are applied before any other rule checks; they do not interact
+  with `--exclusions` YAML per-file suppressions.
+
+---
+
+## Auto-fix mode (`--fix`)
+
+CStyleCheck can apply safe, mechanical fixes in-place.  All currently fixable
+violations are zero-risk character substitutions.
+
+```bash
+# Apply fixes in-place
+python src/cstylecheck.py --fix --include "source/**"
+
+# Preview the diff without writing
+python src/cstylecheck.py --fix --dry-run --include "source/**"
+
+# Restrict to zero-risk fixes only (currently equivalent to --fix alone)
+python src/cstylecheck.py --fix --safe-only --include "source/**"
+```
+
+### Currently fixable rules
+
+| Rule | What is fixed | Example |
+|---|---|---|
+| `misc.unsigned_suffix` | Lowercase `u` suffix → uppercase `U` | `42u` → `42U` |
+| `misc.lowercase_l_suffix` | Lowercase `l` suffix → uppercase `L` | `100l` → `100L` |
+
+`--dry-run` shows a unified diff and exits 0 without modifying any file.
+`--safe-only` limits fixes to those assessed as zero-risk; at present all fixes
+qualify, so the flag is a forward-compatibility guard.
+
+---
+
+## Config wizard (`--init` / `--preset`)
+
+Generate a starter `.cstylecheck.yml` without writing YAML by hand.
+
+### Interactive wizard
+
+```bash
+python src/cstylecheck.py --init
+```
+
+The wizard asks a short series of questions (project name, preferred naming style,
+which rule categories to enable) and writes `.cstylecheck.yml` in the current
+directory.
+
+### Pre-built presets
+
+Skip the wizard entirely with `--preset`:
+
+```bash
+python src/cstylecheck.py --preset barr-c     # Barr-C:2018 recommended defaults
+python src/cstylecheck.py --preset minimal    # minimal rule set for adoption
+python src/cstylecheck.py --preset misra      # MISRA-oriented rule set
+```
+
+### Options
+
+| Flag | Description |
+|---|---|
+| `--init-output FILE` | Write the config to `FILE` instead of `.cstylecheck.yml` |
+| `--overwrite` | Overwrite an existing config file; without this flag the command aborts if the file already exists |
+
+---
+
+## Per-directory config (`--per-dir-config`)
+
+Enable hierarchical configuration where subdirectories can override the root
+`rules.yml` settings.
+
+```bash
+python src/cstylecheck.py --config src/rules.yml --per-dir-config \
+    --include "source/**"
+```
+
+### How it works
+
+When `--per-dir-config` is active, CStyleCheck walks upward from each source file's
+directory looking for a `.cstylecheck.yml` file.  Any found config is deep-merged on
+top of the root config; the nearest (deepest) config wins for conflicting keys.
+
+The upward search stops when:
+
+- the root of the file system is reached, or
+- a `.cstylecheck.yml` containing `root: true` is found.
+
+Results are cached per directory, so repeated lookups for files in the same directory
+are free.
+
+### Example layout
+
+```
+project/
+  .cstylecheck.yml          # root config  (root: true)
+  source/
+    drivers/
+      .cstylecheck.yml      # overrides for the drivers subtree
+      uart/
+        uart_driver.c       # picks up drivers/.cstylecheck.yml overrides
+    app/
+      main.c                # uses root config only
 ```
 
 ---
