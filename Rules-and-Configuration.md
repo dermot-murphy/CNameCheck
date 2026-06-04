@@ -52,8 +52,9 @@ and `info`.
 10. [Reserved names](#10-reserved-names)
 11. [Spell check](#11-spell-check)
 12. [Sign compatibility](#12-sign-compatibility)
-13. [Quick reference table](#13-quick-reference-table)
-14. [MISRA C:2012/2023 coverage matrix](#14-misra-c20122023-coverage-matrix)
+13. [Inline suppression comments](#13-inline-suppression-comments)
+14. [Quick reference table](#14-quick-reference-table)
+15. [MISRA C:2012/2023 coverage matrix](#15-misra-c20122023-coverage-matrix)
 
 ---
 
@@ -1306,7 +1307,74 @@ uart_driver_Send(-1);    /* sign_compatibility */
 
 ---
 
-## 13. Quick reference table
+## 13. Inline suppression comments
+
+Violations can be suppressed without modifying `rules.yml` or `exclusions.yml` by
+placing structured inline comments directly in the C source.  Suppressions are parsed
+by `preprocessor.parse_inline_suppressions` before any rule checks run.  All
+directive keywords are **case-insensitive**.
+
+### 13.1 Suppress the current line
+
+Place the directive as a trailing comment on the line to suppress:
+
+```c
+uint32_t g_raw_value = 42;  // cstylecheck: disable=variable.global.g_prefix
+```
+
+Only the line containing the directive is suppressed.
+
+### 13.2 Suppress the next line
+
+```c
+// cstylecheck: disable-next-line=misc.magic_number
+uint8_t sync_byte = 0xA5;
+```
+
+The directive suppresses the immediately following non-blank, non-comment line.
+
+### 13.3 Suppress a block
+
+A `disable=` directive without a matching `enable=` suppresses the rule from that
+point forward in the file.  Pair it with `enable=` to re-activate:
+
+```c
+// cstylecheck: disable=misc.unsigned_suffix
+uint32_t raw_a = 1;
+uint32_t raw_b = 2;
+// cstylecheck: enable=misc.unsigned_suffix
+
+uint32_t good_value = 3U;   /* checked again */
+```
+
+A `disable=` with no paired `enable=` suppresses the rule for the remainder of the
+file.
+
+### 13.4 Suppress multiple rules at once
+
+Comma-separate rule IDs in a single directive:
+
+```c
+/* cstylecheck: disable=misc.unsigned_suffix,misc.magic_number */
+uint32_t threshold = 42;
+/* cstylecheck: enable=misc.unsigned_suffix,misc.magic_number */
+```
+
+All three directive forms (`disable=`, `disable-next-line=`, `enable=`) accept
+comma-separated lists.
+
+### 13.5 Scope and precedence
+
+| Property | Behaviour |
+|---|---|
+| Scope | Inline suppressions apply only to the file that contains them |
+| Precedence | Inline suppressions take precedence over `rules.yml` enabled state — a rule disabled globally can still be suppressed inline, but the inline `disable=` has no effect when the rule is already disabled |
+| Interaction with `--exclusions` | Independent: `--exclusions` suppresses by file+rule; inline suppressions suppress by line or block within a file; both mechanisms can be active simultaneously |
+| Caching | Parsed suppression state is computed once per file before any rule check |
+
+---
+
+## 14. Quick reference table
 
 | Rule ID | Default severity | YAML key | Default |
 |---|---|---|---|
@@ -1368,7 +1436,7 @@ uart_driver_Send(-1);    /* sign_compatibility */
 
 ---
 
-## 14. MISRA C:2012/2023 coverage matrix
+## 15. MISRA C:2012/2023 coverage matrix
 
 CStyleCheck provides complementary support for a subset of MISRA C:2012/2023 rules.
 It is **not** a full MISRA compliance checker.  The table below documents which rules

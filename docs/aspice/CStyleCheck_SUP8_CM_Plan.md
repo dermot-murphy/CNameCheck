@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP8-001 | **Version** | 1.4 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SUP8-001 | **Version** | 1.6 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-04 | Claude | Deep accuracy audit: fix CI-024 workflow filename (rules.yml→cstylecheck_rules.yml), fix §7.5 reference, update SWE1-001 version in §3.3 — resolves issue #163 |
+| 1.5 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 version text v1.0.0→v1.2.0, update referenced doc versions — resolves issue #163 |
 | 1.4 | 2026-05-28 | Dermot Murphy | Add CI-034 (wiki_publish.yml) to CI inventory — closes issue #150 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Add CI-032 (CSC-DEV-002 independent review deviation) and CI-033 (CSC-SVD-001) to CI list — issue #61 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CI-028 (CSC-DEV-001 deviation document) to CI list — issue #52 |
@@ -32,7 +34,7 @@
 
 ### 3.1 Purpose
 
-This Configuration Management (CM) Plan defines the processes, tools, methods, and responsibilities used to identify, control, store, and audit all configuration items (CIs) produced during the development and maintenance of **CStyleCheck v1.0.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules.
+This Configuration Management (CM) Plan defines the processes, tools, methods, and responsibilities used to identify, control, store, and audit all configuration items (CIs) produced during the development and maintenance of **CStyleCheck v1.2.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules.
 
 This plan satisfies the requirements of **Automotive SPICE® PAM v4.0, SUP.8 — Configuration Management**.
 
@@ -52,9 +54,9 @@ This plan applies to all configuration items produced by the CStyleCheck project
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CSC-SUP9-001 | CStyleCheck Problem Resolution Management Plan | 1.0 |
-| CSC-SUP10-001 | CStyleCheck Change Request Management Plan | 1.0 |
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
+| CSC-SUP9-001 | CStyleCheck Problem Resolution Management Plan | 1.1 |
+| CSC-SUP10-001 | CStyleCheck Change Request Management Plan | 1.1 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.5 |
 
 ---
 
@@ -135,7 +137,7 @@ All items in the following table are placed under configuration control.
 | CI-021 | Test stdlib dictionary | `tests/c_stdlib_names.txt` | Test data |
 | CI-022 | Test spell dictionary | `tests/c_spell_dict.txt` | Test data |
 | CI-023 | CI — test workflow | `.github/workflows/cstylecheck_tests.yml` | CI/CD |
-| CI-024 | CI — naming convention workflow | `.github/workflows/rules.yml` | CI/CD |
+| CI-024 | CI — naming convention workflow | `.github/workflows/cstylecheck_rules.yml` | CI/CD |
 | CI-025 | CI — Docker publish workflow | `.github/workflows/docker_publish.yml` | CI/CD |
 | CI-026 | Project README | `README.md` | Documentation |
 | CI-027 | This CM Plan | `CStyleCheck_SUP8_CM_Plan.md` | Documentation |
@@ -205,7 +207,7 @@ main ──► hotfix/* ──► main ──► tag v1.0.1
 ### 7.5 CI Enforcement
 
 - All merges to `develop` and `main` require CI (`cstylecheck_tests.yml`) to pass
-- The `rules.yml` workflow runs the linter against the project's own source on every commit touching C files, enforcing self-hosting of the tool's own rules
+- The `cstylecheck_rules.yml` workflow runs the linter against the project's own source on every commit touching C files, enforcing self-hosting of the tool's own rules
 - Supporting branches are deleted after merge
 
 > **📋 Note:** The `release/*` branch is the only branch where version-bump commits (`_version.py`, `pyproject.toml`) and release notes updates are permitted outside of `develop`. No new features may be introduced on a `release/*` branch.

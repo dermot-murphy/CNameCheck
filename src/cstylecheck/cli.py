@@ -23,12 +23,15 @@ from .config import (
     _build_spell_dict, _load_dict_file, _expand_options_file,
     update_config,
     C_KEYWORDS, C_STDLIB_NAMES,
+    resolve_per_dir_config,
 )
+from .fixer import apply_fixes, unified_diff, FIXABLE_RULES, SAFE_RULES
 from .utils import module_name, _cfg
 from .checker import Checker
 from .sign_checker import SignChecker, DeclaredNotDefinedChecker
 from .baseline import load_baseline, write_baseline, _baseline_key
-from .output import Tee, _violations_to_json, _violations_to_sarif, print_summary
+from .output import Tee, _violations_to_json, _violations_to_sarif, _violations_to_html, print_summary
+from .wizard import run_wizard, run_preset, PRESETS
 from . import _TOOL_NAME, _VERSION, _VERSION_STRING
 
 
@@ -226,10 +229,11 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="YAML config file (default: rules.yml)")
     p.add_argument("--github-actions", action="store_true",
                    help="Emit ::error/::warning GitHub Actions annotations")
-    p.add_argument("--output-format", choices=["text", "json", "sarif"],
+    p.add_argument("--output-format", choices=["text", "json", "sarif", "html"],
                    default="text",
-                   help="Output format: text (default), json, or sarif. "
-                        "json and sarif write to --log if given, else stdout. "
+                   help="Output format: text (default), json, sarif, or html. "
+                        "json, sarif, and html write to --log if given, "
+                        "else stdout. "
                         "Implies --exit-zero is unaffected.")
     p.add_argument("--summary", action="store_true",
                    help="Print summary table after all files are checked")
@@ -309,6 +313,48 @@ def _build_parser() -> argparse.ArgumentParser:
                         "default values.  Exits 0 on success.  "
                         "NOTE: YAML comments are not preserved — keep the "
                         "original file in version control before running.")
+
+    fix_group = p.add_argument_group("auto-fix")
+    fix_group.add_argument(
+        "--fix", action="store_true",
+        help="Automatically apply safe, mechanical fixes to source files in-place. "
+             f"Fixable rules: {', '.join(sorted(FIXABLE_RULES))}. "
+             "Use --dry-run to preview changes without writing files.")
+    fix_group.add_argument(
+        "--dry-run", action="store_true",
+        help="With --fix: print a unified diff of what would change without "
+             "modifying any files.")
+    fix_group.add_argument(
+        "--safe-only", action="store_true",
+        help=f"With --fix: apply only zero-risk fixes "
+             f"({', '.join(sorted(SAFE_RULES))}). "
+             "Implied by default; all current fixes are safe.")
+    init_group = p.add_argument_group("config generation")
+    init_group.add_argument(
+        "--init", action="store_true",
+        help="Interactively generate a .cstylecheck.yml starter config in the "
+             "current directory.  Asks a short Q&A and writes a commented YAML "
+             "file.  Use --preset to skip the wizard.")
+    init_group.add_argument(
+        "--preset", choices=list(PRESETS),
+        metavar="PRESET",
+        help=f"Write a pre-built config without the wizard.  "
+             f"Available presets: {', '.join(PRESETS)}.  "
+             "Writes .cstylecheck.yml in the current directory.")
+    init_group.add_argument(
+        "--init-output", metavar="FILE", default=None,
+        help="Output path for --init / --preset (default: .cstylecheck.yml).")
+    init_group.add_argument(
+        "--overwrite", action="store_true",
+        help="Overwrite existing config file when using --init or --preset.")
+    p.add_argument("--per-dir-config", action="store_true",
+                   help="Enable per-directory config overrides. For each source "
+                        "file, CStyleCheck walks up the directory tree looking "
+                        "for '.cstylecheck.yml' files and deep-merges any found "
+                        "overrides on top of the root config. Add 'root: true' "
+                        "to any '.cstylecheck.yml' to stop the search at that "
+                        "directory. The nearest config (closest to the file) "
+                        "takes highest priority.")
     return p
 
 
@@ -352,6 +398,20 @@ def main() -> int:
     # --update-config: merge new defaults into the config file and exit.
     if getattr(args, "update_config", False):
         return update_config(args.config)
+
+    # --init / --preset: generate a starter config and exit.
+    if getattr(args, "preset", None):
+        return run_preset(
+            args.preset,
+            output_path=getattr(args, "init_output", None),
+            overwrite=getattr(args, "overwrite", False),
+        )
+    if getattr(args, "init", False):
+        return run_wizard(
+            output_path=getattr(args, "init_output", None),
+            overwrite=getattr(args, "overwrite", False),
+        )
+
 
     cfg  = load_config(args.config)
 
@@ -447,6 +507,8 @@ def main() -> int:
         # Cache source text keyed by filepath to avoid reading each file twice
         # (once for Checker, once for SignChecker).
         source_cache: dict = {}
+        # Per-directory config cache: {dir_path -> effective_cfg}
+        _per_dir_cache: dict = {}
 
         for filepath in files:
             if getattr(args, "verbose", False):
@@ -462,20 +524,28 @@ def main() -> int:
                 tee.print(f"ERROR: Cannot read {filepath}: {e}")
                 continue
 
+            # Resolve effective config (root cfg optionally overridden per-dir)
+            file_cfg = (
+                resolve_per_dir_config(filepath, cfg, _per_dir_cache)
+                if getattr(args, "per_dir_config", False)
+                else cfg
+            )
+
             # Build accepted prefix list for this file (canonical + aliases)
             mod   = module_name(filepath)
-            sep   = _cfg(cfg, "file_prefix", "separator", default="_")
-            case  = _cfg(cfg, "file_prefix", "case", default="lower")
+            sep   = _cfg(file_cfg, "file_prefix", "separator", default="_")
+            case  = _cfg(file_cfg, "file_prefix", "case", default="lower")
             canon = (mod.upper() if case == "upper" else mod.lower()) + sep
             alias_pfxs = [canon] + [
                 a.lower() + sep for a in alias_map.get(mod.lower(), [])
             ]
 
+
             # Collect disabled rules for this specific file
             _file_disabled, _ident_disabled = _disabled_rules_for_file(filepath, exclusions_map)
 
             checker = Checker(
-                filepath, source, cfg,
+                filepath, source, file_cfg,
                 spell_words=spell_words,
                 alias_prefixes=alias_pfxs,
                 disabled_rules=_file_disabled,
@@ -534,6 +604,39 @@ def main() -> int:
                     else:
                         tee.print(v)
 
+        # --fix / --dry-run: apply mechanical fixes to source files.
+        if getattr(args, "fix", False):
+            safe_only = getattr(args, "safe_only", False)
+            dry_run   = getattr(args, "dry_run", False)
+            total_fixed = 0
+            for filepath in files:
+                original = source_cache.get(filepath)
+                if original is None:
+                    continue
+                file_violations = [
+                    v for v in all_violations if v.filepath == filepath
+                ]
+                fixed, count = apply_fixes(original, file_violations,
+                                           safe_only=safe_only)
+                if fixed == original:
+                    continue
+                if dry_run:
+                    diff_text = unified_diff(original, fixed, filepath)
+                    if diff_text:
+                        tee.print(diff_text)
+                else:
+                    try:
+                        Path(filepath).write_text(fixed, encoding="utf-8")
+                        tee.print(f"Fixed {count} issue(s) in {filepath}")
+                    except OSError as exc:
+                        tee.print(f"ERROR: Cannot write {filepath}: {exc}")
+                total_fixed += count
+            if total_fixed and not dry_run:
+                tee.print(f"Total: {total_fixed} fix(es) applied.")
+            elif dry_run and not total_fixed:
+                tee.print("No fixable violations found.")
+
+
         # --write-baseline: dump all violations and exit 0 (no further checks).
         if getattr(args, "write_baseline", None):
             write_baseline(all_violations, args.write_baseline)
@@ -562,13 +665,16 @@ def main() -> int:
                 if v.severity in ("warning", "info"):
                     v.severity = "error"
 
-        # --output-format json / sarif: emit structured output to stdout or --log.
+        # --output-format json / sarif / html: emit structured output.
         if output_format == "json":
             json_text = _violations_to_json(all_violations, len(files))
             tee.print(json_text)
         elif output_format == "sarif":
             sarif_text = _violations_to_sarif(all_violations, _VERSION)
             tee.print(sarif_text)
+        elif output_format == "html":
+            html_text = _violations_to_html(all_violations, len(files), _VERSION)
+            tee.print(html_text)
 
         if args.summary and output_format == "text":
             print_summary(all_violations, len(files), tee)

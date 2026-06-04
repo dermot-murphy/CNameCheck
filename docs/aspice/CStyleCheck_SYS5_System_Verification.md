@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS5-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.4 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions, fix VTC-003 header and §6 rule count — resolves issue #163 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC execution result tables; fill §3.3 configuration; update overall verdict to commit 93178cd, 839 tests PASS — closes issue #152 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC results (PASS); map 6 untraced requirements to SYS-VTC; defer NF-010/011/012; populate open issues — closes issue #53 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
@@ -31,7 +32,7 @@
 
 ### 3.1 Purpose
 
-This System Verification Report documents the qualification test specification, execution results, and verdict for **CStyleCheck v1.0.0** — verifying that the complete, integrated system satisfies all system requirements defined in CSC-SYS2-001. It satisfies **Automotive SPICE® PAM v4.0, SYS.5 — System Verification**.
+This System Verification Report documents the qualification test specification, execution results, and verdict for **CStyleCheck v1.2.x** — verifying that the complete, integrated system satisfies all system requirements defined in CSC-SYS2-001. It satisfies **Automotive SPICE® PAM v4.0, SYS.5 — System Verification**.
 
 System verification (SYS.5) differs from system integration testing (SYS.4) in that it tests the **complete, fully integrated system against its requirements**, rather than testing interface behaviour between subsystems.
 
@@ -39,18 +40,18 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.3 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
 
 ### 3.3 System Configuration Under Test
 
 | Attribute | Value |
 |---|---|
-| **Software Version** | 1.0.0 |
-| **Git Tag** | v1.0.0 |
+| **Software Version** | 1.2.0 |
+| **Git Tag** | v1.2.0 |
 | **Commit SHA** | 93178cd (develop HEAD after PR #158 merge) |
 | **Python Versions Tested** | 3.10, 3.11, 3.12 |
 | **OS** | Ubuntu 24.04 (`ubuntu-latest` GitHub Actions runner) |
@@ -58,7 +59,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | **Docker Image Digest** | See `docker_publish.yml` Actions log for commit 93178cd |
 | **Test Execution Date** | 2026-05-28 |
 | **Tester** | GitHub Actions (automated) / Dermot Murphy (manual review) |
-| **CM Baseline** | v1.0.0 release tag |
+| **CM Baseline** | v1.2.0 release tag |
 
 ### 3.4 Verification Strategy
 
@@ -79,7 +80,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | Python version matrix | 3.10, 3.11, 3.12 | All pass on all three versions |
 | Exit code correctness | 100% | All exit code test cases PASS |
 | Output format conformance | JSON valid, SARIF 2.1.0 valid | Schema validation PASS |
-| Open GitHub Issues against v1.0.0 | 0 | No unresolved bug-labelled Issues targeting v1.0.0 |
+| Open GitHub Issues against v1.2.0 | 0 | No unresolved bug-labelled Issues targeting v1.2.0 |
 
 ---
 
@@ -131,13 +132,13 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 ---
 
-### SYS-VTC-003 — Full Rule Coverage (48 Rule IDs)
+### SYS-VTC-003 — Full Rule Coverage (53 Rule IDs)
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SYS-VTC-003 |
 | **Requirement** | SYS-F-011 through SYS-F-024 |
-| **Objective** | Verify that all 48 rule IDs detect violations when triggered by conforming test inputs |
+| **Objective** | Verify that all 53 rule IDs detect violations when triggered by conforming test inputs |
 | **Pass Criteria** | Each rule ID appears in at least one violation report when a known-bad input is provided |
 
 | Rule Category | Rule IDs | Evidence Source | Result |
@@ -368,7 +369,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|---|---|---|
 | SYS-VTC-001 | Input: multiple files and globs | SYS-F-001, F-004, F-005, F-033 | PASS | |
 | SYS-VTC-002 | Configuration and rule enablement | SYS-F-002, F-006, F-007, F-009, F-025, F-026, NF-007 | PASS | |
-| SYS-VTC-003 | Full rule coverage (50 rule IDs) | SYS-F-011 to F-024 | PASS | |
+| SYS-VTC-003 | Full rule coverage (53 rule IDs) | SYS-F-011 to F-024 | PASS | |
 | SYS-VTC-004 | Module prefix enforcement | SYS-F-012 | PASS | |
 | SYS-VTC-005 | Pointer and scope prefix rules | SYS-F-013, F-014 | PASS | |
 | SYS-VTC-006 | Output formats: text, JSON, SARIF | SYS-F-027, F-028, F-029, F-032 | PASS | |
@@ -380,7 +381,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-VTC-012 | Docker multi-platform build | SYS-NF-006 | PASS | |
 | SYS-VTC-013 | Self-hosting: linter passes own rules | SYS-F-011 | PASS | |
 
-**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 839 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
+**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 965 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
 
 ---
 
@@ -398,7 +399,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-F-008 | `--exclusions` file | SITC-009 | Covered |
 | SYS-F-009 | Dictionary override flags | SYS-VTC-002 | Covered |
 | SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | Covered |
-| SYS-F-011 to F-024 | All 48 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
+| SYS-F-011 to F-024 | All 53 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
 | SYS-F-025 | Rule `enabled` toggle | SYS-VTC-002 | Covered |
 | SYS-F-026 | Per-rule severity | SYS-VTC-002 | Covered |
 | SYS-F-027 | Text output format | SYS-VTC-006 | Covered |
