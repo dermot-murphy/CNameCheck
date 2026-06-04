@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import difflib
 import re
-from typing import Callable
+from typing import Optional
 
 from .models import Violation
 
@@ -39,7 +39,7 @@ def _line_col_to_offset(source: str, line: int, col: int) -> int:
     return offset + col - 1
 
 
-def _fix_unsigned_suffix(source: str, v: Violation) -> tuple[int, str, str]:
+def _fix_unsigned_suffix(source: str, v: Violation) -> Optional[tuple]:
     """Return (offset, old_text, new_text) for unsigned suffix fix."""
     m = _RE_EXTRACT_QUOTED.search(v.message)
     if not m:
@@ -63,7 +63,7 @@ def _fix_unsigned_suffix(source: str, v: Violation) -> tuple[int, str, str]:
     return (offset, old_text, new_text)
 
 
-def _fix_lowercase_l_suffix(source: str, v: Violation) -> tuple[int, str, str]:
+def _fix_lowercase_l_suffix(source: str, v: Violation) -> Optional[tuple]:
     """Return (offset, old_text, new_text) for lowercase-l suffix fix."""
     m = _RE_EXTRACT_QUOTED.search(v.message)
     if not m:
@@ -90,7 +90,7 @@ def _fix_lowercase_l_suffix(source: str, v: Violation) -> tuple[int, str, str]:
 
 # Maps rule_id → (fix_fn, is_safe)
 # is_safe=True means applied by both --fix and --fix --safe-only
-_FIXERS: dict[str, tuple[Callable, bool]] = {
+_FIXERS: dict = {
     "misc.unsigned_suffix":    (_fix_unsigned_suffix,    True),
     "misc.lowercase_l_suffix": (_fix_lowercase_l_suffix, True),
 }
