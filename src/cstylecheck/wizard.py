@@ -79,7 +79,7 @@ _PRESET_MISRA = {
     "sign_compatibility": {"enabled": True, "severity": "error"},
 }
 
-PRESETS = {
+PRESETS: dict[str, dict] = {
     "barr-c":  _PRESET_BARR_C,
     "minimal": _PRESET_MINIMAL,
     "misra":   _PRESET_MISRA,
