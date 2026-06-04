@@ -24,13 +24,14 @@ import cstylecheck as _mod  # noqa: E402
 
 Checker   = _mod.Checker
 Violation = _mod.Violation
-load_defines_file       = _mod.load_defines_file
-load_copyright_file     = _mod.load_copyright_file
-_build_spell_dict       = _mod._build_spell_dict
-_BUILTIN_DICT           = _mod._BUILTIN_DICT
-_load_dict_file         = _mod._load_dict_file
-SignChecker             = _mod.SignChecker
-DeclaredNotDefinedChecker = _mod.DeclaredNotDefinedChecker
+load_defines_file           = _mod.load_defines_file
+load_copyright_file         = _mod.load_copyright_file
+_build_spell_dict           = _mod._build_spell_dict
+_BUILTIN_DICT               = _mod._BUILTIN_DICT
+_load_dict_file             = _mod._load_dict_file
+SignChecker                 = _mod.SignChecker
+DeclaredNotDefinedChecker   = _mod.DeclaredNotDefinedChecker
+parse_inline_suppressions   = _mod.parse_inline_suppressions
 
 
 # ---------------------------------------------------------------------------
