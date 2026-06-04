@@ -139,6 +139,13 @@ from .output import (                    # noqa: F401, E402
     print_summary,
 )
 
+from .fixer import (                     # noqa: F401, E402
+    apply_fixes,
+    unified_diff,
+    FIXABLE_RULES,
+    SAFE_RULES,
+)
+
 from .cli import (                       # noqa: F401, E402
     discover_files,
     _path_matches_exclude,
