@@ -214,7 +214,7 @@ If any configuration or invocation error is detected during steps 1 or 2:
 | SYS REQ-ID | Requirement Summary | Subsystem(s) |
 |---|---|---|
 | SYS-F-001 to SYS-F-010 | Input handling | SS-01 (CLI & Options Loader) |
-| SYS-F-011 to SYS-F-026 | Rule checking (all 48 rule IDs) | SS-05 (Rule Engine), SS-03 (Dictionary Manager) |
+| SYS-F-011 to SYS-F-026 | Rule checking (all 53 rule IDs) | SS-05 (Rule Engine), SS-03 (Dictionary Manager) |
 | SYS-F-027 to SYS-F-033 | Output formats and reporting | SS-06 (Output Formatter) |
 | SYS-F-034 to SYS-F-036 | Baseline suppression | SS-01 (flags), SS-05 (filter), SS-06 (write) |
 | SYS-F-037 to SYS-F-040 | Exit codes | SS-06 (exit code return) |

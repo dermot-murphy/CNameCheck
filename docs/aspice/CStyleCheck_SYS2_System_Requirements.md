@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 and SYS-F-011 rule count 48→53; update referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | §5.9: formally defer NF-010 and NF-012 to v2.0; classify NF-011 as Out of Scope v1.x — closes issue #153 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -30,7 +31,7 @@
 
 ### 3.1 Purpose
 
-This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.0.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 48 rule IDs.
+This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.2.x** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 53 rule IDs.
 
 This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2 — System Requirements Analysis**.
 
@@ -51,8 +52,8 @@ The system is deployed in three integration modes:
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.2 |
 
 ### 3.4 Glossary
 
@@ -105,7 +106,7 @@ The following table summarises the stakeholder needs from which the system requi
 
 | REQ-ID | Requirement | Priority | Verification Method | Derived From |
 |---|---|---|---|---|
-| SYS-F-011 | The system shall enforce naming rules across 48 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules | Mandatory | Test | STK-001, STK-002 |
+| SYS-F-011 | The system shall enforce naming rules across 53 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules | Mandatory | Test | STK-001, STK-002 |
 | SYS-F-012 | The system shall enforce module-prefix requirements on global variables, file-scope static variables, public functions, macros, and constants | Mandatory | Test | STK-001 |
 | SYS-F-013 | The system shall enforce scope-aware variable rules: global (`g_` prefix), file-static (`s_` prefix), local, and parameter — each independently configurable | Mandatory | Test | STK-001 |
 | SYS-F-014 | The system shall enforce pointer-prefix rules: single pointer (`p_`), double pointer (`pp_`), boolean (`b_`), and handle variables (`h_`) | Mandatory | Test | STK-001 |

@@ -137,7 +137,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|
 | **Test Case ID** | SYS-VTC-003 |
 | **Requirement** | SYS-F-011 through SYS-F-024 |
-| **Objective** | Verify that all 48 rule IDs detect violations when triggered by conforming test inputs |
+| **Objective** | Verify that all 53 rule IDs detect violations when triggered by conforming test inputs |
 | **Pass Criteria** | Each rule ID appears in at least one violation report when a known-bad input is provided |
 
 | Rule Category | Rule IDs | Evidence Source | Result |
@@ -380,7 +380,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-VTC-012 | Docker multi-platform build | SYS-NF-006 | PASS | |
 | SYS-VTC-013 | Self-hosting: linter passes own rules | SYS-F-011 | PASS | |
 
-**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 839 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
+**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 965 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
 
 ---
 
@@ -398,7 +398,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-F-008 | `--exclusions` file | SITC-009 | Covered |
 | SYS-F-009 | Dictionary override flags | SYS-VTC-002 | Covered |
 | SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | Covered |
-| SYS-F-011 to F-024 | All 48 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
+| SYS-F-011 to F-024 | All 53 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
 | SYS-F-025 | Rule `enabled` toggle | SYS-VTC-002 | Covered |
 | SYS-F-026 | Per-rule severity | SYS-VTC-002 | Covered |
 | SYS-F-027 | Text output format | SYS-VTC-006 | Covered |

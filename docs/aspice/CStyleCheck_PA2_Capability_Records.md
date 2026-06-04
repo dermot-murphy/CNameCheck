@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.6 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.7 |
 | **Project** | CStyleCheck | **Date** | 2026-05-29 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-06-04 | Claude | Automated accuracy audit: update §4.1 SWE.4 test count ≥500→965, §5.2 SWE.4 839→965, §5.4 CI-017 839→965 and SUP9/10/ACQ4 versions, §6 SWE.4 839→965 — resolves issue #163 |
 | 1.6 | 2026-05-29 | Claude | §5.4: mark all work products Released at v1.2.0 tag; update SVD to 1.2, PA2 to 1.6, AUD-001 to Released |
 | 1.5 | 2026-05-28 | Dermot Murphy | §5.4: update all document version numbers to reflect issues #146–#157 changes — closes issue #156 |
 | 1.4 | 2026-05-28 | Claude / Dermot Murphy | Internal audit CSC-AUD-001: populate §6 Assessment Verdicts for all 17 processes (N/P/L/F); update §5.4 document version table to current versions; add audit report reference — closes issue #136 |
@@ -54,7 +55,7 @@ For each assessed process, performance objectives are defined in the table below
 | SWE.1 | 70 software requirements defined, reviewed, approved; 100% traceable to SYS.2 | CSC-SWE1-001 §4.15 verification criteria | ✅ Defined |
 | SWE.2 | Architecture reviewed; all SWE.1 requirements mapped to components; interfaces defined | CSC-SWE2-001 §10 traceability | ✅ Defined |
 | SWE.3 | All 46 units designed; algorithmic specification complete; resource usage documented | CSC-SWE3-001 §4 unit catalogue | ✅ Defined |
-| SWE.4 | ≥ 85% combined statement + branch coverage (CI gate); ≥ 90% statement / ≥ 85% branch (long-term target); all ≥500 unit tests PASS on Python 3.10/11/12 | CSC-SWE4-001 §4.2 coverage criteria | ✅ Defined |
+| SWE.4 | ≥ 85% combined statement + branch coverage (CI gate); ≥ 90% statement / ≥ 85% branch (long-term target); all 965 unit tests PASS on Python 3.10/11/12 | CSC-SWE4-001 §4.2 coverage criteria | ✅ Defined |
 | SWE.5 | All 13 SIT integration test cases PASS; all 10 SWA interfaces covered | CSC-SWE5-001 §3.3 verification criteria | ✅ Defined |
 | SWE.6 | All 12 SWQ qualification test cases PASS; 100% SW requirements coverage; release gate met | CSC-SWE6-001 §3.3 qualification criteria | ✅ Defined |
 | MAN.3 | All WBS work packages completed; milestones achieved within schedule | CSC-MAN3-001 §8 schedule | ✅ Defined |
@@ -175,34 +176,34 @@ All work products are reviewed before approval according to the following schedu
 
 ### 5.4 Work Product Baseline Status
 
-*Updated for v1.2.0 release, 2026-05-29. All work products released at v1.2.0 tag.*
+*Updated for v1.2.0 release, 2026-05-29; accuracy audit 2026-06-04.*
 
 | Document ID | Work Product | Version | Baseline Status | CM Baseline |
 |---|---|---|---|---|
-| CSC-SYS2-001 | System Requirements Spec | 1.2 | Released | v1.2.0 tag |
+| CSC-SYS2-001 | System Requirements Spec | 1.3 | Released | issue #163 audit |
 | CSC-SYS3-001 | System Architecture Description | 1.2 | Released | v1.2.0 tag |
 | CSC-SYS4-001 | System Integration Test Spec | 1.2 | Released | v1.2.0 tag |
 | CSC-SYS5-001 | System Verification Report | 1.3 | Released | v1.2.0 tag |
-| CSC-SWE1-001 | SW Requirements Spec | 1.3 | Released | v1.2.0 tag |
-| CSC-SWE2-001 | SW Architecture Description | 1.2 | Released | v1.2.0 tag |
-| CSC-SWE3-001 | SW Detailed Design | 1.3 | Released | v1.2.0 tag |
-| CSC-SWE4-001 | Unit Verification Spec | 1.5 | Released | v1.2.0 tag |
-| CSC-SWE5-001 | Integration Test Spec | 1.2 | Released | v1.2.0 tag |
-| CSC-SWE6-001 | Qualification Test Spec | 1.3 | Released | v1.2.0 tag |
-| CSC-MAN3-001 | Project Management Plan | 1.3 | Released | v1.2.0 tag |
+| CSC-SWE1-001 | SW Requirements Spec | 1.4 | Released | issue #163 audit |
+| CSC-SWE2-001 | SW Architecture Description | 1.3 | Released | issue #163 audit |
+| CSC-SWE3-001 | SW Detailed Design | 1.4 | Released | issue #163 audit |
+| CSC-SWE4-001 | Unit Verification Spec | 1.6 | Released | issue #163 audit |
+| CSC-SWE5-001 | Integration Test Spec | 1.3 | Released | issue #163 audit |
+| CSC-SWE6-001 | Qualification Test Spec | 1.4 | Released | issue #163 audit |
+| CSC-MAN3-001 | Project Management Plan | 1.4 | Released | issue #163 audit |
 | CSC-MAN5-001 | Risk Management Plan | 1.2 | Released | v1.2.0 tag |
 | CSC-SUP1-001 | Quality Assurance Plan | 1.2 | Released | v1.2.0 tag |
-| CSC-SUP8-001 | Configuration Management Plan | 1.4 | Released | v1.2.0 tag |
-| CSC-SUP9-001 | Problem Resolution Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-SUP10-001 | Change Request Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-ACQ4-001 | Supplier Monitoring Plan | 1.0 | Released | v1.0.0 tag |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.6 | Released | v1.2.0 tag |
+| CSC-SUP8-001 | Configuration Management Plan | 1.5 | Released | issue #163 audit |
+| CSC-SUP9-001 | Problem Resolution Plan | 1.1 | Released | v1.1.0 tag |
+| CSC-SUP10-001 | Change Request Plan | 1.1 | Released | v1.1.0 tag |
+| CSC-ACQ4-001 | Supplier Monitoring Plan | 1.1 | Released | v1.1.0 tag |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.7 | Released | issue #163 audit |
 | CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
 | CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
-| CSC-SVD-001 | Software Version Description | 1.2 | Released | v1.2.0 tag |
+| CSC-SVD-001 | Software Version Description | 1.3 | Released | issue #163 audit |
 | CSC-AUD-001 | ASPICE Internal Audit Report | 1.0 | Released | v1.2.0 tag |
 | CI-001 | `src/cstylecheck/` package | 1.2.0 | Released | v1.2.0 tag |
-| CI-017 | Test suite (839 tests) | 1.2.0 | Released | v1.2.0 tag |
+| CI-017 | Test suite (965 tests) | 1.2.0 | Released | v1.2.0 tag |
 
 ---
 
@@ -219,7 +220,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 | SWE.1 | 70+ SW requirements defined | Objectives: §4.1; strategy: §4.2 | CSC-SWE1-001 reviewed; in CM | **L** | #148, #149 |
 | SWE.2 | 7 components, 10 interfaces defined | Objectives: §4.1 | CSC-SWE2-001 reviewed; in CM | **L** | #146 |
 | SWE.3 | 89 units with algorithmic specs | Objectives: §4.1 | CSC-SWE3-001 reviewed; in CM | **L** | #147, #148 |
-| SWE.4 | 839 unit tests; self-check CI; 85% cov. | Objectives: §4.1; coverage targets | CSC-SWE4-001 reviewed; CI evidence | **L** | #148, #151, #157 |
+| SWE.4 | 965 unit tests; self-check CI; 85% cov. | Objectives: §4.1; coverage targets | CSC-SWE4-001 reviewed; CI evidence | **L** | — |
 | SWE.5 | 13 SIT tests covering all interfaces | Objectives: §4.1 | CSC-SWE5-001 reviewed; in CM | **P** ⚠️ | #152 |
 | SWE.6 | 12 SWQ tests; 100% SW-REQ coverage | Objectives: §4.1; release gate | CSC-SWE6-001 reviewed; CI evidence | **L** | #151, #152 |
 | MAN.3 | WBS, schedule, monitoring defined | Objectives: §4.1; §4.3 monitoring | CSC-MAN3-001 reviewed; in CM | **L** | #154 |

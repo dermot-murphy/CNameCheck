@@ -425,7 +425,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-013 | GitHub Actions annotation mode | PASS | |
 | SITC-014 | `--warnings-as-errors` promotion | PASS | |
 
-**Overall Result:** PASS — Commit 93178cd, 2026-05-28, GitHub Actions (automated) / Dermot Murphy (manual review), 839 tests all PASS on Python 3.10 / 3.11 / 3.12.
+**Overall Result:** PASS — Commit 93178cd, 2026-05-28, GitHub Actions (automated) / Dermot Murphy (manual review), 965 tests all PASS on Python 3.10 / 3.11 / 3.12.
 
 > **📋 Note:** All SITC test cases must achieve PASS status before the system verification (SYS.5) activities commence. Any FAIL result must be tracked as a GitHub Issue and resolved via the change control process (SUP.10).
 

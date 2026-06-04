@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.3 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.4 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.1 — resolves issue #163 |
 | 1.3 | 2026-05-28 | Claude | Update all 89 Source Location values to reflect package refactor (issue #144); add UNIT-90 (_check_whitespace_ratio); update §4.1 to show completed refactor; update run_all order — closes issues #146 #147 #148 |
 | 1.2 | 2026-05-28 | Claude | Added ~25 units missing from v1.1 (load_spell_words, load_banned_names_file, load_copyright_file, to_case, is_exempt, _cfg, extract_comments, all Checker helper methods, _check_copyright_header, _body_is_object_verb, _check_comment_ratio, _check_lowercase_l_suffix, _check_octal_constants, _check_trigraphs, _is_reserved, _check_name_reserved, _ParamSig, _FuncSig, sign-checker helpers, SignChecker, DeclaredNotDefinedChecker, _strip_module_prefix, Tee, parse_args, _build_parser, _github_annotation_category, _is_constant_token, _is_variable_token). Updated all source line numbers to match v1.2.x source. Added Section 4.1 Target Package Structure documenting planned refactor (issue #65). Updated purpose to reference v1.2.x. |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
@@ -35,9 +36,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.0 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.3 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.2 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.6 |
 
 ---
 

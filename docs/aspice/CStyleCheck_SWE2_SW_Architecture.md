@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.2 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.3 |
 | **Project** | CStyleCheck | **Date** | 2026-05-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.1 — resolves issue #163 |
 | 1.2 | 2026-05-28 | Claude | Update §3/§4 to reflect package refactor (issue #144): replace "single Python module (cstylecheck.py)" with "Python package (src/cstylecheck/)" — closes issue #146 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -36,10 +37,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.0 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.3 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.2 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.3 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
 
 ---
 
