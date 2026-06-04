@@ -7,6 +7,39 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Inline suppression comments** (`preprocessor.parse_inline_suppressions`) — suppress
+  violations on a per-line, next-line, or block basis using structured `// cstylecheck:
+  disable=rule.id` comments in C source.  Multiple rules can be comma-separated;
+  directives are case-insensitive
+  (issue [#188](https://github.com/dermot-murphy/CStyleCheck/issues/188)).
+- **`--fix` auto-fix mode** (`fixer.py`) — apply safe mechanical fixes in-place.
+  Currently fixes `misc.unsigned_suffix` (`42u` → `42U`) and `misc.lowercase_l_suffix`
+  (`100l` → `100L`).  Use `--dry-run` to preview a unified diff without writing, and
+  `--safe-only` to restrict to zero-risk fixes (all current fixes qualify)
+  (issue [#189](https://github.com/dermot-murphy/CStyleCheck/issues/189)).
+- **`--init` config wizard and `--preset`** (`wizard.py`) — `--init` launches an
+  interactive Q&A wizard that writes `.cstylecheck.yml`; `--preset barr-c|minimal|misra`
+  writes a pre-built config without the wizard.  `--init-output FILE` sets a custom
+  output path; `--overwrite` allows overwriting an existing file
+  (issue [#190](https://github.com/dermot-murphy/CStyleCheck/issues/190)).
+- **Per-directory config** (`config.py resolve_per_dir_config`) — `--per-dir-config`
+  flag enables upward directory-walk from each source file, deep-merging any
+  `.cstylecheck.yml` found along the path on top of the root config.  The nearest config
+  wins; `root: true` in any `.cstylecheck.yml` stops the upward search.  Results are
+  cached per directory
+  (issue [#193](https://github.com/dermot-murphy/CStyleCheck/issues/193)).
+- **HTML report** (`output.py _violations_to_html`) — `--output-format html` produces a
+  self-contained HTML report with inline CSS, summary cards (errors / warnings / info /
+  total / files), and per-file violation tables.  Written to `--log FILE` if provided,
+  else stdout
+  (issue [#192](https://github.com/dermot-murphy/CStyleCheck/issues/192)).
+
+---
+
 ## [1.2.1] — 2026-05-29
 
 ### Fixed
@@ -180,6 +213,7 @@ Initial public release.
 
 ---
 
+[Unreleased]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.2.1...HEAD
 [1.1.0]: https://github.com/dermot-murphy/CStyleCheck/compare/V1.0.0...v1.1.0
 [1.0.2]: https://github.com/dermot-murphy/CStyleCheck/compare/V1.0.0...V1.0.2
 [1.0.0]: https://github.com/dermot-murphy/CStyleCheck/releases/tag/V1.0.0

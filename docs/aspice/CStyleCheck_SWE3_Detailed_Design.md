@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.5 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.6 |
 | **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-04 | Claude | Add UNIT-95 to UNIT-101 for five new features (inline suppression, fixer, wizard, per-dir config, HTML output); update §4.1 package structure; update §8 traceability — issues #188 #189 #190 #193 #192 |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: correct 48 stale line numbers, add 4 missing config.py units (UNIT-91 to UNIT-94), update §4.1 package structure, update §3.1 referenced doc versions — resolves issue #163 |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.1 — resolves issue #163 |
 | 1.3 | 2026-05-28 | Claude | Update all 89 Source Location values to reflect package refactor (issue #144); add UNIT-90 (_check_whitespace_ratio); update §4.1 to show completed refactor; update run_all order — closes issues #146 #147 #148 |
@@ -143,6 +144,13 @@ All source locations refer to the current package layout under `src/cstylecheck/
 | UNIT-92 | `_deep_merge` | `config.py:114` | COMP-02 | `config.py` |
 | UNIT-93 | `_collect_paths` | `config.py:137` | COMP-02 | `config.py` |
 | UNIT-94 | `update_config` | `config.py:148` | COMP-02 | `config.py` |
+| UNIT-95 | `parse_inline_suppressions` | `preprocessor.py` | COMP-04 | `preprocessor.py` |
+| UNIT-96 | `Fixer.apply_fixes` | `fixer.py` | COMP-08 | `fixer.py` |
+| UNIT-97 | `Fixer.dry_run_diff` | `fixer.py` | COMP-08 | `fixer.py` |
+| UNIT-98 | `run_wizard` | `wizard.py` | COMP-09 | `wizard.py` |
+| UNIT-99 | `write_preset` | `wizard.py` | COMP-09 | `wizard.py` |
+| UNIT-100 | `resolve_per_dir_config` | `config.py` | COMP-10 | `config.py` |
+| UNIT-101 | `_violations_to_html` | `output.py` | COMP-07 | `output.py` |
 
 ---
 
@@ -157,7 +165,7 @@ src/cstylecheck/
   preprocessor.py  — strip_comments, strip_strings, preprocess,
                      build_line_map, offset_to_line_col,
                      _build_brace_depths, _comment_only_lines,
-                     extract_comments
+                     extract_comments, parse_inline_suppressions
   utils.py         — matches_case, matches_case_abbrev, to_case,
                      module_name, is_exempt, _cfg,
                      _strip_module_prefix, _github_annotation_category
@@ -168,7 +176,8 @@ src/cstylecheck/
                      _disabled_rules_for_file, load_defines_file,
                      apply_defines, _load_dict_file, _data_file,
                      load_banned_names_file, load_copyright_file,
-                     _build_spell_dict, _BUILTIN_DICT
+                     _build_spell_dict, _BUILTIN_DICT,
+                     resolve_per_dir_config
   checker.py       — Checker class, all regex patterns (RE_DEFINE,
                      RE_VAR_DECL, RE_FUNCTION_DEF, …), all _check_* methods
   sign_checker.py  — SignChecker, DeclaredNotDefinedChecker,
@@ -177,7 +186,9 @@ src/cstylecheck/
                      _extract_call_args)
   baseline.py      — load_baseline, write_baseline, _baseline_key
   output.py        — Tee, _violations_to_json, _violations_to_sarif,
-                     print_summary
+                     _violations_to_html, print_summary
+  fixer.py         — Fixer class: apply_fixes, dry_run_diff
+  wizard.py        — run_wizard, write_preset
   cli.py           — discover_files, _path_matches_exclude, parse_args,
                      _build_parser, main
 ```
@@ -755,6 +766,86 @@ src/cstylecheck/
 
 ---
 
+### UNIT-95 — `parse_inline_suppressions(source: str) → dict`
+
+**Purpose:** Parse `// cstylecheck: disable=…` / `enable=…` / `disable-next-line=…` directives from raw C source and return a mapping of line numbers to the set of suppressed rule IDs at that line.
+
+**Algorithm:**
+1. Scan `source` line by line; detect `cstylecheck:` directives in comments (case-insensitive)
+2. For `disable=rule.a,rule.b` on the same line as code: add the rule IDs to that line's suppressed set only
+3. For `disable-next-line=rule.id`: add rule IDs to the next non-blank, non-comment line's suppressed set
+4. For a standalone `disable=rule.id` line: open a block suppression; accumulate affected rule IDs per line until a matching `enable=rule.id` is found; unpaired `disable=` suppresses to end of file
+5. Multiple rules are comma-separated in any directive form
+6. Return `dict[int, frozenset[str]]` mapping 1-based line numbers to suppressed rule IDs
+
+---
+
+### UNIT-96 — `Fixer.apply_fixes(files: list[str], violations: list[Violation]) → None`
+
+**Purpose:** Apply safe mechanical in-place fixes to source files for supported rules.
+
+**Algorithm:**
+1. Group violations by file
+2. For each file: read source; apply fixes in reverse line order (to preserve line offsets); write modified source back to disk
+3. Currently supported: `misc.unsigned_suffix` (`u`/`l` → `U`/`L`) and `misc.lowercase_l_suffix`
+4. If `safe_only` flag is set: skip any fix not classified as zero-risk (currently all fixes qualify)
+
+---
+
+### UNIT-97 — `Fixer.dry_run_diff(files: list[str], violations: list[Violation]) → str`
+
+**Purpose:** Compute the unified diff of what `apply_fixes` would write without modifying any file.
+
+**Algorithm:** Apply fixes to in-memory copies of each file; call `difflib.unified_diff()` between original and patched text; return combined diff string; exit 0.
+
+---
+
+### UNIT-98 — `run_wizard() → dict`
+
+**Purpose:** Interactive Q&A wizard that prompts the user for project preferences and returns a config dict suitable for writing to `.cstylecheck.yml`.
+
+**Algorithm:**
+1. Present a short series of prompts (project name, preferred naming style, which rule categories to enable)
+2. Build and return a YAML-serialisable config dict based on user answers
+
+---
+
+### UNIT-99 — `write_preset(preset: str, output_path: str, overwrite: bool) → None`
+
+**Purpose:** Write a pre-built config file for the named preset without running the wizard.
+
+**Algorithm:**
+1. Look up the named preset (`barr-c`, `minimal`, or `misra`) from a built-in dict
+2. If `output_path` exists and `overwrite` is false → exit with error
+3. Write YAML to `output_path`
+
+---
+
+### UNIT-100 — `resolve_per_dir_config(filepath: str, root_cfg: dict, cache: dict) → dict`
+
+**Purpose:** Walk upward from `filepath`'s directory looking for `.cstylecheck.yml` files and return a deep-merged config for that file.
+
+**Algorithm:**
+1. Check `cache[dir]`; if found return cached result
+2. Walk upward from `os.dirname(filepath)`; for each directory check for `.cstylecheck.yml`
+3. If found: load and collect; stop if `root: true` is present; continue otherwise
+4. Deep-merge collected configs (nearest wins) on top of `root_cfg`
+5. Store in `cache[dir]` and return merged result
+
+---
+
+### UNIT-101 — `_violations_to_html(violations: list, files_checked: int) → str`
+
+**Purpose:** Serialise violations to a self-contained HTML report string with inline CSS.
+
+**Algorithm:**
+1. Compute counts: errors, warnings, info, total, files checked
+2. Render summary cards (one per count)
+3. Group violations by file; render a per-file `<table>` with line, column, severity, rule, message columns
+4. Wrap in a full HTML document with embedded CSS; return the document string
+
+---
+
 ### UNIT-90 — `Checker._check_whitespace_ratio() → None`
 
 **Purpose:** Enforce a minimum ratio of blank lines to code lines (issue #143), measuring code "airiness".
@@ -870,6 +961,11 @@ Violation:
 | SWE1-065 to SWE1-067 | Baseline | UNIT-35, UNIT-36, UNIT-37 |
 | SWE1-068 to SWE1-070 | CLI / entry point | UNIT-01, UNIT-02, UNIT-03, UNIT-04, UNIT-46, UNIT-87, UNIT-88 |
 | SWE1-071 | Declared-not-defined check | UNIT-84 |
+| SWE1-072 to SWE1-073 | Inline suppression comments | UNIT-95 |
+| SWE1-074 | Auto-fix mode | UNIT-96, UNIT-97 |
+| SWE1-075 | Config wizard and presets | UNIT-98, UNIT-99 |
+| SWE1-076 | Per-directory config | UNIT-100 |
+| SWE1-077 | HTML report output | UNIT-101 |
 
 ---
 
