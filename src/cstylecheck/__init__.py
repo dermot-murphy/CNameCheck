@@ -146,6 +146,12 @@ from .fixer import (                     # noqa: F401, E402
     SAFE_RULES,
 )
 
+from .wizard import (                    # noqa: F401, E402
+    run_wizard,
+    run_preset,
+    PRESETS,
+)
+
 from .cli import (                       # noqa: F401, E402
     discover_files,
     _path_matches_exclude,
