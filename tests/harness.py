@@ -40,6 +40,7 @@ PRESETS                     = _mod.PRESETS
 resolve_per_dir_config      = _mod.resolve_per_dir_config
 _walk_per_dir_configs       = _mod._walk_per_dir_configs
 _PER_DIR_CONFIG_NAME        = _mod._PER_DIR_CONFIG_NAME
+_violations_to_html         = _mod._violations_to_html
 
 
 # ---------------------------------------------------------------------------

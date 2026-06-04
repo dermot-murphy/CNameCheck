@@ -30,7 +30,7 @@ from .utils import module_name, _cfg
 from .checker import Checker
 from .sign_checker import SignChecker, DeclaredNotDefinedChecker
 from .baseline import load_baseline, write_baseline, _baseline_key
-from .output import Tee, _violations_to_json, _violations_to_sarif, print_summary
+from .output import Tee, _violations_to_json, _violations_to_sarif, _violations_to_html, print_summary
 from .wizard import run_wizard, run_preset, PRESETS
 from . import _TOOL_NAME, _VERSION, _VERSION_STRING
 
@@ -229,10 +229,11 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="YAML config file (default: rules.yml)")
     p.add_argument("--github-actions", action="store_true",
                    help="Emit ::error/::warning GitHub Actions annotations")
-    p.add_argument("--output-format", choices=["text", "json", "sarif"],
+    p.add_argument("--output-format", choices=["text", "json", "sarif", "html"],
                    default="text",
-                   help="Output format: text (default), json, or sarif. "
-                        "json and sarif write to --log if given, else stdout. "
+                   help="Output format: text (default), json, sarif, or html. "
+                        "json, sarif, and html write to --log if given, "
+                        "else stdout. "
                         "Implies --exit-zero is unaffected.")
     p.add_argument("--summary", action="store_true",
                    help="Print summary table after all files are checked")
@@ -661,13 +662,16 @@ def main() -> int:
                 if v.severity in ("warning", "info"):
                     v.severity = "error"
 
-        # --output-format json / sarif: emit structured output to stdout or --log.
+        # --output-format json / sarif / html: emit structured output.
         if output_format == "json":
             json_text = _violations_to_json(all_violations, len(files))
             tee.print(json_text)
         elif output_format == "sarif":
             sarif_text = _violations_to_sarif(all_violations, _VERSION)
             tee.print(sarif_text)
+        elif output_format == "html":
+            html_text = _violations_to_html(all_violations, len(files), _VERSION)
+            tee.print(html_text)
 
         if args.summary and output_format == "text":
             print_summary(all_violations, len(files), tee)

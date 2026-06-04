@@ -139,6 +139,7 @@ from .output import (                    # noqa: F401, E402
     Tee,
     _violations_to_json,
     _violations_to_sarif,
+    _violations_to_html,
     print_summary,
 )
 
