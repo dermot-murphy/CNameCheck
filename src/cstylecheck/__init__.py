@@ -54,6 +54,7 @@ from .preprocessor import (              # noqa: F401, E402
     _build_brace_depths,
     _comment_only_lines,
     extract_comments,
+    parse_inline_suppressions,
 )
 
 from .utils import (                     # noqa: F401, E402
