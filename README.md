@@ -90,7 +90,7 @@ Dockerfile/
     Dockerfile               # multi-platform Docker image
     .dockerignore
 .github/workflows/
-    cstylecheck_tests.yml      # runs the test suite on every commit (839 tests)
+    cstylecheck_tests.yml      # runs the test suite on every commit (965 tests)
     rules.yml    # runs linter + trend page on C source commits
     docker_publish.yml       # builds and pushes image to GHCR and Docker Hub
     wiki_publish.yml         # publishes GitHub Wiki from README + ASPICE docs
@@ -262,7 +262,7 @@ existing command-line flags are fully backward-compatible — nothing changes fo
 - **`misc.declared_not_defined`** — cross-file check: flags functions declared in a `.h`
   that are never defined in any `.c` file passed in the same invocation.
 
-#### Test suite: 839 tests across 30 modules
+#### Test suite: 965 tests across 33 modules
 
 290 tests added since v1.1.0. New modules cover the 3 new rules, MISRA rule coverage, parameter
 prefixes, per-file exclusions, GitHub annotations, case-pattern helpers, and thread-safe globals.

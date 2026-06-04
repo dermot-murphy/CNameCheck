@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -22,6 +22,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions (SWE2 1.2→1.3, SUP8 1.4→1.5) — resolves issue #163 |
+| 1.4 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.2 — resolves issue #163 |
 | 1.3 | 2026-05-28 | Claude | Add SWE1-071 (whitespace_ratio); fix §4.15 coverage targets to reflect package refactor; update RTM and Appendix A.1; fix §4.15 coverage wording — closes issues #146 #148 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation footnote to §1 — closes issue #61 |
 | 1.1 | 2026-05-28 | Claude | Added SWE1-MISRA-001/002/003 requirements for MISRA C:2012/2023 lexical rules (Rule 7.3, 7.1, 4.2); updated §5 traceability matrix |
@@ -33,7 +35,7 @@
 
 ### 3.1 Purpose
 
-This Software Requirements Specification (SRS) refines the system-level requirements from CSC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.0.0**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
+This Software Requirements Specification (SRS) refines the system-level requirements from CSC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.2.x**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requirements Analysis**.
 
@@ -41,10 +43,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.0 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.3 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 

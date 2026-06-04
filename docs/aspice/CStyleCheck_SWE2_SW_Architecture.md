@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.2 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.4 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 version text, update §3.1 referenced doc versions, fix COMP-05f functions (remove non-existent, add missing), add comment/whitespace ratio to §8.1 sequence, add SWE1-071/MISRA rows to §10 RTM, add config utility functions to COMP-02 — resolves issue #163 |
+| 1.3 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.1 — resolves issue #163 |
 | 1.2 | 2026-05-28 | Claude | Update §3/§4 to reflect package refactor (issue #144): replace "single Python module (cstylecheck.py)" with "Python package (src/cstylecheck/)" — closes issue #146 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -28,7 +30,7 @@
 
 ## 3. Purpose & Scope
 
-This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.0.0**. It refines the system architecture (CSC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
+This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.2.x**. It refines the system architecture (CSC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Architectural Design**.
 
@@ -36,10 +38,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.0 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.0 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.0 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.5 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.4 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
 
 ---
 
@@ -52,7 +54,8 @@ src/cstylecheck/   (package — 10 sub-modules)
 │
 ├── [COMP-01] CLI & Options Loader     (parse_args, _expand_options_file, discover_files)
 ├── [COMP-02] Configuration Loader     (load_config, load_alias_file, load_exclusions_file,
-│                                       load_defines_file, apply_defines)
+│                                       load_defines_file, apply_defines, update_config,
+│                                       _find_default_rules, _deep_merge, _collect_paths)
 ├── [COMP-03] Dictionary Manager       (_load_dict_file, _data_file, _build_spell_dict,
 │                                       load_spell_words, load_banned_names_file)
 ├── [COMP-04] Source Parser & Cache    (strip_comments, strip_strings, preprocess,
@@ -67,7 +70,7 @@ src/cstylecheck/   (package — 10 sub-modules)
 │   ├── [COMP-05e] Guard Checker       (_check_include_guard)
 │   ├── [COMP-05f] Misc Checker        (_check_misc, _check_yoda, _check_spelling,
 │   │                                   _check_reserved_names, _check_copyright_header,
-│   │                                   _check_block_comment_spacing, _check_eof_comment)
+│   │                                   _check_comment_ratio, _check_whitespace_ratio)
 │   └── [COMP-05g] Sign Checker        (class SignChecker — _check_calls)
 ├── [COMP-06] Baseline Manager         (load_baseline, write_baseline, _baseline_key)
 └── [COMP-07] Output Formatter         (_violations_to_json, _violations_to_sarif,
@@ -92,7 +95,7 @@ src/cstylecheck/   (package — 10 sub-modules)
 
 | Attribute | Value |
 |---|---|
-| **Source functions** | `load_config()`, `load_alias_file()`, `load_exclusions_file()`, `_disabled_rules_for_file()`, `load_defines_file()`, `apply_defines()` |
+| **Source functions** | `load_config()`, `load_alias_file()`, `load_exclusions_file()`, `_disabled_rules_for_file()`, `load_defines_file()`, `apply_defines()`, `update_config()`, `_find_default_rules()`, `_deep_merge()`, `_collect_paths()` |
 | **Responsibility** | Load and validate YAML config; build alias-prefix lists; resolve per-file disabled rules; apply defines substitutions to preprocessed source |
 | **Inputs** | YAML config file path; alias file path; exclusions file path; defines file path |
 | **Outputs** | `cfg` dict; `alias_prefixes` list; `disabled_rules` frozenset; preprocessed source text |
@@ -167,8 +170,8 @@ The `Checker` class is the central analysis component. It is instantiated once p
 | `_check_spelling()` | `spell_check` |
 | `_check_reserved_names()` | `reserved_name` |
 | `_check_copyright_header()` | `misc.copyright_header` |
-| `_check_block_comment_spacing()` | `misc.block_comment_spacing` |
-| `_check_eof_comment()` | `misc.eof_comment` |
+| `_check_comment_ratio()` | `misc.comment_ratio` |
+| `_check_whitespace_ratio()` | `misc.whitespace_ratio` |
 
 #### COMP-05g — Sign Checker (`class SignChecker`)
 
@@ -251,6 +254,8 @@ main()
 │   │   ├─ _check_structs()
 │   │   ├─ _check_include_guard()  [header files only]
 │   │   ├─ _check_misc()
+│   │   ├─ _check_comment_ratio()
+│   │   ├─ _check_whitespace_ratio()
 │   │   ├─ _check_yoda()
 │   │   ├─ _check_spelling()
 │   │   └─ _check_reserved_names()
@@ -302,6 +307,8 @@ main()
 | SWE1-057 to SWE1-064 | Output formatting | COMP-07 |
 | SWE1-065 to SWE1-067 | Baseline suppression | COMP-06 |
 | SWE1-068 to SWE1-070 | CLI and entry point | COMP-01 |
+| SWE1-071 | Whitespace ratio check | COMP-05f |
+| SWE1-MISRA-001 to SWE1-MISRA-003 | MISRA C lexical rules (lowercase l, octal, trigraphs) | COMP-05f |
 
 ---
 

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS3-001 | **Version** | 1.2 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SYS3-001 | **Version** | 1.3 |
+| **Project** | CStyleCheck | **Date** | 2026-06-04 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Claude | Update §5/§6/§8 to reflect package refactor (issue #144): replace single `cstylecheck.py` references with package sub-modules — closes issue #146 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -30,16 +31,16 @@
 
 ### 3.1 Purpose
 
-This System Architecture Description defines the top-level structural and behavioural design of **CStyleCheck v1.0.0**, decomposing the system into its major functional subsystems, defining their interfaces, and establishing the basis for software-level design. It satisfies **Automotive SPICE® PAM v4.0, SYS.3 — System Architectural Design**.
+This System Architecture Description defines the top-level structural and behavioural design of **CStyleCheck v1.2.x**, decomposing the system into its major functional subsystems, defining their interfaces, and establishing the basis for software-level design. It satisfies **Automotive SPICE® PAM v4.0, SYS.3 — System Architectural Design**.
 
 ### 3.2 Referenced Documents
 
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.0 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.0 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.1 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.3 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
 
 ---
 
@@ -214,7 +215,7 @@ If any configuration or invocation error is detected during steps 1 or 2:
 | SYS REQ-ID | Requirement Summary | Subsystem(s) |
 |---|---|---|
 | SYS-F-001 to SYS-F-010 | Input handling | SS-01 (CLI & Options Loader) |
-| SYS-F-011 to SYS-F-026 | Rule checking (all 48 rule IDs) | SS-05 (Rule Engine), SS-03 (Dictionary Manager) |
+| SYS-F-011 to SYS-F-026 | Rule checking (all 53 rule IDs) | SS-05 (Rule Engine), SS-03 (Dictionary Manager) |
 | SYS-F-027 to SYS-F-033 | Output formats and reporting | SS-06 (Output Formatter) |
 | SYS-F-034 to SYS-F-036 | Baseline suppression | SS-01 (flags), SS-05 (filter), SS-06 (write) |
 | SYS-F-037 to SYS-F-040 | Exit codes | SS-06 (exit code return) |
