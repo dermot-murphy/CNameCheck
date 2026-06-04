@@ -23,6 +23,7 @@ from .config import (
     _build_spell_dict, _load_dict_file, _expand_options_file,
     update_config,
     C_KEYWORDS, C_STDLIB_NAMES,
+    resolve_per_dir_config,
 )
 from .fixer import apply_fixes, unified_diff, FIXABLE_RULES, SAFE_RULES
 from .utils import module_name, _cfg
@@ -345,6 +346,14 @@ def _build_parser() -> argparse.ArgumentParser:
     init_group.add_argument(
         "--overwrite", action="store_true",
         help="Overwrite existing config file when using --init or --preset.")
+    p.add_argument("--per-dir-config", action="store_true",
+                   help="Enable per-directory config overrides. For each source "
+                        "file, CStyleCheck walks up the directory tree looking "
+                        "for '.cstylecheck.yml' files and deep-merges any found "
+                        "overrides on top of the root config. Add 'root: true' "
+                        "to any '.cstylecheck.yml' to stop the search at that "
+                        "directory. The nearest config (closest to the file) "
+                        "takes highest priority.")
     return p
 
 
@@ -496,6 +505,8 @@ def main() -> int:
         # Cache source text keyed by filepath to avoid reading each file twice
         # (once for Checker, once for SignChecker).
         source_cache: dict = {}
+        # Per-directory config cache: {dir_path -> effective_cfg}
+        _per_dir_cache: dict = {}
 
         for filepath in files:
             if getattr(args, "verbose", False):
@@ -511,10 +522,17 @@ def main() -> int:
                 tee.print(f"ERROR: Cannot read {filepath}: {e}")
                 continue
 
+            # Resolve effective config (root cfg optionally overridden per-dir)
+            file_cfg = (
+                resolve_per_dir_config(filepath, cfg, _per_dir_cache)
+                if getattr(args, "per_dir_config", False)
+                else cfg
+            )
+
             # Build accepted prefix list for this file (canonical + aliases)
             mod   = module_name(filepath)
-            sep   = _cfg(cfg, "file_prefix", "separator", default="_")
-            case  = _cfg(cfg, "file_prefix", "case", default="lower")
+            sep   = _cfg(file_cfg, "file_prefix", "separator", default="_")
+            case  = _cfg(file_cfg, "file_prefix", "case", default="lower")
             canon = (mod.upper() if case == "upper" else mod.lower()) + sep
             alias_pfxs = [canon] + [
                 a.lower() + sep for a in alias_map.get(mod.lower(), [])
@@ -524,7 +542,7 @@ def main() -> int:
             _file_disabled, _ident_disabled = _disabled_rules_for_file(filepath, exclusions_map)
 
             checker = Checker(
-                filepath, source, cfg,
+                filepath, source, file_cfg,
                 spell_words=spell_words,
                 alias_prefixes=alias_pfxs,
                 disabled_rules=_file_disabled,

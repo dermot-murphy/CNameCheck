@@ -645,3 +645,69 @@ def _build_spell_dict(cfg_exempt: list, extra_words: set,
     combined.update(w.lower() for w in cfg_exempt)
     combined.update(w.lower() for w in extra_words)
     return combined
+
+
+# ---------------------------------------------------------------------------
+# Per-directory config override discovery  (--per-dir-config)
+# ---------------------------------------------------------------------------
+
+_PER_DIR_CONFIG_NAME = ".cstylecheck.yml"
+
+
+def _walk_per_dir_configs(dirpath: Path) -> list:
+    """
+    Walk upward from *dirpath* collecting ``.cstylecheck.yml`` dicts.
+
+    Stops at the filesystem root or when a config containing ``root: true``
+    is found.  Returns the list ordered **outermost-to-innermost** so callers
+    can merge them in priority order (innermost wins).
+    """
+    chain: list = []
+    current = dirpath.resolve()
+    while True:
+        candidate = current / _PER_DIR_CONFIG_NAME
+        if candidate.exists():
+            try:
+                data = yaml.safe_load(candidate.read_text(encoding="utf-8"))
+            except (OSError, yaml.YAMLError):
+                data = None
+            if isinstance(data, dict):
+                chain.append(data)
+                if data.get("root"):
+                    break
+        parent = current.parent
+        if parent == current:  # reached filesystem root
+            break
+        current = parent
+    chain.reverse()  # outermost first → lower priority merged first
+    return chain
+
+
+def resolve_per_dir_config(filepath: str, root_cfg: dict, cache: dict) -> dict:
+    """
+    Return the effective config for *filepath* by deep-merging per-directory
+    ``.cstylecheck.yml`` overrides on top of *root_cfg*.
+
+    Walks up from the file's directory, collecting all ``.cstylecheck.yml``
+    files until the filesystem root or until a config with ``root: true`` is
+    encountered.  Overrides are merged outermost-to-innermost so the config
+    nearest to the file has the highest priority.
+
+    Results are cached by the file's resolved directory so each directory is
+    only processed once per run.
+    """
+    file_dir = str(Path(filepath).resolve().parent)
+    if file_dir in cache:
+        return cache[file_dir]
+
+    chain = _walk_per_dir_configs(Path(filepath).resolve().parent)
+    if not chain:
+        result = root_cfg
+    else:
+        result = root_cfg
+        for override in chain:
+            clean_override = {k: v for k, v in override.items() if k != "root"}
+            result = _deep_merge(result, clean_override)
+
+    cache[file_dir] = result
+    return result

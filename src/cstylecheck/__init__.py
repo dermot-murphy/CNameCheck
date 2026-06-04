@@ -96,6 +96,9 @@ from .config import (                    # noqa: F401, E402
     _DEFAULT_KEYWORDS_FILE,
     _DEFAULT_STDLIB_FILE,
     _DEFAULT_SPELL_DICT,
+    _PER_DIR_CONFIG_NAME,
+    _walk_per_dir_configs,
+    resolve_per_dir_config,
 )
 
 from .checker import (                   # noqa: F401, E402
