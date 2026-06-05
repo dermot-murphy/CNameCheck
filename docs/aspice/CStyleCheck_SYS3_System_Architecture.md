@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS3-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SYS3-001 | **Version** | 1.4 |
+| **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Claude | Update §5/§6/§8 to reflect package refactor (issue #144): replace single `cstylecheck.py` references with package sub-modules — closes issue #146 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
@@ -38,7 +39,7 @@ This System Architecture Description defines the top-level structural and behavi
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.5 |
 | CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.3 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
 
@@ -75,7 +76,7 @@ CStyleCheck is a software-only system with no hardware dependencies. It is deplo
 
 ## 5. System Decomposition — Static View
 
-CStyleCheck is decomposed into six functional subsystems, all implemented within the `src/cstylecheck/` Python package (10 sub-modules) and its supporting configuration and data files.
+CStyleCheck is decomposed into six functional subsystems, all implemented within the `src/cstylecheck/` Python package (12 sub-modules) and its supporting configuration and data files.
 
 ### 5.1 Subsystem Overview
 
@@ -87,6 +88,9 @@ CStyleCheck is decomposed into six functional subsystems, all implemented within
 | SS-04 | Source Parser & Cache | Read each source file once; tokenise identifiers, extract scoped declarations; cache content for cross-file checks | `preprocessor.py` |
 | SS-05 | Rule Engine | Evaluate all enabled rules against each identifier; classify violations by severity; apply exclusions and baselines | `checker.py`, `sign_checker.py`, `exclusions.yml` |
 | SS-06 | Output Formatter | Render violation results as plain text, JSON, or SARIF; emit GitHub annotations; write log file; print summary | `output.py`, `baseline.py` |
+| SS-07 | Auto-fix Engine | Apply safe mechanical in-place fixes (`--fix`); show unified diff without writing (`--dry-run`); restrict to zero-risk fixes (`--safe-only`) | `fixer.py` — `apply_fixes`, `unified_diff` |
+| SS-08 | Config Wizard | Interactive Q&A config generation (`--init`); pre-built preset config generation (`--preset`) without running wizard | `wizard.py` — `run_wizard`, `run_preset` |
+| SS-09 | Per-directory Config | Walk upward from each source file's directory; deep-merge found `.cstylecheck.yml` on top of root config; nearest config wins; `root: true` stops search; cache per directory | `config.py` — `resolve_per_dir_config` |
 
 ### 5.2 Subsystem Interface Summary
 
@@ -201,7 +205,7 @@ If any configuration or invocation error is detected during steps 1 or 2:
 
 | Decision ID | Decision | Rationale | Alternative Considered |
 |---|---|---|---|
-| AD-001 | Python package (`src/cstylecheck/`, 10 sub-modules) with no third-party runtime dependencies beyond PyYAML | Maximises maintainability; package refactor (issue #144) splits the original monolithic file into logical modules while preserving full backward compatibility via `__init__.py` re-exports | Single monolithic file — was v1.0/v1.1 approach; refactored in v1.2 to aid readability and navigation |
+| AD-001 | Python package (`src/cstylecheck/`, 12 sub-modules) with no third-party runtime dependencies beyond PyYAML | Maximises maintainability; package refactor (issue #144) splits the original monolithic file into logical modules while preserving full backward compatibility via `__init__.py` re-exports | Single monolithic file — was v1.0/v1.1 approach; refactored in v1.2 to aid readability and navigation |
 | AD-002 | YAML for rule configuration | Human-readable, widely used in CI/CD toolchains, native Python support via PyYAML | JSON / TOML — rejected: JSON too verbose; TOML less familiar to embedded teams |
 | AD-003 | Source-cache architecture (read each file once) | Eliminates duplicate I/O; required for cross-file sign-compatibility check to share the same parsed content | Re-read files per check pass — rejected: doubles I/O on large repos |
 | AD-004 | Three output formats (text, JSON, SARIF) | Supports human review (text), downstream automation (JSON), and GitHub Code Scanning integration (SARIF) | Single format — rejected: insufficient for CI/CD integration requirements |
@@ -227,6 +231,11 @@ If any configuration or invocation error is detected during steps 1 or 2:
 | SYS-NF-007 to SYS-NF-009 | Configurability | SS-02 (Configuration Loader) |
 | SYS-NF-010 | pre-commit integration | `.pre-commit-hooks.yml` (CI-015) |
 | SYS-NF-011 to SYS-NF-012 | GitHub Action integration | `action.yml` (CI-016) |
+| SYS-F-041 | Inline suppression comment directives | SS-01 (Preprocessor/Source Parser — `parse_inline_suppressions`) |
+| SYS-F-042 | Auto-fix mode (`--fix`, `--dry-run`, `--safe-only`) | SS-07 (Auto-fix Engine) |
+| SYS-F-043 | Config wizard (`--init`) and preset generation (`--preset`) | SS-08 (Config Wizard) |
+| SYS-F-044 | Per-directory config override resolution (`--per-dir-config`) | SS-09 (Per-directory Config) |
+| SYS-F-045 | HTML report output (`--output-format html`) | SS-06 (Output Formatter) |
 
 ---
 
