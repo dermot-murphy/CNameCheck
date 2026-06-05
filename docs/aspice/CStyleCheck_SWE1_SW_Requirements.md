@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.6 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.7 |
+| **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Add SWE1-072 to SWE1-076 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output) — issues #188 #189 #190 #193 #192 |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions (SWE2 1.2→1.3, SUP8 1.4→1.5) — resolves issue #163 |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.2 — resolves issue #163 |
@@ -44,9 +45,9 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.3 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.5 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.4 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.6 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
@@ -257,11 +258,11 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-057 to SWE1-064 | Output formatting | SYS-F-027 to F-033 | Output Formatter / `Tee` | `test_cli.py` |
 | SWE1-065 to SWE1-067 | Baseline suppression | SYS-F-034 to F-036 | Baseline Manager | `test_cli.py` |
 | SWE1-068 to SWE1-070 | CLI and entry point | SYS-F-004, F-005, SYS-NF-008 | CLI module / `main()` | `test_cli.py` |
-| SWE1-072 to SWE1-073 | Inline suppression comments | SYS-F-008 | `preprocessor.parse_inline_suppressions()` | `test_improvements.py` |
-| SWE1-074 | Auto-fix mode | SYS-F-020 | `fixer.py` Fixer module | `test_cli.py` |
-| SWE1-075 | Config wizard and presets | SYS-F-002 | `wizard.py` Wizard module | `test_cli.py` |
-| SWE1-076 | Per-directory config | SYS-F-002 | `config.resolve_per_dir_config()` | `test_cli.py` |
-| SWE1-077 | HTML report output | SYS-F-027 | `output._violations_to_html()` | `test_cli.py` |
+| SWE1-072 to SWE1-073 | Inline suppression comments | SYS-F-008 | `preprocessor.parse_inline_suppressions()` | `test_inline_suppression.py` |
+| SWE1-074 | Auto-fix mode | SYS-F-020 | `fixer.py` Fixer module | `test_fix_mode.py` |
+| SWE1-075 | Config wizard and presets | SYS-F-002 | `wizard.py` Wizard module | `test_init_wizard.py` |
+| SWE1-076 | Per-directory config | SYS-F-002 | `config.resolve_per_dir_config()` | `test_per_dir_config.py` |
+| SWE1-077 | HTML report output | SYS-F-027 | `output._violations_to_html()` | `test_html_report.py` |
 
 ---
 

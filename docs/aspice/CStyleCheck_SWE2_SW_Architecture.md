@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.5 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.6 |
+| **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.5 | 2026-06-04 | Claude | Add COMP-08 (Fixer), COMP-09 (Config Wizard), COMP-10 (Per-dir Config); add `parse_inline_suppressions` to COMP-04; add `_violations_to_html` to COMP-07; update §8.1 sequence; update §10 RTM — issues #188 #189 #190 #193 #192 |
 | 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 version text, update §3.1 referenced doc versions, fix COMP-05f functions (remove non-existent, add missing), add comment/whitespace ratio to §8.1 sequence, add SWE1-071/MISRA rows to §10 RTM, add config utility functions to COMP-02 — resolves issue #163 |
 | 1.3 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.1 — resolves issue #163 |
@@ -39,19 +40,19 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.5 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.4 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.4 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.8 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
 
 ---
 
 ## 4. Architectural Overview
 
-CStyleCheck is implemented as a **Python package** (`src/cstylecheck/`) comprising 10 sub-modules with supporting data files. The package is structured into distinct functional components that map directly to the system-level subsystems defined in CSC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
+CStyleCheck is implemented as a **Python package** (`src/cstylecheck/`) comprising 12 sub-modules with supporting data files. The package is structured into distinct functional components that map directly to the system-level subsystems defined in CSC-SYS3-001. The architecture follows a **pipeline pattern**: each source file passes sequentially through preprocessing, caching, rule evaluation, and output formatting.
 
 ```
-src/cstylecheck/   (package — 10 sub-modules)
+src/cstylecheck/   (package — 12 sub-modules)
 │
 ├── [COMP-01] CLI & Options Loader     (parse_args, _expand_options_file, discover_files)
 ├── [COMP-02] Configuration Loader     (load_config, load_alias_file, load_exclusions_file,
@@ -78,7 +79,7 @@ src/cstylecheck/   (package — 10 sub-modules)
 │                                       _violations_to_html, print_summary,
 │                                       class Tee, Violation.github_annotation)
 ├── [COMP-08] Fixer                    (fixer.py — apply_fixes, --fix, --dry-run, --safe-only)
-├── [COMP-09] Config Wizard            (wizard.py — run_wizard, write_preset,
+├── [COMP-09] Config Wizard            (wizard.py — run_wizard, run_preset,
 │                                       --init, --preset, --init-output, --overwrite)
 └── [COMP-10] Per-directory Config     (config.resolve_per_dir_config — upward dir-walk,
                                         deep-merge, root-stop, per-dir cache)

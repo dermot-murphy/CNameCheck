@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.7 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.8 |
 | **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Automated accuracy audit: add §6 rows for test_preprocessor.py/test_comment_ratio/test_declared_not_defined/test_update_config/test_config_loading; update total 786→965; fix section header counts (§5.4/§5.6/§5.12/§5.13); update referenced doc versions; fix §3 version text; update coverage note — resolves issue #163 |
 | 1.5 | 2026-05-28 | Claude | Add §5.7b whitespace_ratio test catalogue (27 tests); fix §5.1 count 32→35; add §6 row for test_whitespace_ratio.py; update total 759→786; update §7 traceability — closes issues #148 #157 |
 | 1.4 | 2026-05-28 | Dermot Murphy | §4.2: implement subprocess coverage via COVERAGE_PROCESS_START + sitecustomize.py; raise CI gate to 85% combined; actual v1.2.0 CI: 89.8% stmt, 87.31% combined — closes issue #54 |
@@ -42,9 +43,9 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.3 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.3 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.2 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.8 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.4 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
 
 ---
@@ -56,10 +57,10 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 | Method | Scope | Tool |
 |---|---|---|
 | Dynamic unit testing | All COMP-05 rule-check methods; COMP-02, COMP-03, COMP-04, COMP-06, COMP-07 utility functions | pytest 7+ |
-| Static verification (naming convention) | `cstylecheck.py` source file itself | `cstylecheck` self-hosted via `rules.yml` CI |
-| Static type check | `src/cstylecheck.py` — import and inferred-type check (`--ignore-missing-imports`; `--strict` deferred until codebase is annotated) | mypy 1.0+ |
+| Static verification (naming convention) | `src/cstylecheck/` package source files | `cstylecheck` self-hosted via `rules.yml` CI |
+| Static type check | `src/cstylecheck/` — import and inferred-type check (`--ignore-missing-imports`; `--strict` deferred until codebase is annotated) | mypy 1.0+ |
 | Lint check | `src/` and `tests/` — style and common error detection | ruff 0.1+ |
-| Code coverage measurement | `src/cstylecheck.py` | pytest-cov |
+| Code coverage measurement | `src/cstylecheck/` | pytest-cov |
 | Code review / inspection | `SignChecker` try/finally pattern (SWE1-053); `_data_file()` fallback logic | Manual review during PR |
 
 ### 4.2 Coverage Criteria
@@ -72,9 +73,9 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 Coverage is measured per CI run on all three Python matrix versions (3.10, 3.11, 3.12) and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact, Python 3.11 build).
 
-**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 965 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
+**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 1041 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
 
-> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures.
+> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures (baseline reference: 1041 tests as of v1.2.x).
 
 ### 4.3 Test Infrastructure
 
@@ -101,12 +102,12 @@ Key harness functions:
 
 ### 4.4 Naming Convention Self-Check (Static Verification)
 
-CStyleCheck enforces its own naming rules on `cstylecheck.py` via the `rules.yml` CI workflow. This constitutes a static verification pass satisfying SWE.4 BP3.
+CStyleCheck enforces its own naming rules on `src/cstylecheck/` via the `rules.yml` CI workflow. This constitutes a static verification pass satisfying SWE.4 BP3.
 
 | Verification Item | Evidence |
 |---|---|
-| Zero `error`-level violations on `cstylecheck.py` | `rules.yml` CI job PASS |
-| Workflow trigger | Every push that modifies `src/cstylecheck.py` |
+| Zero `error`-level violations on `src/cstylecheck/` | `rules.yml` CI job PASS |
+| Workflow trigger | Every push that modifies `src/cstylecheck/` |
 
 ---
 
@@ -383,11 +384,16 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_declared_not_defined.py` | 39 | 39 | 0 | `DeclaredNotDefinedChecker` |
 | `test_config_loading.py` | 13 | 13 | 0 | COMP-02 (`load_config` — UTF-8, missing file, YAML errors) |
 | `test_update_config.py` | 27 | 27 | 0 | COMP-02 (`_deep_merge`) |
-| **Total** | **965** | **965** | **0** | All rules covered |
+| `test_inline_suppression.py` | 15 | 15 | 0 | COMP-04 (`parse_inline_suppressions`) |
+| `test_fix_mode.py` | 11 | 11 | 0 | COMP-08 (`apply_fixes`, `unified_diff`) |
+| `test_init_wizard.py` | 15 | 15 | 0 | COMP-09 (`run_wizard`, `run_preset`) |
+| `test_per_dir_config.py` | 15 | 15 | 0 | COMP-10 (`resolve_per_dir_config`) |
+| `test_html_report.py` | 20 | 20 | 0 | COMP-07 (`_violations_to_html`) |
+| **Total** | **1041** | **1041** | **0** | All rules covered — 38 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
-**Statement Coverage (v1.2.0 CI — 839 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
-**Branch Coverage (v1.2.0 CI — 839 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
+**Statement Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
+**Branch Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
 
 **Static Verification (rules.yml):** PASS
 
@@ -411,6 +417,11 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | SWE1-007 to SWE1-010 | Dictionary management | UV-DCT-001 to UV-DCT-004 |
 | SWE1-065 to SWE1-067 | Baseline suppression | UV-CLI-008 |
 | SWE1-068 to SWE1-070 | CLI / entry point | UV-CLI-001 to UV-CLI-010 |
+| SWE1-072 to SWE1-073 | Inline suppression comments (`parse_inline_suppressions`, suppression logic) | `test_inline_suppression.py` |
+| SWE1-074 | Auto-fix mode (`apply_fixes`, `unified_diff`) | `test_fix_mode.py` |
+| SWE1-075 | Config wizard and presets (`run_wizard`, `run_preset`) | `test_init_wizard.py` |
+| SWE1-076 | Per-directory config (`resolve_per_dir_config`) | `test_per_dir_config.py` |
+| SWE1-077 | HTML report output (`_violations_to_html`) | `test_html_report.py` |
 
 ---
 
