@@ -3,3 +3,4 @@ __pycache__/
 **/__pycache__/
 src/_version.py
 
+tests/robot/generated/

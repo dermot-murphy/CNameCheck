@@ -1,0 +1,43 @@
+name: Generate Robot Framework Tests
+
+on:
+  push:
+    paths:
+      - 'docs/aspice/test_cases/**/*.md'
+      - 'scripts/robot_converter/**'
+  pull_request:
+    paths:
+      - 'docs/aspice/test_cases/**/*.md'
+      - 'scripts/robot_converter/**'
+
+jobs:
+  generate:
+    name: Convert MD test cases to Robot Framework
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate Robot Framework tests
+        run: |
+          python -m scripts.robot_converter.converter \
+            --input docs/aspice/test_cases/ \
+            --output tests/robot/generated/
+
+      - name: Show generated files
+        run: |
+          echo "=== Generated .robot files ==="
+          find tests/robot/generated/ -name "*.robot" -exec echo "--- {} ---" \; -exec cat {} \;
+
+      - name: Upload generated Robot tests as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-tests
+          path: tests/robot/generated/
+          retention-days: 30
