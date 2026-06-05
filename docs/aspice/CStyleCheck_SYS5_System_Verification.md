@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS5-001 | **Version** | 1.4 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions, fix VTC-003 header and §6 rule count — resolves issue #163 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC execution result tables; fill §3.3 configuration; update overall verdict to commit 93178cd, 839 tests PASS — closes issue #152 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC results (PASS); map 6 untraced requirements to SYS-VTC; defer NF-010/011/012; populate open issues — closes issue #53 |
@@ -40,8 +41,8 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.5 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.4 |
 | CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.3 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
@@ -381,7 +382,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-VTC-012 | Docker multi-platform build | SYS-NF-006 | PASS | |
 | SYS-VTC-013 | Self-hosting: linter passes own rules | SYS-F-011 | PASS | |
 
-**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 965 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
+**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 1041 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
 
 ---
 
@@ -428,6 +429,11 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-NF-010 | pre-commit integration | — | Deferred — not separately verified at system level; covered by unit test suite only |
 | SYS-NF-011 | GitHub Action `action.yml` | — | Deferred — not separately verified at system level |
 | SYS-NF-012 | GitHub Action step outputs | — | Deferred — not separately verified at system level |
+| SYS-F-041 | Inline suppression comment directives | SIT-014 (`test_inline_suppression.py`) | Covered |
+| SYS-F-042 | Auto-fix mode (`--fix`, `--dry-run`, `--safe-only`) | SIT-015 (`test_fix_mode.py`) | Covered |
+| SYS-F-043 | Config wizard (`--init`) and preset generation (`--preset`) | SIT-016 (`test_init_wizard.py`) | Covered |
+| SYS-F-044 | Per-directory config override resolution (`--per-dir-config`) | SIT-017 (`test_per_dir_config.py`) | Covered |
+| SYS-F-045 | HTML report output (`--output-format html`) | SIT-018 (`test_html_report.py`) | Covered |
 
 > **📋 Note:** SYS-NF-010/011/012 are deferred — no dedicated system-level test case exists. These will be addressed in a future SYS5 revision when a GitHub Action integration test environment is available.
 
