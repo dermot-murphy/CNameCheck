@@ -7,7 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [Unreleased]
+## [1.3.0] — 2026-06-05
 
 ### Added
 
@@ -214,7 +214,8 @@ Initial public release.
 
 ---
 
-[Unreleased]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.2.1...v1.3.0
 [1.1.0]: https://github.com/dermot-murphy/CStyleCheck/compare/V1.0.0...v1.1.0
 [1.0.2]: https://github.com/dermot-murphy/CStyleCheck/compare/V1.0.0...V1.0.2
 [1.0.0]: https://github.com/dermot-murphy/CStyleCheck/releases/tag/V1.0.0
