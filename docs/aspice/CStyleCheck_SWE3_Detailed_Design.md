@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.6 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.8 |
+| **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Add UNIT-95 to UNIT-101 for five new features (inline suppression, fixer, wizard, per-dir config, HTML output); update §4.1 package structure; update §8 traceability — issues #188 #189 #190 #193 #192 |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: correct 48 stale line numbers, add 4 missing config.py units (UNIT-91 to UNIT-94), update §4.1 package structure, update §3.1 referenced doc versions — resolves issue #163 |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions in §3.1 — resolves issue #163 |
@@ -38,9 +39,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.5 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.4 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.6 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.6 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.8 |
 
 ---
 
@@ -145,10 +146,10 @@ All source locations refer to the current package layout under `src/cstylecheck/
 | UNIT-93 | `_collect_paths` | `config.py:137` | COMP-02 | `config.py` |
 | UNIT-94 | `update_config` | `config.py:148` | COMP-02 | `config.py` |
 | UNIT-95 | `parse_inline_suppressions` | `preprocessor.py` | COMP-04 | `preprocessor.py` |
-| UNIT-96 | `Fixer.apply_fixes` | `fixer.py` | COMP-08 | `fixer.py` |
-| UNIT-97 | `Fixer.dry_run_diff` | `fixer.py` | COMP-08 | `fixer.py` |
+| UNIT-96 | `apply_fixes` | `fixer.py` | COMP-08 | `fixer.py` |
+| UNIT-97 | `unified_diff` | `fixer.py` | COMP-08 | `fixer.py` |
 | UNIT-98 | `run_wizard` | `wizard.py` | COMP-09 | `wizard.py` |
-| UNIT-99 | `write_preset` | `wizard.py` | COMP-09 | `wizard.py` |
+| UNIT-99 | `run_preset` | `wizard.py` | COMP-09 | `wizard.py` |
 | UNIT-100 | `resolve_per_dir_config` | `config.py` | COMP-10 | `config.py` |
 | UNIT-101 | `_violations_to_html` | `output.py` | COMP-07 | `output.py` |
 
@@ -187,8 +188,8 @@ src/cstylecheck/
   baseline.py      — load_baseline, write_baseline, _baseline_key
   output.py        — Tee, _violations_to_json, _violations_to_sarif,
                      _violations_to_html, print_summary
-  fixer.py         — Fixer class: apply_fixes, dry_run_diff
-  wizard.py        — run_wizard, write_preset
+  fixer.py         — apply_fixes, unified_diff
+  wizard.py        — run_wizard, run_preset
   cli.py           — discover_files, _path_matches_exclude, parse_args,
                      _build_parser, main
 ```
@@ -780,44 +781,46 @@ src/cstylecheck/
 
 ---
 
-### UNIT-96 — `Fixer.apply_fixes(files: list[str], violations: list[Violation]) → None`
+### UNIT-96 — `apply_fixes(source: str, violations: list, safe_only: bool = False) → tuple[str, int]`
 
-**Purpose:** Apply safe mechanical in-place fixes to source files for supported rules.
+**Purpose:** Module-level function. Scans source string for fixable violations and returns (new_source, fix_count).
 
 **Algorithm:**
-1. Group violations by file
-2. For each file: read source; apply fixes in reverse line order (to preserve line offsets); write modified source back to disk
-3. Currently supported: `misc.unsigned_suffix` (`u`/`l` → `U`/`L`) and `misc.lowercase_l_suffix`
-4. If `safe_only` flag is set: skip any fix not classified as zero-risk (currently all fixes qualify)
+1. Iterate over violations; for each fixable rule apply the mechanical substitution to the source string
+2. Currently supported: `misc.unsigned_suffix` (`u`/`l` → `U`/`L`) and `misc.lowercase_l_suffix`
+3. If `safe_only` flag is set: skip any fix not classified as zero-risk (currently all fixes qualify)
+4. Return `(new_source, fix_count)` where `fix_count` is the number of substitutions applied
 
 ---
 
-### UNIT-97 — `Fixer.dry_run_diff(files: list[str], violations: list[Violation]) → str`
+### UNIT-97 — `unified_diff(original: str, fixed: str, filepath: str) → str`
 
-**Purpose:** Compute the unified diff of what `apply_fixes` would write without modifying any file.
+**Purpose:** Module-level function. Returns unified diff string comparing original and fixed source.
 
-**Algorithm:** Apply fixes to in-memory copies of each file; call `difflib.unified_diff()` between original and patched text; return combined diff string; exit 0.
+**Algorithm:** Call `difflib.unified_diff()` between `original` and `fixed` strings; use `filepath` as the filename label in the diff header; return the combined diff string.
 
 ---
 
-### UNIT-98 — `run_wizard() → dict`
+### UNIT-98 — `run_wizard(output_path=None, prompt_fn=input, print_fn=print, overwrite=False) → int`
 
-**Purpose:** Interactive Q&A wizard that prompts the user for project preferences and returns a config dict suitable for writing to `.cstylecheck.yml`.
+**Purpose:** Interactive Q&A wizard that prompts the user for project preferences, writes `.cstylecheck.yml` directly, and returns 0 on success or 1 on abort.
 
 **Algorithm:**
 1. Present a short series of prompts (project name, preferred naming style, which rule categories to enable)
-2. Build and return a YAML-serialisable config dict based on user answers
+2. Build a YAML-serialisable config dict based on user answers
+3. Write the config to `output_path` (default `.cstylecheck.yml`); if the file exists and `overwrite` is False → return 1 (abort)
+4. Return 0 on success
 
 ---
 
-### UNIT-99 — `write_preset(preset: str, output_path: str, overwrite: bool) → None`
+### UNIT-99 — `run_preset(preset_name: str, output_path: str | None = None, print_fn=print, overwrite: bool = False) → int`
 
-**Purpose:** Write a pre-built config file for the named preset without running the wizard.
+**Purpose:** Write a pre-built config file for the named preset without running the wizard; returns 0 on success or 1 on error.
 
 **Algorithm:**
-1. Look up the named preset (`barr-c`, `minimal`, or `misra`) from a built-in dict
-2. If `output_path` exists and `overwrite` is false → exit with error
-3. Write YAML to `output_path`
+1. Look up `preset_name` (`barr-c`, `minimal`, or `misra`) from the built-in `PRESETS` dict
+2. If `output_path` exists and `overwrite` is false → emit error via `print_fn`; return 1
+3. Write YAML to `output_path` (default `.cstylecheck.yml`); return 0
 
 ---
 
@@ -960,12 +963,13 @@ Violation:
 | SWE1-064 | Copyright header check | UNIT-52, UNIT-63 |
 | SWE1-065 to SWE1-067 | Baseline | UNIT-35, UNIT-36, UNIT-37 |
 | SWE1-068 to SWE1-070 | CLI / entry point | UNIT-01, UNIT-02, UNIT-03, UNIT-04, UNIT-46, UNIT-87, UNIT-88 |
-| SWE1-071 | Declared-not-defined check | UNIT-84 |
 | SWE1-072 to SWE1-073 | Inline suppression comments | UNIT-95 |
 | SWE1-074 | Auto-fix mode | UNIT-96, UNIT-97 |
 | SWE1-075 | Config wizard and presets | UNIT-98, UNIT-99 |
 | SWE1-076 | Per-directory config | UNIT-100 |
 | SWE1-077 | HTML report output | UNIT-101 |
+
+> **Note (UNIT-84):** `DeclaredNotDefinedChecker` (UNIT-84) is traced via the cross-file check requirement (SWE1-051 to SWE1-053 range). SWE1-071 maps exclusively to `_check_whitespace_ratio` (UNIT-90) as shown in the `SWE1-045 to SWE1-050, SWE1-071` row above; the duplicate mapping of SWE1-071 → UNIT-84 has been removed as a CSC-AUD-005 corrective action.
 
 ---
 

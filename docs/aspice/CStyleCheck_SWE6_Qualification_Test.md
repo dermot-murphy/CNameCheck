@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.4 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.6 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: fix version text v1.0.0→v1.2.x, rule count 48→53, update referenced doc versions, resolve §3.2 placeholders — resolves issue #163 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Complete §8 release gate checklist for v1.1.0; populate §8 open issues — closes issue #53 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Add CSC-DEV-002 deviation footnote to §1 — closes issue #61 |
@@ -40,9 +41,9 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.3 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.2 |
-| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.3 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.4 |
+| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.5 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
 
 ### 3.2 Software Configuration Under Test
@@ -62,11 +63,11 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | Criterion | Target | Pass Condition |
 |---|---|---|
 | All SWQ test cases | PASS | Zero FAIL results |
-| SW Requirements coverage | 100% | All SWE1-001 to SWE1-070 traced to ≥ 1 SWQ test |
+| SW Requirements coverage | 100% | All SWE1-001 to SWE1-077 traced to ≥ 1 SWQ test |
 | Statement coverage | ≥ 90% | Coverage report at execution |
 | Branch coverage | ≥ 85% | Coverage report at execution |
-| Static verification | PASS | `rules.yml` CI job on v1.0.0 commit |
-| Open bug Issues targeting v1.0.0 | 0 | No unresolved bug-labelled Issues |
+| Static verification | PASS | `rules.yml` CI job on v1.2.0 commit |
+| Open bug Issues targeting v1.2.0 | 0 | No unresolved bug-labelled Issues |
 
 ---
 
@@ -311,12 +312,12 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | **Test Case ID** | SWQ-011 |
 | **Objective** | Verify the delivered `cstylecheck.py` passes its own naming rules |
 | **SW-REQ** | SWE1-017 to SWE1-056 (self-hosting quality gate) |
-| **Verification Method** | CI evidence — `rules.yml` job on v1.0.0 tag |
+| **Verification Method** | CI evidence — `rules.yml` job on v1.2.0 tag |
 
 | Check | Evidence | Result |
 |---|---|---|
-| `rules.yml` CI job result | GitHub Actions job PASS on v1.0.0 commit | PASS |
-| Zero error-level violations on `cstylecheck.py` | Workflow output — errors count = 0 | PASS |
+| `rules.yml` CI job result | GitHub Actions job PASS on v1.2.0 commit | PASS |
+| Zero error-level violations on `src/cstylecheck/` | Workflow output — errors count = 0 | PASS |
 | CI Run URL | \<GitHub Actions run URL\> | |
 
 ---
@@ -377,8 +378,14 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | SWE1-057 to SWE1-064 | Output formats | SWQ-004 | Covered |
 | SWE1-065 to SWE1-067 | Baseline suppression | SWQ-007 | Covered |
 | SWE1-068 to SWE1-070 | CLI and entry point | SWQ-002 | Covered |
+| SWE1-071 | Whitespace ratio check | SWQ-003 (via pytest) | Covered |
+| SWE1-072 to SWE1-073 | Inline suppression comments | `test_inline_suppression.py` (via pytest) | Covered |
+| SWE1-074 | Auto-fix mode | `test_fix_mode.py` (via pytest) | Covered |
+| SWE1-075 | Config wizard and presets | `test_init_wizard.py` (via pytest) | Covered |
+| SWE1-076 | Per-directory config | `test_per_dir_config.py` (via pytest) | Covered |
+| SWE1-077 | HTML report output | `test_html_report.py` (via pytest) | Covered |
 
-**Requirements Coverage:** 70 / 70 requirements covered (100%)
+**Requirements Coverage:** 77 / 77 requirements covered (100%)
 
 ---
 
@@ -405,12 +412,12 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 ## 9. Release Readiness Gate
 
-The following conditions were assessed for the **v1.1.0** release baseline (2026-05-28):
+The following conditions were assessed for the **v1.2.x** release baseline (2026-06-05):
 
-- [x] All SWQ test cases: PASS — 759 tests, 0 failures (Python 3.10 / 3.11 / 3.12)
+- [x] All SWQ test cases: PASS — 1041 tests, 0 failures (Python 3.10 / 3.11 / 3.12)
 - [x] Statement coverage ≥ 72% CI gate: PASS — 86% achieved (interim baseline; target 90% deferred per issue #54)
 - [ ] Branch coverage ≥ 85%: N/A — branch coverage not measured in CI (`--cov-branch` not enabled; see issue #54)
-- [x] `rules.yml` CI job: PASS on v1.1.0 commit (2026-05-28)
+- [x] `rules.yml` CI job: PASS on v1.2.0 commit (2026-06-05)
 - [x] `cstylecheck_tests.yml` CI: PASS on Python 3.10, 3.11, 3.12
 - [x] `docker_publish.yml` CI: PASS; image available on GHCR and Docker Hub (`cstylecheck:1.1.0`, `:latest`)
 - [x] Zero open functional bug Issues: PASS — issues #53 and #54 are documentation/process bugs, not functional defects; accepted for v1.2.0
@@ -451,5 +458,5 @@ That appendix contains:
 | MISRA C:2012 | 130 Required + 16 Advisory applicable | 9 Required, 8 Advisory | 121 Required | 100% Required |
 | MISRA C:2023 | 143 Required + 18 Advisory applicable | 9 Required, 7 Advisory | 134 Required | 100% Required |
 
-> **SWE.6 BP3 Evidence:** The test suite in `tests/test_misra_rules.py` (52 test cases) provides direct verification evidence for MISRA Rules 4.2, 7.1, and 7.3. All other CStyleCheck-enforced rules are covered by the existing test suite (692 total passing tests as of v1.1).
+> **SWE.6 BP3 Evidence:** The test suite in `tests/test_misra_rules.py` (52 test cases) provides direct verification evidence for MISRA Rules 4.2, 7.1, and 7.3. All other CStyleCheck-enforced rules are covered by the existing test suite (1041 total passing tests as of v1.2.x).
 
