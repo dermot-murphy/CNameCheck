@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.6 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.7 |
 | **Project** | CStyleCheck | **Date** | 2026-06-05 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-06-08 | Claude | ASPICE audit #238 — add COMP-05h (naming rules); extend §10 RTM with SWE1-078–088 |
 | 1.6 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.5 | 2026-06-04 | Claude | Add COMP-08 (Fixer), COMP-09 (Config Wizard), COMP-10 (Per-dir Config); add `parse_inline_suppressions` to COMP-04; add `_violations_to_html` to COMP-07; update §8.1 sequence; update §10 RTM — issues #188 #189 #190 #193 #192 |
 | 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 version text, update §3.1 referenced doc versions, fix COMP-05f functions (remove non-existent, add missing), add comment/whitespace ratio to §8.1 sequence, add SWE1-071/MISRA rows to §10 RTM, add config utility functions to COMP-02 — resolves issue #163 |
@@ -72,8 +73,14 @@ src/cstylecheck/   (package — 12 sub-modules)
 │   ├── [COMP-05e] Guard Checker       (_check_include_guard)
 │   ├── [COMP-05f] Misc Checker        (_check_misc, _check_yoda, _check_spelling,
 │   │                                   _check_reserved_names, _check_copyright_header,
-│   │                                   _check_comment_ratio, _check_whitespace_ratio)
-│   └── [COMP-05g] Sign Checker        (class SignChecker — _check_calls)
+│   │                                   _check_comment_ratio, _check_whitespace_ratio,
+│   │                                   _check_function_length, _check_function_doc_header,
+│   │                                   _check_assert_density, _check_null_statement_comment,
+│   │                                   _check_declaration_spacing, _check_file_length,
+│   │                                   _check_reserved_header_name)
+│   ├── [COMP-05g] Sign Checker        (class SignChecker — _check_calls)
+│   └── [COMP-05h] Naming Checker      (_check_identifier_length,
+│                                       _check_no_single_char_identifiers)
 ├── [COMP-06] Baseline Manager         (load_baseline, write_baseline, _baseline_key)
 ├── [COMP-07] Output Formatter         (_violations_to_json, _violations_to_sarif,
 │                                       _violations_to_html, print_summary,
@@ -189,6 +196,16 @@ The `Checker` class is the central analysis component. It is instantiated once p
 | **Responsibility** | Cross-file sign-compatibility analysis; resolves typedef chains; enforces `plain_char_is_signed` without global state mutation |
 | **Key method** | `_check_calls()` — finds function calls and validates argument signedness against parameter declarations |
 | **Rule enforced** | `sign_compatibility` |
+
+#### COMP-05h — Naming Constraints Checker
+
+| Attribute | Value |
+|---|---|
+| **Source module** | `checker.py` |
+| **Methods** | `_check_identifier_length()`, `_check_no_single_char_identifiers()` |
+| **Responsibility** | Enforce cross-category identifier naming constraints: uniform min/max length (`naming.identifier_length`) and single-character identifier prohibition (`naming.no_single_char_identifiers`); both rules are opt-in (disabled by default) |
+| **Config section** | `naming:` |
+| **Rules enforced** | `naming.identifier_length`, `naming.no_single_char_identifiers` |
 
 ### COMP-06 — Baseline Manager
 
@@ -349,6 +366,17 @@ main()
 | SWE1-075 | Config wizard and presets | COMP-09 |
 | SWE1-076 | Per-directory config | COMP-10 |
 | SWE1-077 | HTML report output | COMP-07 |
+| SWE1-078 | `misc.function_length` | COMP-05f |
+| SWE1-079 | `misc.function_doc_header` | COMP-05f |
+| SWE1-080 | `misc.assert_density` | COMP-05f |
+| SWE1-081 | `misc.null_statement_comment` | COMP-05f |
+| SWE1-082 | `misc.declaration_spacing` | COMP-05f |
+| SWE1-083 | `misc.file_length` | COMP-05f |
+| SWE1-084 | `misc.reserved_header_name` | COMP-05f |
+| SWE1-085 | `macro.trailing_semicolon` | COMP-05c |
+| SWE1-086 | `macro.multistatement_wrapper` | COMP-05c |
+| SWE1-087 | `naming.identifier_length` | COMP-05h |
+| SWE1-088 | `naming.no_single_char_identifiers` | COMP-05h |
 
 ---
 

@@ -40,8 +40,8 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.6 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.8 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.7 |
 | CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.8 |
 
 ---
