@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-STD-001 | **Version** | 1.0 |
+| **Document ID** | CSC-STD-001 | **Version** | 1.1 |
 | **Project** | CStyleCheck | **Date** | 2026-06-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.1 | 2026-06-06 | Claude | Add `misc.file_length` (max lines per file) as unique opportunity #12; create change-request issues for all 12 opportunities |
 | 1.0 | 2026-06-06 | Claude | Initial document — full survey of 11 industry standards with coverage matrix; closes issue #217 |
 
 ---
@@ -303,6 +304,7 @@ The following rules represent the highest-priority candidates for new CStyleChec
 | 🟧 9 | No standard header filename reuse | CERT PRE04-C | Preprocessor | Check source filenames against a list of POSIX/C standard header names |
 | 🟨 10 | Blank line required after last local variable declaration block | Linux Kernel LK-8 | Formatting | Pattern: non-declaration line after declaration block with no blank line separator |
 | 🟨 11 | Identifier length maximum (configurable, default 31) | JSF AV Rule 45 | Naming | Regex: identifier token length |
+| 🟨 12 | Maximum lines per file (configurable, default 500) | ESA, industry practice | Complexity | Count all source lines (including blank/comment lines) in each file; flag when exceeding threshold |
 
 ---
 
@@ -369,6 +371,7 @@ These rules are best handled by a dedicated formatting tool. CStyleCheck should 
 | **Blank line after declaration block** | **Linux LK-8** | **⭐** | **—** | **—** | **✅** |
 | **Null statement on own line with comment** | **JSF 192** | **⭐** | **—** | **—** | **✅** |
 | **No standard header filename reuse** | **CERT PRE04-C** | **⭐** | **—** | **—** | **✅** |
+| **Maximum lines per file** | **ESA, industry practice** | **⭐** | **—** | **—** | **✅** |
 | Yoda conditions | Barr-C 5.3 | 🟢 | — | — | ✅ |
 | Unsigned literal suffix `U` not `u` | Barr-C 8.x | 🟢 | — | — | ✅ |
 | `L` suffix not `l` | Barr-C 8.x | 🟢 | — | — | ✅ |
@@ -386,12 +389,12 @@ These rules are best handled by a dedicated formatting tool. CStyleCheck should 
 | Category | Count |
 |---|---|
 | 🟢 Rules already covered by CStyleCheck | 22 |
-| ⭐ Unique CStyleCheck opportunities (not in astyle or MISRA) | 11 |
+| ⭐ Unique CStyleCheck opportunities (not in astyle or MISRA) | 12 |
 | 🔵 Could add to CStyleCheck (astyle or MISRA already covers) | 17 |
 | ❌ Not feasible without type system / semantic analysis | 3 |
 | 🎨 Best handled by astyle/uncrustify | 7 |
 | 📏 Fully covered by MISRA C checkers | 15 |
-| **Total rules assessed** | **54** |
+| **Total rules assessed** | **55** |
 
 ---
 
@@ -416,6 +419,7 @@ These rules are best handled by a dedicated formatting tool. CStyleCheck should 
 5. **Minimum assert density** (Power of 10 R5) — counts `assert(` occurrences per function scope; unique reliability metric
 6. **Global variable `g_` prefix** (JSF Rule 69) — file-scope variable detection; natural extension of existing naming suite
 7. **Identifier length limits** (JSF Rule 45 + ESA-R-7) — min/max configurable; pure regex token check
+8. **Maximum lines per file** — total line count per file; configurable threshold; natural companion to existing `misc.function_length`
 
 ### 12.3 Standards Not Recommended for Extension
 
@@ -438,4 +442,4 @@ These rules are best handled by a dedicated formatting tool. CStyleCheck should 
 
 ---
 
-*End of Industry Standards Comparison Report — CSC-STD-001 v1.0*
+*End of Industry Standards Comparison Report — CSC-STD-001 v1.1*
