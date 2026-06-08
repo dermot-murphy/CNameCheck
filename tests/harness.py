@@ -76,10 +76,28 @@ _ALL_OFF: dict = {
         # Whitespace ratio check (issue #143) -- disabled so existing tests
         # are not affected by the new blank-line density check.
         "whitespace_ratio":      {"enabled": False},
+        # New rules (issues #221-#232) -- disabled so existing tests are
+        # not contaminated by these checks when using cfg_only().
+        "function_length":            {"enabled": False},
+        "function_doc_header":        {"enabled": False},
+        "assert_density":             {"enabled": False},
+        "declaration_spacing":        {"enabled": False},
+        "file_length":                {"enabled": False},
+        "reserved_header_name":       {"enabled": False},
+        "null_statement_comment":     {"enabled": False},
     },
     "reserved_names":    {"enabled": False},
     "sign_compatibility":{"enabled": False},
     "spell_check":       {"enabled": False},
+    "naming": {
+        "identifier_length":          {"enabled": False},
+        "no_single_char_identifiers": {"enabled": False},
+    },
+    "macros": {
+        "trailing_semicolon":         {"enabled": False},
+        "multistatement_wrapper":     {"enabled": False},
+        "function_like_suffix":       {"enabled": False},
+    },
 }
 
 

@@ -56,6 +56,26 @@ RE_TYPEDEF_SIMPLE = re.compile(
     r"([A-Za-z_]\w*)\s*;",                               # typedef name
 )
 
+# Standard C (C89–C17) and POSIX.1-2017 header names (CERT PRE04-C).
+# Source files must not be named after any of these headers.
+_STANDARD_C_HEADERS: frozenset = frozenset({
+    # C standard headers
+    "assert.h", "complex.h", "ctype.h", "errno.h", "fenv.h", "float.h",
+    "inttypes.h", "iso646.h", "limits.h", "locale.h", "math.h", "setjmp.h",
+    "signal.h", "stdalign.h", "stdarg.h", "stdatomic.h", "stdbool.h",
+    "stddef.h", "stdint.h", "stdio.h", "stdlib.h", "stdnoreturn.h",
+    "string.h", "tgmath.h", "threads.h", "time.h", "uchar.h", "wchar.h",
+    "wctype.h",
+    # POSIX.1-2017 headers
+    "aio.h", "cpio.h", "dirent.h", "dlfcn.h", "fcntl.h", "fnmatch.h",
+    "ftw.h", "glob.h", "grp.h", "iconv.h", "langinfo.h", "libgen.h",
+    "monetary.h", "mqueue.h", "netdb.h", "nl_types.h", "poll.h",
+    "pthread.h", "pwd.h", "regex.h", "sched.h", "search.h", "semaphore.h",
+    "spawn.h", "strings.h", "syslog.h", "tar.h", "termios.h",
+    "unistd.h", "utime.h", "utmpx.h", "wordexp.h",
+})
+
+
 # Control-flow keywords that must never be mistaken for a return type.
 _CFKW = (
     r"if|else|while|for|do|switch|case|return|goto|break|continue"
@@ -293,14 +313,25 @@ class Checker:
     def run_all(self) -> CheckResult:
         self._check_copyright_header()
         self._check_defines()
+        self._check_macro_trailing_semicolon()    # CERT PRE11-C
+        self._check_macro_multistatement_wrapper()  # CERT PRE10-C
         self._check_variables()
         self._check_functions()
+        self._check_function_length()             # JPL Power of Ten Rule 4
+        self._check_function_doc_header()         # ESA-R-1, JSF
+        self._check_assert_density()              # JPL Power of Ten Rule 5
+        self._check_declaration_spacing()         # Linux LK-8
         self._check_typedefs()
         self._check_enums()
         self._check_structs()
         if self._is_header:
             self._check_include_guard()
         self._check_misc()
+        self._check_file_length()                 # ESA, industry practice
+        self._check_reserved_header_name()        # CERT PRE04-C
+        self._check_null_statement_comment()      # JSF Rule 192
+        self._check_identifier_length()           # ESA-R-7, JSF Rule 45
+        self._check_no_single_char_identifiers()  # ESA-R-4
         self._check_comment_ratio()
         self._check_whitespace_ratio()
         self._check_yoda()
@@ -2095,4 +2126,558 @@ class Checker:
             if name:
                 self._check_name_reserved(name, m.start(), sev)
 
+    # -----------------------------------------------------------------------
+    # Helper: iterate function bodies
+    # -----------------------------------------------------------------------
+
+    def _iter_function_bodies(self):
+        """Yield (fn_def_pos, fn_name, body_start, body_end) for each function.
+
+        body_start points to the opening '{'; body_end points one past the
+        matching closing '}'.  All positions are in self.clean / self.source
+        coordinate space (preprocess() preserves source length).
+        """
+        for m in RE_FUNCTION_DEF.finditer(self.clean):
+            name = m.group(1)
+            if not name:
+                continue
+            open_brace = self.clean.find("{", m.start())
+            if open_brace == -1:
+                continue
+            depth = 0
+            pos = open_brace
+            end = len(self.clean)
+            while pos < end:
+                ch = self.clean[pos]
+                if ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        yield (m.start(), name, open_brace, pos + 1)
+                        break
+                pos += 1
+
+    # -----------------------------------------------------------------------
+    # New rule: macro.trailing_semicolon (CERT PRE11-C, issue #223)
+    # -----------------------------------------------------------------------
+
+    def _check_macro_trailing_semicolon(self) -> None:
+        """Flag #define bodies that end with a bare semicolon (CERT PRE11-C)."""
+        ts_cfg = self.cfg.get("macros", {}).get("trailing_semicolon", {})
+        if not ts_cfg.get("enabled", False):
+            return
+        sev = ts_cfg.get("severity", "warning")
+
+        lines = self.source.splitlines()
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            m = re.match(r'^[ \t]*#[ \t]*define[ \t]+(\w+)', line)
+            if not m:
+                i += 1
+                continue
+
+            macro_name = m.group(1)
+            start_lineno = i + 1  # 1-based
+
+            # Collect full body including backslash continuations
+            body_parts = [line]
+            while line.rstrip().endswith('\\') and i + 1 < len(lines):
+                i += 1
+                line = lines[i]
+                body_parts.append(line)
+
+            full_text = '\n'.join(body_parts)
+
+            # Strip string and char literals, then comments
+            stripped = re.sub(r'"(?:[^"\\]|\\.)*"', '""', full_text)
+            stripped = re.sub(r"'(?:[^'\\]|\\.)'", "''", stripped)
+            stripped = re.sub(r'//[^\n]*', '', stripped)
+            stripped = re.sub(r'/\*.*?\*/', '', stripped, flags=re.DOTALL)
+
+            # Isolate the macro body (everything after NAME or NAME(...))
+            body_m = re.match(
+                r'^[ \t]*#[ \t]*define[ \t]+\w+(?:\s*\([^)]*\))?',
+                stripped,
+            )
+            if body_m:
+                body = stripped[body_m.end():]
+                body = re.sub(r'\\\n', ' ', body).strip()
+                if body.endswith(';'):
+                    self.result.add(Violation(
+                        self.filepath, start_lineno, 1, sev,
+                        "macro.trailing_semicolon",
+                        f"Macro '{macro_name}' body ends with ';'; "
+                        f"remove the trailing semicolon (CERT PRE11-C)",
+                    ))
+
+            i += 1
+
+    # -----------------------------------------------------------------------
+    # New rule: macro.multistatement_wrapper (CERT PRE10-C, issue #222)
+    # -----------------------------------------------------------------------
+
+    def _check_macro_multistatement_wrapper(self) -> None:
+        """Flag function-like multi-statement macros not wrapped in do{}while(0)."""
+        mw_cfg = self.cfg.get("macros", {}).get("multistatement_wrapper", {})
+        if not mw_cfg.get("enabled", False):
+            return
+        sev = mw_cfg.get("severity", "warning")
+
+        lines = self.source.splitlines()
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            # Only function-like macros (have a '(' immediately after name)
+            m = re.match(r'^[ \t]*#[ \t]*define[ \t]+(\w+)\s*\(', line)
+            if not m:
+                i += 1
+                continue
+
+            macro_name = m.group(1)
+            start_lineno = i + 1
+
+            # Collect full body
+            body_parts = [line]
+            while line.rstrip().endswith('\\') and i + 1 < len(lines):
+                i += 1
+                line = lines[i]
+                body_parts.append(line)
+
+            full_text = '\n'.join(body_parts)
+
+            # Strip literals and comments
+            stripped = re.sub(r'"(?:[^"\\]|\\.)*"', '""', full_text)
+            stripped = re.sub(r"'(?:[^'\\]|\\.)'", "''", stripped)
+            stripped = re.sub(r'//[^\n]*', '', stripped)
+            stripped = re.sub(r'/\*.*?\*/', '', stripped, flags=re.DOTALL)
+
+            # Get body after the parameter list
+            body_m = re.match(
+                r'^[ \t]*#[ \t]*define[ \t]+\w+\s*\([^)]*\)',
+                stripped,
+            )
+            if not body_m:
+                i += 1
+                continue
+
+            body_flat = re.sub(r'\\\n', ' ', stripped[body_m.end():]).strip()
+
+            # Needs wrapping only if there are 2+ semicolons (multi-statement)
+            if body_flat.count(';') < 2:
+                i += 1
+                continue
+
+            # Accept do { ... } while(0) or do { ... } while (0)
+            if re.match(r'do\s*\{.*\}\s*while\s*\(\s*0\s*\)\s*;?\s*$',
+                        body_flat, re.DOTALL):
+                i += 1
+                continue
+
+            self.result.add(Violation(
+                self.filepath, start_lineno, 1, sev,
+                "macro.multistatement_wrapper",
+                f"Multi-statement macro '{macro_name}' must be wrapped in "
+                f"do {{ ... }} while(0) (CERT PRE10-C)",
+            ))
+
+            i += 1
+
+    # -----------------------------------------------------------------------
+    # New rule: misc.function_length (JPL Power of Ten Rule 4, issue #221)
+    # -----------------------------------------------------------------------
+
+    def _check_function_length(self) -> None:
+        """Flag function bodies exceeding a configurable line count."""
+        fl_cfg = self.cfg.get("misc", {}).get("function_length", {})
+        if not fl_cfg.get("enabled", True):
+            return
+        sev = fl_cfg.get("severity", "warning")
+        max_lines = int(fl_cfg.get("max_lines", 60))
+        count_comments = fl_cfg.get("count_comments", True)
+
+        for fn_pos, name, body_start, body_end in self._iter_function_bodies():
+            body_src = self.source[body_start:body_end]
+            body_lines = body_src.splitlines()
+
+            if count_comments:
+                total = len(body_lines)
+            else:
+                first_lineno = self.source[:body_start].count('\n') + 1
+                total = sum(
+                    1 for idx, ln in enumerate(body_lines)
+                    if (first_lineno + idx) not in self._comment_only
+                    and ln.strip()
+                )
+
+            if total > max_lines:
+                self._v(
+                    fn_pos, sev, "misc.function_length",
+                    f"Function '{name}' body has {total} lines, exceeding "
+                    f"maximum {max_lines} (JPL Power of Ten Rule 4)",
+                )
+
+    # -----------------------------------------------------------------------
+    # New rule: misc.function_doc_header (ESA-R-1, JSF, issue #224)
+    # -----------------------------------------------------------------------
+
+    def _check_function_doc_header(self) -> None:
+        """Require a documentation comment block before each function definition."""
+        fdh_cfg = self.cfg.get("misc", {}).get("function_doc_header", {})
+        if not fdh_cfg.get("enabled", False):
+            return
+        sev = fdh_cfg.get("severity", "warning")
+        req_brief = fdh_cfg.get("require_brief", True)
+        req_param = fdh_cfg.get("require_param", True)
+        req_return = fdh_cfg.get("require_return", True)
+        style = fdh_cfg.get("style", "doxygen")
+
+        _fp_cfg = self.cfg.get("file_prefix", {})
+
+        for m in RE_FUNCTION_DEF.finditer(self.clean):
+            name = m.group(1)
+            if not name:
+                continue
+
+            if _fp_cfg.get("exempt_main", True) and self.module == "main":
+                continue
+            if is_exempt(name, _fp_cfg.get("exempt_patterns", [])):
+                continue
+
+            fn_pos = m.start()
+            preceding = self.source[:fn_pos]
+            preceding_stripped = preceding.rstrip()
+
+            # The immediately-preceding non-whitespace text must end with */
+            if not preceding_stripped.endswith('*/'):
+                self._v(fn_pos, sev, "misc.function_doc_header",
+                        f"Function '{name}' must be preceded by a "
+                        f"documentation comment block (ESA-R-1, JSF)")
+                continue
+
+            # Locate the matching /* or /**
+            cmt_end_abs = preceding.rfind('*/')
+            cmt_start_abs = preceding.rfind('/*', 0, cmt_end_abs)
+            if cmt_start_abs < 0:
+                self._v(fn_pos, sev, "misc.function_doc_header",
+                        f"Function '{name}' must be preceded by a "
+                        f"documentation comment block (ESA-R-1, JSF)")
+                continue
+
+            comment_body = preceding[cmt_start_abs: cmt_end_abs + 2]
+
+            tags_brief  = ['@brief', '\\brief', '@details', '\\details']
+            tags_param  = ['@param', '\\param']
+            tags_return = ['@return', '@returns', '\\return', '\\returns']
+
+            if req_brief and style != 'any':
+                if not any(t in comment_body for t in tags_brief):
+                    self._v(fn_pos, sev, "misc.function_doc_header",
+                            f"Function '{name}' doc comment is missing "
+                            f"@brief (ESA-R-1, JSF)")
+
+            # Extract parameter names from signature
+            paren_open = self.clean.find('(', fn_pos)
+            open_brace = self.clean.find('{', fn_pos)
+            if paren_open >= 0 and open_brace > paren_open:
+                sig_text = self.clean[paren_open:open_brace]
+                param_names = [
+                    pm.group(1) for pm in RE_FUNCTION_PARAM.finditer(sig_text)
+                ]
+            else:
+                param_names = []
+
+            if req_param and param_names:
+                if not any(t in comment_body for t in tags_param):
+                    self._v(fn_pos, sev, "misc.function_doc_header",
+                            f"Function '{name}' doc comment is missing "
+                            f"@param entries (ESA-R-1, JSF)")
+
+            if req_return:
+                # Determine return type: text before function name in the match
+                match_text = self.clean[fn_pos: fn_pos + 300]
+                name_idx = match_text.find(name)
+                pre_name = match_text[:name_idx] if name_idx >= 0 else ''
+                pre_clean = re.sub(
+                    r'\b(?:static|inline|extern|const|volatile|unsigned|signed'
+                    r'|long|short|STATIC|INLINE|EXTERN|CONST|LOCAL_INLINE)\b',
+                    ' ', pre_name,
+                ).strip()
+                parts = pre_clean.split()
+                return_type = parts[-1].rstrip('*') if parts else ''
+                if return_type and return_type not in ('void', ''):
+                    if not any(t in comment_body for t in tags_return):
+                        self._v(fn_pos, sev, "misc.function_doc_header",
+                                f"Function '{name}' (returns '{return_type}') "
+                                f"doc comment is missing @return (ESA-R-1, JSF)")
+
+    # -----------------------------------------------------------------------
+    # New rule: misc.assert_density (JPL Power of Ten Rule 5, issue #225)
+    # -----------------------------------------------------------------------
+
+    def _check_assert_density(self) -> None:
+        """Require a minimum number of assert() calls per non-trivial function."""
+        ad_cfg = self.cfg.get("misc", {}).get("assert_density", {})
+        if not ad_cfg.get("enabled", False):
+            return
+        sev = ad_cfg.get("severity", "info")
+        min_asserts = int(ad_cfg.get("min_asserts", 1))
+        min_fn_lines = int(ad_cfg.get("min_function_lines", 10))
+        exempt_fns = ad_cfg.get("exempt_functions", [])
+
+        for fn_pos, name, body_start, body_end in self._iter_function_bodies():
+            if is_exempt(name, exempt_fns):
+                continue
+
+            body_src = self.source[body_start:body_end]
+            if len(body_src.splitlines()) < min_fn_lines:
+                continue
+
+            assert_count = len(re.findall(r'\bassert\s*\(', body_src))
+            if assert_count < min_asserts:
+                self._v(
+                    fn_pos, sev, "misc.assert_density",
+                    f"Function '{name}' has {assert_count} assert() call(s); "
+                    f"minimum is {min_asserts} (Power of Ten Rule 5)",
+                )
+
+    # -----------------------------------------------------------------------
+    # New rule: misc.declaration_spacing (Linux LK-8, issue #229)
+    # -----------------------------------------------------------------------
+
+    def _check_declaration_spacing(self) -> None:
+        """Require a blank line between the declaration block and first statement."""
+        ds_cfg = self.cfg.get("misc", {}).get("declaration_spacing", {})
+        if not ds_cfg.get("enabled", False):
+            return
+        sev = ds_cfg.get("severity", "info")
+
+        _RE_DECL = re.compile(
+            r"^\s*(?:(?:static|extern|volatile|const|unsigned|signed|long|short)\s+)*"
+            r"(?:int|char|float|double|uint\w+|int\w+|bool|_Bool|size_t|[A-Z_]\w+_[Tt])"
+            r"[ \t]*\*{0,2}[ \t]*\w+[ \t]*(?:=|;|\[)"
+        )
+
+        for fn_pos, name, body_start, body_end in self._iter_function_bodies():
+            # Work inside the body (exclude the outer braces)
+            inner_src = self.source[body_start + 1: body_end - 1]
+            first_lineno = self.source[:body_start + 1].count('\n') + 2
+            lines = inner_src.splitlines()
+
+            last_decl_idx = -1
+            first_exec_idx = -1
+
+            for idx, line in enumerate(lines):
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                abs_ln = first_lineno + idx
+                if abs_ln in self._comment_only:
+                    continue
+
+                if first_exec_idx < 0:  # still scanning for transition
+                    if _RE_DECL.match(line):
+                        last_decl_idx = idx
+                    elif last_decl_idx >= 0:
+                        # First non-decl, non-blank line after declarations
+                        first_exec_idx = idx
+                        break
+                    else:
+                        # Function starts with executable — no decl block
+                        break
+
+            if last_decl_idx < 0 or first_exec_idx < 0:
+                continue
+
+            has_blank = any(
+                not lines[j].strip()
+                for j in range(last_decl_idx + 1, first_exec_idx)
+            )
+            if not has_blank:
+                abs_exec = first_lineno + first_exec_idx
+                self.result.add(Violation(
+                    self.filepath, abs_exec, 1, sev,
+                    "misc.declaration_spacing",
+                    f"First executable statement in '{name}' should be "
+                    f"preceded by a blank line after the declaration block "
+                    f"(Linux LK-8)",
+                ))
+
+    # -----------------------------------------------------------------------
+    # New rule: misc.file_length (ESA/industry practice, issue #232)
+    # -----------------------------------------------------------------------
+
+    def _check_file_length(self) -> None:
+        """Flag files whose total line count exceeds a configurable maximum."""
+        fl_cfg = self.cfg.get("misc", {}).get("file_length", {})
+        if not fl_cfg.get("enabled", True):
+            return
+        sev = fl_cfg.get("severity", "warning")
+        max_lines = int(fl_cfg.get("max_lines", 500))
+        count_blank = fl_cfg.get("count_blank_lines", True)
+        count_comment = fl_cfg.get("count_comment_lines", True)
+
+        lines = self.source.splitlines()
+
+        if count_blank and count_comment:
+            total = len(lines)
+        else:
+            total = 0
+            for lineno, ln in enumerate(lines, 1):
+                if not count_blank and not ln.strip():
+                    continue
+                if not count_comment and lineno in self._comment_only:
+                    continue
+                total += 1
+
+        if total > max_lines:
+            self.result.add(Violation(
+                self.filepath, 1, 1, sev, "misc.file_length",
+                f"File has {total} lines, exceeding maximum {max_lines}",
+            ))
+
+    # -----------------------------------------------------------------------
+    # New rule: misc.reserved_header_name (CERT PRE04-C, issue #230)
+    # -----------------------------------------------------------------------
+
+    def _check_reserved_header_name(self) -> None:
+        """Flag source files whose name collides with a standard C/POSIX header."""
+        rhn_cfg = self.cfg.get("misc", {}).get("reserved_header_name", {})
+        if not rhn_cfg.get("enabled", True):
+            return
+        sev = rhn_cfg.get("severity", "error")
+        extra = {n.lower().strip() for n in rhn_cfg.get("extra_reserved", [])}
+
+        basename = Path(self.filepath).name.lower()
+        if basename in _STANDARD_C_HEADERS or basename in extra:
+            self.result.add(Violation(
+                self.filepath, 1, 1, sev, "misc.reserved_header_name",
+                f"'{basename}' is a reserved C/POSIX header name; "
+                f"rename this file to avoid include-path collisions "
+                f"(CERT PRE04-C)",
+            ))
+
+    # -----------------------------------------------------------------------
+    # New rule: misc.null_statement_comment (JSF Rule 192, issue #228)
+    # -----------------------------------------------------------------------
+
+    def _check_null_statement_comment(self) -> None:
+        """Flag null statements without an explanatory comment (JSF Rule 192)."""
+        ns_cfg = self.cfg.get("misc", {}).get("null_statement_comment", {})
+        if not ns_cfg.get("enabled", True):
+            return
+        sev = ns_cfg.get("severity", "warning")
+
+        # Pattern 1: control-flow keyword with ; on the SAME LINE only.
+        # [^()\n] prevents matching across newlines.
+        # Allows one level of nested parens (e.g. while(fn());).
+        _RE_INLINE_NULL = re.compile(
+            r'\b(?:while|for|if)[ \t]*\((?:[^()\n]*|\([^()\n]*\))*\)[ \t]*;',
+        )
+        for m in _RE_INLINE_NULL.finditer(self.clean):
+            self._v(m.start(), sev, "misc.null_statement_comment",
+                    "Null statement on same line as control expression; "
+                    "put ';' on its own line with an explanatory comment "
+                    "(JSF Rule 192)")
+
+        # Pattern 2: standalone ';' on its own line without a comment
+        for lineno, line in enumerate(self.source.splitlines(), 1):
+            if line.strip() == ';':
+                self.result.add(Violation(
+                    self.filepath, lineno, 1, sev,
+                    "misc.null_statement_comment",
+                    "Standalone null statement ';' must be accompanied by an "
+                    "explanatory comment (JSF Rule 192)",
+                ))
+
+    # -----------------------------------------------------------------------
+    # New rule: naming.identifier_length (ESA-R-7, JSF Rule 45, issue #227)
+    # -----------------------------------------------------------------------
+
+    def _check_identifier_length(self) -> None:
+        """Enforce configurable min/max identifier length across all identifier types."""
+        il_cfg = self.cfg.get("naming", {}).get("identifier_length", {})
+        if not il_cfg.get("enabled", False):
+            return
+        sev = il_cfg.get("severity", "warning")
+        min_len = il_cfg.get("min_length", 3)
+        max_len = il_cfg.get("max_length", 31)
+        exempt = set(il_cfg.get("exempt_names", ["i", "j", "k", "n", "x", "y", "z"]))
+        check_vars = il_cfg.get("check_variables", True)
+        check_fns = il_cfg.get("check_functions", True)
+        check_macros_flag = il_cfg.get("check_macros", True)
+        check_types = il_cfg.get("check_types", True)
+
+        def _emit(name: str, pos: int) -> None:
+            if name in exempt or name in self._c_keywords:
+                return
+            n = len(name)
+            if min_len and n < min_len:
+                self._v(pos, sev, "naming.identifier_length",
+                        f"Identifier '{name}' length {n} is below "
+                        f"minimum {min_len} (ESA-R-7)")
+            if max_len and n > max_len:
+                self._v(pos, sev, "naming.identifier_length",
+                        f"Identifier '{name}' length {n} exceeds "
+                        f"maximum {max_len} (JSF Rule 45)")
+
+        if check_vars:
+            for m in RE_VAR_DECL.finditer(self.clean):
+                name = m.group(4)
+                if name:
+                    _emit(name, m.start())
+
+        if check_fns:
+            for m in RE_FUNCTION_DEF.finditer(self.clean):
+                name = m.group(1)
+                if name:
+                    _emit(name, m.start())
+
+        if check_macros_flag:
+            for m in RE_DEFINE.finditer(self.clean):
+                name = m.group(1)
+                rest = self.clean[m.end():].split("\n")[0].strip()
+                if rest and name:
+                    _emit(name, m.start())
+
+        if check_types:
+            for m in RE_TYPEDEF_SIMPLE.finditer(self.clean):
+                name = m.group(1)
+                if name:
+                    _emit(name, m.start())
+
+    # -----------------------------------------------------------------------
+    # New rule: naming.no_single_char_identifiers (ESA-R-4, issue #231)
+    # -----------------------------------------------------------------------
+
+    def _check_no_single_char_identifiers(self) -> None:
+        """Flag single-character identifiers outside the configured exempt list."""
+        ni_cfg = self.cfg.get("naming", {}).get("no_single_char_identifiers", {})
+        if not ni_cfg.get("enabled", False):
+            return
+        sev = ni_cfg.get("severity", "warning")
+        exempt = set(ni_cfg.get("exempt", ["i", "j", "k", "n", "x", "y", "z"]))
+
+        for m in RE_VAR_DECL.finditer(self.clean):
+            name = m.group(4)
+            if name and len(name) == 1 and name not in exempt:
+                self._v(m.start(), sev, "naming.no_single_char_identifiers",
+                        f"Single-character identifier '{name}' is not allowed "
+                        f"(ESA-R-4)")
+
+        # Also check function parameters via signature scanning
+        for fn_m in RE_FUNCTION_DEF.finditer(self.clean):
+            paren_open = self.clean.find("(", fn_m.start())
+            open_brace = self.clean.find("{", fn_m.start())
+            if paren_open < 0 or open_brace <= paren_open:
+                continue
+            sig = self.clean[paren_open:open_brace]
+            for pm in RE_FUNCTION_PARAM.finditer(sig):
+                pname = pm.group(1)
+                if pname and len(pname) == 1 and pname not in exempt:
+                    self._v(paren_open + pm.start(), sev,
+                            "naming.no_single_char_identifiers",
+                            f"Single-character parameter '{pname}' is not "
+                            f"allowed (ESA-R-4)")
 

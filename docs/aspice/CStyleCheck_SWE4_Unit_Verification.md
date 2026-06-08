@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.8 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-06-08 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-08 | Claude | Add 11 new test modules (102 tests) for issues #221–#232; update §6 totals; update §7 traceability |
 | 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Automated accuracy audit: add §6 rows for test_preprocessor.py/test_comment_ratio/test_declared_not_defined/test_update_config/test_config_loading; update total 786→965; fix section header counts (§5.4/§5.6/§5.12/§5.13); update referenced doc versions; fix §3 version text; update coverage note — resolves issue #163 |
 | 1.5 | 2026-05-28 | Claude | Add §5.7b whitespace_ratio test catalogue (27 tests); fix §5.1 count 32→35; add §6 row for test_whitespace_ratio.py; update total 759→786; update §7 traceability — closes issues #148 #157 |
@@ -389,7 +390,18 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_init_wizard.py` | 15 | 15 | 0 | COMP-09 (`run_wizard`, `run_preset`) |
 | `test_per_dir_config.py` | 15 | 15 | 0 | COMP-10 (`resolve_per_dir_config`) |
 | `test_html_report.py` | 20 | 20 | 0 | COMP-07 (`_violations_to_html`) |
-| **Total** | **1041** | **1041** | **0** | All rules covered — 38 modules |
+| `test_function_length.py` | 11 | 11 | 0 | COMP-01 (`_check_function_length`) |
+| `test_function_doc_header.py` | 12 | 12 | 0 | COMP-01 (`_check_function_doc_header`) |
+| `test_assert_density.py` | 8 | 8 | 0 | COMP-01 (`_check_assert_density`) |
+| `test_null_statement_comment.py` | 9 | 9 | 0 | COMP-01 (`_check_null_statement_comment`) |
+| `test_declaration_spacing.py` | 8 | 8 | 0 | COMP-01 (`_check_declaration_spacing`) |
+| `test_file_length.py` | 8 | 8 | 0 | COMP-01 (`_check_file_length`) |
+| `test_reserved_header_name.py` | 10 | 10 | 0 | COMP-01 (`_check_reserved_header_name`) |
+| `test_macro_trailing_semicolon.py` | 9 | 9 | 0 | COMP-01 (`_check_macro_trailing_semicolon`) |
+| `test_macro_multistatement_wrapper.py` | 9 | 9 | 0 | COMP-01 (`_check_macro_multistatement_wrapper`) |
+| `test_identifier_length.py` | 10 | 10 | 0 | COMP-01 (`_check_identifier_length`) |
+| `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-01 (`_check_no_single_char_identifiers`) |
+| **Total** | **1143** | **1143** | **0** | All rules covered — 49 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
@@ -422,6 +434,17 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | SWE1-075 | Config wizard and presets (`run_wizard`, `run_preset`) | `test_init_wizard.py` |
 | SWE1-076 | Per-directory config (`resolve_per_dir_config`) | `test_per_dir_config.py` |
 | SWE1-077 | HTML report output (`_violations_to_html`) | `test_html_report.py` |
+| SWE1-078 | Function length (`_check_function_length`) | `test_function_length.py` |
+| SWE1-079 | Function doc header (`_check_function_doc_header`) | `test_function_doc_header.py` |
+| SWE1-080 | Assert density (`_check_assert_density`) | `test_assert_density.py` |
+| SWE1-081 | Null statement comment (`_check_null_statement_comment`) | `test_null_statement_comment.py` |
+| SWE1-082 | Declaration spacing (`_check_declaration_spacing`) | `test_declaration_spacing.py` |
+| SWE1-083 | File length (`_check_file_length`) | `test_file_length.py` |
+| SWE1-084 | Reserved header name (`_check_reserved_header_name`) | `test_reserved_header_name.py` |
+| SWE1-085 | Macro trailing semicolon (`_check_macro_trailing_semicolon`) | `test_macro_trailing_semicolon.py` |
+| SWE1-086 | Macro multistatement wrapper (`_check_macro_multistatement_wrapper`) | `test_macro_multistatement_wrapper.py` |
+| SWE1-087 | Identifier length (`_check_identifier_length`) | `test_identifier_length.py` |
+| SWE1-088 | No single-char identifiers (`_check_no_single_char_identifiers`) | `test_no_single_char_identifiers.py` |
 
 ---
 
