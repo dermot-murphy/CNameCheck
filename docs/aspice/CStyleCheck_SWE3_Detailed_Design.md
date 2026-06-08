@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.8 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-06-08 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-08 | Claude | Add UNIT-102 to UNIT-112 for 11 new rules (issues #221–#232); update §8 traceability |
 | 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Add UNIT-95 to UNIT-101 for five new features (inline suppression, fixer, wizard, per-dir config, HTML output); update §4.1 package structure; update §8 traceability — issues #188 #189 #190 #193 #192 |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: correct 48 stale line numbers, add 4 missing config.py units (UNIT-91 to UNIT-94), update §4.1 package structure, update §3.1 referenced doc versions — resolves issue #163 |
@@ -152,6 +153,17 @@ All source locations refer to the current package layout under `src/cstylecheck/
 | UNIT-99 | `run_preset` | `wizard.py` | COMP-09 | `wizard.py` |
 | UNIT-100 | `resolve_per_dir_config` | `config.py` | COMP-10 | `config.py` |
 | UNIT-101 | `_violations_to_html` | `output.py` | COMP-07 | `output.py` |
+| UNIT-102 | `_check_function_length` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-103 | `_check_function_doc_header` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-104 | `_check_assert_density` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-105 | `_check_null_statement_comment` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-106 | `_check_declaration_spacing` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-107 | `_check_file_length` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-108 | `_check_reserved_header_name` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-109 | `_check_macro_trailing_semicolon` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-110 | `_check_macro_multistatement_wrapper` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-111 | `_check_identifier_length` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-112 | `_check_no_single_char_identifiers` | `checker.py` | COMP-01 | `checker.py` |
 
 ---
 
@@ -849,6 +861,141 @@ src/cstylecheck/
 
 ---
 
+### UNIT-102 — `Checker._check_function_length() → None`
+
+**Purpose:** Enforce a maximum function body line count (`misc.function_length`, issue #221).
+
+**Algorithm:**
+1. Skip if `misc.function_length.enabled` is false
+2. Call `_iter_function_bodies()` to yield `(fn_def_pos, fn_name, body_start, body_end)`
+3. For each function body: split lines between `body_start` and `body_end`
+4. If `count_comments: false`, exclude blank and comment-only lines before counting
+5. If line count exceeds `max_lines`, emit `misc.function_length` at the function definition line
+
+---
+
+### UNIT-103 — `Checker._check_function_doc_header() → None`
+
+**Purpose:** Require a Doxygen block comment before each non-static function (`misc.function_doc_header`, issue #222).
+
+**Algorithm:**
+1. Skip if `misc.function_doc_header.enabled` is false
+2. For each function definition found via `RE_FUNCTION_DEF`: scan backwards for a block comment
+3. Verify comment contains `@brief` (or `\brief`)
+4. If `require_param: true`: verify each parameter has a corresponding `@param` tag
+5. If `require_return: true` and return type is not `void`: verify `@return` tag is present
+6. Emit `misc.function_doc_header` on any missing element
+
+---
+
+### UNIT-104 — `Checker._check_assert_density() → None`
+
+**Purpose:** Enforce minimum `assert()` calls per function (`misc.assert_density`, issue #225).
+
+**Algorithm:**
+1. Skip if `misc.assert_density.enabled` is false
+2. Call `_iter_function_bodies()` to yield function bodies
+3. For each body: count lines; if below `min_function_lines`, skip
+4. Check function name against `exempt_functions` regex patterns; skip if matched
+5. Count `assert(` occurrences in body
+6. If count < `min_asserts`, emit `misc.assert_density`
+
+---
+
+### UNIT-105 — `Checker._check_null_statement_comment() → None`
+
+**Purpose:** Require a comment alongside null statements (`misc.null_statement_comment`, issue #227).
+
+**Algorithm:**
+1. Skip if `misc.null_statement_comment.enabled` is false
+2. Scan `self.clean` for control-flow keywords immediately followed by `;` using a regex that handles one level of nested parentheses; emit violation for each match
+3. Scan `self.source.splitlines()` for standalone `;` on its own line; emit violation if no comment present
+
+---
+
+### UNIT-106 — `Checker._check_declaration_spacing() → None`
+
+**Purpose:** Enforce a blank line between declarations and first executable statement (`misc.declaration_spacing`, issue #224).
+
+**Algorithm:**
+1. Skip if `misc.declaration_spacing.enabled` is false
+2. Call `_iter_function_bodies()` to yield function bodies
+3. Within each body: identify trailing declaration lines (lines starting with a type keyword or typedef)
+4. Verify the line immediately following the declaration block is blank; emit `misc.declaration_spacing` if not
+
+---
+
+### UNIT-107 — `Checker._check_file_length() → None`
+
+**Purpose:** Enforce a maximum source-file line count (`misc.file_length`, issue #232).
+
+**Algorithm:**
+1. Skip if `misc.file_length.enabled` is false
+2. Split `self.source` into lines
+3. If `count_blank_lines: false`, exclude blank lines
+4. If `count_comment_lines: false`, exclude comment-only lines
+5. If remaining count > `max_lines`, emit `misc.file_length` at line 1
+
+---
+
+### UNIT-108 — `Checker._check_reserved_header_name() → None`
+
+**Purpose:** Flag files and `#include` directives using standard C/POSIX header names (`misc.reserved_header_name`, issue #230).
+
+**Algorithm:**
+1. Skip if `misc.reserved_header_name.enabled` is false
+2. Check `os.path.basename(self.filename)` against `_STANDARD_C_HEADERS`; emit violation at line 1 if matched
+3. Scan `self.source` for `#include "..."` directives; check the included name against `_STANDARD_C_HEADERS`; emit violation at the directive line if matched
+
+---
+
+### UNIT-109 — `Checker._check_macro_trailing_semicolon() → None`
+
+**Purpose:** Detect `#define` macros ending with `;` (`macro.trailing_semicolon`, issue #228).
+
+**Algorithm:**
+1. Skip if `macros.trailing_semicolon.enabled` is false
+2. Iterate source lines; collect multi-line macros (continuation `\`)
+3. Strip string literals, character literals, and comments from the assembled body
+4. If the resulting body text ends with `;`, emit `macro.trailing_semicolon`
+
+---
+
+### UNIT-110 — `Checker._check_macro_multistatement_wrapper() → None`
+
+**Purpose:** Enforce `do { ... } while (0)` for multi-statement macros (`macro.multistatement_wrapper`, issue #229).
+
+**Algorithm:**
+1. Skip if `macros.multistatement_wrapper.enabled` is false
+2. Collect function-like macros; assemble multi-line bodies
+3. Count `;` statement terminators in the body (excluding trailing `;` already caught by UNIT-109)
+4. If count > 1 and the body is not a `do { ... } while (0)` block, emit `macro.multistatement_wrapper`
+
+---
+
+### UNIT-111 — `Checker._check_identifier_length() → None`
+
+**Purpose:** Uniform min/max identifier length across all categories (`naming.identifier_length`, issue #223).
+
+**Algorithm:**
+1. Skip if `naming.identifier_length.enabled` is false
+2. For each declared identifier found by the declaration scanner: check length against `[min_length, max_length]`
+3. Skip names matching any pattern in `exempt_patterns`
+4. Emit `naming.identifier_length` for out-of-range names
+
+---
+
+### UNIT-112 — `Checker._check_no_single_char_identifiers() → None`
+
+**Purpose:** Flag single-character variable names not in the exempt list (`naming.no_single_char_identifiers`, issue #231).
+
+**Algorithm:**
+1. Skip if `naming.no_single_char_identifiers.enabled` is false
+2. For each declared identifier with `len(name) == 1`: check against `exempt` list
+3. Emit `naming.no_single_char_identifiers` for non-exempt single-character names
+
+---
+
 ### UNIT-90 — `Checker._check_whitespace_ratio() → None`
 
 **Purpose:** Enforce a minimum ratio of blank lines to code lines (issue #143), measuring code "airiness".
@@ -968,6 +1115,17 @@ Violation:
 | SWE1-075 | Config wizard and presets | UNIT-98, UNIT-99 |
 | SWE1-076 | Per-directory config | UNIT-100 |
 | SWE1-077 | HTML report output | UNIT-101 |
+| SWE1-078 | Function length | UNIT-102 |
+| SWE1-079 | Function doc header | UNIT-103 |
+| SWE1-080 | Assert density | UNIT-104 |
+| SWE1-081 | Null statement comment | UNIT-105 |
+| SWE1-082 | Declaration spacing | UNIT-106 |
+| SWE1-083 | File length | UNIT-107 |
+| SWE1-084 | Reserved header name | UNIT-108 |
+| SWE1-085 | Macro trailing semicolon | UNIT-109 |
+| SWE1-086 | Macro multistatement wrapper | UNIT-110 |
+| SWE1-087 | Identifier length | UNIT-111 |
+| SWE1-088 | No single-char identifiers | UNIT-112 |
 
 > **Note (UNIT-84):** `DeclaredNotDefinedChecker` (UNIT-84) is traced via the cross-file check requirement (SWE1-051 to SWE1-053 range). SWE1-071 maps exclusively to `_check_whitespace_ratio` (UNIT-90) as shown in the `SWE1-045 to SWE1-050, SWE1-071` row above; the duplicate mapping of SWE1-071 → UNIT-84 has been removed as a CSC-AUD-005 corrective action.
 

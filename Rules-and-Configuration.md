@@ -30,6 +30,8 @@ and `info`.
 3. [Constants and macros](#3-constants-and-macros)
    - [3.1 Constants (`#define` object-like)](#31-constants-define-object-like)
    - [3.2 Macros (`#define` function-like)](#32-macros-define-function-like)
+   - [3.3 Macro trailing semicolon](#33-macro-trailing-semicolon)
+   - [3.4 Macro multistatement wrapper](#34-macro-multistatement-wrapper)
 4. [Functions](#4-functions)
    - [4.1 Prefix](#41-prefix)
    - [4.2 Style (Object-Verb / Verb-Object / lower\_snake)](#42-style)
@@ -49,12 +51,22 @@ and `info`.
    - [9.6 Unsigned suffix](#96-unsigned-suffix)
    - [9.7 Block-comment spacing](#97-block-comment-spacing)
    - [9.8 Yoda conditions](#98-yoda-conditions)
+   - [9.9 Function length](#99-function-length)
+   - [9.10 Function doc header](#910-function-doc-header)
+   - [9.11 Assert density](#911-assert-density)
+   - [9.12 Null statement comment](#912-null-statement-comment)
+   - [9.13 Declaration spacing](#913-declaration-spacing)
+   - [9.14 File length](#914-file-length)
+   - [9.15 Reserved header name](#915-reserved-header-name)
 10. [Reserved names](#10-reserved-names)
 11. [Spell check](#11-spell-check)
 12. [Sign compatibility](#12-sign-compatibility)
-13. [Inline suppression comments](#13-inline-suppression-comments)
-14. [Quick reference table](#14-quick-reference-table)
-15. [MISRA C:2012/2023 coverage matrix](#15-misra-c20122023-coverage-matrix)
+13. [Naming conventions (identifier length)](#13-naming-conventions-identifier-length)
+    - [13.1 Identifier length](#131-identifier-length)
+    - [13.2 No single-character identifiers](#132-no-single-character-identifiers)
+14. [Inline suppression comments](#14-inline-suppression-comments)
+15. [Quick reference table](#15-quick-reference-table)
+16. [MISRA C:2012/2023 coverage matrix](#16-misra-c20122023-coverage-matrix)
 
 ---
 
@@ -540,6 +552,76 @@ same `UPPER_SNAKE` + module-prefix rules as constants.
 /* ✗ FAIL */
 #define reflectByte(b)         ...   /* macro.case   — not upper_snake */
 #define REFLECT_BYTE(b)        ...   /* macro.prefix — missing crc_ prefix */
+```
+
+---
+
+### 3.3 Macro trailing semicolon
+
+**Rule ID:** `macro.trailing_semicolon`
+
+```yaml
+macros:
+  trailing_semicolon:
+    enabled: true        # recommended: true  (MISRA C 20.7)
+    severity: warning
+```
+
+Object-like and function-like macros must **not** end with a semicolon.
+The canonical usage pattern is `MACRO();` at the call site — if the macro
+definition ends with `;` the call site produces `MACRO();;` (a double
+semicolon or a dangling null statement in an `if`/`else` branch).
+
+```c
+/* ✓ PASS */
+#define RESET_WATCHDOG()    WDT->CTRL = 0x00U
+
+/* ✗ FAIL */
+#define RESET_WATCHDOG()    WDT->CTRL = 0x00U;  /* macro.trailing_semicolon */
+#define LOG_ERROR(msg)      uart_Log(msg);        /* macro.trailing_semicolon */
+```
+
+Multi-line macros are also checked:
+
+```c
+/* ✗ FAIL — trailing ; on the last continuation line */
+#define INIT_MODULE()  \
+    module_Reset();    \
+    module_Start();
+```
+
+---
+
+### 3.4 Macro multistatement wrapper
+
+**Rule ID:** `macro.multistatement_wrapper`
+
+```yaml
+macros:
+  multistatement_wrapper:
+    enabled: true
+    severity: warning
+```
+
+Any function-like macro whose expansion contains **more than one statement**
+must be wrapped in `do { ... } while (0)` to ensure safe use in `if/else`
+branches.
+
+```c
+/* ✓ PASS — single statement, no wrapper needed */
+#define SET_BIT(reg, bit)    ((reg) |= (bit))
+
+/* ✓ PASS — multiple statements safely wrapped */
+#define INIT_GPIO()             \
+    do {                        \
+        GPIO->DIR = 0xFFU;      \
+        GPIO->OUT = 0x00U;      \
+    } while (0)
+
+/* ✗ FAIL — two statements, no do-while wrapper */
+#define INIT_GPIO()             \
+    GPIO->DIR = 0xFFU;          \
+    GPIO->OUT = 0x00U;          /* macro.multistatement_wrapper */
 ```
 
 ---
@@ -1191,6 +1273,266 @@ if (ret == UART_STATUS_OK) { }   /* misc.yoda_condition */
 
 ---
 
+### 9.9 Function length
+
+**Rule ID:** `misc.function_length`
+
+```yaml
+misc:
+  function_length:
+    enabled: true
+    severity: warning
+    max_lines: 60          # total lines from opening { to closing }
+    count_comments: true   # false = exclude blank and comment-only lines
+```
+
+Reports any function whose body (from the opening `{` to the closing `}`,
+inclusive) exceeds `max_lines` lines.  Set `count_comments: false` to
+ignore blank and comment-only lines when counting — only executable
+statement lines count toward the limit.
+
+```c
+/* max_lines: 10, count_comments: true */
+
+/* ✓ PASS — 8 lines total */
+void uart_driver_Init(void)
+{
+    /* set baud rate */
+    uart_driver_s_reg->BAUD = UART_DRIVER_DEFAULT_BAUD;
+    /* enable TX and RX */
+    uart_driver_s_reg->CTRL = UART_DRIVER_CTRL_TX_EN
+                            | UART_DRIVER_CTRL_RX_EN;
+}
+
+/* ✗ FAIL — body exceeds max_lines */
+void uart_driver_ProcessFrame(void)
+{
+    /* ... more than 10 lines ... */
+}   /* misc.function_length */
+```
+
+---
+
+### 9.10 Function doc header
+
+**Rule ID:** `misc.function_doc_header`
+
+```yaml
+misc:
+  function_doc_header:
+    enabled: false         # off by default
+    severity: warning
+    require_brief: true
+    require_param: true    # if the function has parameters
+    require_return: true   # if the function returns non-void
+```
+
+When enabled, every non-static function definition must be immediately
+preceded by a Doxygen-style block comment containing at least `@brief`
+(or `\brief`).  If `require_param` is `true`, each parameter must also
+have a `@param` tag; if `require_return` is `true`, non-void functions
+must have a `@return` tag.
+
+```c
+/* ✓ PASS */
+/**
+ * @brief Read one byte from the UART RX FIFO.
+ * @param[out] p_byte  Pointer to store the received byte.
+ * @return             true if a byte was available, false otherwise.
+ */
+bool uart_driver_ByteRead(uint8_t *p_byte);
+
+/* ✗ FAIL — no doc comment at all */
+bool uart_driver_ByteRead(uint8_t *p_byte);  /* misc.function_doc_header */
+
+/* ✗ FAIL — comment is present but missing @param */
+/**
+ * @brief Read one byte from the UART RX FIFO.
+ */
+bool uart_driver_ByteRead(uint8_t *p_byte);  /* misc.function_doc_header */
+```
+
+---
+
+### 9.11 Assert density
+
+**Rule ID:** `misc.assert_density`
+
+```yaml
+misc:
+  assert_density:
+    enabled: false
+    severity: info
+    min_asserts: 1          # minimum assert() calls per qualifying function
+    min_function_lines: 5   # functions shorter than this are exempt
+    exempt_functions:       # regex list of function names to skip
+      - "^ISR_.*"
+      - "^main$"
+```
+
+Enforces a minimum number of `assert()` calls in each non-trivial function.
+Functions with fewer body lines than `min_function_lines` are exempt.
+`exempt_functions` accepts Python regex patterns matched against the
+unqualified function name.
+
+```c
+/* min_asserts: 1, min_function_lines: 5 */
+
+/* ✓ PASS — function has an assert */
+void uart_driver_BufferWrite(uint8_t *p_buf, uint16_t len)
+{
+    assert(NULL != p_buf);
+    assert(0U < len);
+    /* ... 6 more lines ... */
+}
+
+/* ✗ FAIL — long function with no assert */
+void uart_driver_ProcessFrame(uint8_t *p_frame, uint16_t len)
+{
+    /* 10 lines of processing, no assert */
+}   /* misc.assert_density */
+```
+
+---
+
+### 9.12 Null statement comment
+
+**Rule ID:** `misc.null_statement_comment`
+
+```yaml
+misc:
+  null_statement_comment:
+    enabled: true
+    severity: warning
+```
+
+A null statement (a lone `;` on its own line, or a control-flow keyword
+immediately followed by `;`) must be accompanied by a comment explaining
+the intent.  This prevents accidental null statements in `if`/`while`/`for`
+bodies from silently altering control flow.
+
+```c
+/* ✓ PASS — comment explains the deliberate null body */
+while (uart_driver_IsBusy())
+{
+    ;  /* wait for TX to drain */
+}
+
+/* ✓ PASS — standalone semicolon with comment */
+;   /* intentional no-op */
+
+/* ✗ FAIL — naked null statement */
+while (uart_driver_IsBusy()) ;   /* misc.null_statement_comment */
+
+/* ✗ FAIL — standalone semicolon without comment */
+;                                /* misc.null_statement_comment */
+```
+
+---
+
+### 9.13 Declaration spacing
+
+**Rule ID:** `misc.declaration_spacing`
+
+```yaml
+misc:
+  declaration_spacing:
+    enabled: false      # off by default
+    severity: warning
+    require_blank_line_after: true
+```
+
+When enabled, a block of variable declarations at the start of a function
+body must be followed by exactly one blank line before the first executable
+statement.  This mirrors the MISRA C:2012 Rule 8.1 intent of keeping
+declarations visually separated from code.
+
+```c
+/* ✓ PASS */
+void uart_driver_Init(void)
+{
+    uint32_t baud = UART_DRIVER_DEFAULT_BAUD;
+    uint8_t  ctrl = 0U;
+
+    uart_driver_s_reg->BAUD = baud;
+    uart_driver_s_reg->CTRL = ctrl;
+}
+
+/* ✗ FAIL — no blank line between declarations and code */
+void uart_driver_Init(void)
+{
+    uint32_t baud = UART_DRIVER_DEFAULT_BAUD;
+    uart_driver_s_reg->BAUD = baud;   /* misc.declaration_spacing */
+}
+```
+
+---
+
+### 9.14 File length
+
+**Rule ID:** `misc.file_length`
+
+```yaml
+misc:
+  file_length:
+    enabled: true
+    severity: warning
+    max_lines: 500           # maximum total lines in the file
+    count_blank_lines: true  # false = exclude blank lines from count
+    count_comment_lines: true # false = exclude comment-only lines from count
+```
+
+Reports when a source file exceeds `max_lines` total lines.  Use
+`count_blank_lines: false` or `count_comment_lines: false` to restrict the
+count to executable lines only.  The violation is always reported on line 1.
+
+```c
+/* rules.yml: max_lines: 300 */
+
+/* ✓ PASS — file has 250 lines */
+
+/* ✗ FAIL — file has 350 lines */
+/* misc.file_length reported at line 1 */
+```
+
+---
+
+### 9.15 Reserved header name
+
+**Rule ID:** `misc.reserved_header_name`
+
+```yaml
+misc:
+  reserved_header_name:
+    enabled: true
+    severity: error
+```
+
+`#include` directives must not use the name of a standard C or POSIX
+library header for a project-local file.  Including a file named `string.h`
+from the local directory shadows the standard library and produces
+undefined behaviour.
+
+The built-in list covers all C89/C99/C11 standard headers and the
+POSIX.1-2017 header set (e.g. `stdio.h`, `stdlib.h`, `pthread.h`).
+
+```c
+/* File: string.h  (project local) */
+
+/* ✗ FAIL — file is named the same as a standard header */
+/* misc.reserved_header_name reported at line 1 of string.h */
+
+
+/* In any .c file */
+/* ✓ PASS — including the standard library header */
+#include <string.h>
+
+/* ✗ FAIL — local "string.h" shadows the standard header */
+#include "string.h"   /* misc.reserved_header_name */
+```
+
+---
+
 ## 10. Reserved names
 
 **Rule ID:** `reserved_name`
@@ -1307,14 +1649,96 @@ uart_driver_Send(-1);    /* sign_compatibility */
 
 ---
 
-## 13. Inline suppression comments
+## 13. Naming conventions (identifier length)
+
+### 13.1 Identifier length
+
+**Rule ID:** `naming.identifier_length`
+
+```yaml
+naming:
+  identifier_length:
+    enabled: false      # off by default
+    severity: warning
+    min_length: 3       # minimum identifier length (characters)
+    max_length: 31      # maximum identifier length (C89 significant: 31)
+    exempt_patterns:    # regex list of names exempt from the length check
+      - "^i$"
+      - "^j$"
+      - "^k$"
+```
+
+When enabled, every declared identifier (variables, parameters, struct
+members, etc.) must have a name within `[min_length, max_length]` characters.
+`exempt_patterns` accepts Python regex patterns; any match bypasses the
+length check for that identifier.
+
+This rule complements the per-category `min_length`/`max_length` settings
+in the `variables:` section but applies uniformly across all identifier
+categories.
+
+```c
+/* min_length: 3, max_length: 31 */
+
+/* ✓ PASS */
+uint32_t uart_baud_rate;
+uint8_t  idx;
+
+/* ✗ FAIL — too short */
+uint32_t ab;              /* naming.identifier_length — length 2 < 3 */
+
+/* ✗ FAIL — too long */
+uint32_t uart_driver_receive_and_buffer_byte_stream_pointer;
+                          /* naming.identifier_length — length > 31 */
+```
+
+---
+
+### 13.2 No single-character identifiers
+
+**Rule ID:** `naming.no_single_char_identifiers`
+
+```yaml
+naming:
+  no_single_char_identifiers:
+    enabled: false      # off by default
+    severity: warning
+    exempt:             # single-character names that are always allowed
+      - "i"
+      - "j"
+      - "k"
+      - "n"
+      - "x"
+      - "y"
+      - "z"
+```
+
+When enabled, any identifier with a single-character name that is not in
+`exempt` is flagged.  The `exempt` list is intended for conventional loop
+counters and mathematical variables.
+
+```c
+/* ✓ PASS — i is in exempt */
+for (int i = 0; i < len; i++) { }
+
+/* ✓ PASS — multi-character name */
+uint8_t byte_count = 0U;
+
+/* ✗ FAIL — single character, not in exempt */
+uint32_t a = 0U;    /* naming.no_single_char_identifiers */
+uint32_t b = 0U;    /* naming.no_single_char_identifiers */
+```
+
+---
+
+## 14. Inline suppression comments
 
 Violations can be suppressed without modifying `rules.yml` or `exclusions.yml` by
 placing structured inline comments directly in the C source.  Suppressions are parsed
 by `preprocessor.parse_inline_suppressions` before any rule checks run.  All
 directive keywords are **case-insensitive**.
 
-### 13.1 Suppress the current line
+### 14.1 Suppress the current line
 
 Place the directive as a trailing comment on the line to suppress:
 
@@ -1324,7 +1748,7 @@ uint32_t g_raw_value = 42;  // cstylecheck: disable=variable.global.g_prefix
 
 Only the line containing the directive is suppressed.
 
-### 13.2 Suppress the next line
+### 14.2 Suppress the next line
 
 ```c
 // cstylecheck: disable-next-line=misc.magic_number
@@ -1333,7 +1757,7 @@ uint8_t sync_byte = 0xA5;
 
 The directive suppresses the immediately following non-blank, non-comment line.
 
-### 13.3 Suppress a block
+### 14.3 Suppress a block
 
 A `disable=` directive without a matching `enable=` suppresses the rule from that
 point forward in the file.  Pair it with `enable=` to re-activate:
@@ -1350,7 +1774,7 @@ uint32_t good_value = 3U;   /* checked again */
 A `disable=` with no paired `enable=` suppresses the rule for the remainder of the
 file.
 
-### 13.4 Suppress multiple rules at once
+### 14.4 Suppress multiple rules at once
 
 Comma-separate rule IDs in a single directive:
 
@@ -1363,7 +1787,7 @@ uint32_t threshold = 42;
 All three directive forms (`disable=`, `disable-next-line=`, `enable=`) accept
 comma-separated lists.
 
-### 13.5 Scope and precedence
+### 14.5 Scope and precedence
 
 | Property | Behaviour |
 |---|---|
@@ -1374,7 +1798,7 @@ comma-separated lists.
 
 ---
 
-## 14. Quick reference table
+## 15. Quick reference table
 
 | Rule ID | Default severity | YAML key | Default |
 |---|---|---|---|
@@ -1433,10 +1857,21 @@ comma-separated lists.
 | `misc.lowercase_l_suffix` | warning | `misc.lowercase_l_suffix.enabled` | `true` |
 | `misc.octal_constant` | error | `misc.octal_constant.enabled` | `true` |
 | `misc.trigraph` | error | `misc.trigraph.enabled` | `true` |
+| `macro.trailing_semicolon` | warning | `macros.trailing_semicolon.enabled` | `true` |
+| `macro.multistatement_wrapper` | warning | `macros.multistatement_wrapper.enabled` | `true` |
+| `misc.function_length` | warning | `misc.function_length.enabled` | `true` |
+| `misc.function_doc_header` | warning | `misc.function_doc_header.enabled` | `false` |
+| `misc.assert_density` | info | `misc.assert_density.enabled` | `false` |
+| `misc.null_statement_comment` | warning | `misc.null_statement_comment.enabled` | `true` |
+| `misc.declaration_spacing` | warning | `misc.declaration_spacing.enabled` | `false` |
+| `misc.file_length` | warning | `misc.file_length.enabled` | `true` |
+| `misc.reserved_header_name` | error | `misc.reserved_header_name.enabled` | `true` |
+| `naming.identifier_length` | warning | `naming.identifier_length.enabled` | `false` |
+| `naming.no_single_char_identifiers` | warning | `naming.no_single_char_identifiers.enabled` | `false` |
 
 ---
 
-## 15. MISRA C:2012/2023 coverage matrix
+## 16. MISRA C:2012/2023 coverage matrix
 
 CStyleCheck provides complementary support for a subset of MISRA C:2012/2023 rules.
 It is **not** a full MISRA compliance checker.  The table below documents which rules
@@ -1455,7 +1890,9 @@ are implemented, which are partially addressed, and which are explicitly out of 
 | Rule 14.x / 15.x | Control flow (unreachable code, goto, switch) | Out of scope | — |
 | Rule 17.x | Function usage (recursion, variable-argument functions) | Out of scope | — |
 | Rule 18.x | Pointer type conversion and arithmetic | Out of scope | — |
-| Rule 21.x | Standard library usage | Out of scope | — |
+| Rule 20.7 | Expressions resulting from the expansion of macro parameters shall be enclosed in parentheses | Partial — `macro.multistatement_wrapper` enforces do-while wrapper | `macro.multistatement_wrapper` |
+| Rule 20.10 | The `#` and `##` preprocessor operators should not be used | Out of scope | — |
+| Rule 21.x | Standard library usage (headers) | Partial — `misc.reserved_header_name` prevents local files shadowing stdlib headers | `misc.reserved_header_name` |
 
 > **Note:** "Partial" means the rule's intent is partially addressed by CStyleCheck's
 > naming-convention rules, but full MISRA compliance requires a dedicated MISRA checker

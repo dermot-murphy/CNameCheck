@@ -7,6 +7,49 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **`macro.trailing_semicolon` rule** — detects `#define` macros whose expansion ends
+  with a semicolon, preventing double-semicolon and dangling-else bugs at the call site
+  (issue [#228](https://github.com/dermot-murphy/CStyleCheck/issues/228)).
+- **`macro.multistatement_wrapper` rule** — enforces that function-like macros containing
+  multiple statements are wrapped in `do { ... } while (0)` for safe use in `if`/`else`
+  branches
+  (issue [#229](https://github.com/dermot-murphy/CStyleCheck/issues/229)).
+- **`misc.function_length` rule** — configurable maximum function body line count;
+  supports `count_comments: false` to exclude blank and comment-only lines from the count
+  (issue [#221](https://github.com/dermot-murphy/CStyleCheck/issues/221)).
+- **`misc.function_doc_header` rule** — requires a Doxygen-style `@brief`/`@param`/`@return`
+  block comment before each non-static function definition (disabled by default)
+  (issue [#222](https://github.com/dermot-murphy/CStyleCheck/issues/222)).
+- **`misc.assert_density` rule** — enforces a minimum number of `assert()` calls per
+  qualifying function; supports per-function exemption via regex patterns (disabled by default)
+  (issue [#225](https://github.com/dermot-murphy/CStyleCheck/issues/225)).
+- **`misc.null_statement_comment` rule** — requires a comment whenever a null statement
+  (`while (x) ;`, standalone `;`) is used, preventing accidental empty loop bodies
+  (issue [#227](https://github.com/dermot-murphy/CStyleCheck/issues/227)).
+- **`misc.declaration_spacing` rule** — enforces a blank line between variable declarations
+  and the first executable statement in a function body (disabled by default)
+  (issue [#224](https://github.com/dermot-murphy/CStyleCheck/issues/224)).
+- **`misc.file_length` rule** — configurable maximum total lines per source file; supports
+  excluding blank and/or comment-only lines from the count
+  (issue [#232](https://github.com/dermot-murphy/CStyleCheck/issues/232)).
+- **`misc.reserved_header_name` rule** — flags source files and `#include "..."` directives
+  that use a name identical to a standard C or POSIX library header, preventing shadowing
+  (issue [#230](https://github.com/dermot-murphy/CStyleCheck/issues/230)).
+- **`naming.identifier_length` rule** — uniform minimum/maximum identifier-length check
+  across all identifier categories with per-name exemptions (disabled by default)
+  (issue [#223](https://github.com/dermot-murphy/CStyleCheck/issues/223)).
+- **`naming.no_single_char_identifiers` rule** — flags single-character variable names
+  outside a configurable exempt list (e.g. `i`, `j`, `k`) (disabled by default)
+  (issue [#231](https://github.com/dermot-murphy/CStyleCheck/issues/231)).
+- **102 new tests** (1143 total) covering all 11 new rules, including edge cases for
+  multi-line macros, nested braces, comment exclusion, and regex-based exemptions.
+
+---
+
 ## [1.3.0] — 2026-06-05
 
 ### Added

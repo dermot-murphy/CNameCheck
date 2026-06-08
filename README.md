@@ -10,14 +10,14 @@ Contributions are very welcome.
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **53 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **64 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 📖 **[Rules and Configuration Reference](Rules-and-Configuration.md)** — full
-documentation for all 53 rules with YAML configuration and annotated C examples.
+documentation for all 64 rules with YAML configuration and annotated C examples.
 
 ---
 
@@ -26,7 +26,7 @@ documentation for all 53 rules with YAML configuration and annotated C examples.
 ```
 .pre-commit-hooks.yml   # pre-commit hook definition (id: cstylecheck)
 pyproject.toml           # pip / pipx / pre-commit packaging metadata
-Rules-and-Configuration.md  # wiki: all 53 rules with config and examples
+Rules-and-Configuration.md  # wiki: all 64 rules with config and examples
 src/
     cstylecheck.py          # thin CLI shim (backward-compatible entry point)
     cstylecheck/            # checker package (12 sub-modules)
@@ -36,7 +36,7 @@ src/
         models.py           # Violation, CheckResult, shared constants
         preprocessor.py     # comment/string stripping, token extraction
         utils.py            # case matching, module name helpers
-        checker.py          # main Checker class — all 53 rule implementations
+        checker.py          # main Checker class — all 64 rule implementations
         sign_checker.py     # cross-file sign-compatibility and declared_not_defined
         baseline.py         # baseline load/write
         output.py           # text / JSON / SARIF / HTML formatters, Tee, summary
@@ -93,11 +93,22 @@ tests/
     test_init_wizard.py     #  15 tests: config wizard and presets (run_wizard, run_preset)
     test_per_dir_config.py  #  15 tests: per-directory config resolution
     test_html_report.py     #  20 tests: HTML report output
+    test_function_length.py #  11 tests: misc.function_length
+    test_function_doc_header.py # 12 tests: misc.function_doc_header
+    test_assert_density.py  #   8 tests: misc.assert_density
+    test_null_statement_comment.py # 9 tests: misc.null_statement_comment
+    test_declaration_spacing.py #  8 tests: misc.declaration_spacing
+    test_file_length.py     #   8 tests: misc.file_length
+    test_reserved_header_name.py # 10 tests: misc.reserved_header_name
+    test_macro_trailing_semicolon.py #  9 tests: macro.trailing_semicolon
+    test_macro_multistatement_wrapper.py # 9 tests: macro.multistatement_wrapper
+    test_identifier_length.py #  10 tests: naming.identifier_length
+    test_no_single_char_identifiers.py # 8 tests: naming.no_single_char_identifiers
 Dockerfile/
     Dockerfile               # multi-platform Docker image
     .dockerignore
 .github/workflows/
-    cstylecheck_tests.yml      # runs the test suite on every commit (1041 tests)
+    cstylecheck_tests.yml      # runs the test suite on every commit (1143 tests)
     rules.yml    # runs linter + trend page on C source commits
     docker_publish.yml       # builds and pushes image to GHCR and Docker Hub
     wiki_publish.yml         # publishes GitHub Wiki from README + ASPICE docs
