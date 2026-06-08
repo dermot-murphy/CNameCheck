@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.7 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.8 |
+| **Project** | CStyleCheck | **Date** | 2026-06-08 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-08 | Claude | Add SWE1-078 to SWE1-088 for 11 new rules (issues #221–#232); update RTM |
 | 1.7 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Add SWE1-072 to SWE1-076 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output) — issues #188 #189 #190 #193 #192 |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions (SWE2 1.2→1.3, SUP8 1.4→1.5) — resolves issue #163 |
@@ -224,6 +225,17 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-075 | The `wizard.py` module shall implement `--init` (interactive Q&A wizard writing `.cstylecheck.yml`) and `--preset barr-c\|minimal\|misra` (write pre-built config without wizard); `--init-output FILE` shall set the output path; `--overwrite` shall allow overwriting an existing file | Mandatory | Test | SYS-F-002 |
 | SWE1-076 | The `config.py resolve_per_dir_config()` function shall walk upward from each source file's directory when `--per-dir-config` is active, deep-merging any `.cstylecheck.yml` found on top of the root config; the nearest config wins; `root: true` in any `.cstylecheck.yml` stops the upward search; results shall be cached per directory | Mandatory | Test | SYS-F-002 |
 | SWE1-077 | The `output.py _violations_to_html()` function shall produce a self-contained HTML report when `--output-format html` is specified; the report shall include inline CSS, summary cards (errors/warnings/info/total/files), and per-file violation tables; when `--log FILE` is provided the HTML shall be written to that file, otherwise to stdout | Mandatory | Test | SYS-F-027 |
+| SWE1-078 | The `_check_function_length()` method shall report `misc.function_length` when a function body (opening `{` to closing `}`, inclusive) exceeds `misc.function_length.max_lines`; when `count_comments: false` blank and comment-only lines shall be excluded from the count | Mandatory | Test | SYS-F-020 |
+| SWE1-079 | The `_check_function_doc_header()` method shall report `misc.function_doc_header` for any non-static function definition not immediately preceded by a Doxygen block comment containing `@brief`; when `require_param: true` each parameter requires a `@param` tag; when `require_return: true` non-void functions require `@return` | Mandatory | Test | SYS-F-020 |
+| SWE1-080 | The `_check_assert_density()` method shall report `misc.assert_density` for any function body with fewer than `min_asserts` `assert()` calls; functions with fewer body lines than `min_function_lines` shall be exempt; functions whose name matches any pattern in `exempt_functions` shall be exempt | Mandatory | Test | SYS-F-020 |
+| SWE1-081 | The `_check_null_statement_comment()` method shall report `misc.null_statement_comment` for any control-flow keyword (`while`, `for`, `if`) immediately followed by `;` and for any standalone `;` on its own line that is not followed by a comment | Mandatory | Test | SYS-F-020 |
+| SWE1-082 | The `_check_declaration_spacing()` method shall report `misc.declaration_spacing` when a block of variable declarations at the start of a function body is not followed by exactly one blank line before the first executable statement | Mandatory | Test | SYS-F-020 |
+| SWE1-083 | The `_check_file_length()` method shall report `misc.file_length` at line 1 when the source file exceeds `misc.file_length.max_lines`; when `count_blank_lines: false` blank lines shall be excluded; when `count_comment_lines: false` comment-only lines shall be excluded | Mandatory | Test | SYS-F-020 |
+| SWE1-084 | The `_check_reserved_header_name()` method shall report `misc.reserved_header_name` when the file under analysis is a header whose base name matches a standard C or POSIX library header, and when a `#include "..."` directive references a name matching a standard header | Mandatory | Test | SYS-F-020 |
+| SWE1-085 | The `_check_macro_trailing_semicolon()` method shall report `macro.trailing_semicolon` for any `#define` whose expansion (after stripping string literals and comments) ends with a `;`; multi-line macros shall be fully assembled before the check | Mandatory | Test | SYS-F-020 |
+| SWE1-086 | The `_check_macro_multistatement_wrapper()` method shall report `macro.multistatement_wrapper` for any function-like `#define` whose expansion contains more than one statement and is not wrapped in `do { ... } while (0)` | Mandatory | Test | SYS-F-020 |
+| SWE1-087 | The `_check_identifier_length()` method shall report `naming.identifier_length` for any declared identifier whose name is shorter than `naming.identifier_length.min_length` or longer than `naming.identifier_length.max_length`; names matching any pattern in `exempt_patterns` shall be exempt | Mandatory | Test | SYS-F-020 |
+| SWE1-088 | The `_check_no_single_char_identifiers()` method shall report `naming.no_single_char_identifiers` for any declared identifier with a single-character name that does not appear in `naming.no_single_char_identifiers.exempt` | Mandatory | Test | SYS-F-020 |
 
 ### 4.15 Verification Criteria
 
@@ -263,6 +275,17 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-075 | Config wizard and presets | SYS-F-002 | `wizard.py` Wizard module | `test_init_wizard.py` |
 | SWE1-076 | Per-directory config | SYS-F-002 | `config.resolve_per_dir_config()` | `test_per_dir_config.py` |
 | SWE1-077 | HTML report output | SYS-F-027 | `output._violations_to_html()` | `test_html_report.py` |
+| SWE1-078 | Function length | SYS-F-020 | `Checker._check_function_length()` | `test_function_length.py` |
+| SWE1-079 | Function doc header | SYS-F-020 | `Checker._check_function_doc_header()` | `test_function_doc_header.py` |
+| SWE1-080 | Assert density | SYS-F-020 | `Checker._check_assert_density()` | `test_assert_density.py` |
+| SWE1-081 | Null statement comment | SYS-F-020 | `Checker._check_null_statement_comment()` | `test_null_statement_comment.py` |
+| SWE1-082 | Declaration spacing | SYS-F-020 | `Checker._check_declaration_spacing()` | `test_declaration_spacing.py` |
+| SWE1-083 | File length | SYS-F-020 | `Checker._check_file_length()` | `test_file_length.py` |
+| SWE1-084 | Reserved header name | SYS-F-020 | `Checker._check_reserved_header_name()` | `test_reserved_header_name.py` |
+| SWE1-085 | Macro trailing semicolon | SYS-F-020 | `Checker._check_macro_trailing_semicolon()` | `test_macro_trailing_semicolon.py` |
+| SWE1-086 | Macro multistatement wrapper | SYS-F-020 | `Checker._check_macro_multistatement_wrapper()` | `test_macro_multistatement_wrapper.py` |
+| SWE1-087 | Identifier length | SYS-F-020 | `Checker._check_identifier_length()` | `test_identifier_length.py` |
+| SWE1-088 | No single-char identifiers | SYS-F-020 | `Checker._check_no_single_char_identifiers()` | `test_no_single_char_identifiers.py` |
 
 ---
 
