@@ -245,6 +245,28 @@ macros:
     enabled: false          # optionally require e.g. trailing _M
     suffix: "_M"
 
+  # -----------------------------------------------------------------------
+  # CERT PRE11-C: macro body must not end with a bare semicolon (issue #223)
+  # -----------------------------------------------------------------------
+  # A trailing ; in a #define body causes a double-semicolon at every call
+  # site (FOO(); → ;;) and syntax errors when the macro is used in an
+  # expression context.
+  # Handles line-continuation macros.
+  trailing_semicolon:
+    enabled: true
+    severity: warning
+
+  # -----------------------------------------------------------------------
+  # CERT PRE10-C: multi-statement macros must use do{}while(0) (issue #222)
+  # -----------------------------------------------------------------------
+  # A function-like macro whose body contains two or more statements (i.e.
+  # contains ';' more than once) must be wrapped in do { ... } while(0) so
+  # that it behaves correctly in all control-flow contexts (e.g. if/else
+  # without braces).
+  multistatement_wrapper:
+    enabled: true
+    severity: warning
+
 # --- Enumerations ---
 enums:
   enabled: true
@@ -545,7 +567,6 @@ misc:
     # Alternative: add the macro to your --defines file with 'API_WDT_EXTERN extern'.
     extern_macros: []
 
-  # TEST FIXTURE: comment_ratio disabled (intentionally matches src/rules.yml)
   # -----------------------------------------------------------------------
   # Comment-to-code ratio (issue #68)
   # -----------------------------------------------------------------------
@@ -610,6 +631,90 @@ misc:
     warning_threshold: 0.10 # ratio below which a WARNING is raised  (10%)
     error_threshold: 0.01   # ratio below which an ERROR is raised    (1%)
     min_lines: 20           # skip files with fewer code lines (avoids trivial-file false positives)
+
+  # -----------------------------------------------------------------------
+  # Maximum lines per function body (JPL Power of Ten Rule 4, issue #221)
+  # -----------------------------------------------------------------------
+  # Each function body (including comments and blank lines within it) must
+  # not exceed max_lines lines.  The JPL default is 60; JSF uses 200.
+  # When count_comments is false, only non-blank, non-comment lines count.
+  function_length:
+    enabled: true
+    severity: warning
+    max_lines: 60           # JPL Power of Ten default; JSF uses 200
+    count_comments: true    # include blank and comment lines in the count
+
+  # -----------------------------------------------------------------------
+  # Mandatory Doxygen-style function header comment (ESA-R-1, issue #224)
+  # -----------------------------------------------------------------------
+  # Every function definition must be immediately preceded by a block
+  # comment containing at minimum @brief, @param (for each parameter), and
+  # @return (for non-void functions).
+  # style: "doxygen" requires @brief/@param/@return;
+  #        "javadoc" same tags;
+  #        "any"     accepts any non-empty comment (no tag check).
+  function_doc_header:
+    enabled: false          # opt-in; requires existing code to be updated
+    severity: warning
+    require_brief: true
+    require_param: true
+    require_return: true
+    style: doxygen
+
+  # -----------------------------------------------------------------------
+  # Minimum assert() calls per function (JPL Power of Ten Rule 5, #225)
+  # -----------------------------------------------------------------------
+  # Every non-trivial function must contain at least min_asserts calls to
+  # assert() (or a project-defined assert macro).  Functions shorter than
+  # min_function_lines are exempt, as are functions in exempt_functions.
+  assert_density:
+    enabled: false          # opt-in; off by default
+    severity: info
+    min_asserts: 1          # minimum assert() calls per qualifying function
+    min_function_lines: 10  # skip functions with fewer lines than this
+    exempt_functions: []    # regex patterns for exempt function names
+
+  # -----------------------------------------------------------------------
+  # Null statements must be on their own line with a comment (JSF Rule 192)
+  # -----------------------------------------------------------------------
+  # Flags: (1) control-flow expressions with ; on the same line (while(x);),
+  # and (2) standalone ';' on its own line without an explanatory comment.
+  null_statement_comment:
+    enabled: true
+    severity: warning
+
+  # -----------------------------------------------------------------------
+  # Blank line required after the local variable declaration block (LK-8)
+  # -----------------------------------------------------------------------
+  # Within each function body, the first executable statement must be
+  # preceded by at least one blank line after the last local variable
+  # declaration.  Functions with no declarations are not affected.
+  declaration_spacing:
+    enabled: false          # opt-in; disabled by default
+    severity: info
+
+  # -----------------------------------------------------------------------
+  # Maximum lines per source file (ESA/industry practice, issue #232)
+  # -----------------------------------------------------------------------
+  # Source files exceeding max_lines total lines are flagged.  Optionally
+  # blank lines and/or comment-only lines can be excluded from the count.
+  file_length:
+    enabled: true
+    severity: warning
+    max_lines: 500          # industry common defaults: 300–1000
+    count_blank_lines: true
+    count_comment_lines: true
+
+  # -----------------------------------------------------------------------
+  # Reserved C/POSIX standard header filename (CERT PRE04-C, issue #230)
+  # -----------------------------------------------------------------------
+  # A project source file must not share its basename with a standard C or
+  # POSIX header (e.g. string.h, stdio.h) because #include "string.h" would
+  # then include the local file instead of the system header.
+  reserved_header_name:
+    enabled: true
+    severity: error
+    extra_reserved: []      # additional project-specific names to reserve
 
 # --- Reserved / banned identifier names ---
 # Checks that no declared variable, function, macro, or constant name
@@ -718,6 +823,38 @@ ignore:
   files:
     - "stm32f4xx_hal_*.c"
     - "stm32f4xx_hal_*.h"
+
+# --- Identifier naming constraints ---
+# Cross-category rules governing identifier length and character constraints.
+# These complement the per-category length limits in variables/functions/etc.
+naming:
+  # -----------------------------------------------------------------------
+  # Min/max identifier length across all categories (ESA-R-7, JSF Rule 45)
+  # -----------------------------------------------------------------------
+  # Enforces a project-wide minimum and maximum identifier length applied
+  # uniformly across variables, functions, macros, and type names.
+  # short exempt_names (i, j, k, …) are always allowed as loop counters.
+  identifier_length:
+    enabled: false          # opt-in; off by default
+    severity: warning
+    min_length: 3           # ESA-R-7 default; set to 0 to disable min check
+    max_length: 31          # JSF Rule 45 default; set to 0 to disable max check
+    exempt_names: ["i", "j", "k", "n", "x", "y", "z"]
+    check_variables: true
+    check_functions: true
+    check_macros: true
+    check_types: true
+
+  # -----------------------------------------------------------------------
+  # No single-character identifiers except conventional loop counters (ESA-R-4)
+  # -----------------------------------------------------------------------
+  # Single-character names are ambiguous and non-searchable in code review.
+  # Identifiers in the exempt list (default: i, j, k, n, x, y, z) are
+  # accepted as conventional loop counter abbreviations.
+  no_single_char_identifiers:
+    enabled: false          # opt-in; off by default
+    severity: warning
+    exempt: ["i", "j", "k", "n", "x", "y", "z"]
 
 # --- Sign compatibility (cross-file) ---
 # Check that unsigned literals (e.g. 100U) are not passed to signed parameters
