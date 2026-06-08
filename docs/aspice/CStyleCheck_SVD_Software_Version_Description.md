@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.7 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.8 |
+| **Project** | CStyleCheck | **Date** | 2026-06-08 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-08 | Claude | ASPICE audit #238 — update SWE1/SWE3/SWE4 version refs; correct rule count 53→64; update test count 1041→1143, 38→49 modules |
 | 1.7 | 2026-06-05 | Claude | v1.3.0 release — update all version identifiers, release summary, change log, upgrade notes |
 | 1.6 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.5 | 2026-06-04 | Claude | Add §6.1 F-008 to F-012 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output); update §5.1 deliverables, §5.5 doc versions, §10 traceability — issues #188 #189 #190 #193 #192 |
@@ -40,10 +41,10 @@ This document satisfies the release-identification and configuration-status-acco
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.6 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.8 |
-| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.8 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.8 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.7 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.9 |
+| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.9 |
 | CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.4 |
 | CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.5 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.6 |
@@ -71,7 +72,7 @@ This document satisfies the release-identification and configuration-status-acco
 
 This is a **minor release** under Semantic Versioning. It is **backward-compatible** with v1.2.1: all existing `rules.yml` configurations, CLI flags, and pre-commit hook integrations continue to work without modification.
 
-New capabilities (inline suppression, `--fix`, `--init`/`--preset`, per-directory config, HTML report) are entirely additive. The CLI entry point, all 53 rule IDs, and all existing output formats are unchanged from the caller's perspective.
+New capabilities (inline suppression, `--fix`, `--init`/`--preset`, per-directory config, HTML report, and 11 new rules from issues #221–#232) are entirely additive. The CLI entry point, all 64 rule IDs, and all existing output formats are backward-compatible with v1.2.1.
 
 ---
 
@@ -88,7 +89,7 @@ New capabilities (inline suppression, `--fix`, `--init`/`--preset`, per-director
 | `src/cstylecheck/models.py` | Violation, CheckResult, shared constants | `src/cstylecheck/models.py` |
 | `src/cstylecheck/preprocessor.py` | Comment/string stripping, token extraction | `src/cstylecheck/preprocessor.py` |
 | `src/cstylecheck/utils.py` | Case matching helpers, module-name derivation | `src/cstylecheck/utils.py` |
-| `src/cstylecheck/checker.py` | Main Checker class — all 53 rule implementations | `src/cstylecheck/checker.py` |
+| `src/cstylecheck/checker.py` | Main Checker class — all 64 rule implementations | `src/cstylecheck/checker.py` |
 | `src/cstylecheck/sign_checker.py` | Cross-file sign-compatibility and declared_not_defined | `src/cstylecheck/sign_checker.py` |
 | `src/cstylecheck/baseline.py` | Baseline load / write | `src/cstylecheck/baseline.py` |
 | `src/cstylecheck/output.py` | Text / JSON / SARIF / HTML formatters, Tee, summary table | `src/cstylecheck/output.py` |
@@ -124,7 +125,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ### 5.4 Test Suite
 
-**Total: 1041 tests across 38 modules** — all passing.
+**Total: 1143 tests across 49 modules** — all passing.
 
 | Item | Test Count | Description |
 |---|---|---|
@@ -166,7 +167,18 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_init_wizard.py` | 15 | Config wizard and presets (`run_wizard`, `run_preset`) |
 | `tests/test_per_dir_config.py` | 15 | Per-directory config resolution (`resolve_per_dir_config`) |
 | `tests/test_html_report.py` | 20 | HTML report output (`_violations_to_html`) |
-| **Total** | **1041** | |
+| `tests/test_function_length.py` | 11 | `misc.function_length` rule |
+| `tests/test_function_doc_header.py` | 12 | `misc.function_doc_header` rule |
+| `tests/test_assert_density.py` | 8 | `misc.assert_density` rule |
+| `tests/test_null_statement_comment.py` | 9 | `misc.null_statement_comment` rule |
+| `tests/test_declaration_spacing.py` | 8 | `misc.declaration_spacing` rule |
+| `tests/test_file_length.py` | 8 | `misc.file_length` rule |
+| `tests/test_reserved_header_name.py` | 10 | `misc.reserved_header_name` rule |
+| `tests/test_macro_trailing_semicolon.py` | 9 | `macro.trailing_semicolon` rule |
+| `tests/test_macro_multistatement_wrapper.py` | 9 | `macro.multistatement_wrapper` rule |
+| `tests/test_identifier_length.py` | 10 | `naming.identifier_length` rule |
+| `tests/test_no_single_char_identifiers.py` | 8 | `naming.no_single_char_identifiers` rule |
+| **Total** | **1143** | |
 
 ### 5.5 Documentation
 

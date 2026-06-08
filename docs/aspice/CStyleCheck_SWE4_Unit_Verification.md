@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.9 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.10 |
 | **Project** | CStyleCheck | **Date** | 2026-06-08 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.10 | 2026-06-08 | Claude | ASPICE audit #238 — correct CSC-SWE3 version reference 1.8→1.9 in §3.1 |
 | 1.9 | 2026-06-08 | Claude | Add 11 new test modules (102 tests) for issues #221–#232; update §6 totals; update §7 traceability |
 | 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Automated accuracy audit: add §6 rows for test_preprocessor.py/test_comment_ratio/test_declared_not_defined/test_update_config/test_config_loading; update total 786→965; fix section header counts (§5.4/§5.6/§5.12/§5.13); update referenced doc versions; fix §3 version text; update coverage note — resolves issue #163 |
@@ -45,7 +46,7 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 | Document ID | Title | Version |
 |---|---|---|
 | CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.8 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.9 |
 | CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.4 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
 
