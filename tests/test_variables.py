@@ -282,5 +282,101 @@ class TestVariableMinLength(unittest.TestCase):
         self.assertIn("BARR-C", ml[0].message)
 
 
+class TestPointerPrefixCombinedNonParameterScopes(unittest.TestCase):
+    """Regression for GitHub issue #245.
+
+    The 'p_ptr_name' leniency (parameter prefix 'p_' followed by the
+    configured pointer-type prefix, e.g. 'ptr_') was previously only applied
+    when scope == "parameter". Globals, statics, locals, and struct members
+    using the identical naming convention were incorrectly flagged even
+    though their local part, after stripping the leading 'p_', clearly
+    starts with the configured pointer prefix.
+
+    Reported false positives:
+        api_radio_transport.h: Pointer variable 'p_ptr_offset' ...
+        api_vibration.h:       Pointer variable 'p_ptr_packet_buffer' ...
+    Neither was a function parameter.
+    """
+
+    @staticmethod
+    def _cfg(ptr_pfx="ptr_", pp_pfx="pp_", param_pfx="p_"):
+        return cfg_only(variables={
+            "enabled": True, "severity": "error",
+            "case": "lower_snake", "min_length": 2, "max_length": 60,
+            "allow_single_char_loop_vars": True,
+            "allow_loop_vars_short": True,
+            "allowed_abbreviations": [],
+            "global": {"severity": "error", "case": "lower_snake",
+                       "require_module_prefix": False,
+                       "g_prefix": {"enabled": False}},
+            "static": {"severity": "error", "case": "lower_snake",
+                       "require_module_prefix": False,
+                       "s_prefix": {"enabled": False}},
+            "local":     {"severity": "error", "case": "lower_snake",
+                          "require_module_prefix": False},
+            "parameter": {"severity": "warning", "case": "lower_snake",
+                          "require_module_prefix": False,
+                          # Rule itself need not be enabled — only its
+                          # configured prefix value is used for stripping.
+                          "p_prefix": {"enabled": False,
+                                       "severity": "warning",
+                                       "prefix": param_pfx}},
+            "pointer_prefix": {"enabled": True, "severity": "warning",
+                               "prefix": ptr_pfx},
+            "pp_prefix":      {"enabled": True, "severity": "warning",
+                               "prefix": pp_pfx},
+            "bool_prefix":    {"enabled": False},
+            "no_numeric_in_name": {"enabled": False, "exempt_patterns": []},
+            "prefix_order": {"enabled": False},
+            "handle_prefix": {"enabled": False, "handle_types": []},
+        })
+
+    def test_global_p_ptr_name_passes(self):
+        cfg = self._cfg()
+        src = "uint8_t *p_ptr_offset;\n"
+        self.assertFalse(has(src, cfg, "variable.pointer_prefix"))
+
+    def test_local_p_ptr_name_passes(self):
+        cfg = self._cfg()
+        src = "void f(void){ uint8_t *p_ptr_offset = 0; (void)p_ptr_offset; }\n"
+        self.assertFalse(has(src, cfg, "variable.pointer_prefix"))
+
+    def test_struct_member_p_ptr_name_passes(self):
+        cfg = self._cfg()
+        src = "typedef struct { uint8_t *p_ptr_packet_buffer; } api_x_t;\n"
+        self.assertFalse(has(src, cfg, "variable.pointer_prefix"))
+
+    def test_static_p_ptr_name_passes(self):
+        cfg = self._cfg()
+        src = "static uint8_t *p_ptr_offset;\n"
+        self.assertFalse(has(src, cfg, "variable.pointer_prefix"))
+
+    def test_global_pp_ptr_name_passes(self):
+        """Double pointer: pp_pfx leniency must also apply outside parameters."""
+        cfg = self._cfg()
+        src = "uint8_t **p_pp_table;\n"
+        self.assertFalse(has(src, cfg, "variable.pp_prefix"))
+
+    def test_global_missing_type_prefix_still_flags(self):
+        """Sanity check: the leniency must not become a blanket bypass —
+        a global pointer missing the type prefix entirely must still warn."""
+        cfg = self._cfg()
+        src = "uint8_t *p_offset;\n"
+        self.assertTrue(has(src, cfg, "variable.pointer_prefix"))
+
+    def test_global_bare_type_prefix_still_passes(self):
+        """A global pointer using the bare type prefix (no param prefix
+        lead-in) must still pass directly."""
+        cfg = self._cfg()
+        src = "uint8_t *ptr_offset;\n"
+        self.assertFalse(has(src, cfg, "variable.pointer_prefix"))
+
+    def test_parameter_scope_still_passes_after_fix(self):
+        """Existing parameter-scope behaviour must be unaffected."""
+        cfg = self._cfg()
+        src = "void f(uint8_t *p_ptr_buf){ (void)p_ptr_buf; }\n"
+        self.assertFalse(has(src, cfg, "variable.pointer_prefix"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
