@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-MAN5-001 | **Version** | 1.2 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-MAN5-001 | **Version** | 1.3 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | MAN.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.2 | 2026-05-28 | Dermot Murphy | RISK-003: add Dependabot; update owner and review date. RISK-005: add CONTRIBUTING.md and AI-reproducibility mitigations; update owner and review date — closes issue #155 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -34,9 +35,9 @@ This Risk Management Plan defines the risk identification, analysis, treatment, 
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-MAN3-001 | Project Management Plan | 1.0 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CSC-SUP10-001 | Change Request Management Plan | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.6 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP10-001 | Change Request Management Plan | 1.2 |
 
 ---
 

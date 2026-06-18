@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.4 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.4 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.3 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions §3.1, test count 839→965 in overall result — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SIT-001 to SIT-013 execution results (PASS); commit 93178cd, 2026-05-28 — closes issue #152 |
@@ -40,10 +41,10 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.5 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.8 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.4 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.3 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.8 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.11 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.6 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.4 |
 
 ### 3.2 Test Environment
 

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.8 |
-| **Project** | CStyleCheck | **Date** | 2026-06-08 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — fix internally inconsistent test counts: §3/§5.4/§8.2/§9 now all read 1152 tests / 49 modules (previously a mix of 1143 and stale 1041) |
 | 1.8 | 2026-06-08 | Claude | ASPICE audit #238 — update SWE1/SWE3/SWE4 version refs; correct rule count 53→64; update test count 1041→1143, 38→49 modules |
 | 1.7 | 2026-06-05 | Claude | v1.3.0 release — update all version identifiers, release summary, change log, upgrade notes |
 | 1.6 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
@@ -41,15 +42,15 @@ This document satisfies the release-identification and configuration-status-acco
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.8 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.7 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.9 |
-| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.9 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.4 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.5 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.6 |
-| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.3 |
-| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.5 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.8 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.10 |
+| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.11 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.5 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.6 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
+| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.4 |
+| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.6 |
 
 ---
 
@@ -125,7 +126,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ### 5.4 Test Suite
 
-**Total: 1143 tests across 49 modules** — all passing.
+**Total: 1152 tests across 49 modules** — all passing.
 
 | Item | Test Count | Description |
 |---|---|---|
@@ -135,7 +136,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_dictionaries.py` | 32 | dict file loading and CLI flags |
 | `tests/test_misc_improvements.py` | 77 | unsigned_suffix, loop vars, numerics |
 | `tests/test_defines.py` | 16 | constant.* / macro.* |
-| `tests/test_variables.py` | 35 | all variable.* rules |
+| `tests/test_variables.py` | 43 | all variable.* rules |
 | `tests/test_functions.py` | 14 | function.* |
 | `tests/test_typedefs.py` | 8 | typedef.* |
 | `tests/test_enums.py` | 11 | enum.* |
@@ -170,7 +171,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_function_length.py` | 11 | `misc.function_length` rule |
 | `tests/test_function_doc_header.py` | 12 | `misc.function_doc_header` rule |
 | `tests/test_assert_density.py` | 8 | `misc.assert_density` rule |
-| `tests/test_null_statement_comment.py` | 9 | `misc.null_statement_comment` rule |
+| `tests/test_null_statement_comment.py` | 10 | `misc.null_statement_comment` rule |
 | `tests/test_declaration_spacing.py` | 8 | `misc.declaration_spacing` rule |
 | `tests/test_file_length.py` | 8 | `misc.file_length` rule |
 | `tests/test_reserved_header_name.py` | 10 | `misc.reserved_header_name` rule |
@@ -178,31 +179,31 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_macro_multistatement_wrapper.py` | 9 | `macro.multistatement_wrapper` rule |
 | `tests/test_identifier_length.py` | 10 | `naming.identifier_length` rule |
 | `tests/test_no_single_char_identifiers.py` | 8 | `naming.no_single_char_identifiers` rule |
-| **Total** | **1143** | |
+| **Total** | **1152** | |
 
 ### 5.5 Documentation
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SVD-001 | Software Version Description (this document) | 1.7 |
-| CSC-SWE1-001 | Software Requirements Specification | 1.6 |
-| CSC-SWE2-001 | Software Architecture Design | 1.5 |
-| CSC-SWE3-001 | Software Detailed Design | 1.6 |
-| CSC-SWE4-001 | Software Unit Verification Specification | 1.6 |
-| CSC-SWE5-001 | Software Integration Test Specification | 1.3 |
-| CSC-SWE6-001 | Software Qualification Test Specification | 1.4 |
-| CSC-SYS2-001 | System Requirements Specification | 1.5 |
-| CSC-SYS3-001 | System Architecture Design | 1.4 |
-| CSC-SYS4-001 | System Integration Test Specification | 1.3 |
-| CSC-SYS5-001 | System Verification Specification | 1.4 |
-| CSC-MAN3-001 | Project Management Plan | 1.5 |
-| CSC-MAN5-001 | Risk Management Plan | 1.2 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.3 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.6 |
-| CSC-SUP9-001 | Problem Resolution Plan | 1.1 |
-| CSC-SUP10-001 | Change Request Plan | 1.1 |
-| CSC-ACQ4-001 | Supplier Monitoring Plan | 1.1 |
-| CSC-PA2-001 | Capability Level 2 Records | 1.8 |
+| CSC-SVD-001 | Software Version Description (this document) | 1.9 |
+| CSC-SWE1-001 | Software Requirements Specification | 1.9 |
+| CSC-SWE2-001 | Software Architecture Design | 1.8 |
+| CSC-SWE3-001 | Software Detailed Design | 1.10 |
+| CSC-SWE4-001 | Software Unit Verification Specification | 1.11 |
+| CSC-SWE5-001 | Software Integration Test Specification | 1.5 |
+| CSC-SWE6-001 | Software Qualification Test Specification | 1.6 |
+| CSC-SYS2-001 | System Requirements Specification | 1.6 |
+| CSC-SYS3-001 | System Architecture Design | 1.5 |
+| CSC-SYS4-001 | System Integration Test Specification | 1.4 |
+| CSC-SYS5-001 | System Verification Specification | 1.6 |
+| CSC-MAN3-001 | Project Management Plan | 1.6 |
+| CSC-MAN5-001 | Risk Management Plan | 1.3 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.4 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP9-001 | Problem Resolution Plan | 1.2 |
+| CSC-SUP10-001 | Change Request Plan | 1.2 |
+| CSC-ACQ4-001 | Supplier Monitoring Plan | 1.2 |
+| CSC-PA2-001 | Capability Level 2 Records | 1.9 |
 | CSC-DEV001 | AI Authorship Deviation Record | 1.0 |
 | CSC-DEV002 | Independent Review Deviation Record | 1.0 |
 
@@ -268,7 +269,7 @@ All of the following CI checks passed on the `develop` branch before tag creatio
 
 ### 8.2 Qualification Test Status
 
-All 1041 tests pass with no failures. Test counts per module are documented in §5.4.
+All 1152 tests pass with no failures. Test counts per module are documented in §5.4.
 
 ### 8.3 Docker Build
 
@@ -328,7 +329,7 @@ The `src/cstylecheck.py` entry point shim is unchanged. All 53 rule IDs, existin
 | Integration Tests | CSC-SWE5-001 | 1.4 | Released |
 | Qualification Tests | CSC-SWE6-001 | 1.5 | Released |
 | Source Code | `src/cstylecheck/` (package) | 1.3.0 | Released |
-| Test Suite | `tests/` (1041 tests) | 1.3.0 | Released |
+| Test Suite | `tests/` (1152 tests) | 1.3.0 | Released |
 | CI Automation | `.github/workflows/` + `scripts/ci/` | 1.3.0 | Released |
 | Docker Image | `Dockerfile/Dockerfile` | 1.3.0 | Released |
 | Change Log | `CHANGELOG.md` | 1.3.0 | Released |

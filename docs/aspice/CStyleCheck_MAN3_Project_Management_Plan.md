@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-MAN3-001 | **Version** | 1.5 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-MAN3-001 | **Version** | 1.6 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | MAN.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 Purpose version text v1.0.0→v1.2.0, update SWE1-001 version in §3.2 (1.3→1.5) — resolves issue #163 |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 version, §4.1 rule count 48→53 and package reference, update test count and module count, update referenced doc versions, update WBS-10 status — resolves issue #163 |
 | 1.3 | 2026-05-28 | Dermot Murphy | §6 WBS-10 to WBS-16: update status with concrete facts (839 tests, release dates, blocked items) — closes issue #154 |
@@ -49,11 +50,11 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | System Requirements Specification | 1.4 |
-| CSC-SWE1-001 | Software Requirements Specification | 1.5 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.4 |
-| CSC-MAN5-001 | Risk Management Plan | 1.2 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.2 |
+| CSC-SYS2-001 | System Requirements Specification | 1.6 |
+| CSC-SWE1-001 | Software Requirements Specification | 1.9 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-MAN5-001 | Risk Management Plan | 1.3 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.4 |
 
 ---
 

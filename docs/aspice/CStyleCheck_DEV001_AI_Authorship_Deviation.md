@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-DEV-001 | **Version** | 1.1 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-DEV-001 | **Version** | 1.2 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Approved | **Classification** | Internal |
 | **Author** | Dermot Murphy | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | PA 2.1, GP 2.1.6 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.0 | 2026-05-28 | Dermot Murphy | Initial deviation record — closes issue #52 |
 
 ---
@@ -131,7 +132,7 @@ This deviation is accepted on the basis that Dermot Murphy is the sole accountab
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-PA2-001 | Process Capability Records | 1.1 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CSC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
+| CSC-PA2-001 | Process Capability Records | 1.9 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.2 |
 | GitHub Issue #52 | AI listed as Author across all 18 ASPICE work products | — |

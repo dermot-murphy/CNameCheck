@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.10 |
-| **Project** | CStyleCheck | **Date** | 2026-06-08 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.11 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.11 | 2026-06-18 | Claude | ASPICE audit #254 — update §6 test total 1143→1152 (49 modules) |
 | 1.10 | 2026-06-08 | Claude | ASPICE audit #238 — correct CSC-SWE3 version reference 1.8→1.9 in §3.1 |
 | 1.9 | 2026-06-08 | Claude | Add 11 new test modules (102 tests) for issues #221–#232; update §6 totals; update §7 traceability |
 | 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
@@ -45,10 +46,10 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.9 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.4 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.10 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.5 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 
 ---
 
@@ -119,7 +120,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.1 Variable Rules — `test_variables.py` (35 tests)
+### 5.1 Variable Rules — `test_variables.py` (43 tests)
 
 | TC-ID | Test Name | Rule Verified | Pass Condition |
 |---|---|---|---|
@@ -353,7 +354,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 
 | Test Module | Tests | Pass | Fail | Coverage Contribution |
 |---|---|---|---|---|
-| `test_variables.py` | 35 | 35 | 0 | `_check_variables` |
+| `test_variables.py` | 43 | 43 | 0 | `_check_variables` |
 | `test_functions.py` | 14 | 14 | 0 | `_check_functions` |
 | `test_defines.py` | 16 | 16 | 0 | `_check_defines` |
 | `test_typedefs.py` | 8 | 8 | 0 | `_check_typedefs` |
@@ -394,7 +395,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_function_length.py` | 11 | 11 | 0 | COMP-01 (`_check_function_length`) |
 | `test_function_doc_header.py` | 12 | 12 | 0 | COMP-01 (`_check_function_doc_header`) |
 | `test_assert_density.py` | 8 | 8 | 0 | COMP-01 (`_check_assert_density`) |
-| `test_null_statement_comment.py` | 9 | 9 | 0 | COMP-01 (`_check_null_statement_comment`) |
+| `test_null_statement_comment.py` | 10 | 10 | 0 | COMP-01 (`_check_null_statement_comment`) |
 | `test_declaration_spacing.py` | 8 | 8 | 0 | COMP-01 (`_check_declaration_spacing`) |
 | `test_file_length.py` | 8 | 8 | 0 | COMP-01 (`_check_file_length`) |
 | `test_reserved_header_name.py` | 10 | 10 | 0 | COMP-01 (`_check_reserved_header_name`) |
@@ -402,7 +403,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_macro_multistatement_wrapper.py` | 9 | 9 | 0 | COMP-01 (`_check_macro_multistatement_wrapper`) |
 | `test_identifier_length.py` | 10 | 10 | 0 | COMP-01 (`_check_identifier_length`) |
 | `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-01 (`_check_no_single_char_identifiers`) |
-| **Total** | **1143** | **1143** | **0** | All rules covered — 49 modules |
+| **Total** | **1152** | **1152** | **0** | All rules covered — 49 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.4 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.3 referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SITC-001 to SITC-014 execution results (PASS); commit 93178cd, 2026-05-28 — closes issue #152 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
@@ -49,9 +50,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.4 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
-| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.4 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.6 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
+| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.6 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
 ### 3.4 Test Environment

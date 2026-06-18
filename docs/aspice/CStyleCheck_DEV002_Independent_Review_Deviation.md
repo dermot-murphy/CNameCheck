@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-DEV-002 | **Version** | 1.0 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-DEV-002 | **Version** | 1.1 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Approved | **Classification** | Internal |
 | **Author** | Dermot Murphy | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | PA 2.2, GP 2.2.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.1 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.0 | 2026-05-28 | Dermot Murphy | Initial deviation record — closes issue #61 |
 
 ---
@@ -150,9 +151,9 @@ This deviation is accepted on the basis that CStyleCheck is a single-person proj
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-DEV-001 | Process Deviation — AI-Assisted Authorship | 1.1 |
-| CSC-PA2-001 | Process Capability Records | 1.1 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CSC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
-| CSC-SUP10-001 | Change Request Plan | 1.0 |
+| CSC-DEV-001 | Process Deviation — AI-Assisted Authorship | 1.2 |
+| CSC-PA2-001 | Process Capability Records | 1.9 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.2 |
+| CSC-SUP10-001 | Change Request Plan | 1.2 |
 | GitHub Issue #61 | Designate independent reviewer (not approver) for SWE1, SWE4, SWE6 work products | — |

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-STD-001 | **Version** | 1.1 |
-| **Project** | CStyleCheck | **Date** | 2026-06-06 |
+| **Document ID** | CSC-STD-001 | **Version** | 1.2 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.1 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.1 | 2026-06-06 | Claude | Add `misc.file_length` (max lines per file) as unique opportunity #12; create change-request issues for all 12 opportunities |
 | 1.0 | 2026-06-06 | Claude | Initial document — full survey of 11 industry standards with coverage matrix; closes issue #217 |
 
@@ -40,9 +41,9 @@ The findings are presented in a unified coverage matrix and a prioritised list o
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.6 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.8 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.8 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.10 |
 
 ---
 

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP1-001 | **Version** | 1.3 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SUP1-001 | **Version** | 1.4 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.1 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.4 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 Purpose version text, update §3.1 referenced doc versions (all 5 stale), update QO-006 and §5.4 to v1.2.0, clarify §7 version language — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | §4 QO-003/QO-004: document 85% combined CI gate as enforced threshold; 90% statement as aspirational target; align §5.4 checklist — closes issue #151 |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
@@ -37,11 +38,11 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-MAN3-001 | Project Management Plan | 1.5 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.6 |
-| CSC-SUP9-001 | Problem Resolution Management Plan | 1.1 |
-| CSC-SUP10-001 | Change Request Management Plan | 1.1 |
-| CSC-SWE4-001 | Unit Verification Specification | 1.6 |
+| CSC-MAN3-001 | Project Management Plan | 1.6 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.2 |
+| CSC-SUP10-001 | Change Request Management Plan | 1.2 |
+| CSC-SWE4-001 | Unit Verification Specification | 1.11 |
 
 ---
 

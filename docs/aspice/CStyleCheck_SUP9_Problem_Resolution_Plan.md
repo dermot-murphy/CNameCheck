@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP9-001 | **Version** | 1.1 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-SUP9-001 | **Version** | 1.2 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.9 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -35,10 +36,10 @@ A **problem** is any unintended behaviour, defect, failure, or non-conformance d
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-MAN3-001 | Project Management Plan | 1.0 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CSC-SUP10-001 | Change Request Management Plan | 1.0 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.6 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP10-001 | Change Request Management Plan | 1.2 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.4 |
 
 ---
 

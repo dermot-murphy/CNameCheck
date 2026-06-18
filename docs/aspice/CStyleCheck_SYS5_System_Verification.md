@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS5-001 | **Version** | 1.5 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.6 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions, fix VTC-003 header and §6 rule count — resolves issue #163 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Populate all SYS-VTC execution result tables; fill §3.3 configuration; update overall verdict to commit 93178cd, 839 tests PASS — closes issue #152 |
@@ -41,11 +42,11 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.5 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.4 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.3 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.6 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.4 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 
 ### 3.3 System Configuration Under Test
 
