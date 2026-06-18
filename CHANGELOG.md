@@ -45,8 +45,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **`naming.no_single_char_identifiers` rule** — flags single-character variable names
   outside a configurable exempt list (e.g. `i`, `j`, `k`) (disabled by default)
   (issue [#231](https://github.com/dermot-murphy/CStyleCheck/issues/231)).
-- **102 new tests** (1143 total) covering all 11 new rules, including edge cases for
+- **102 new tests** (1152 total) covering all 11 new rules, including edge cases for
   multi-line macros, nested braces, comment exclusion, and regex-based exemptions.
+- Draft companion documents `embedded_c_style_guide.md`, `embedded_c_coding_standard.md`,
+  and `external_standards_analysis.md` — pending rule population, linked from the README.
+
+### Fixed
+
+- Parameter and pointer naming-prefix checks no longer require both prefixes
+  simultaneously when only one is configured, fixing false positives on otherwise
+  compliant declarations
+  (issues [#245](https://github.com/dermot-murphy/CStyleCheck/issues/245),
+  [#246](https://github.com/dermot-murphy/CStyleCheck/issues/246)).
+- Fixed a catastrophic-backtracking (ReDoS) regular expression in
+  `misc.null_statement_comment` that could hang indefinitely on an unclosed
+  `if`/`while`/`for` condition spanning a long line
+  (issues [#248](https://github.com/dermot-murphy/CStyleCheck/issues/248),
+  [#249](https://github.com/dermot-murphy/CStyleCheck/issues/249)).
+- Fixed broken GitHub Wiki links: malformed triple-hyphen slugs for headings containing
+  backticks/parentheses, and a non-functional "Rules and Configuration Reference" link
+  that previously prompted "Create a new page" instead of opening the Rules page
+  (issue [#251](https://github.com/dermot-murphy/CStyleCheck/issues/251)).
 
 ---
 

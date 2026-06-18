@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS3-001 | **Version** | 1.4 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SYS3-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.4 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Claude | Update §5/§6/§8 to reflect package refactor (issue #144): replace single `cstylecheck.py` references with package sub-modules — closes issue #146 |
@@ -39,9 +40,9 @@ This System Architecture Description defines the top-level structural and behavi
 | Document ID | Title | Version |
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.5 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.3 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.6 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.4 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 
 ---
 

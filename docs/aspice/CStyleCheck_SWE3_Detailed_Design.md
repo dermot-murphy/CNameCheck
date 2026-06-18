@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.9 |
-| **Project** | CStyleCheck | **Date** | 2026-06-08 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.10 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.10 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.9 | 2026-06-08 | Claude | Add UNIT-102 to UNIT-112 for 11 new rules (issues #221–#232); update §8 traceability |
 | 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Add UNIT-95 to UNIT-101 for five new features (inline suppression, fixer, wizard, per-dir config, HTML output); update §4.1 package structure; update §8 traceability — issues #188 #189 #190 #193 #192 |
@@ -40,9 +41,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.8 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.7 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.8 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.8 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.11 |
 
 ---
 

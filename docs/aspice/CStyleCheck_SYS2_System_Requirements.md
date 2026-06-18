@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.5 |
-| **Project** | CStyleCheck | **Date** | 2026-06-04 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.6 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-04 | Claude | Add SYS-F-041 to SYS-F-045 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output); update §6 RTM — issues #188 #189 #190 #193 #192 |
 | 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.2 "three modes" text (listed 4 modes), update §3.3 referenced doc versions — resolves issue #163 |
 | 1.3 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 and SYS-F-011 rule count 48→53; update referenced doc versions — resolves issue #163 |
@@ -54,8 +55,8 @@ The system is deployed in four integration modes:
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.6 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.3 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
 
 ### 3.4 Glossary
 

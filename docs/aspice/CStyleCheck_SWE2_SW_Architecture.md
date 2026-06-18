@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.7 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.8 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.7 | 2026-06-08 | Claude | ASPICE audit #238 — add COMP-05h (naming rules); extend §10 RTM with SWE1-078–088 |
 | 1.6 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.5 | 2026-06-04 | Claude | Add COMP-08 (Fixer), COMP-09 (Config Wizard), COMP-10 (Per-dir Config); add `parse_inline_suppressions` to COMP-04; add `_violations_to_html` to COMP-07; update §8.1 sequence; update §10 RTM — issues #188 #189 #190 #193 #192 |
@@ -41,10 +42,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.4 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.8 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.10 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 
 ---
 

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.8 |
-| **Project** | CStyleCheck | **Date** | 2026-06-08 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.8 | 2026-06-08 | Claude | Add SWE1-078 to SWE1-088 for 11 new rules (issues #221–#232); update RTM |
 | 1.7 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.6 | 2026-06-04 | Claude | Add SWE1-072 to SWE1-076 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output) — issues #188 #189 #190 #193 #192 |
@@ -46,10 +47,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.5 |
-| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.4 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.7 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.5 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.6 |
+| CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.8 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-ACQ4-001 | **Version** | 1.1 |
-| **Project** | CStyleCheck | **Date** | 2026-05-28 |
+| **Document ID** | CSC-ACQ4-001 | **Version** | 1.2 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | ACQ.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.2 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
 
@@ -43,10 +44,10 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-MAN3-001 | Project Management Plan | 1.0 |
-| CSC-MAN5-001 | Risk Management Plan | 1.0 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.1 |
-| CSC-SUP9-001 | Problem Resolution Management Plan | 1.0 |
+| CSC-MAN3-001 | Project Management Plan | 1.6 |
+| CSC-MAN5-001 | Risk Management Plan | 1.3 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP9-001 | Problem Resolution Management Plan | 1.2 |
 
 ---
 
