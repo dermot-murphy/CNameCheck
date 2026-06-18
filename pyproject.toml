@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name            = "cstylecheck"
-version         = "1.3.0"
+version         = "1.4.0"
 description     = "Embedded C Style Compliance Checker (Barr-C / MISRA-C complementary)"
 readme          = "README.md"
 license         = { text = "MIT" }
