@@ -2570,7 +2570,7 @@ class Checker:
         # [^()\n] prevents matching across newlines.
         # Allows one level of nested parens (e.g. while(fn());).
         _RE_INLINE_NULL = re.compile(
-            r'\b(?:while|for|if)[ \t]*\((?:[^()\n]*|\([^()\n]*\))*\)[ \t]*;',
+            r'\b(?:while|for|if)[ \t]*\((?:[^()\n]|\([^()\n]*\))*\)[ \t]*;',
         )
         for m in _RE_INLINE_NULL.finditer(self.clean):
             self._v(m.start(), sev, "misc.null_statement_comment",
