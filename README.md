@@ -312,7 +312,7 @@ uint32_t val = 100;  // cstylecheck: disable=misc.unsigned_suffix,misc.magic_num
 
 ---
 
-## Auto-fix mode (`--fix`)
+## Auto-fix mode
 
 CStyleCheck can apply safe, mechanical fixes in-place.  All currently fixable
 violations are zero-risk character substitutions.
@@ -341,7 +341,7 @@ qualify, so the flag is a forward-compatibility guard.
 
 ---
 
-## Config wizard (`--init` / `--preset`)
+## Config wizard
 
 Generate a starter `.cstylecheck.yml` without writing YAML by hand.
 
@@ -374,7 +374,7 @@ python src/cstylecheck.py --preset misra      # MISRA-oriented rule set
 
 ---
 
-## Per-directory config (`--per-dir-config`)
+## Per-directory config
 
 Enable hierarchical configuration where subdirectories can override the root
 `rules.yml` settings.
