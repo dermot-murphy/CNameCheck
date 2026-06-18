@@ -1,5 +1,6 @@
 """test_null_statement_comment.py — tests for misc.null_statement_comment (issue #228)."""
 import sys, os; sys.path.insert(0, os.path.dirname(__file__))
+import time
 import unittest
 from harness import cfg_only, has, clean, count
 
@@ -51,3 +52,17 @@ class TestNullStatementComment(unittest.TestCase):
             "}\n"
         )
         self.assertEqual(count(src, NS_CFG, "misc.null_statement_comment"), 2)
+
+    def test_no_catastrophic_backtracking_on_unclosed_condition(self):
+        # Regression test: the inline-null regex used a nested-quantifier
+        # alternation (?:[^()\n]*|\(...\))* which caused exponential
+        # backtracking when a line opened "if (" / "while (" / "for (" with
+        # a long run of plain characters and no matching ");" on that line.
+        long_line = "if (" + "a" * 5000 + "\n"
+        src = "void foo(void) {\n" + long_line + "}\n"
+        start = time.time()
+        has(src, NS_CFG, "misc.null_statement_comment")
+        elapsed = time.time() - start
+        self.assertLess(elapsed, 2.0,
+                         f"null_statement_comment check took {elapsed:.2f}s; "
+                         f"likely catastrophic regex backtracking")

@@ -751,26 +751,26 @@ class Checker:
             # Double pointer (**) → local part must start with pp_
             # The stars are captured directly in RE_VAR_DECL (group 3).
             #
-            # For function parameters the naming convention allows a parameter
-            # prefix (e.g. "p_") to precede the type prefix (e.g. "ptr_"),
-            # giving "p_ptr_name".  Accept the type prefix when it appears
-            # either directly at the start of the local part OR immediately
-            # after the configured parameter prefix.  This is independent of
-            # whether variable.parameter.p_prefix is enabled — it reflects the
-            # physical naming convention used by the project.
+            # The naming convention allows a parameter prefix (e.g. "p_") to
+            # precede the type prefix (e.g. "ptr_"), giving "p_ptr_name".
+            # Accept the type prefix when it appears either directly at the
+            # start of the local part OR immediately after the configured
+            # parameter prefix. This applies regardless of scope — a project
+            # may apply the same "p_ptr_name" convention to struct members,
+            # locals, and globals, not just function parameters — and is
+            # independent of whether variable.parameter.p_prefix is enabled,
+            # since it reflects the physical naming convention used by the
+            # project rather than the parameter-prefix rule itself.
             local_raw = self._strip_any_prefix(name)
 
             if stars == "**":
                 if pp_cfg.get("enabled", True):
                     pp_pfx = pp_cfg.get("prefix", "pp_")
                     pp_sev = pp_cfg.get("severity", "warning")
-                    if scope == "parameter":
-                        pp_ok = local_raw.startswith(pp_pfx) or (
-                            local_raw.startswith(_pp_param_pfx) and
-                            local_raw[len(_pp_param_pfx):].startswith(pp_pfx)
-                        )
-                    else:
-                        pp_ok = local_raw.startswith(pp_pfx)
+                    pp_ok = local_raw.startswith(pp_pfx) or (
+                        local_raw.startswith(_pp_param_pfx) and
+                        local_raw[len(_pp_param_pfx):].startswith(pp_pfx)
+                    )
                     if not pp_ok:
                         self._v(m.start(), pp_sev, "variable.pp_prefix",
                                 f"Double-pointer variable '{name}' local part "
@@ -779,13 +779,10 @@ class Checker:
                 if ptr_cfg.get("enabled", True):
                     p_pfx = ptr_cfg.get("prefix", "p_")
                     p_sev = ptr_cfg.get("severity", "warning")
-                    if scope == "parameter":
-                        ptr_ok = local_raw.startswith(p_pfx) or (
-                            local_raw.startswith(_pp_param_pfx) and
-                            local_raw[len(_pp_param_pfx):].startswith(p_pfx)
-                        )
-                    else:
-                        ptr_ok = local_raw.startswith(p_pfx)
+                    ptr_ok = local_raw.startswith(p_pfx) or (
+                        local_raw.startswith(_pp_param_pfx) and
+                        local_raw[len(_pp_param_pfx):].startswith(p_pfx)
+                    )
                     if not ptr_ok:
                         self._v(m.start(), p_sev, "variable.pointer_prefix",
                                 f"Pointer variable '{name}' local part should "
@@ -2573,7 +2570,7 @@ class Checker:
         # [^()\n] prevents matching across newlines.
         # Allows one level of nested parens (e.g. while(fn());).
         _RE_INLINE_NULL = re.compile(
-            r'\b(?:while|for|if)[ \t]*\((?:[^()\n]*|\([^()\n]*\))*\)[ \t]*;',
+            r'\b(?:while|for|if)[ \t]*\((?:[^()\n]|\([^()\n]*\))*\)[ \t]*;',
         )
         for m in _RE_INLINE_NULL.finditer(self.clean):
             self._v(m.start(), sev, "misc.null_statement_comment",
