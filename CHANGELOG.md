@@ -11,6 +11,28 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.1] — 2026-06-18
+
+### Fixed
+
+- **`variable.parameter.p_prefix` false positive on call statements** —
+  `RE_FUNCTION_DECL`/`RE_FUNCTION_DEF` allowed a zero-width separator between
+  the captured return-type token and the function-name token. Regex
+  backtracking on a plain call statement (e.g. `foo (args) ;`, a single
+  identifier with no real type/name split) could split that identifier into a
+  fake type + fake name, making the call match as if it were a declaration or
+  definition. The call's arguments were then parsed as parameters, producing
+  nonsensical `variable.parameter.p_prefix` violations (e.g. flagging `t` from
+  a `(uint16_t)` cast, or substrings of `interval`/`timeout`). Fixed by
+  requiring a real (non-zero-width) separator — whitespace and/or a pointer
+  star — between the return type and the name
+  (issue [#273](https://github.com/dermot-murphy/CStyleCheck/issues/273)).
+- **`docker_publish.yml` `github-release` job** — checkout step was missing
+  the explicit `token: secrets.GITHUB_TOKEN`, inconsistent with the
+  `build-and-push` job's checkout step.
+
+---
+
 ## [1.4.0] — 2026-06-18
 
 ### Added

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.11 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.12 |
 | **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.12 | 2026-06-18 | Claude | v1.4.1 patch (issue #273) — add 5 regression tests to `test_parameter_prefix.py` (42→47); update §6 total 1152→1157 |
 | 1.11 | 2026-06-18 | Claude | ASPICE audit #254 — update §6 test total 1143→1152 (49 modules) |
 | 1.10 | 2026-06-08 | Claude | ASPICE audit #238 — correct CSC-SWE3 version reference 1.8→1.9 in §3.1 |
 | 1.9 | 2026-06-08 | Claude | Add 11 new test modules (102 tests) for issues #221–#232; update §6 totals; update §7 traceability |
@@ -375,7 +376,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_exclusions.py` | 28 | 28 | 0 | COMP-02 |
 | `test_eof_comment.py` | 33 | 33 | 0 | `_check_eof_comment` |
 | `test_copyright_header.py` | 55 | 55 | 0 | `_check_copyright_header` |
-| `test_parameter_prefix.py` | 42 | 42 | 0 | `_check_variables` |
+| `test_parameter_prefix.py` | 47 | 47 | 0 | `_check_variables` |
 | `test_misra_rules.py` | 52 | 52 | 0 | `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_yoda` |
 | `test_block_comment_spacing.py` | 29 | 29 | 0 | `_check_block_comment_spacing` |
 | `test_workflow_config.py` | 16 | 16 | 0 | CI workflow configuration regression |
@@ -403,7 +404,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_macro_multistatement_wrapper.py` | 9 | 9 | 0 | COMP-01 (`_check_macro_multistatement_wrapper`) |
 | `test_identifier_length.py` | 10 | 10 | 0 | COMP-01 (`_check_identifier_length`) |
 | `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-01 (`_check_no_single_char_identifiers`) |
-| **Total** | **1152** | **1152** | **0** | All rules covered — 49 modules |
+| **Total** | **1157** | **1157** | **0** | All rules covered — 49 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)

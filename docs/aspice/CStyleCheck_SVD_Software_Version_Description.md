@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.10 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.11 |
 | **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.11 | 2026-06-18 | Claude | v1.4.1 patch release — fix `variable.parameter.p_prefix` false positive on call statements (issue #273); update version identifiers, release summary, change log |
 | 1.10 | 2026-06-18 | Claude | v1.4.0 release — update all version identifiers, release summary, change log, upgrade notes |
 | 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — fix internally inconsistent test counts: §3/§5.4/§8.2/§9 now all read 1152 tests / 49 modules (previously a mix of 1143 and stale 1041) |
 | 1.8 | 2026-06-08 | Claude | ASPICE audit #238 — update SWE1/SWE3/SWE4 version refs; correct rule count 53→64; update test count 1041→1143, 38→49 modules |
@@ -35,7 +36,7 @@
 
 ## 3. Purpose & Scope
 
-This **Software Version Description (SVD)** formally describes the **CStyleCheck v1.4.0** software release. It identifies the software items delivered, the baseline against which changes are recorded, and the configuration status of all controlled work products.
+This **Software Version Description (SVD)** formally describes the **CStyleCheck v1.4.1** software release. It identifies the software items delivered, the baseline against which changes are recorded, and the configuration status of all controlled work products.
 
 This document satisfies the release-identification and configuration-status-accounting requirements of **Automotive SPICE® PAM v4.0, SUP.8 — Configuration Management**.
 
@@ -46,7 +47,7 @@ This document satisfies the release-identification and configuration-status-acco
 | CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
 | CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.8 |
 | CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.10 |
-| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.11 |
+| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.12 |
 | CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.5 |
 | CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.6 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
@@ -62,27 +63,28 @@ This document satisfies the release-identification and configuration-status-acco
 | Field | Value |
 |---|---|
 | **Product Name** | CStyleCheck |
-| **Version** | 1.4.0 |
+| **Version** | 1.4.1 |
 | **Release Date** | 2026-06-18 |
-| **Release Type** | Minor Release |
-| **Git Tag** | `v1.4.0` |
+| **Release Type** | Patch Release |
+| **Git Tag** | `v1.4.1` |
 | **Branch** | `main` |
-| **Previous Release** | v1.3.0 (2026-06-05) |
+| **Previous Release** | v1.4.0 (2026-06-18) |
 | **Repository** | https://github.com/dermot-murphy/CStyleCheck |
 
 ### 4.2 Release Classification
 
-This is a **minor release** under Semantic Versioning. It is **backward-compatible** with v1.3.0: all existing `rules.yml` configurations, CLI flags, and pre-commit hook integrations continue to work without modification.
+This is a **patch release** under Semantic Versioning. It is **backward-compatible** with
+v1.4.0: no rule IDs, CLI flags, or `rules.yml` schema changed. It contains a single bug
+fix (issue [#273](https://github.com/dermot-murphy/CStyleCheck/issues/273)) plus an
+unrelated CI configuration correction — see §6.2.
 
-New capabilities are 11 new rules from issues #221–#232 (`macro.trailing_semicolon`,
+v1.4.0 itself added 11 new rules from issues #221–#232 (`macro.trailing_semicolon`,
 `macro.multistatement_wrapper`, `misc.function_length`, `misc.function_doc_header`,
 `misc.assert_density`, `misc.null_statement_comment`, `misc.declaration_spacing`,
 `misc.file_length`, `misc.reserved_header_name`, `naming.identifier_length`,
-`naming.no_single_char_identifiers`), bringing the total from 64 to **75 rule IDs**. All
-new rules are entirely additive; several are disabled by default. This release also
-includes three bug fixes (issues #245/#246, #248/#249, #251) — see §6.2. The CLI entry
-point, all pre-existing rule IDs, and all existing output formats remain
-backward-compatible with v1.3.0.
+`naming.no_single_char_identifiers`), bringing the total to **75 rule IDs** — unchanged
+in this patch. The CLI entry point, all rule IDs, and all existing output formats remain
+backward-compatible with v1.4.0.
 
 ---
 
@@ -106,7 +108,7 @@ backward-compatible with v1.3.0.
 | `src/cstylecheck/fixer.py` | Auto-fix engine: apply_fixes, unified_diff (`--fix`, `--dry-run`, `--safe-only`) | `src/cstylecheck/fixer.py` |
 | `src/cstylecheck/wizard.py` | Config wizard and preset writer (`--init`, `--preset`) | `src/cstylecheck/wizard.py` |
 | `src/rules.yml` | Rule configuration for the CStyleCheck project | `src/rules.yml` |
-| `src/_version.py` | Version string: `1.4.0` (generated by CI: `git describe --tags`) | `src/_version.py` |
+| `src/_version.py` | Version string: `1.4.1` (generated by CI: `git describe --tags`) | `src/_version.py` |
 | `src/aliases.txt` | Module alias map | `src/aliases.txt` |
 | `src/exclusions.yml` | Per-file rule suppressions | `src/exclusions.yml` |
 | `src/options.txt` | Project defaults for `--options-file` | `src/options.txt` |
@@ -120,8 +122,8 @@ backward-compatible with v1.3.0.
 
 | Registry | Image | Tags |
 |---|---|---|
-| Docker Hub | `dermotmurphy/cstylecheck` | `1.4.0`, `1.4`, `1`, `latest` |
-| GitHub Container Registry | `ghcr.io/dermot-murphy/cstylecheck` | `1.4.0`, `1.4`, `1`, `latest` |
+| Docker Hub | `dermotmurphy/cstylecheck` | `1.4.1`, `1.4`, `1`, `latest` |
+| GitHub Container Registry | `ghcr.io/dermot-murphy/cstylecheck` | `1.4.1`, `1.4`, `1`, `latest` |
 
 Platforms: `linux/amd64`, `linux/arm64`.
 
@@ -135,7 +137,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ### 5.4 Test Suite
 
-**Total: 1152 tests across 49 modules** — all passing.
+**Total: 1157 tests across 49 modules** — all passing.
 
 | Item | Test Count | Description |
 |---|---|---|
@@ -163,7 +165,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_whitespace_ratio.py` | 27 | misc.whitespace_ratio (new in v1.2.0) |
 | `tests/test_declared_not_defined.py` | 39 | misc.declared_not_defined (new in v1.2.0) |
 | `tests/test_misra_rules.py` | 52 | MISRA C rule coverage |
-| `tests/test_parameter_prefix.py` | 42 | variable.parameter.* rules |
+| `tests/test_parameter_prefix.py` | 47 | variable.parameter.* rules |
 | `tests/test_exclusions.py` | 28 | per-file rule suppression |
 | `tests/test_github_annotations.py` | 8 | GitHub Actions annotation output |
 | `tests/test_case_patterns.py` | 6 | case-pattern helper functions |
@@ -188,7 +190,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_macro_multistatement_wrapper.py` | 9 | `macro.multistatement_wrapper` rule |
 | `tests/test_identifier_length.py` | 10 | `naming.identifier_length` rule |
 | `tests/test_no_single_char_identifiers.py` | 8 | `naming.no_single_char_identifiers` rule |
-| **Total** | **1152** | |
+| **Total** | **1157** | |
 
 ### 5.5 Documentation
 
@@ -198,7 +200,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | CSC-SWE1-001 | Software Requirements Specification | 1.9 |
 | CSC-SWE2-001 | Software Architecture Design | 1.8 |
 | CSC-SWE3-001 | Software Detailed Design | 1.10 |
-| CSC-SWE4-001 | Software Unit Verification Specification | 1.11 |
+| CSC-SWE4-001 | Software Unit Verification Specification | 1.12 |
 | CSC-SWE5-001 | Software Integration Test Specification | 1.5 |
 | CSC-SWE6-001 | Software Qualification Test Specification | 1.6 |
 | CSC-SYS2-001 | System Requirements Specification | 1.6 |
@@ -218,7 +220,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ---
 
-## 6. Change Summary (v1.3.0 → v1.4.0)
+## 6. Change Summary (v1.3.0 → v1.4.1)
 
 ### 6.1 New Features
 
@@ -252,6 +254,16 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | D-007 | Fixed Wiki sidebar/README links: malformed triple-hyphen slugs and the non-functional "Rules and Configuration Reference" link | [#251](https://github.com/dermot-murphy/CStyleCheck/issues/251) |
 | D-008 | 102 new tests (1152 total) covering all 11 new rules, including edge cases for multi-line macros, nested braces, comment exclusion, and regex-based exemptions | — |
 
+### 6.4 v1.4.1 Patch (2026-06-18)
+
+| ID | Description | Issue |
+|---|---|---|
+| B-004 | `variable.parameter.p_prefix` false positive on call statements — `RE_FUNCTION_DECL`/`RE_FUNCTION_DEF` required only a zero-width-permitted separator between the return-type and name tokens, allowing regex backtracking to misparse a plain function-call statement (e.g. `foo (args) ;`) as a declaration/definition and check its call arguments as if they were parameters. Fixed by requiring a real separator (whitespace and/or pointer star) | [#273](https://github.com/dermot-murphy/CStyleCheck/issues/273) |
+| D-009 | `docker_publish.yml` `github-release` job's checkout step was missing `token: secrets.GITHUB_TOKEN`, inconsistent with the `build-and-push` job | — |
+| D-010 | 5 new regression tests (1157 total) covering the call-statement misparse scenario and confirming genuine parameter-naming violations are still detected | — |
+
+No new rules, no rule-ID changes, no `rules.yml` schema changes.
+
 ---
 
 ## 7. Known Issues and Limitations
@@ -272,7 +284,8 @@ The following issues are open at the time of this release and deferred to a futu
 
 ### 8.1 CI Status at Release
 
-All of the following CI checks passed on the `develop` branch before tag creation and merge to `main`:
+All of the following CI checks passed on the `fix/re-function-decl-call-misparse` branch
+before merge to `develop` and sync to `main`:
 
 | Check | Result |
 |---|---|
@@ -286,11 +299,11 @@ All of the following CI checks passed on the `develop` branch before tag creatio
 
 ### 8.2 Qualification Test Status
 
-All 1152 tests pass with no failures. Test counts per module are documented in §5.4.
+All 1157 tests pass with no failures. Test counts per module are documented in §5.4.
 
 ### 8.3 Docker Build
 
-The Docker image is built for `linux/amd64` and `linux/arm64` and published to Docker Hub and GHCR automatically on creation of the `v1.4.0` tag via `docker_publish.yml`.
+The Docker image is built for `linux/amd64` and `linux/arm64` and published to Docker Hub and GHCR automatically on creation of the `v1.4.1` tag via `docker_publish.yml`.
 
 ### 8.4 GitHub Pages / Wiki
 
@@ -300,20 +313,25 @@ The GitHub Wiki is rebuilt automatically on any push to `main` that touches `REA
 
 ## 9. Installation and Upgrade Notes
 
-### 9.1 Upgrade from v1.3.0
+### 9.1 Upgrade from v1.4.0
 
-No breaking changes. Upgrade steps:
+No breaking changes. This is a bug-fix-only patch. Upgrade steps:
 
 ```bash
 # pip / pipx
 pip install --upgrade cstylecheck
 
 # Docker
-docker pull dermotmurphy/cstylecheck:1.4.0
+docker pull dermotmurphy/cstylecheck:1.4.1
 
 # pre-commit (update rev in .pre-commit-config.yaml)
-rev: v1.4.0
+rev: v1.4.1
 ```
+
+Users who have `variables.parameter.p_prefix.enabled: true` (or the equivalent
+`variable.pointer_prefix` enforcement) configured and were seeing spurious violations on
+plain function-call statements should re-run CStyleCheck after upgrading — those false
+positives are eliminated by this patch.
 
 ### 9.2 New Features — Optional Activation
 
@@ -330,10 +348,10 @@ benefit from them.
 
 ### 9.3 Backward Compatibility
 
-The `src/cstylecheck.py` entry point shim is unchanged. All pre-existing rule IDs,
-existing `rules.yml` configurations, and pre-commit hook definitions are unchanged. The
-11 new rules added in this release bring the total to 75 rule IDs. Users who import the
-checker programmatically via `import cstylecheck` continue to work without modification.
+The `src/cstylecheck.py` entry point shim is unchanged. All rule IDs, existing
+`rules.yml` configurations, and pre-commit hook definitions are unchanged from v1.4.0
+(75 rule IDs total). Users who import the checker programmatically via
+`import cstylecheck` continue to work without modification.
 
 ---
 
@@ -348,14 +366,14 @@ checker programmatically via `import cstylecheck` continue to work without modif
 | Software Requirements | CSC-SWE1-001 | 1.9 | Released |
 | Software Architecture | CSC-SWE2-001 | 1.8 | Released |
 | Detailed Design | CSC-SWE3-001 | 1.10 | Released |
-| Unit Verification | CSC-SWE4-001 | 1.11 | Released |
+| Unit Verification | CSC-SWE4-001 | 1.12 | Released |
 | Integration Tests | CSC-SWE5-001 | 1.5 | Released |
 | Qualification Tests | CSC-SWE6-001 | 1.6 | Released |
-| Source Code | `src/cstylecheck/` (package) | 1.4.0 | Released |
-| Test Suite | `tests/` (1152 tests) | 1.4.0 | Released |
-| CI Automation | `.github/workflows/` + `scripts/ci/` | 1.4.0 | Released |
-| Docker Image | `Dockerfile/Dockerfile` | 1.4.0 | Released |
-| Change Log | `CHANGELOG.md` | 1.4.0 | Released |
+| Source Code | `src/cstylecheck/` (package) | 1.4.1 | Released |
+| Test Suite | `tests/` (1157 tests) | 1.4.1 | Released |
+| CI Automation | `.github/workflows/` + `scripts/ci/` | 1.4.1 | Released |
+| Docker Image | `Dockerfile/Dockerfile` | 1.4.1 | Released |
+| Change Log | `CHANGELOG.md` | 1.4.1 | Released |
 
 ---
 
@@ -372,4 +390,4 @@ checker programmatically via `import cstylecheck` continue to work without modif
 
 ---
 
-*End of Software Version Description — CStyleCheck v1.4.0*
+*End of Software Version Description — CStyleCheck v1.4.1*
