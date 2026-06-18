@@ -9,6 +9,10 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+
+## [1.4.0] — 2026-06-18
+
 ### Added
 
 - **`macro.trailing_semicolon` rule** — detects `#define` macros whose expansion ends

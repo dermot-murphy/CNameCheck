@@ -10,14 +10,14 @@ Contributions are very welcome.
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **64 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **75 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 📖 **[Rules and Configuration Reference](Rules-and-Configuration.md)** — full
-documentation for all 64 rules with YAML configuration and annotated C examples.
+documentation for all 75 rules with YAML configuration and annotated C examples.
 
 Draft companion documents (pending rule population, not yet authoritative):
 [Embedded C Style Guide](embedded_c_style_guide.md) ·
@@ -31,7 +31,7 @@ Draft companion documents (pending rule population, not yet authoritative):
 ```
 .pre-commit-hooks.yml   # pre-commit hook definition (id: cstylecheck)
 pyproject.toml           # pip / pipx / pre-commit packaging metadata
-Rules-and-Configuration.md  # wiki: all 64 rules with config and examples
+Rules-and-Configuration.md  # wiki: all 75 rules with config and examples
 src/
     cstylecheck.py          # thin CLI shim (backward-compatible entry point)
     cstylecheck/            # checker package (12 sub-modules)
@@ -41,7 +41,7 @@ src/
         models.py           # Violation, CheckResult, shared constants
         preprocessor.py     # comment/string stripping, token extraction
         utils.py            # case matching, module name helpers
-        checker.py          # main Checker class — all 64 rule implementations
+        checker.py          # main Checker class — all 75 rule implementations
         sign_checker.py     # cross-file sign-compatibility and declared_not_defined
         baseline.py         # baseline load/write
         output.py           # text / JSON / SARIF / HTML formatters, Tee, summary
@@ -484,6 +484,37 @@ Subprocess coverage now captures the CLI entry point in CI; `--cov-fail-under=85
   cards and per-file violation tables.
 
 #### Test suite: 1152 tests across 49 modules
+
+---
+
+### New in v1.4.0 (2026-06-18)
+
+- **`macro.trailing_semicolon`** — flags `#define` macros whose expansion ends with a
+  semicolon, preventing double-semicolon and dangling-else bugs at the call site.
+- **`macro.multistatement_wrapper`** — enforces that function-like macros containing
+  multiple statements are wrapped in `do { ... } while (0)`.
+- **`misc.function_length`** — configurable maximum function body line count, with
+  `count_comments: false` to exclude blank and comment-only lines.
+- **`misc.function_doc_header`** — requires a Doxygen-style `@brief`/`@param`/`@return`
+  block comment before each non-static function definition (disabled by default).
+- **`misc.assert_density`** — enforces a minimum number of `assert()` calls per qualifying
+  function, with per-function exemption via regex patterns (disabled by default).
+- **`misc.null_statement_comment`** — requires a comment whenever a null statement is used.
+- **`misc.declaration_spacing`** — enforces a blank line between variable declarations and
+  the first executable statement in a function body (disabled by default).
+- **`misc.file_length`** — configurable maximum total lines per source file.
+- **`misc.reserved_header_name`** — flags source files and `#include "..."` directives that
+  shadow a standard C or POSIX library header name.
+- **`naming.identifier_length`** — uniform minimum/maximum identifier-length check across
+  all identifier categories (disabled by default).
+- **`naming.no_single_char_identifiers`** — flags single-character variable names outside a
+  configurable exempt list (disabled by default).
+
+11 new rules, bringing the total to **75 rule IDs**. 102 new tests added (1152 total).
+
+Bug fixes: parameter/pointer naming-prefix false positives (#245, #246), a
+catastrophic-backtracking regex hang in `misc.null_statement_comment` (#248, #249), and
+broken GitHub Wiki links (#251).
 
 ---
 
