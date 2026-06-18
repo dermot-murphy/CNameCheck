@@ -93,7 +93,13 @@ RE_FUNCTION_DEF = re.compile(
     r"(?:(?:long[ \t]+long|long|short)[ \t]+)?"
     r"(?!(?:" + _CFKW + r")\b)"         # return type must NOT be a keyword
     r"\w+"                              # return type (one token)
-    r"[ \t]*\*?[ \t]*"
+    # A real declaration always has a visible separator (whitespace and/or
+    # pointer star) between the return type and the function name. A plain
+    # call statement (e.g. "foo (args) ;") is a single identifier with no
+    # such separator, so without this requirement \w+ can backtrack to peel
+    # off the call's trailing character as a fake "name" and misparse the
+    # call as a declaration (issue #273).
+    r"(?:[ \t]+\*{0,2}|\*{1,2})[ \t]*"
     r"([A-Za-z_]\w*)"                  # FUNCTION NAME — group 1
     r"[ \t]*\([^;{}]*\)"              # param list — [^;{}] matches newlines
     r"[ \t\n]*\{",                    # allow newline before opening brace
@@ -110,7 +116,9 @@ RE_FUNCTION_DECL = re.compile(
     r"(?:(?:long[ \t]+long|long|short)[ \t]+)?"
     r"(?!(?:" + _CFKW + r")\b)"
     r"\w+"                              # return type
-    r"[ \t]*\*?[ \t]*"
+    # See RE_FUNCTION_DEF above: require a real separator so a bare call
+    # statement's identifier can't be split into a fake type+name pair.
+    r"(?:[ \t]+\*{0,2}|\*{1,2})[ \t]*"
     r"([A-Za-z_]\w*)"                  # FUNCTION NAME — group 1
     r"[ \t]*\([^;{}]*\)"              # param list — [^;{}] matches newlines
     r"[ \t\n]*;",                     # ends with semicolon (declaration)
