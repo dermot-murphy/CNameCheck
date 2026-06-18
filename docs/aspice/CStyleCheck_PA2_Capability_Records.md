@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.10 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.11 |
 | **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.11 | 2026-06-18 | Claude | Fix §6 verdict summary arithmetic (11 F, 6 L → 9 F, 8 L; table itself was already correct); bump CSC-AUD-007 §5.4 entry to v1.1 (matching erratum); reorganise Wiki publishing into Deviations/Audits sections — see issue tracker |
 | 1.10 | 2026-06-18 | Claude | CSC-AUD-007 — §6 was stale since 2026-05-28 (predated issue #152 closure and superseding audit CSC-AUD-002); resync §6 ratings/verdict to current `main` (v1.4.0); CL2 confirmed ACHIEVED; add §5.4 rows for CSC-AUD-002/CSC-AUD-007 |
 | 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — update §4.1/§5.4/§6 SWE.4 test count 965→1152; mark CI-017 released at v1.3.0 |
 | 1.8 | 2026-06-04 | Claude | Deep accuracy audit: fix §4.1 SWE.3 unit count (46→90), SUP.8 CI count (27→34), §6 SWE.3 (89→90) and SUP.8 (29→34); update §5.4 document version table — resolves issue #163 |
@@ -208,7 +209,7 @@ All work products are reviewed before approval according to the following schedu
 | CSC-AUD-002 | ASPICE Internal Audit — CL2 Re-assessment (2026-05-29) | 1.0 | Released | v1.2.1 tag |
 | CSC-AUD-003 | ASPICE Internal Audit — Accuracy (2026-06-04) | 1.0 | Released | issue #163 audit |
 | CSC-AUD-004 | ASPICE Internal Audit — Deep Accuracy (2026-06-04) | 1.0 | Released | issue #163 deep audit |
-| CSC-AUD-007 | ASPICE Internal Audit — CL2 Re-assessment (2026-06-18) | 1.0 | Released | v1.4.0 tag |
+| CSC-AUD-007 | ASPICE Internal Audit — CL2 Re-assessment (2026-06-18) | 1.1 | Released | v1.4.0 tag |
 | CI-001 | `src/cstylecheck/` package | 1.2.0 | Released | v1.2.0 tag |
 | CI-017 | Test suite (1152 tests) | 1.3.0 | Released | v1.3.0+ |
 
@@ -242,7 +243,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 > **📋 Rating scale:** N = Not achieved (0–15%), P = Partially achieved (15–50%), L = Largely achieved (50–85%), F = Fully achieved (85–100%). All processes must achieve **L or F** at PA 2.1 and PA 2.2 for CL2 to be awarded.
 >
-> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **L or F** (11 F, 6 L, 0 P/N). One corrective action remains open — **AUD7-F-001**: the 11 rules added in v1.3.0/v1.4.0 (issues #221–#232) have requirements/design/unit-test coverage (SWE.1/SWE.3/SWE.4) but no integration-, system-, or qualification-level test cases yet (SWE.5/SYS.4/SYS.5/SWE.6); `SYS-VTC-003`/`SWQ-003` still cite "53 rule IDs" instead of 75. This downgrades SWE.5 and SWE.6 from F to L but does not affect the CL2 award. Targeted for the v1.5.0 cycle. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
+> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **L or F** (9 F, 8 L, 0 P/N). One corrective action remains open — **AUD7-F-001**: the 11 rules added in v1.3.0/v1.4.0 (issues #221–#232) have requirements/design/unit-test coverage (SWE.1/SWE.3/SWE.4) but no integration-, system-, or qualification-level test cases yet (SWE.5/SYS.4/SYS.5/SWE.6); `SYS-VTC-003`/`SWQ-003` still cite "53 rule IDs" instead of 75. This downgrades SWE.5 and SWE.6 from F to L but does not affect the CL2 award. Targeted for the v1.5.0 cycle. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
 >
 > **Ratings assigned by internal audit CSC-AUD-007, 2026-06-18 (supersedes CSC-AUD-001 2026-05-28 and CSC-AUD-002 2026-05-29 for this table).**
 
