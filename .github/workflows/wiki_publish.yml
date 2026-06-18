@@ -4,7 +4,7 @@
 # =============================================================================
 #
 # Triggers:
-#   - Push to main when README.md or docs/aspice/ changes
+#   - Push to main when README.md, Rules-and-Configuration.md, or docs/aspice/ changes
 #   - Manual trigger (workflow_dispatch)
 #
 # What it does:
@@ -54,6 +54,7 @@ on:
       - main
     paths:
       - "README.md"
+      - "Rules-and-Configuration.md"
       - "docs/aspice/**.md"
       - ".github/workflows/wiki_publish.yml"
   workflow_dispatch:
@@ -139,7 +140,6 @@ jobs:
               "Structured output":                    "Structured-output",
               "Baseline suppression":                 "Baseline-suppression",
               "New in this release":                  "New-in-this-release",
-              "Rule IDs (48 total)":                  "Rule-IDs",
               "Dictionary files":                     "Dictionary-files",
               "pre-commit":                           "Pre-commit",
               "Docker":                               "Docker",
@@ -148,15 +148,49 @@ jobs:
               "GitHub Actions (CI workflow)":         "CI-Workflows",
           }
 
+          # README_SLUG_MAP is keyed on the literal heading text, so any heading
+          # that embeds a changing count (e.g. "Rule IDs (N total)") would need
+          # its map entry updated every time the count changes — easy to miss
+          # (it was, going from 48 to 64). Match on a stable prefix instead.
+          README_SLUG_PREFIX_MAP = {
+              "Rule IDs": "Rule-IDs",
+          }
+
+          # Top-level repo docs (outside README.md / docs/aspice/) that are
+          # published to the wiki as their own page. Maps the relative link
+          # target used in README.md to the wiki page slug.
+          TOP_LEVEL_DOC_MAP = {
+              "Rules-and-Configuration.md": "Rules-and-Configuration",
+          }
+
+          def rewrite_local_doc_links(text):
+              """Rewrite links to top-level repo docs into wiki [[Text|Slug]] links.
+              Plain markdown links like [Text](Rules-and-Configuration.md) resolve to
+              a non-existent page once published to the wiki's flat namespace."""
+              def _fix(m):
+                  link_text, target = m.group(1), m.group(2)
+                  if target in TOP_LEVEL_DOC_MAP:
+                      return f'[[{link_text}|{TOP_LEVEL_DOC_MAP[target]}]]'
+                  return m.group(0)
+              return re.sub(r'\[([^\]]+)\]\(([^)]+)\)', _fix, text)
+
           def readme_slug(h):
               if h in README_SLUG_MAP:
                   return README_SLUG_MAP[h]
+              for prefix, slug in README_SLUG_PREFIX_MAP.items():
+                  if h.startswith(prefix):
+                      return slug
               s = re.sub(r'[^\w\s-]', '', h)
-              return re.sub(r'\s+', '-', s.strip())
+              s = re.sub(r'\s+', '-', s.strip())
+              s = re.sub(r'-+', '-', s).strip('-')
+              return s
 
           def aspice_slug(filename):
               stem = filename[:-3] if filename.endswith('.md') else filename
               stem = re.sub(r'^CStyleCheck_', '', stem)
+              # Audit report filenames already start with "ASPICE_" - strip it
+              # too, otherwise the slug doubles up as "ASPICE-ASPICE-...".
+              stem = re.sub(r'^ASPICE_', '', stem)
               stem = stem.replace('_', '-')
               return 'ASPICE-' + stem
 
@@ -214,7 +248,7 @@ jobs:
               + "---\n\n## Contents\n\n"
               + "\n".join(home_toc) + "\n"
           )
-          write("wiki/Home.md", rewrite_images(home_md))
+          write("wiki/Home.md", rewrite_images(rewrite_local_doc_links(home_md)))
 
           # One page per README section
           for idx, heading in enumerate(ordered):
@@ -224,17 +258,35 @@ jobs:
               prev_s     = readme_slug(ordered[idx - 1]) if idx > 0 else "Home"
               next_label = ordered[idx + 1] if idx < len(ordered) - 1 else None
               next_s     = readme_slug(ordered[idx + 1]) if idx < len(ordered) - 1 else None
-              write(f"wiki/{s}.md",
-                    rewrite_images(body.rstrip() + nav_footer(prev_label, prev_s, next_label, next_s)))
+              page = rewrite_local_doc_links(body.rstrip()) + nav_footer(prev_label, prev_s, next_label, next_s)
+              write(f"wiki/{s}.md", rewrite_images(page))
 
           print(f"Wrote {len(ordered)} README section pages.")
 
-          # ASPICE pages - all flat in wiki root with ASPICE- prefix
-          aspice_src   = Path("docs/aspice")
-          aspice_files = []
+          # Top-level repo docs published as their own wiki page (e.g. the
+          # full Rules-and-Configuration reference linked from the README intro).
+          for rel_path, slug in TOP_LEVEL_DOC_MAP.items():
+              src = Path(rel_path)
+              if not src.is_file():
+                  print(f"  WARNING: {rel_path} not found - skipping its wiki page.")
+                  continue
+              raw = src.read_text(encoding="utf-8")
+              write(f"wiki/{slug}.md", rewrite_images(raw.rstrip() + nav_footer()))
+          print(f"Wrote {len(TOP_LEVEL_DOC_MAP)} top-level doc page(s).")
 
-          if aspice_src.is_dir():
-              for src in sorted(aspice_src.glob("*.md")):
+          # ASPICE pages - all flat in wiki root with ASPICE- prefix.
+          # docs/aspice/ holds the 21 work products + supporting reports;
+          # docs/aspice/audits/ holds the dated, immutable internal audit
+          # reports - both are published the same way, just classified
+          # into different Wiki sidebar sections (see classify() below).
+          def publish_aspice_dir(src_dir):
+              """Convert every *.md in src_dir to a flat wiki page. Returns
+              the list of filenames written."""
+              files = []
+              if not src_dir.is_dir():
+                  print(f"{src_dir} not found - skipping its pages.")
+                  return files
+              for src in sorted(src_dir.glob("*.md")):
                   raw = src.read_text(encoding="utf-8")
                   # Strip YAML front-matter
                   raw = re.sub(r'^---\s*\n.*?\n---\s*\n', '', raw, flags=re.DOTALL)
@@ -250,22 +302,34 @@ jobs:
                   footer = "\n\n---\n\n*[[ASPICE Documentation Index|ASPICE-Index]]*\n"
                   page_slug = aspice_slug(src.name)
                   write(f"wiki/{page_slug}.md", raw.rstrip() + footer)
-                  aspice_files.append(src.name)
-              print(f"Wrote {len(aspice_files)} ASPICE pages.")
-          else:
-              print("docs/aspice/ not found - skipping ASPICE pages.")
+                  files.append(src.name)
+              return files
+
+          aspice_src   = Path("docs/aspice")
+          aspice_files = publish_aspice_dir(aspice_src)
+          print(f"Wrote {len(aspice_files)} ASPICE pages.")
+
+          audit_files  = publish_aspice_dir(aspice_src / "audits")
+          print(f"Wrote {len(audit_files)} ASPICE audit pages.")
+
+          doc_paths = {f: aspice_src / f for f in aspice_files}
+          doc_paths.update({f: aspice_src / "audits" / f for f in audit_files})
 
           # ASPICE-Index.md
           now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
           def classify(fn):
+              # Match "_<CODE><digit>" rather than a bare substring - otherwise
+              # e.g. "_ACQ4_Supplier_..." misclassifies as Support (_SUP is a
+              # substring of _SUPplier).
               u = fn.upper()
-              if '_SYS' in u:  return "System Engineering (SYS)"
-              if '_SWE' in u:  return "Software Engineering (SWE)"
-              if '_MAN' in u:  return "Management (MAN)"
-              if '_SUP' in u:  return "Support Processes (SUP)"
-              if '_ACQ' in u:  return "Acquisition (ACQ)"
-              if '_PA'  in u:  return "Capability Level 2 (PA 2.1 / PA 2.2)"
+              if re.search(r'_SYS\d', u): return "System Engineering (SYS)"
+              if re.search(r'_SWE\d', u): return "Software Engineering (SWE)"
+              if re.search(r'_MAN\d', u): return "Management (MAN)"
+              if re.search(r'_SUP\d', u): return "Support Processes (SUP)"
+              if re.search(r'_ACQ\d', u): return "Acquisition (ACQ)"
+              if re.search(r'_PA\d',  u): return "Capability Level 2 (PA 2.1 / PA 2.2)"
+              if re.search(r'_DEV\d', u): return "Deviations (DEV)"
               return "Other"
 
           group_order = [
@@ -275,11 +339,16 @@ jobs:
               "Support Processes (SUP)",
               "Acquisition (ACQ)",
               "Capability Level 2 (PA 2.1 / PA 2.2)",
+              "Deviations (DEV)",
+              "Internal Audits (AUD)",
               "Other",
           ]
           groups = {g: [] for g in group_order}
           for f in aspice_files:
               groups[classify(f)].append(f)
+          # Audit reports are classified by directory, not filename pattern -
+          # their names don't follow the "_XXX" process-code convention.
+          groups["Internal Audits (AUD)"] = audit_files
 
           idx_lines = [
               "# ASPICE CL2 Documentation",
@@ -301,23 +370,28 @@ jobs:
                   idx_lines.append(f"- [[{aspice_display(f)}|{aspice_slug(f)}]]")
               idx_lines.append("")
 
-          if aspice_files:
+          all_aspice_files = aspice_files + audit_files
+          if all_aspice_files:
               idx_lines += ["---", "", "## Document ID Reference", "",
                             "| Document ID | Process | Page |",
                             "|---|---|---|"]
-              for f in aspice_files:
+              for f in all_aspice_files:
                   doc_id = process = ""
-                  src = aspice_src / f
-                  if src.exists():
+                  src = doc_paths.get(f)
+                  if src and src.exists():
                       for line in src.read_text(encoding="utf-8").splitlines():
                           if not doc_id:
+                              # Work products use "Document ID"; audit
+                              # reports use "Audit ID" instead.
                               m = re.search(
-                                  r'\|\s*\*\*Document ID\*\*\s*\|\s*(\S+)\s*\|', line)
+                                  r'\|\s*\*\*(?:Document|Audit) ID\*\*\s*\|\s*(\S+)\s*\|', line)
                               if m:
                                   doc_id = m.group(1)
                           if not process:
+                              # Work products use "Related Process"; audit
+                              # reports use "Scope" instead.
                               p = re.search(
-                                  r'\|\s*\*\*Related Process\*\*\s*\|\s*([^\|]+?)\s*\|', line)
+                                  r'\|\s*\*\*(?:Related Process|Scope)\*\*\s*\|\s*([^\|]+?)\s*\|', line)
                               if p:
                                   process = p.group(1).strip()
                           if doc_id and process:
@@ -336,6 +410,7 @@ jobs:
               "",
               "**User Guide**",
               "",
+              "- [[Rules and Configuration Reference|Rules-and-Configuration]]",
           ]
           for h in ordered:
               sidebar.append(f"- [[{h}|{readme_slug(h)}]]")
@@ -413,7 +488,7 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           README_SECTIONS=$(grep -c "^## " README.md || echo "0")
-          ASPICE_COUNT=$(find docs/aspice -maxdepth 1 -name "*.md" 2>/dev/null \
+          ASPICE_COUNT=$(find docs/aspice -name "*.md" 2>/dev/null \
                          | wc -l | tr -d ' ')
 
           {

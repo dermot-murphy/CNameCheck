@@ -12,6 +12,10 @@
 #   - GitHub Container Registry  ghcr.io/<owner>/<repo>
 #   - Docker Hub cstylecheck
 #
+# On a version tag push, also creates a GitHub Release whose notes are the
+# matching "## [x.y.z]" section of CHANGELOG.md (falls back to GitHub's
+# auto-generated notes if no matching section is found).
+#
 # Required secrets (Settings → Secrets and variables → Actions):
 #   DOCKERHUB_USERNAME   Your Docker Hub username
 #   DOCKERHUB_TOKEN      Docker Hub access token (not your password)
@@ -152,3 +156,60 @@ jobs:
           repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
           readme-filepath: README.md
         continue-on-error: true   # non-fatal — Hub description is nice-to-have
+
+  github-release:
+    name: Create GitHub Release
+    needs: build-and-push
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # needed to create the release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Extract the matching CHANGELOG.md section as release notes ──────────
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          python3 - <<'PYEOF'
+          import os
+          import re
+
+          version = os.environ["GITHUB_REF_NAME"].lstrip("v")
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          pattern = re.compile(
+              r"^## \[" + re.escape(version) + r"\][^\n]*\n(.*?)(?=\n## \[|\Z)",
+              re.DOTALL | re.MULTILINE,
+          )
+          match = pattern.search(text)
+          notes = match.group(1).strip() if match else ""
+          notes = re.sub(r"\n?-{3,}\s*$", "", notes).strip()
+
+          with open("release_notes.md", "w", encoding="utf-8") as f:
+              f.write(notes)
+          print(f"Extracted {len(notes)} chars of release notes for {version}")
+          PYEOF
+
+      # ── Create the release (skip if it already exists, e.g. re-run) ─────────
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            echo "Release ${GITHUB_REF_NAME} already exists — skipping"
+            exit 0
+          fi
+          if [ -s release_notes.md ]; then
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --notes-file release_notes.md
+          else
+            echo "No matching CHANGELOG.md section for ${GITHUB_REF_NAME} — using auto-generated notes"
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --generate-notes
+          fi

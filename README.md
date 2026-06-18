@@ -10,14 +10,19 @@ Contributions are very welcome.
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **64 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **75 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 📖 **[Rules and Configuration Reference](Rules-and-Configuration.md)** — full
-documentation for all 64 rules with YAML configuration and annotated C examples.
+documentation for all 75 rules with YAML configuration and annotated C examples.
+
+Draft companion documents (pending rule population, not yet authoritative):
+[Embedded C Style Guide](embedded_c_style_guide.md) ·
+[Embedded C Coding Standard](embedded_c_coding_standard.md) ·
+[External C Coding Standards — Survey and Analysis](external_standards_analysis.md)
 
 ---
 
@@ -26,7 +31,7 @@ documentation for all 64 rules with YAML configuration and annotated C examples.
 ```
 .pre-commit-hooks.yml   # pre-commit hook definition (id: cstylecheck)
 pyproject.toml           # pip / pipx / pre-commit packaging metadata
-Rules-and-Configuration.md  # wiki: all 64 rules with config and examples
+Rules-and-Configuration.md  # wiki: all 75 rules with config and examples
 src/
     cstylecheck.py          # thin CLI shim (backward-compatible entry point)
     cstylecheck/            # checker package (12 sub-modules)
@@ -36,7 +41,7 @@ src/
         models.py           # Violation, CheckResult, shared constants
         preprocessor.py     # comment/string stripping, token extraction
         utils.py            # case matching, module name helpers
-        checker.py          # main Checker class — all 64 rule implementations
+        checker.py          # main Checker class — all 75 rule implementations
         sign_checker.py     # cross-file sign-compatibility and declared_not_defined
         baseline.py         # baseline load/write
         output.py           # text / JSON / SARIF / HTML formatters, Tee, summary
@@ -64,7 +69,7 @@ tests/
     test_dictionaries.py    #  32 tests: dict file loading and CLI flags
     test_misc_improvements.py #  77 tests: unsigned_suffix, loop vars, numerics
     test_defines.py         #  16 tests: constant.* / macro.*
-    test_variables.py       #  35 tests: all variable.* rules
+    test_variables.py       #  43 tests: all variable.* rules
     test_functions.py       #  14 tests: function.*
     test_typedefs.py        #   8 tests: typedef.*
     test_enums.py           #  11 tests: enum.*
@@ -96,7 +101,7 @@ tests/
     test_function_length.py #  11 tests: misc.function_length
     test_function_doc_header.py # 12 tests: misc.function_doc_header
     test_assert_density.py  #   8 tests: misc.assert_density
-    test_null_statement_comment.py # 9 tests: misc.null_statement_comment
+    test_null_statement_comment.py # 10 tests: misc.null_statement_comment
     test_declaration_spacing.py #  8 tests: misc.declaration_spacing
     test_file_length.py     #   8 tests: misc.file_length
     test_reserved_header_name.py # 10 tests: misc.reserved_header_name
@@ -104,11 +109,14 @@ tests/
     test_macro_multistatement_wrapper.py # 9 tests: macro.multistatement_wrapper
     test_identifier_length.py #  10 tests: naming.identifier_length
     test_no_single_char_identifiers.py # 8 tests: naming.no_single_char_identifiers
+    test_config_loading.py  #  13 tests: rules.yml / config loading edge cases
+    test_preprocessor.py    #  76 tests: comment/string stripping, token extraction
+    test_update_config.py   #  27 tests: per-directory and config merge updates
 Dockerfile/
     Dockerfile               # multi-platform Docker image
     .dockerignore
 .github/workflows/
-    cstylecheck_tests.yml      # runs the test suite on every commit (1143 tests)
+    cstylecheck_tests.yml      # runs the test suite on every commit (1152 tests)
     rules.yml    # runs linter + trend page on C source commits
     docker_publish.yml       # builds and pushes image to GHCR and Docker Hub
     wiki_publish.yml         # publishes GitHub Wiki from README + ASPICE docs
@@ -312,7 +320,7 @@ uint32_t val = 100;  // cstylecheck: disable=misc.unsigned_suffix,misc.magic_num
 
 ---
 
-## Auto-fix mode (`--fix`)
+## Auto-fix mode
 
 CStyleCheck can apply safe, mechanical fixes in-place.  All currently fixable
 violations are zero-risk character substitutions.
@@ -341,7 +349,7 @@ qualify, so the flag is a forward-compatibility guard.
 
 ---
 
-## Config wizard (`--init` / `--preset`)
+## Config wizard
 
 Generate a starter `.cstylecheck.yml` without writing YAML by hand.
 
@@ -374,7 +382,7 @@ python src/cstylecheck.py --preset misra      # MISRA-oriented rule set
 
 ---
 
-## Per-directory config (`--per-dir-config`)
+## Per-directory config
 
 Enable hierarchical configuration where subdirectories can override the root
 `rules.yml` settings.
@@ -441,7 +449,7 @@ suppressed rule, delete its entries from the baseline and commit.
 #### Package refactor
 
 The monolithic `cstylecheck.py` (~3 200 lines) has been split into a proper Python package
-(`src/cstylecheck/`) with 10 focused sub-modules. The CLI entry point `cstylecheck` and all
+(`src/cstylecheck/`) with 12 focused sub-modules. The CLI entry point `cstylecheck` and all
 existing command-line flags are fully backward-compatible — nothing changes for users.
 
 #### Three new lint rules
@@ -461,6 +469,52 @@ prefixes, per-file exclusions, GitHub annotations, case-pattern helpers, and thr
 #### Coverage gate: 85% combined (statement + branch)
 
 Subprocess coverage now captures the CLI entry point in CI; `--cov-fail-under=85` enforced.
+
+### New in v1.3.0 (2026-06-05)
+
+- **Inline suppression comments** — `// cstylecheck: disable=rule.id` (same-line),
+  `disable-next-line=`, and paired `disable=`/`enable=` block directives.
+- **Auto-fix mode** (`--fix`, `--dry-run`, `--safe-only`) — applies safe mechanical fixes
+  such as `misc.unsigned_suffix` and `misc.lowercase_l_suffix` in place.
+- **Config wizard and presets** (`--init`, `--preset barr-c|minimal|misra`) — interactive
+  `.cstylecheck.yml` generation, or a pre-built preset written non-interactively.
+- **Per-directory config** (`--per-dir-config`) — deep-merges the nearest `.cstylecheck.yml`
+  found walking up from each source file, honouring `root: true`.
+- **HTML report output** (`--output-format html`) — self-contained report with summary
+  cards and per-file violation tables.
+
+#### Test suite: 1152 tests across 49 modules
+
+---
+
+### New in v1.4.0 (2026-06-18)
+
+- **`macro.trailing_semicolon`** — flags `#define` macros whose expansion ends with a
+  semicolon, preventing double-semicolon and dangling-else bugs at the call site.
+- **`macro.multistatement_wrapper`** — enforces that function-like macros containing
+  multiple statements are wrapped in `do { ... } while (0)`.
+- **`misc.function_length`** — configurable maximum function body line count, with
+  `count_comments: false` to exclude blank and comment-only lines.
+- **`misc.function_doc_header`** — requires a Doxygen-style `@brief`/`@param`/`@return`
+  block comment before each non-static function definition (disabled by default).
+- **`misc.assert_density`** — enforces a minimum number of `assert()` calls per qualifying
+  function, with per-function exemption via regex patterns (disabled by default).
+- **`misc.null_statement_comment`** — requires a comment whenever a null statement is used.
+- **`misc.declaration_spacing`** — enforces a blank line between variable declarations and
+  the first executable statement in a function body (disabled by default).
+- **`misc.file_length`** — configurable maximum total lines per source file.
+- **`misc.reserved_header_name`** — flags source files and `#include "..."` directives that
+  shadow a standard C or POSIX library header name.
+- **`naming.identifier_length`** — uniform minimum/maximum identifier-length check across
+  all identifier categories (disabled by default).
+- **`naming.no_single_char_identifiers`** — flags single-character variable names outside a
+  configurable exempt list (disabled by default).
+
+11 new rules, bringing the total to **75 rule IDs**. 102 new tests added (1152 total).
+
+Bug fixes: parameter/pointer naming-prefix false positives (#245, #246), a
+catastrophic-backtracking regex hang in `misc.null_statement_comment` (#248, #249), and
+broken GitHub Wiki links (#251).
 
 ---
 
