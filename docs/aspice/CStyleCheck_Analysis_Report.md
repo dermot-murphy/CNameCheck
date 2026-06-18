@@ -3,6 +3,8 @@
 *Automotive SPICE® V4 · MISRA C · CI/CD · Code Quality | Generated 2026-04-17*
 *Updated 2026-05-28 — post-v1.2 internal audit CSC-AUD-001 status addendum appended (§7)*
 
+> **⚠️ Historical snapshot — not maintained past v1.2.1.** This report and its §7 addendum reflect the codebase as of 2026-05-28 (v1.2.1). Three releases (v1.3.0, v1.4.0) and five further internal audits (CSC-AUD-002 through CSC-AUD-007) have landed since. For the current ASPICE CL2 status, see `CSC-PA2-001` §6 and the latest audit: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
+
 | Metric | Count |
 |---|---|
 | Files analysed | 87 (initial) / 102 (post-refactor) |

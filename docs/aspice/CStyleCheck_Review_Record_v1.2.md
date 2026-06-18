@@ -2,6 +2,8 @@
 
 *Produced using CSC-REVIEW-TEMPLATE-001 v1.0*
 
+> **⚠️ Historical snapshot — pinned to the v1.2.1 baseline, not re-run for later releases.** This record covers the 21 work products as reviewed on 2026-05-29. It is not updated each release; a new review record would need a new document ID/version. For the current document and CL2 status, see `CSC-PA2-001` §5.4/§6 and the latest audit, CSC-AUD-007 (`docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md`).
+
 ---
 
 ## 1. Review Identification

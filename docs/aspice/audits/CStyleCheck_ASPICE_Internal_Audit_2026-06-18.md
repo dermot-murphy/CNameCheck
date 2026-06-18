@@ -78,7 +78,7 @@ This does **not** block CL2 — L is a passing rating — but it is the top corr
 
 ### 4.1 Overall CL2 Verdict
 
-**✅ ASPICE CL2 IS ACHIEVED at v1.4.0.** All 17 processes rate **L or F** (11 F, 6 L, 0 P/N). The `CSC-PA2-001` §6 table's "NOT YET ACHIEVED" verdict was stale — it predated both the closure of issue #152 (2026-05-28) and the superseding re-assessment CSC-AUD-002 (2026-05-29) by several weeks, and was never refreshed across five subsequent document revisions.
+**✅ ASPICE CL2 IS ACHIEVED at v1.4.0.** All 17 processes rate **L or F** (9 F, 8 L, 0 P/N). The `CSC-PA2-001` §6 table's "NOT YET ACHIEVED" verdict was stale — it predated both the closure of issue #152 (2026-05-28) and the superseding re-assessment CSC-AUD-002 (2026-05-29) by several weeks, and was never refreshed across five subsequent document revisions.
 
 One corrective action remains open (AUD7-F-001/#261: extend SWE.5/SYS.4/SYS.5/SWE.6 verification scope to the 11 rules added in v1.3.0/v1.4.0), tracked for the v1.5.0 cycle. It does not affect the CL2 award since the affected processes still rate L.
 
@@ -111,5 +111,7 @@ CL2 was actually achieved on 2026-05-29 (CSC-AUD-002, at v1.2.1) and remains ach
 
 ---
 
-*Document: CSC-AUD-007 · Version 1.0 · 2026-06-18*
+*Erratum (v1.1, 2026-06-18): §4.1 summary corrected from "11 F, 6 L" to "9 F, 8 L" to match the §4 table; the row-by-row ratings and the CL2 ACHIEVED verdict were already correct and are unaffected.*
+
+*Document: CSC-AUD-007 · Version 1.1 · 2026-06-18*
 *Location: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md`*
