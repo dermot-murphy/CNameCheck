@@ -169,6 +169,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # ── Extract the matching CHANGELOG.md section as release notes ──────────
       - name: Extract release notes from CHANGELOG.md

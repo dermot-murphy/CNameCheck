@@ -508,5 +508,77 @@ class TestParamPrefixCombinedNoFalsePositive(unittest.TestCase):
             "p_p_buf should satisfy both p_prefix and pointer_prefix='p_'")
 
 
+# ===========================================================================
+# Regression: a function-CALL statement inside a function body must not be
+# misparsed as a declaration/definition (GitHub issue #273).
+#
+# RE_FUNCTION_DECL / RE_FUNCTION_DEF require a "return type" token followed
+# by a "name" token before "(args)". A call statement like "foo (args) ;" is
+# only a single identifier, but without a mandatory separator between the
+# two captured tokens, regex backtracking could peel off the call's last
+# character as a fake "name", turning the call into a fake declaration whose
+# "parameters" (the call's actual arguments) then got checked as if they
+# were real function parameters.
+# ===========================================================================
+
+class TestCallStatementNotMisparsedAsDeclaration(unittest.TestCase):
+
+    def test_zero_param_function_call_in_body_not_flagged(self):
+        """Reproduces app_normal.c:712 — call inside a (void) function."""
+        src = (
+            "void f (void)\n"
+            "{\n"
+            "    API_Radio_Field_ParameterPut (0U, (uint16_t) data.param.period) ;\n"
+            "}\n"
+        )
+        self.assertFalse(has(src, ON, RULE))
+
+    def test_call_with_correctly_prefixed_args_not_flagged(self):
+        """Reproduces api_ble.c:248 — call whose args are already 'p_'-prefixed."""
+        src = (
+            "void API_Ble_ProtocolInit (uint32_t p_fast_interval, "
+            "uint32_t p_fast_timeout)\n"
+            "{\n"
+            "    HAL_Ble_ProtocolInit (p_fast_interval, p_fast_timeout) ;\n"
+            "}\n"
+        )
+        self.assertFalse(has(src, ON, RULE))
+
+    def test_real_signature_with_genuine_violation_still_caught(self):
+        """The fix must not blind the rule to real, badly-named parameters."""
+        src = (
+            "void f (uint32_t timeout, uint8_t * buf)\n"
+            "{\n"
+            "    (void) timeout ;\n"
+            "}\n"
+        )
+        vs = [v for v in run(src, ON) if v.rule == RULE]
+        names = {v.message.split("'")[1] for v in vs}
+        self.assertEqual(names, {"timeout", "buf"})
+
+    def test_pointer_return_type_definition_still_detected(self):
+        """A real function returning a pointer (no space before name) still
+        has its parameters checked — only the separator-less call case
+        should be excluded."""
+        src = (
+            "uint8_t* f(uint32_t channel)\n"
+            "{\n"
+            "    return 0U ;\n"
+            "}\n"
+        )
+        self.assertTrue(has(src, ON, RULE))
+
+    def test_call_statement_in_header_declaration_context_not_flagged(self):
+        """A call-shaped line ending in ';' must not be treated as a
+        prototype either (covers the RE_FUNCTION_DECL path)."""
+        src = (
+            "void g (void)\n"
+            "{\n"
+            "    HAL_DoThing (some_value, other_value) ;\n"
+            "}\n"
+        )
+        self.assertFalse(has(src, ON, RULE))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
