@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.5 |
-| **Project** | CStyleCheck | **Date** | 2026-06-05 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.6 |
+| **Project** | CStyleCheck | **Date** | 2026-06-18 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.6 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: fix version text v1.0.0→v1.2.x, rule count 48→53, update referenced doc versions, resolve §3.2 placeholders — resolves issue #163 |
 | 1.3 | 2026-05-28 | Dermot Murphy | Complete §8 release gate checklist for v1.1.0; populate §8 open issues — closes issue #53 |
@@ -41,10 +42,10 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.7 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.4 |
-| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.5 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.4 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.5 |
+| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.6 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 
 ### 3.2 Software Configuration Under Test
 
