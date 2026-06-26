@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.17 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.18 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.18 | 2026-06-26 | Claude | §6: advance SYS.2 L→F (RTM placeholders resolved; §3.3 SWE1-001 added; scope updated to v1.4.1); verdict 16F/1L→17F/0L; §5.4: SYS2 to 1.9, self to 1.18 — closes issue #292 |
 | 1.17 | 2026-06-26 | Claude | §6: advance SYS.4/SYS.5/SWE.5/SWE.6 L→F (SITC-015 + SIT-019 added; SYS-F-020 expanded; AUD7-F-001 fully resolved); verdict 12F/5L→16F/1L — closes issue #261 |
 | 1.16 | 2026-06-26 | Claude | §6: advance SUP.1 L→F (recurring review process established; CSC-REVIEW-002 produced); verdict 11F/6L→12F/5L; §5.4: update SUP1 to 1.5, add CSC-REVIEW-001/002 rows, self to 1.16 — closes issue #268 |
 | 1.15 | 2026-06-26 | Claude | §6: advance MAN.5 L→F and ACQ.4 L→F (RISK-003/005 treatments implemented; SUP-06 added); verdict 9F/8L→11F/6L; §5.4: update MAN5 to 1.4, ACQ4 to 1.3, self to 1.15 |
@@ -190,7 +191,7 @@ All work products are reviewed before approval according to the following schedu
 
 | Document ID | Work Product | Version | Baseline Status | CM Baseline |
 |---|---|---|---|---|
-| CSC-SYS2-001 | System Requirements Spec | 1.8 | Released | PR #261 (issue #261) |
+| CSC-SYS2-001 | System Requirements Spec | 1.9 | Released | PR (issue #292) |
 | CSC-SYS3-001 | System Architecture Description | 1.5 | Released | CSC-AUD-007 |
 | CSC-SYS4-001 | System Integration Test Spec | 1.5 | Released | PR #261 (issue #261) |
 | CSC-SYS5-001 | System Verification Report | 1.7 | Released | PR #280 (AUD7-F-001) |
@@ -207,7 +208,7 @@ All work products are reviewed before approval according to the following schedu
 | CSC-SUP9-001 | Problem Resolution Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-SUP10-001 | Change Request Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.3 | Released | PR D (issue #269) |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.17 | Released | PR (issue #261) |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.18 | Released | PR (issue #292) |
 | CSC-REVIEW-001 | ASPICE Peer Review Record (v1.2.1 baseline) | 1.0 | Released | issue #169 |
 | CSC-REVIEW-002 | ASPICE Peer Review Record (v1.4.1 baseline) | 1.0 | Released | PR (issue #268) |
 | CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
@@ -233,7 +234,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 | Process | PA 1.1 (Performed) | PA 2.1 (Perf. Mgmt) | PA 2.2 (WP Mgmt) | Assessment Verdict | Open Issue(s) |
 |---|---|---|---|---|---|
-| SYS.2 | SYS REQ-IDs defined and traceable | Objectives: §4.1; strategy: §4.2 | CSC-SYS2-001 reviewed; in CM | **L** | — |
+| SYS.2 | 45 SYS REQ-IDs defined and traced to SWE.1 (§6 RTM); all placeholder IDs resolved | Objectives: §4.1; strategy: §4.2 | CSC-SYS2-001 v1.9 reviewed; in CM | **F** | — |
 | SYS.3 | Architecture with subsystems and interfaces | Objectives: §4.1; monitoring: §4.3 | CSC-SYS3-001 reviewed; in CM | **F** | — |
 | SYS.4 | 15 SITC test cases defined and executed; all 71 rules covered including 11 v1.4.0 rules (SITC-015) | Objectives: §4.1 | CSC-SYS4-001 reviewed; in CM | **F** | — |
 | SYS.5 | SYS-VTC test cases defined and executed; SYS-VTC-003 covers all 71 rule IDs | Objectives: §4.1 | CSC-SYS5-001 reviewed; in CM | **F** | — |
@@ -253,7 +254,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 > **📋 Rating scale:** N = Not achieved (0–15%), P = Partially achieved (15–50%), L = Largely achieved (50–85%), F = Fully achieved (85–100%). All processes must achieve **L or F** at PA 2.1 and PA 2.2 for CL2 to be awarded.
 >
-> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **L or F** (16 F, 1 L, 0 P/N). SYS.4, SYS.5, SWE.5, and SWE.6 advanced to F (2026-06-26): SITC-015 and SIT-019 added covering all 11 v1.4.0 rules; SYS-F-020 expanded to enumerate all misc and macro-safety rules; AUD7-F-001 fully resolved (issue #261). The sole remaining L is **SYS.2**: system requirements scope covers all 71 rules, but the requirements document version and cross-reference precision do not yet fully satisfy the F threshold. Targeted for the v1.5.0 cycle. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
+> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **F** (17 F, 0 L, 0 P/N). SYS.2 advanced to F (2026-06-26): CSC-SYS2-001 §6 RTM placeholder IDs replaced with actual SWE1-xxx IDs; CSC-SWE1-001 added to §3.3; scope updated to v1.4.1 (issue #292). All previously open ASPICE findings (AUD7-F-001, issues #261–#271) resolved. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
 >
 > **Ratings assigned by internal audit CSC-AUD-007, 2026-06-18 (supersedes CSC-AUD-001 2026-05-28 and CSC-AUD-002 2026-05-29 for this table).**
 
