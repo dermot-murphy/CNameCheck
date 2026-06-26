@@ -320,6 +320,45 @@ uint32_t val = 100;  // cstylecheck: disable=misc.unsigned_suffix,misc.magic_num
 
 ---
 
+## Recommendations for source code
+
+These recommendations help you write C source that produces accurate, low-noise
+results from CStyleCheck.
+
+### Prefer `typedef` over `#define` for type aliases
+
+Object-like `#define`s are syntactically indistinguishable from constant
+definitions, so CStyleCheck checks them against the `constant.case` rule
+(upper-snake by default). A `_t`- or `_T`-suffixed macro will therefore be
+flagged even though it is logically a type alias, not a constant:
+
+```c
+/* Avoid — CStyleCheck cannot tell this #define introduces a type rather
+ * than a constant value, so it is checked against constant.case (upper_snake)
+ * and will be flagged: */
+#define api_nvm_error_t   uint8_t
+
+/* Prefer — typedef is unambiguous; it is checked against typedef.case and
+ * typedef.suffix instead, and is the standard C99+ idiom for type aliasing: */
+typedef uint8_t api_nvm_error_t;
+```
+
+Reserve `#define`-based type aliasing for legacy/pre-C99 or assembler-shared
+headers where `typedef` is unavoidable. If you must use it, add an exemption
+pattern to suppress the false positive:
+
+```yaml
+# rules.yml
+constants:
+  exempt_patterns:
+    - '.*_t$'   # suppress constant.case for _t-suffixed #define type aliases
+```
+
+See issue [#244](https://github.com/dermot-murphy/CStyleCheck/issues/244) for
+the original discussion.
+
+---
+
 ## Auto-fix mode
 
 CStyleCheck can apply safe, mechanical fixes in-place.  All currently fixable
