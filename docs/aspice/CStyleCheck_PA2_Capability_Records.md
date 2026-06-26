@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.13 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.14 |
 | **Project** | CStyleCheck | **Date** | 2026-06-25 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.14 | 2026-06-25 | Claude | §5.4: add missing CSC-AUD-005 and CSC-AUD-006 rows; update CSC-SYS2-001 to 1.7; update self to 1.14 — closes issues #266, #270 |
 | 1.13 | 2026-06-25 | Claude | Doc accuracy — update §5.4 baseline table: all document versions synced to v1.4.1 state (CSC-AUD-007 / PR #281); fix CI-001/CI-017 versions; update §5.4 preamble |
 | 1.12 | 2026-06-25 | Claude | AUD7-F-001 doc fix — update §6 SWE.6 capability summary; update CL2 verdict note to reflect SYS-VTC-003/SWQ-003 updated to 71 rule IDs; remaining test-scope gap still pending v1.5.0 |
 | 1.11 | 2026-06-18 | Claude | Fix §6 verdict summary arithmetic (11 F, 6 L → 9 F, 8 L; table itself was already correct); bump CSC-AUD-007 §5.4 entry to v1.1 (matching erratum); reorganise Wiki publishing into Deviations/Audits sections — see issue tracker |
@@ -186,7 +187,7 @@ All work products are reviewed before approval according to the following schedu
 
 | Document ID | Work Product | Version | Baseline Status | CM Baseline |
 |---|---|---|---|---|
-| CSC-SYS2-001 | System Requirements Spec | 1.6 | Released | CSC-AUD-007 |
+| CSC-SYS2-001 | System Requirements Spec | 1.7 | Released | PR #282 (issue #266) |
 | CSC-SYS3-001 | System Architecture Description | 1.5 | Released | CSC-AUD-007 |
 | CSC-SYS4-001 | System Integration Test Spec | 1.4 | Released | CSC-AUD-007 |
 | CSC-SYS5-001 | System Verification Report | 1.7 | Released | PR #280 (AUD7-F-001) |
@@ -203,7 +204,7 @@ All work products are reviewed before approval according to the following schedu
 | CSC-SUP9-001 | Problem Resolution Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-SUP10-001 | Change Request Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.2 | Released | CSC-AUD-007 |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.13 | Released | PR #281 (doc accuracy) |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.14 | Released | PR #282 (issue #270) |
 | CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
 | CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
 | CSC-SVD-001 | Software Version Description | 1.13 | Released | PR #281 (doc accuracy) |
@@ -211,6 +212,8 @@ All work products are reviewed before approval according to the following schedu
 | CSC-AUD-002 | ASPICE Internal Audit — CL2 Re-assessment (2026-05-29) | 1.0 | Released | v1.2.1 tag |
 | CSC-AUD-003 | ASPICE Internal Audit — Accuracy (2026-06-04) | 1.0 | Released | issue #163 audit |
 | CSC-AUD-004 | ASPICE Internal Audit — Deep Accuracy (2026-06-04) | 1.0 | Released | issue #163 deep audit |
+| CSC-AUD-005 | ASPICE Internal Audit — Post-release accuracy (2026-06-05) | 1.0 | Released | issue #163 / v1.3.0 |
+| CSC-AUD-006 | ASPICE Internal Audit — Test/module-count drift (2026-06-18) | — | Released (issue #254 only; no standalone report) | issue #254 |
 | CSC-AUD-007 | ASPICE Internal Audit — CL2 Re-assessment (2026-06-18) | 1.1 | Released | v1.4.0 tag |
 | CI-001 | `src/cstylecheck/` package | 1.4.1 | Released | v1.4.1 tag |
 | CI-017 | Test suite (1157 tests) | 1.4.1 | Released | v1.4.1 tag |
