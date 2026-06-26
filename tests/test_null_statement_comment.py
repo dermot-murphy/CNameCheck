@@ -53,6 +53,20 @@ class TestNullStatementComment(unittest.TestCase):
         )
         self.assertEqual(count(src, NS_CFG, "misc.null_statement_comment"), 2)
 
+    def test_do_while_terminator_not_flagged(self):
+        # Bug #312: "} while (condition);" is the do-while loop terminator,
+        # not a null statement — it must not produce a false positive.
+        src = (
+            "void foo(void) {\n"
+            "    int val = 0;\n"
+            "    do\n"
+            "    {\n"
+            "        some_function(&val);\n"
+            "    } while (val < MAX_SIZE);\n"
+            "}\n"
+        )
+        self.assertFalse(has(src, NS_CFG, "misc.null_statement_comment"))
+
     def test_no_catastrophic_backtracking_on_unclosed_condition(self):
         # Regression test: the inline-null regex used a nested-quantifier
         # alternation (?:[^()\n]*|\(...\))* which caused exponential

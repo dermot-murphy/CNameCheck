@@ -2644,7 +2644,14 @@ class Checker:
         _RE_INLINE_NULL = re.compile(
             r'\b(?:while|for|if)[ \t]*\((?:[^()\n]|\([^()\n]*\))*\)[ \t]*;',
         )
+        # do-while terminator: "} while (condition);" — not a null statement.
+        _RE_DO_WHILE_END = re.compile(r'^\}\s*while\s*\(.*\)\s*;')
         for m in _RE_INLINE_NULL.finditer(self.clean):
+            # Skip the closing line of a do-while loop.
+            line_start = self.clean.rfind('\n', 0, m.start()) + 1
+            line_text  = self.clean[line_start: self.clean.find('\n', m.start())]
+            if _RE_DO_WHILE_END.match(line_text.strip()):
+                continue
             self._v(m.start(), sev, "misc.null_statement_comment",
                     "Null statement on same line as control expression; "
                     "put ';' on its own line with an explanatory comment "

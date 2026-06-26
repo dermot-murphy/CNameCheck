@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.8 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-26 | Claude | v1.9 — ASPICE audit corrections: fix §3 scope text (v1.2.x→v1.5.0); update §3.1 SWE1/SWE3 version refs; add v1.4.0/v1.5.0 methods to §8.1 run_all() sequence; add SWE1-MISRA-004/SWE1-089/SWE1-090 to §10 RTM — closes #307 |
 | 1.8 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.7 | 2026-06-08 | Claude | ASPICE audit #238 — add COMP-05h (naming rules); extend §10 RTM with SWE1-078–088 |
 | 1.6 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
@@ -34,7 +35,7 @@
 
 ## 3. Purpose & Scope
 
-This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.2.x**. It refines the system architecture (CSC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
+This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.5.0**. It refines the system architecture (CSC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Architectural Design**.
 
@@ -42,9 +43,9 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.1 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.10 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.12 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 
 ---
@@ -311,7 +312,15 @@ main()
 │   │   ├─ _check_whitespace_ratio()
 │   │   ├─ _check_yoda()
 │   │   ├─ _check_spelling()
-│   │   └─ _check_reserved_names()
+│   │   ├─ _check_reserved_names()
+│   │   ├─ _check_function_length()         [COMP-05f, v1.4.0]
+│   │   ├─ _check_function_doc_header()     [COMP-05f, v1.4.0]
+│   │   ├─ _check_assert_density()          [COMP-05f, v1.4.0]
+│   │   ├─ _check_null_statement_comment()  [COMP-05f, v1.4.0]
+│   │   ├─ _check_declaration_spacing()     [COMP-05f, v1.4.0]
+│   │   ├─ _check_file_length()             [COMP-05f, v1.4.0]
+│   │   ├─ _check_reserved_header_name()    [COMP-05f, v1.4.0]
+│   │   └─ _check_non_ascii_source()        [COMP-05f, v1.5.0]
 │   └─ accumulate violations
 │
 ├─ COMP-05g: SignChecker(source_cache, cfg).check() → sign violations
@@ -378,6 +387,9 @@ main()
 | SWE1-086 | `macro.multistatement_wrapper` | COMP-05c |
 | SWE1-087 | `naming.identifier_length` | COMP-05h |
 | SWE1-088 | `naming.no_single_char_identifiers` | COMP-05h |
+| SWE1-MISRA-004 | `misc.non_ascii_source` — MISRA C:2012/2023 Rule 4.1 (non-ASCII characters in source files) | COMP-05f |
+| SWE1-089 | per-file breakdown in `--summary` output | COMP-07 |
+| SWE1-090 | `constant.case` typedef-alias exemption | COMP-05c |
 
 ---
 

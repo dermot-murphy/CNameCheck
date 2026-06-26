@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.11 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.12 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.12 | 2026-06-26 | Claude | ASPICE audit corrections: fix §3 scope text (v1.2.x→v1.5.0); update §3.1 SWE1/SWE4 version refs; correct UNIT-102–113 Component from COMP-01 to COMP-05f/COMP-05h; add _check_non_ascii_source to UNIT-22 run_all() order — closes #308 |
 | 1.11 | 2026-06-26 | Claude | Add UNIT-113 (_check_non_ascii_source), UNIT-114 (print_summary per-file breakdown), UNIT-115 (_check_defines typedef-alias exemption); update §8 traceability — issues #279 #278 #272 #244 |
 | 1.10 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.9 | 2026-06-08 | Claude | Add UNIT-102 to UNIT-112 for 11 new rules (issues #221–#232); update §8 traceability |
@@ -36,15 +37,15 @@
 
 ## 3. Purpose & Scope
 
-This document defines the detailed design of each software unit in **CStyleCheck v1.2.x**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
+This document defines the detailed design of each software unit in **CStyleCheck v1.5.0**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
 
 ### 3.1 Referenced Documents
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.8 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.12 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.1 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.9 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.14 |
 
 ---
 
@@ -155,18 +156,18 @@ All source locations refer to the current package layout under `src/cstylecheck/
 | UNIT-99 | `run_preset` | `wizard.py` | COMP-09 | `wizard.py` |
 | UNIT-100 | `resolve_per_dir_config` | `config.py` | COMP-10 | `config.py` |
 | UNIT-101 | `_violations_to_html` | `output.py` | COMP-07 | `output.py` |
-| UNIT-102 | `_check_function_length` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-103 | `_check_function_doc_header` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-104 | `_check_assert_density` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-105 | `_check_null_statement_comment` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-106 | `_check_declaration_spacing` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-107 | `_check_file_length` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-108 | `_check_reserved_header_name` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-109 | `_check_macro_trailing_semicolon` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-110 | `_check_macro_multistatement_wrapper` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-111 | `_check_identifier_length` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-112 | `_check_no_single_char_identifiers` | `checker.py` | COMP-01 | `checker.py` |
-| UNIT-113 | `_check_non_ascii_source` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-102 | `_check_function_length` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-103 | `_check_function_doc_header` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-104 | `_check_assert_density` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-105 | `_check_null_statement_comment` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-106 | `_check_declaration_spacing` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-107 | `_check_file_length` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-108 | `_check_reserved_header_name` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-109 | `_check_macro_trailing_semicolon` | `checker.py` | COMP-05b | `checker.py` |
+| UNIT-110 | `_check_macro_multistatement_wrapper` | `checker.py` | COMP-05b | `checker.py` |
+| UNIT-111 | `_check_identifier_length` | `checker.py` | COMP-05h | `checker.py` |
+| UNIT-112 | `_check_no_single_char_identifiers` | `checker.py` | COMP-05h | `checker.py` |
+| UNIT-113 | `_check_non_ascii_source` | `checker.py` | COMP-05f | `checker.py` |
 | UNIT-114 | `print_summary` (per-file breakdown) | `output.py` | COMP-07 | `output.py` |
 | UNIT-115 | `_check_defines` (typedef-alias exemption) | `checker.py` | COMP-05c | `checker.py` |
 
@@ -370,7 +371,7 @@ src/cstylecheck/
 
 **Algorithm:** Call each enabled `_check_*` method in fixed order; each appends to `self.result.violations`. Return `self.result`.
 
-**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_comment_ratio`, `_check_whitespace_ratio`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_spelling` (when dictionary configured)
+**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_comment_ratio`, `_check_whitespace_ratio`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_reserved_header_name`, `_check_non_ascii_source`, `_check_spelling` (when dictionary configured)
 
 ---
 

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.13 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.14 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.14 | 2026-06-26 | Claude | ASPICE audit — fix §3 scope text (v1.2.x→v1.5.0); update §3.1 refs (SWE1 1.9→2.1, SWE3 1.10→1.12, SWE5 1.5→1.9); correct §6 total 52→50 modules; update test_null_statement_comment count 10→11 and total 1182→1183 — closes #305 #306 #309 #312 |
 | 1.13 | 2026-06-26 | Claude | Add NR-004 tests (12 tests, test_misra_rules.py 52→64), typedef-alias tests (6 tests, test_defines.py 16→22), test_print_summary.py (7 tests, new); update §5 and §6 totals 1157→1182 — issues #279 #278 #272 #244 |
 | 1.12 | 2026-06-18 | Claude | v1.4.1 patch (issue #273) — add 5 regression tests to `test_parameter_prefix.py` (42→47); update §6 total 1152→1157 |
 | 1.11 | 2026-06-18 | Claude | ASPICE audit #254 — update §6 test total 1143→1152 (49 modules) |
@@ -40,7 +41,7 @@
 
 ## 3. Purpose & Scope
 
-This specification defines the unit verification strategy, coverage criteria, and test case catalogue for **CStyleCheck v1.2.x**. It satisfies **Automotive SPICE® PAM v4.0, SWE.4 — Software Unit Verification**.
+This specification defines the unit verification strategy, coverage criteria, and test case catalogue for **CStyleCheck v1.5.0**. It satisfies **Automotive SPICE® PAM v4.0, SWE.4 — Software Unit Verification**.
 
 Unit verification covers both dynamic testing (pytest test suite) and static verification (naming convention self-check via `rules.yml` CI workflow).
 
@@ -48,9 +49,9 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 1.9 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.10 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.5 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.1 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.12 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.9 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 
 ---
@@ -418,7 +419,7 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | `test_function_length.py` | 11 | 11 | 0 | COMP-01 (`_check_function_length`) |
 | `test_function_doc_header.py` | 12 | 12 | 0 | COMP-01 (`_check_function_doc_header`) |
 | `test_assert_density.py` | 8 | 8 | 0 | COMP-01 (`_check_assert_density`) |
-| `test_null_statement_comment.py` | 10 | 10 | 0 | COMP-01 (`_check_null_statement_comment`) |
+| `test_null_statement_comment.py` | 11 | 11 | 0 | COMP-01 (`_check_null_statement_comment`) |
 | `test_declaration_spacing.py` | 8 | 8 | 0 | COMP-01 (`_check_declaration_spacing`) |
 | `test_file_length.py` | 8 | 8 | 0 | COMP-01 (`_check_file_length`) |
 | `test_reserved_header_name.py` | 10 | 10 | 0 | COMP-01 (`_check_reserved_header_name`) |
@@ -427,7 +428,7 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | `test_identifier_length.py` | 10 | 10 | 0 | COMP-01 (`_check_identifier_length`) |
 | `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-01 (`_check_no_single_char_identifiers`) |
 | `test_print_summary.py` | 7 | 7 | 0 | `output.print_summary` (per-file breakdown) |
-| **Total** | **1182** | **1182** | **0** | All rules covered — 52 modules |
+| **Total** | **1183** | **1183** | **0** | All rules covered — 50 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)

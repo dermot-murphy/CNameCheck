@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 2.0 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 2.1 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.1 | 2026-06-26 | Claude | ASPICE audit — fix §3.1 scope text (v1.2.x → v1.5.0) — closes #305 |
 | 2.0 | 2026-06-26 | Claude | Add SWE1-089 (per-file summary #278), SWE1-MISRA-004 (non_ascii_source #279), SWE1-090 (typedef-alias constant.case exemption #272/#244); update RTM |
 | 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.8 | 2026-06-08 | Claude | Add SWE1-078 to SWE1-088 for 11 new rules (issues #221–#232); update RTM |
@@ -40,7 +41,7 @@
 
 ### 3.1 Purpose
 
-This Software Requirements Specification (SRS) refines the system-level requirements from CSC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.2.x**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
+This Software Requirements Specification (SRS) refines the system-level requirements from CSC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.5.0**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requirements Analysis**.
 

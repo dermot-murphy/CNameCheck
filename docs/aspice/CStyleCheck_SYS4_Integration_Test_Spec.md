@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.6 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.7 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-06-26 | Claude | ASPICE audit — update §3.3 SYS2 ref (1.8→1.9); update §5 overall result test count (965→1183) — closes #306 #311 |
 | 1.6 | 2026-06-26 | Claude | v1.5.0 release — update product version reference in §3.1 scope |
 | 1.5 | 2026-06-26 | Claude | Add SITC-015 covering 11 v1.4.0 rules (macro safety, function quality, file constraints, naming); advance SYS.4 to F — closes issue #261 |
 | 1.4 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
@@ -52,7 +53,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.8 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.9 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
 | CSC-SYS5-001 | CStyleCheck System Verification Report | 1.7 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
@@ -454,7 +455,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-014 | `--warnings-as-errors` promotion | PASS | |
 | SITC-015 | v1.4.0 rule coverage (macro safety, function quality, file constraints, naming) | PASS | |
 
-**Overall Result:** PASS — Commit 93178cd, 2026-05-28 (SITC-001 to SITC-014); 2026-06-26 (SITC-015), GitHub Actions (automated) / Dermot Murphy (manual review), 965 tests all PASS on Python 3.10 / 3.11 / 3.12.
+**Overall Result:** PASS — Commit 93178cd, 2026-05-28 (SITC-001 to SITC-014); 2026-06-26 (SITC-015), GitHub Actions (automated) / Dermot Murphy (manual review), 1183 tests all PASS on Python 3.10 / 3.11 / 3.12.
 
 > **📋 Note:** All SITC test cases must achieve PASS status before the system verification (SYS.5) activities commence. Any FAIL result must be tracked as a GitHub Issue and resolved via the change control process (SUP.10).
 
