@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.7 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.8 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-26 | Claude | v1.5.0 release — update product version reference in §3 scope |
 | 1.7 | 2026-06-26 | Claude | Add SIT-020 for non_ascii_source (Rule 4.1), per-file summary breakdown, and typedef-alias constant.case exemption — issues #279 #278 #272 #244 |
 | 1.6 | 2026-06-26 | Claude | Add SIT-019 covering 11 v1.4.0 rules (macro safety, function quality, file constraints, naming); advance SWE.5 to F — closes issue #261 |
 | 1.5 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
@@ -33,7 +34,7 @@
 
 ## 3. Purpose & Scope
 
-This document defines the software integration test specification for **CStyleCheck v1.4.1**, verifying that the software components integrate correctly across the interfaces defined in CSC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
+This document defines the software integration test specification for **CStyleCheck v1.5.0**, verifying that the software components integrate correctly across the interfaces defined in CSC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
 
 Integration tests operate at a higher level than unit tests (SWE.4): they exercise data flows **across component boundaries** — primarily the path from COMP-01 (CLI) through COMP-04 (Parser) into COMP-05 (Rule Engine) and COMP-07 (Output Formatter) — rather than individual method logic.
 
