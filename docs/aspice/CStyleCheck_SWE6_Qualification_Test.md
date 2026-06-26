@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.8 |
-| **Project** | CStyleCheck | **Date** | 2026-06-25 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.6 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-26 | Claude | Correct rule count 74→72 throughout (§3 SWQ-003, §7 RTM): 72 is the confirmed count from source-code analysis; macro.trailing_semicolon/multistatement_wrapper were already in the 71 base |
 | 1.8 | 2026-06-26 | Claude | Add misc.non_ascii_source (SWE1-MISRA-004), per-file summary (SWE1-089), typedef-alias exemption (SWE1-090) to SWQ-003; update rule count 71→74; update requirements coverage 88→91 — issues #279 #278 #272 #244 |
 | 1.7 | 2026-06-25 | Claude | AUD7-F-001 corrective action — update SWQ-003 from 53 to 71 rule IDs; expand rule-category table with all v1.2.x/MISRA/v1.4.0 rules; extend SW-REQ refs to SWE1-088; update requirements coverage to 88 |
 | 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
@@ -127,12 +128,12 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 ---
 
-### SWQ-003 — All 74 Rule IDs Detected
+### SWQ-003 — All 72 Rule IDs Detected
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SWQ-003 |
-| **Objective** | Verify all 74 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-090) |
+| **Objective** | Verify all 72 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-090) |
 | **SW-REQ** | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-004, SWE1-063, SWE1-071, SWE1-078 to SWE1-090 |
 
 | Rule Category | Rule IDs | Test Module | Result |
@@ -356,7 +357,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 |---|---|---|---|---|
 | SWQ-001 | Configuration loading | SWE1-001 to SWE1-006 | PASS | |
 | SWQ-002 | File discovery and CLI | SWE1-068 to SWE1-070 | PASS | |
-| SWQ-003 | All 74 rule IDs | SWE1-017 to SWE1-056, SWE1-MISRA-001–004, SWE1-063, SWE1-071, SWE1-078–090 | PASS | |
+| SWQ-003 | All 72 rule IDs | SWE1-017 to SWE1-056, SWE1-MISRA-001–004, SWE1-063, SWE1-071, SWE1-078–090 | PASS | |
 | SWQ-004 | Output format qualification | SWE1-057 to SWE1-064 | PASS | |
 | SWQ-005 | Dictionary and spell check | SWE1-007 to SWE1-010, SWE1-056 | PASS | |
 | SWQ-006 | Cross-file sign compatibility | SWE1-051 to SWE1-053 | PASS | |

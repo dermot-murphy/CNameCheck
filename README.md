@@ -10,14 +10,14 @@ Contributions are very welcome.
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **78 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **72 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 📖 **[Rules and Configuration Reference](Rules-and-Configuration.md)** — full
-documentation for all 75 rules with YAML configuration and annotated C examples.
+documentation for all 72 rules with YAML configuration and annotated C examples.
 
 Draft companion documents (pending rule population, not yet authoritative):
 [Embedded C Style Guide](embedded_c_style_guide.md) ·
@@ -31,7 +31,7 @@ Draft companion documents (pending rule population, not yet authoritative):
 ```
 .pre-commit-hooks.yml   # pre-commit hook definition (id: cstylecheck)
 pyproject.toml           # pip / pipx / pre-commit packaging metadata
-Rules-and-Configuration.md  # wiki: all 75 rules with config and examples
+Rules-and-Configuration.md  # wiki: all 72 rules with config and examples
 src/
     cstylecheck.py          # thin CLI shim (backward-compatible entry point)
     cstylecheck/            # checker package (12 sub-modules)
@@ -41,7 +41,7 @@ src/
         models.py           # Violation, CheckResult, shared constants
         preprocessor.py     # comment/string stripping, token extraction
         utils.py            # case matching, module name helpers
-        checker.py          # main Checker class — all 75 rule implementations
+        checker.py          # main Checker class — all 72 rule implementations
         sign_checker.py     # cross-file sign-compatibility and declared_not_defined
         baseline.py         # baseline load/write
         output.py           # text / JSON / SARIF / HTML formatters, Tee, summary
@@ -551,7 +551,7 @@ Subprocess coverage now captures the CLI entry point in CI; `--cov-fail-under=85
 - **`naming.no_single_char_identifiers`** — flags single-character variable names outside a
   configurable exempt list (disabled by default).
 
-11 new rules, bringing the total to **75 rule IDs**. 102 new tests added (1152 total).
+11 new rules, bringing the total to **71 rule IDs**. 102 new tests added (1152 total).
 
 Bug fixes: parameter/pointer naming-prefix false positives (#245, #246), a
 catastrophic-backtracking regex hang in `misc.null_statement_comment` (#248, #249), and
@@ -573,7 +573,7 @@ broken GitHub Wiki links (#251).
   `typedefs.suffix.enabled: true`. This eliminates the false positive on `typedef`-style
   `#define` aliases such as `#define api_nvm_error_t uint8_t`.
 
-3 new rule checks / features; **78 rule IDs** total. 25 new tests (1182 total).
+1 new rule + 2 features; **72 rule IDs** total. 25 new tests (1182 total).
 
 Bug fix: function-call misparsed as declaration/definition when return type and name
 had no whitespace separator (issue #273); function-call detection now requires separator.
