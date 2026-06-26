@@ -25,6 +25,7 @@
 ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION}-slim AS base
 
+ARG GITHUB_REPOSITORY
 LABEL org.opencontainers.image.title="CStyleCheck"
 LABEL org.opencontainers.image.description="Embedded C naming-convention linter (Barr-C / MISRA-C complementary)"
 LABEL org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY:-org/cstylecheck}"
