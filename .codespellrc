@@ -27,7 +27,11 @@ skip = .git,__pycache__,.pytest_cache,*.pyc,*.json,*.xml,coverage.xml
 #                 (uart_recive_data test fixture).
 #
 #   unparseable — Accepted alternative spelling of "unparsable"; used in SWE1.
-ignore-words-list = statics,statu,HSI,HSE,LSI,LSE,Initilise,recive,unparseable
+#
+#   caf         — Intentional abbreviation for "café" in NR-004 test strings
+#                 (e.g. `caf\xc3\xa9_count`) that demonstrate non-ASCII source
+#                 character detection.
+ignore-words-list = statics,statu,HSI,HSE,LSI,LSE,Initilise,recive,unparseable,caf
 
 # Quiet level 2: only report errors, not warnings
 quiet-level = 2
