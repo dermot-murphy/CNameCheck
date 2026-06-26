@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.12 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.13 |
 | **Project** | CStyleCheck | **Date** | 2026-06-25 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.13 | 2026-06-25 | Claude | Doc accuracy — sync §5.5 document version table to v1.4.1 baseline (CSC-SYS5-001/CSC-SWE6-001 → 1.7, CSC-PA2-001 → 1.13, self → 1.13) |
 | 1.12 | 2026-06-25 | Claude | Correct rule count 75→71 throughout (§4.2, §5.1, §8.2, §9): 71 is the confirmed count from source-code analysis |
 | 1.11 | 2026-06-18 | Claude | v1.4.1 patch release — fix `variable.parameter.p_prefix` false positive on call statements (issue #273); update version identifiers, release summary, change log |
 | 1.10 | 2026-06-18 | Claude | v1.4.0 release — update all version identifiers, release summary, change log, upgrade notes |
@@ -197,17 +198,17 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SVD-001 | Software Version Description (this document) | 1.9 |
+| CSC-SVD-001 | Software Version Description (this document) | 1.13 |
 | CSC-SWE1-001 | Software Requirements Specification | 1.9 |
 | CSC-SWE2-001 | Software Architecture Design | 1.8 |
 | CSC-SWE3-001 | Software Detailed Design | 1.10 |
 | CSC-SWE4-001 | Software Unit Verification Specification | 1.12 |
 | CSC-SWE5-001 | Software Integration Test Specification | 1.5 |
-| CSC-SWE6-001 | Software Qualification Test Specification | 1.6 |
+| CSC-SWE6-001 | Software Qualification Test Specification | 1.7 |
 | CSC-SYS2-001 | System Requirements Specification | 1.6 |
 | CSC-SYS3-001 | System Architecture Design | 1.5 |
 | CSC-SYS4-001 | System Integration Test Specification | 1.4 |
-| CSC-SYS5-001 | System Verification Specification | 1.6 |
+| CSC-SYS5-001 | System Verification Specification | 1.7 |
 | CSC-MAN3-001 | Project Management Plan | 1.6 |
 | CSC-MAN5-001 | Risk Management Plan | 1.3 |
 | CSC-SUP1-001 | Quality Assurance Plan | 1.4 |
@@ -215,7 +216,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | CSC-SUP9-001 | Problem Resolution Plan | 1.2 |
 | CSC-SUP10-001 | Change Request Plan | 1.2 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.2 |
-| CSC-PA2-001 | Capability Level 2 Records | 1.9 |
+| CSC-PA2-001 | Capability Level 2 Records | 1.13 |
 | CSC-DEV001 | AI Authorship Deviation Record | 1.0 |
 | CSC-DEV002 | Independent Review Deviation Record | 1.0 |
 

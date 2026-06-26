@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.12 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.13 |
 | **Project** | CStyleCheck | **Date** | 2026-06-25 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.13 | 2026-06-25 | Claude | Doc accuracy — update §5.4 baseline table: all document versions synced to v1.4.1 state (CSC-AUD-007 / PR #281); fix CI-001/CI-017 versions; update §5.4 preamble |
 | 1.12 | 2026-06-25 | Claude | AUD7-F-001 doc fix — update §6 SWE.6 capability summary; update CL2 verdict note to reflect SYS-VTC-003/SWQ-003 updated to 71 rule IDs; remaining test-scope gap still pending v1.5.0 |
 | 1.11 | 2026-06-18 | Claude | Fix §6 verdict summary arithmetic (11 F, 6 L → 9 F, 8 L; table itself was already correct); bump CSC-AUD-007 §5.4 entry to v1.1 (matching erratum); reorganise Wiki publishing into Deviations/Audits sections — see issue tracker |
 | 1.10 | 2026-06-18 | Claude | CSC-AUD-007 — §6 was stale since 2026-05-28 (predated issue #152 closure and superseding audit CSC-AUD-002); resync §6 ratings/verdict to current `main` (v1.4.0); CL2 confirmed ACHIEVED; add §5.4 rows for CSC-AUD-002/CSC-AUD-007 |
@@ -181,38 +182,38 @@ All work products are reviewed before approval according to the following schedu
 
 ### 5.4 Work Product Baseline Status
 
-*Updated for v1.2.0 release, 2026-05-29; accuracy audit CSC-AUD-003 2026-06-04; deep accuracy audit CSC-AUD-004 2026-06-04.*
+*Updated for v1.4.1 release, 2026-06-25 (CSC-AUD-007; PR #281). All document versions reflect the v1.4.1 baseline.*
 
 | Document ID | Work Product | Version | Baseline Status | CM Baseline |
 |---|---|---|---|---|
-| CSC-SYS2-001 | System Requirements Spec | 1.4 | Released | issue #163 deep audit |
-| CSC-SYS3-001 | System Architecture Description | 1.3 | Released | issue #163 deep audit |
-| CSC-SYS4-001 | System Integration Test Spec | 1.3 | Released | issue #163 deep audit |
-| CSC-SYS5-001 | System Verification Report | 1.4 | Released | issue #163 deep audit |
-| CSC-SWE1-001 | SW Requirements Spec | 1.5 | Released | issue #163 deep audit |
-| CSC-SWE2-001 | SW Architecture Description | 1.4 | Released | issue #163 deep audit |
-| CSC-SWE3-001 | SW Detailed Design | 1.5 | Released | issue #163 deep audit |
-| CSC-SWE4-001 | Unit Verification Spec | 1.6 | Released | issue #163 audit |
-| CSC-SWE5-001 | Integration Test Spec | 1.3 | Released | issue #163 audit |
-| CSC-SWE6-001 | Qualification Test Spec | 1.4 | Released | issue #163 audit |
-| CSC-MAN3-001 | Project Management Plan | 1.5 | Released | issue #163 deep audit |
-| CSC-MAN5-001 | Risk Management Plan | 1.2 | Released | v1.2.0 tag |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.3 | Released | issue #163 deep audit |
-| CSC-SUP8-001 | Configuration Management Plan | 1.6 | Released | issue #163 deep audit |
-| CSC-SUP9-001 | Problem Resolution Plan | 1.1 | Released | v1.1.0 tag |
-| CSC-SUP10-001 | Change Request Plan | 1.1 | Released | v1.1.0 tag |
-| CSC-ACQ4-001 | Supplier Monitoring Plan | 1.1 | Released | v1.1.0 tag |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.7 | Released | issue #163 audit |
+| CSC-SYS2-001 | System Requirements Spec | 1.6 | Released | CSC-AUD-007 |
+| CSC-SYS3-001 | System Architecture Description | 1.5 | Released | CSC-AUD-007 |
+| CSC-SYS4-001 | System Integration Test Spec | 1.4 | Released | CSC-AUD-007 |
+| CSC-SYS5-001 | System Verification Report | 1.7 | Released | PR #280 (AUD7-F-001) |
+| CSC-SWE1-001 | SW Requirements Spec | 1.9 | Released | CSC-AUD-007 |
+| CSC-SWE2-001 | SW Architecture Description | 1.8 | Released | CSC-AUD-007 |
+| CSC-SWE3-001 | SW Detailed Design | 1.10 | Released | CSC-AUD-007 |
+| CSC-SWE4-001 | Unit Verification Spec | 1.12 | Released | CSC-AUD-007 |
+| CSC-SWE5-001 | Integration Test Spec | 1.5 | Released | CSC-AUD-007 |
+| CSC-SWE6-001 | Qualification Test Spec | 1.7 | Released | PR #280 (AUD7-F-001) |
+| CSC-MAN3-001 | Project Management Plan | 1.6 | Released | CSC-AUD-007 |
+| CSC-MAN5-001 | Risk Management Plan | 1.3 | Released | CSC-AUD-007 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.4 | Released | CSC-AUD-007 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.7 | Released | CSC-AUD-007 |
+| CSC-SUP9-001 | Problem Resolution Plan | 1.2 | Released | CSC-AUD-007 |
+| CSC-SUP10-001 | Change Request Plan | 1.2 | Released | CSC-AUD-007 |
+| CSC-ACQ4-001 | Supplier Monitoring Plan | 1.2 | Released | CSC-AUD-007 |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.13 | Released | PR #281 (doc accuracy) |
 | CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
 | CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
-| CSC-SVD-001 | Software Version Description | 1.4 | Released | issue #163 deep audit |
+| CSC-SVD-001 | Software Version Description | 1.13 | Released | PR #281 (doc accuracy) |
 | CSC-AUD-001 | ASPICE Internal Audit Report | 1.0 | Released | v1.2.0 tag |
 | CSC-AUD-002 | ASPICE Internal Audit — CL2 Re-assessment (2026-05-29) | 1.0 | Released | v1.2.1 tag |
 | CSC-AUD-003 | ASPICE Internal Audit — Accuracy (2026-06-04) | 1.0 | Released | issue #163 audit |
 | CSC-AUD-004 | ASPICE Internal Audit — Deep Accuracy (2026-06-04) | 1.0 | Released | issue #163 deep audit |
 | CSC-AUD-007 | ASPICE Internal Audit — CL2 Re-assessment (2026-06-18) | 1.1 | Released | v1.4.0 tag |
-| CI-001 | `src/cstylecheck/` package | 1.2.0 | Released | v1.2.0 tag |
-| CI-017 | Test suite (1152 tests) | 1.3.0 | Released | v1.3.0+ |
+| CI-001 | `src/cstylecheck/` package | 1.4.1 | Released | v1.4.1 tag |
+| CI-017 | Test suite (1157 tests) | 1.4.1 | Released | v1.4.1 tag |
 
 ---
 
