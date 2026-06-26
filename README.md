@@ -10,7 +10,7 @@ Contributions are very welcome.
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **75 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **78 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
@@ -86,7 +86,7 @@ tests/
     test_comment_ratio.py   #  24 tests: misc.comment_ratio
     test_whitespace_ratio.py #  27 tests: misc.whitespace_ratio
     test_declared_not_defined.py # 39 tests: misc.declared_not_defined
-    test_misra_rules.py     #  52 tests: MISRA C rule coverage
+    test_misra_rules.py     #  64 tests: MISRA C rule coverage
     test_parameter_prefix.py #  42 tests: variable.parameter.*
     test_exclusions.py      #  28 tests: per-file exclusions
     test_github_annotations.py # 8 tests: GitHub Actions annotations
@@ -327,35 +327,37 @@ results from CStyleCheck.
 
 ### Prefer `typedef` over `#define` for type aliases
 
-Object-like `#define`s are syntactically indistinguishable from constant
-definitions, so CStyleCheck checks them against the `constant.case` rule
-(upper-snake by default). A `_t`- or `_T`-suffixed macro will therefore be
-flagged even though it is logically a type alias, not a constant:
+The idiomatic way to define type aliases in C is with `typedef`:
 
 ```c
-/* Avoid — CStyleCheck cannot tell this #define introduces a type rather
- * than a constant value, so it is checked against constant.case (upper_snake)
- * and will be flagged: */
-#define api_nvm_error_t   uint8_t
-
-/* Prefer — typedef is unambiguous; it is checked against typedef.case and
- * typedef.suffix instead, and is the standard C99+ idiom for type aliasing: */
+/* Preferred — typedef is unambiguous; checked against typedef.case and
+ * typedef.suffix; the standard C99+ idiom for type aliasing: */
 typedef uint8_t api_nvm_error_t;
 ```
 
+When `typedefs.suffix.enabled: true` (the default), CStyleCheck automatically
+exempts object-like `#define` names ending with the configured suffix (e.g. `_t`)
+from the `constant.case` rule, so the following no longer produces a false positive:
+
+```c
+/* Also accepted when typedefs.suffix is enabled: */
+#define api_nvm_error_t   uint8_t
+```
+
 Reserve `#define`-based type aliasing for legacy/pre-C99 or assembler-shared
-headers where `typedef` is unavoidable. If you must use it, add an exemption
-pattern to suppress the false positive:
+headers where `typedef` is unavoidable. For custom suffixes configure:
 
 ```yaml
 # rules.yml
-constants:
-  exempt_patterns:
-    - '.*_t$'   # suppress constant.case for _t-suffixed #define type aliases
+typedefs:
+  suffix:
+    enabled: true
+    suffix: "_t"   # names ending with this suffix are exempt from constant.case
 ```
 
-See issue [#244](https://github.com/dermot-murphy/CStyleCheck/issues/244) for
-the original discussion.
+See issues [#244](https://github.com/dermot-murphy/CStyleCheck/issues/244) and
+[#272](https://github.com/dermot-murphy/CStyleCheck/issues/272) for the original
+discussion and the resolution.
 
 ---
 
@@ -522,7 +524,7 @@ Subprocess coverage now captures the CLI entry point in CI; `--cov-fail-under=85
 - **HTML report output** (`--output-format html`) — self-contained report with summary
   cards and per-file violation tables.
 
-#### Test suite: 1152 tests across 49 modules
+#### Test suite: 1152 tests across 49 modules (see v1.4.1 for current totals)
 
 ---
 
@@ -554,6 +556,27 @@ Subprocess coverage now captures the CLI entry point in CI; `--cov-fail-under=85
 Bug fixes: parameter/pointer naming-prefix false positives (#245, #246), a
 catastrophic-backtracking regex hang in `misc.null_statement_comment` (#248, #249), and
 broken GitHub Wiki links (#251).
+
+---
+
+### New in v1.4.1 (2026-06-26)
+
+- **`misc.non_ascii_source`** — flags source files containing characters outside the basic
+  ASCII character set (code points 0x00–0x7F excluding standard whitespace), implementing
+  MISRA C:2012/2023 Rule 4.1 (Required). Optional `exempt_string_literals: true` allows
+  non-ASCII bytes inside double-quoted string literals.
+- **Per-file breakdown in `--summary` output** — the summary footer now includes a
+  "Per-file breakdown" table showing the count of files with errors, files with warnings,
+  files with info, and clean files. The invariant `errors + warnings + info + clean == files checked` always holds.
+- **`constant.case` typedef-alias exemption** — `#define` names ending with the configured
+  `typedefs.suffix.suffix` (e.g. `_t`) are now exempt from `constant.case` when
+  `typedefs.suffix.enabled: true`. This eliminates the false positive on `typedef`-style
+  `#define` aliases such as `#define api_nvm_error_t uint8_t`.
+
+3 new rule checks / features; **78 rule IDs** total. 25 new tests (1182 total).
+
+Bug fix: function-call misparsed as declaration/definition when return type and name
+had no whitespace separator (issue #273); function-call detection now requires separator.
 
 ---
 

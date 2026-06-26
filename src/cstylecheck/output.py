@@ -277,3 +277,30 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee) -> None:
         for rule, count in rule_counts.most_common(10):
             tee.print(f"    {rule:<45} {count}")
     tee.print("=" * 60)
+
+    # Per-file breakdown: bucket each file into errors / warnings / info / ok
+    files_with_errors:   set = set()
+    files_with_warnings: set = set()
+    files_with_infos:    set = set()
+    for v in all_violations:
+        if v.severity == "error":
+            files_with_errors.add(v.filepath)
+        elif v.severity == "warning":
+            files_with_warnings.add(v.filepath)
+        elif v.severity == "info":
+            files_with_infos.add(v.filepath)
+    files_with_issues = (
+        files_with_errors | files_with_warnings | files_with_infos
+    )
+    # Count unique files per bucket (a file counts in the highest bucket only)
+    files_error_only   = len(files_with_errors)
+    files_warning_only = len(files_with_warnings - files_with_errors)
+    files_info_only    = len(files_with_infos - files_with_errors - files_with_warnings)
+    files_clean        = files_checked - len(files_with_issues)
+    if files_checked > 0:
+        tee.print("  Per-file breakdown:")
+        tee.print(f"    Files with errors   : {files_error_only}")
+        tee.print(f"    Files with warnings : {files_warning_only}")
+        tee.print(f"    Files with info     : {files_info_only}")
+        tee.print(f"    Files clean         : {files_clean}")
+        tee.print("=" * 60)

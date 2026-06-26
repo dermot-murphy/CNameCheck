@@ -1,10 +1,11 @@
 """test_misra_rules.py
 =====================
-Unit tests for the three MISRA C:2012/2023 checks added by NR-001/002/003:
+Unit tests for the MISRA C:2012/2023 checks:
 
   NR-001  misc.lowercase_l_suffix  — MISRA C Rule 7.3 (Required)
   NR-002  misc.octal_constant      — MISRA C Rule 7.1 (Required)
   NR-003  misc.trigraph            — MISRA C Rule 4.2 (Advisory/Required)
+  NR-004  misc.non_ascii_source    — MISRA C Rule 4.1 (Required)
 
 Each class documents the rule it covers, lists positive (should flag) and
 negative (should not flag) cases, and verifies the violation message text.
@@ -13,8 +14,8 @@ Line/column positions are verified for representative cases.
 ASPICE traceability
 -------------------
   SWE1 requirements: SWE1-MISRA-001 (Rule 7.3), SWE1-MISRA-002 (Rule 7.1),
-                     SWE1-MISRA-003 (Rule 4.2)
-  SWE4 test IDs:     SWE4-TC-7.3-*, SWE4-TC-7.1-*, SWE4-TC-4.2-*
+                     SWE1-MISRA-003 (Rule 4.2), SWE1-MISRA-004 (Rule 4.1)
+  SWE4 test IDs:     SWE4-TC-7.3-*, SWE4-TC-7.1-*, SWE4-TC-4.2-*, SWE4-TC-4.1-*
 """
 
 import sys
@@ -462,6 +463,95 @@ class TestYodaNegativeLiteralMessage(unittest.TestCase):
                  if v.rule == "misc.yoda_condition"]
         self.assertTrue(viols)
         self.assertIn("NULL", viols[0].message)
+
+
+def _na_cfg(enabled=True, severity="error", exempt_string_literals=False):
+    """Config with only misc.non_ascii_source enabled."""
+    return cfg_only(misc={"non_ascii_source": {
+        "enabled": enabled,
+        "severity": severity,
+        "exempt_string_literals": exempt_string_literals,
+    }})
+
+
+RULE_NA = "misc.non_ascii_source"
+
+
+# ===========================================================================
+# NR-004 — MISRA C Rule 4.1: non-ASCII source characters
+# SWE4-TC-4.1-*
+# ===========================================================================
+
+class TestNonAsciiSource(unittest.TestCase):
+    """MISRA C:2012/2023 Rule 4.1 — only basic source character set permitted.
+
+    Source files must not contain non-ASCII bytes or non-printable control
+    characters.  Standard whitespace (tab, LF, CR) is allowed.
+    """
+
+    def test_pure_ascii_passes(self):
+        """Plain ASCII source must produce no violation."""
+        src = "void foo(void) { int x = 42; }\n"
+        self.assertTrue(clean(src, _na_cfg()))
+
+    def test_utf8_identifier_flagged(self):
+        """UTF-8 accented character in identifier must be flagged."""
+        src = "uint8_t caf\xc3\xa9_count = 0;\n"  # café with UTF-8 é
+        self.assertTrue(has(src, _na_cfg(), RULE_NA))
+
+    def test_utf8_in_comment_flagged(self):
+        """Non-ASCII byte in a comment must be flagged."""
+        src = "/* Author: M\xc3\xbcller */\nvoid foo(void) {}\n"
+        self.assertTrue(has(src, _na_cfg(), RULE_NA))
+
+    def test_bom_flagged(self):
+        """UTF-8 BOM (EF BB BF) at start of file must be flagged."""
+        src = "\xef\xbb\xbfvoid foo(void) {}\n"
+        self.assertTrue(has(src, _na_cfg(), RULE_NA))
+
+    def test_tab_lf_cr_allowed(self):
+        """Tab (0x09), LF (0x0A) and CR (0x0D) are permitted whitespace."""
+        src = "\tvoid foo(void) {\r\n\t\tint x = 1;\r\n\t}\n"
+        self.assertFalse(has(src, _na_cfg(), RULE_NA))
+
+    def test_non_ascii_in_string_flagged_by_default(self):
+        """Non-ASCII inside a string literal is flagged when exempt_string_literals=False."""
+        src = 'const char *s = "\xc3\xa9";\n'
+        self.assertTrue(has(src, _na_cfg(exempt_string_literals=False), RULE_NA))
+
+    def test_non_ascii_in_string_exempt_when_flag_set(self):
+        """Non-ASCII inside a string literal is NOT flagged when exempt_string_literals=True."""
+        src = 'const char *s = "\xc3\xa9";\n'
+        self.assertFalse(has(src, _na_cfg(exempt_string_literals=True), RULE_NA))
+
+    def test_rule_disabled_no_violation(self):
+        """When non_ascii_source is disabled, no violation is raised."""
+        src = "uint8_t caf\xc3\xa9_count = 0;\n"
+        self.assertFalse(has(src, _na_cfg(enabled=False), RULE_NA))
+
+    def test_severity_warning(self):
+        """Severity is configurable; warning severity produces a warning."""
+        src = "uint8_t caf\xc3\xa9_count = 0;\n"
+        viols = [v for v in run(src, _na_cfg(severity="warning")) if v.rule == RULE_NA]
+        self.assertTrue(viols)
+        self.assertEqual(viols[0].severity, "warning")
+
+    def test_violation_message_includes_hex_byte(self):
+        """The violation message must include the hex code point of the offending char."""
+        src = "uint8_t caf\xc3\xa9_count = 0;\n"
+        viols = [v for v in run(src, _na_cfg()) if v.rule == RULE_NA]
+        self.assertTrue(viols)
+        self.assertIn("0xC3", viols[0].message)
+
+    def test_control_character_flagged(self):
+        """Non-printable ASCII control character (e.g. 0x01) must be flagged."""
+        src = "void foo(void) {\x01}\n"
+        self.assertTrue(has(src, _na_cfg(), RULE_NA))
+
+    def test_del_character_flagged(self):
+        """DEL (0x7F) must be flagged."""
+        src = "void foo(void) {\x7f}\n"
+        self.assertTrue(has(src, _na_cfg(), RULE_NA))
 
 
 if __name__ == "__main__":

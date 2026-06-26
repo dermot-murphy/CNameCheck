@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.12 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.13 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.13 | 2026-06-26 | Claude | Add NR-004 tests (12 tests, test_misra_rules.py 52→64), typedef-alias tests (6 tests, test_defines.py 16→22), test_print_summary.py (7 tests, new); update §5 and §6 totals 1157→1182 — issues #279 #278 #272 #244 |
 | 1.12 | 2026-06-18 | Claude | v1.4.1 patch (issue #273) — add 5 regression tests to `test_parameter_prefix.py` (42→47); update §6 total 1152→1157 |
 | 1.11 | 2026-06-18 | Claude | ASPICE audit #254 — update §6 test total 1143→1152 (49 modules) |
 | 1.10 | 2026-06-08 | Claude | ASPICE audit #238 — correct CSC-SWE3 version reference 1.8→1.9 in §3.1 |
@@ -157,7 +158,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.3 Constant and Macro Rules — `test_defines.py` (16 tests)
+### 5.3 Constant and Macro Rules — `test_defines.py` (22 tests)
 
 | TC-ID | Test Name | Rule Verified | Pass Condition |
 |---|---|---|---|
@@ -168,6 +169,12 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 | UV-DEF-005 | `test_exempt_pattern_skipped` | `constant.case` | `__FILE__` exempt via `exempt_patterns` |
 | UV-DEF-006 | `test_constant_min_length` | `constant.min_length` | Violation for constant name below min |
 | UV-DEF-007 | `test_constant_max_length` | `constant.max_length` | Violation for constant name above max |
+| UV-DEF-008 | `test_typedef_alias_lower_snake_no_constant_case` | `constant.case` | `#define module_my_type_t uint8_t` NOT flagged when suffix enabled (issue #272) |
+| UV-DEF-009 | `test_typedef_alias_mixed_case_no_constant_case` | `constant.case` | Mixed-case typedef alias NOT flagged for `constant.case` |
+| UV-DEF-010 | `test_regular_constant_still_flagged` | `constant.case` | Non-`_t` constant with wrong case still flagged |
+| UV-DEF-011 | `test_function_like_macro_still_flagged` | `macro.case` | Function-like `_t`-suffixed macro still flagged |
+| UV-DEF-012 | `test_typedef_suffix_disabled_alias_flagged` | `constant.case` | When suffix disabled, `_t`-named constant IS flagged |
+| UV-DEF-013 | `test_typedef_alias_uppercase_t_suffix` | `constant.case` | Suffix match is case-insensitive (`_T` also exempted) |
 
 ---
 
@@ -332,10 +339,10 @@ These test modules provide regression coverage for previously fixed bugs and new
 
 ---
 
-### 5.14 MISRA C Rule Tests — `test_misra_rules.py` (52 tests)
+### 5.14 MISRA C Rule Tests — `test_misra_rules.py` (64 tests)
 
-Added in v1.1. Covers three new MISRA C:2012/2023 Required rules and one BUG-004 regression.
-ASPICE traceability: SWE1-MISRA-001 (Rule 7.3), SWE1-MISRA-002 (Rule 7.1), SWE1-MISRA-003 (Rule 4.2).
+Covers four MISRA C:2012/2023 Required rules and one BUG-004 regression.
+ASPICE traceability: SWE1-MISRA-001 (Rule 7.3), SWE1-MISRA-002 (Rule 7.1), SWE1-MISRA-003 (Rule 4.2), SWE1-MISRA-004 (Rule 4.1).
 
 | TC-ID | MISRA Rule | SWE4 Test ID range | Verified Behaviour |
 |---|---|---|---|
@@ -343,8 +350,23 @@ ASPICE traceability: SWE1-MISRA-001 (Rule 7.3), SWE1-MISRA-002 (Rule 7.1), SWE1-
 | SWE4-TC-7.1-001 to 7.1-016 | Rule 7.1 (octal constants) | 16 tests | Flags `010`, `07`, `0777U`; passes `0`, `0U`, `0x08`, `0.5` |
 | SWE4-TC-4.2-001 to 4.2-017 | Rule 4.2 (trigraphs) | 17 tests | Flags all 9 trigraph sequences; passes `??` alone, `?` alone |
 | BUG-004-001 to 004-004 | Yoda negative literal | 4 tests | `x == -1` message shows `-1`, not `1` |
+| SWE4-TC-4.1-001 to 4.1-012 | Rule 4.1 (non-ASCII source) | 12 tests | Flags non-ASCII bytes, BOM, control chars; passes tab/LF/CR/printable ASCII; exempt_string_literals option works |
 
-Each test class verifies: positive detection, negative non-detection, disabled-rule suppression, configurable severity, violation message content, and (for trigraphs) accurate line number.
+Each test class verifies: positive detection, negative non-detection, disabled-rule suppression, configurable severity, and violation message content.
+
+### 5.15 Print Summary Per-File Breakdown — `test_print_summary.py` (7 tests)
+
+Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SWE1-089, issue #278).
+
+| TC-ID | Test Name | Verified Behaviour |
+|---|---|---|
+| UV-SUM-001 | `test_per_file_section_present` | Output contains "Per-file breakdown" header |
+| UV-SUM-002 | `test_files_with_errors_count` | Unique files with errors counted correctly |
+| UV-SUM-003 | `test_files_with_warnings_count` | Files with warnings (no errors) in own bucket |
+| UV-SUM-004 | `test_files_clean_count` | Files with no violations shown as clean |
+| UV-SUM-005 | `test_all_clean` | Zero violations: all files clean |
+| UV-SUM-006 | `test_file_counted_once_highest_severity` | File with errors+warnings counted only under errors |
+| UV-SUM-007 | `test_no_files_checked_no_breakdown` | No breakdown section emitted when files_checked = 0 |
 | UV-IMP-006 | `function.static_prefix` | `prv_` prefix enforced on static functions |
 | UV-IMP-007 | `constant.min_length` / `macro.min_length` | Previously undocumented; now implemented |
 | UV-IMP-008 | Baseline suppression | Known violations suppressed; new ones reported |
@@ -357,7 +379,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 |---|---|---|---|---|
 | `test_variables.py` | 43 | 43 | 0 | `_check_variables` |
 | `test_functions.py` | 14 | 14 | 0 | `_check_functions` |
-| `test_defines.py` | 16 | 16 | 0 | `_check_defines` |
+| `test_defines.py` | 22 | 22 | 0 | `_check_defines` (incl. typedef-alias exemption) |
 | `test_typedefs.py` | 8 | 8 | 0 | `_check_typedefs` |
 | `test_enums.py` | 11 | 11 | 0 | `_check_enums` |
 | `test_structs.py` | 12 | 12 | 0 | `_check_structs` |
@@ -377,7 +399,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_eof_comment.py` | 33 | 33 | 0 | `_check_eof_comment` |
 | `test_copyright_header.py` | 55 | 55 | 0 | `_check_copyright_header` |
 | `test_parameter_prefix.py` | 47 | 47 | 0 | `_check_variables` |
-| `test_misra_rules.py` | 52 | 52 | 0 | `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_yoda` |
+| `test_misra_rules.py` | 64 | 64 | 0 | `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_non_ascii_source`, `_check_yoda` |
 | `test_block_comment_spacing.py` | 29 | 29 | 0 | `_check_block_comment_spacing` |
 | `test_workflow_config.py` | 16 | 16 | 0 | CI workflow configuration regression |
 | `test_github_annotations.py` | 8 | 8 | 0 | GitHub Actions annotation output |
@@ -404,7 +426,8 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | `test_macro_multistatement_wrapper.py` | 9 | 9 | 0 | COMP-01 (`_check_macro_multistatement_wrapper`) |
 | `test_identifier_length.py` | 10 | 10 | 0 | COMP-01 (`_check_identifier_length`) |
 | `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-01 (`_check_no_single_char_identifiers`) |
-| **Total** | **1157** | **1157** | **0** | All rules covered — 49 modules |
+| `test_print_summary.py` | 7 | 7 | 0 | `output.print_summary` (per-file breakdown) |
+| **Total** | **1182** | **1182** | **0** | All rules covered — 52 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
@@ -420,7 +443,7 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 |---|---|---|
 | SWE1-017 to SWE1-029 | Variable rules | UV-VAR-001 to UV-VAR-015 |
 | SWE1-030 to SWE1-034 | Function rules | UV-FUN-001 to UV-FUN-007 |
-| SWE1-035 to SWE1-039 | Constant/macro rules | UV-DEF-001 to UV-DEF-007 |
+| SWE1-035 to SWE1-039, SWE1-090 | Constant/macro rules | UV-DEF-001 to UV-DEF-013 |
 | SWE1-040 to SWE1-042 | Type rules | UV-TYP-001 to UV-TYP-007 |
 | SWE1-043 to SWE1-044 | Include guard rules | UV-INC-001 to UV-INC-005 |
 | SWE1-045 to SWE1-050 | Miscellaneous rules | UV-MSC-001 to UV-MSC-007 |
@@ -448,6 +471,9 @@ Each test class verifies: positive detection, negative non-detection, disabled-r
 | SWE1-086 | Macro multistatement wrapper (`_check_macro_multistatement_wrapper`) | `test_macro_multistatement_wrapper.py` |
 | SWE1-087 | Identifier length (`_check_identifier_length`) | `test_identifier_length.py` |
 | SWE1-088 | No single-char identifiers (`_check_no_single_char_identifiers`) | `test_no_single_char_identifiers.py` |
+| SWE1-MISRA-004 | Non-ASCII source characters (`_check_non_ascii_source`) | `test_misra_rules.py` — SWE4-TC-4.1-001 to 4.1-012 |
+| SWE1-089 | Per-file breakdown in `print_summary` | `test_print_summary.py` — UV-SUM-001 to UV-SUM-007 |
+| SWE1-090 | Typedef-alias `constant.case` exemption in `_check_defines` | `test_defines.py` — UV-DEF-008 to UV-DEF-013 |
 
 ---
 

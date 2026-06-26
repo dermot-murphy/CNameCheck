@@ -535,6 +535,39 @@ misc:
     severity: error   # MISRA C:2023 promotes this to Required
 
   # -----------------------------------------------------------------------
+  # Non-ASCII source characters (issue #279)
+  # -----------------------------------------------------------------------
+  # Source files shall contain only printable ASCII characters (0x20–0x7E)
+  # and the standard whitespace characters (tab 0x09, newline 0x0A,
+  # carriage return 0x0D).  Non-ASCII bytes (0x80–0xFF) and non-printable
+  # control characters (0x00–0x08, 0x0B–0x0C, 0x0E–0x1F, 0x7F) are
+  # forbidden.
+  #
+  # Rationale (MISRA C:2012 Rule 4.1 / MISRA C:2023 Rule 4.1):
+  #   The source character set for C is the basic source character set.
+  #   Characters outside this set have implementation-defined behaviour
+  #   and must not appear in source code.
+  #
+  # Common sources of non-ASCII characters in embedded C:
+  #   - UTF-8 encoded string literals with accented characters
+  #   - Comments containing non-ASCII text (e.g. author names, units)
+  #   - Copy-pasted content from word processors (curly quotes, em-dashes)
+  #
+  # Exceptions: string literals and character constants may sometimes
+  # need non-ASCII characters for internationalisation.  Use the
+  # exempt_string_literals option to allow non-ASCII inside double-quoted
+  # strings only.
+  #
+  #   Violation:  uint8_t café_count;   // é is non-ASCII
+  #   Correct:    uint8_t cafe_count;
+  non_ascii_source:
+    enabled: true
+    severity: error
+    # When true, non-ASCII bytes inside double-quoted string literals
+    # are exempted from this rule (they may be intentional UTF-8 content).
+    exempt_string_literals: false
+
+  # -----------------------------------------------------------------------
   # Declared but not defined (issue #114)
   # -----------------------------------------------------------------------
   # Cross-file check: identifies C objects that are declared (via 'extern'
