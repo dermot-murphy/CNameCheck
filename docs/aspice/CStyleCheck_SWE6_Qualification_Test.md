@@ -22,7 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
-| 1.7 | 2026-06-25 | Claude | AUD7-F-001 corrective action — update SWQ-003 from 53 to 75 rule IDs; expand rule-category table with all v1.2.x/MISRA/v1.4.0 rules; extend SW-REQ refs to SWE1-088; update requirements coverage to 88 |
+| 1.7 | 2026-06-25 | Claude | AUD7-F-001 corrective action — update SWQ-003 from 53 to 71 rule IDs; expand rule-category table with all v1.2.x/MISRA/v1.4.0 rules; extend SW-REQ refs to SWE1-088; update requirements coverage to 88 |
 | 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: fix version text v1.0.0→v1.2.x, rule count 48→53, update referenced doc versions, resolve §3.2 placeholders — resolves issue #163 |
@@ -126,12 +126,12 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 ---
 
-### SWQ-003 — All 75 Rule IDs Detected
+### SWQ-003 — All 71 Rule IDs Detected
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SWQ-003 |
-| **Objective** | Verify all 75 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-088) |
+| **Objective** | Verify all 71 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-088) |
 | **SW-REQ** | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-003, SWE1-071, SWE1-078 to SWE1-088 |
 
 | Rule Category | Rule IDs | Test Module | Result |
@@ -353,7 +353,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 |---|---|---|---|---|
 | SWQ-001 | Configuration loading | SWE1-001 to SWE1-006 | PASS | |
 | SWQ-002 | File discovery and CLI | SWE1-068 to SWE1-070 | PASS | |
-| SWQ-003 | All 75 rule IDs | SWE1-017 to SWE1-056, SWE1-MISRA-001–003, SWE1-071, SWE1-078–088 | PASS | |
+| SWQ-003 | All 71 rule IDs | SWE1-017 to SWE1-056, SWE1-MISRA-001–003, SWE1-071, SWE1-078–088 | PASS | |
 | SWQ-004 | Output format qualification | SWE1-057 to SWE1-064 | PASS | |
 | SWQ-005 | Dictionary and spell check | SWE1-007 to SWE1-010, SWE1-056 | PASS | |
 | SWQ-006 | Cross-file sign compatibility | SWE1-051 to SWE1-053 | PASS | |

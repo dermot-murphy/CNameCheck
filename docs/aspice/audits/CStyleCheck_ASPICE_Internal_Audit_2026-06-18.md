@@ -9,7 +9,7 @@
 | **Scope** | CL2 re-assessment of all 17 processes against the current `main` baseline; resolution check on `CSC-PA2-001` §6 staleness |
 | **Overall Status** | **CL2 Achieved, with one open corrective action** |
 | **Test count (actual)** | 1152 / 49 modules |
-| **Rule count (actual)** | 75 |
+| **Rule count (actual)** | 71 |
 
 ---
 
@@ -44,7 +44,7 @@ The 11 rules added across v1.3.0/v1.4.0 (issues #221–#232, SWE1-078 to SWE1-08
 - **SYS.5** (`CSC-SYS5-001`): `SYS-VTC-003` ("Full Rule Coverage") still says **"53 Rule IDs"** — its objective, RTM entries (§ "SYS-F-011 to F-024 → Covered"), and `SYS-F-020` itself (the umbrella system requirement SWE1-078–088 trace to) were never updated to mention the 11 new checks. `SYS-F-020`'s own text still only describes the pre-v1.3.0 misc rules (line length, indentation, magic numbers, unsigned suffix, yoda conditions, block comment spacing).
 - **SWE.6** (`CSC-SWE6-001`): `SWQ-003` ("All Rule IDs Detected") likewise still says **"53 Rule IDs"** and its rule-category breakdown table omits the `macro.*` and the 6 new `misc.*`/`naming.*` rules entirely.
 
-**Impact:** the documented integration/system/qualification verification work products do not demonstrate that 11 of the product's 75 rules — roughly 15% of total functionality — were verified above the unit level for the current release. This is a genuine, currently-open gap, not a stale-documentation artefact like the §6 table issue.
+**Impact:** the documented integration/system/qualification verification work products do not demonstrate that 11 of the product's 71 rules — roughly 15% of total functionality — were verified above the unit level for the current release. This is a genuine, currently-open gap, not a stale-documentation artefact like the §6 table issue.
 
 **Disposition:** SWE.5 and SWE.6 downgrade from **F** (CSC-AUD-002) to **L** — base practices are performed and work products exist and are controlled, but evidence of complete verification scope is not yet objective. SYS.4 and SYS.5 remain **L** (unchanged — they already carried this caveat implicitly; CSC-AUD-002 did not anticipate the rule additions that came after it).
 
@@ -96,7 +96,7 @@ CL2 was actually achieved on 2026-05-29 (CSC-AUD-002, at v1.2.1) and remains ach
 |---|---|---|---|
 | Sync `CSC-PA2-001` §6 to this audit's ratings and verdict | (this audit) | Claude | v1.4.0 (immediate, this PR) |
 | Add `CSC-AUD-002` and `CSC-AUD-007` rows to `CSC-PA2-001` §5.4 baseline table | (this audit) | Claude | v1.4.0 (immediate, this PR) |
-| Add SIT/SITC/SYS-VTC/SWQ test cases for the 11 rules from #221–#232; update `SYS-F-020` and rule-count text (53→75) in `SYS-VTC-003`/`SWQ-003` | AUD7-F-001, #261 | Dermot Murphy | v1.5.0 |
+| Add SIT/SITC/SYS-VTC/SWQ test cases for the 11 rules from #221–#232; update `SYS-F-020` and rule-count text (53→71) in `SYS-VTC-003`/`SWQ-003` | AUD7-F-001, #261 | Dermot Murphy | v1.5.0 |
 
 ---
 

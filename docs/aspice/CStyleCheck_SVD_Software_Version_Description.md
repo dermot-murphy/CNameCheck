@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.11 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.12 |
+| **Project** | CStyleCheck | **Date** | 2026-06-25 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.12 | 2026-06-25 | Claude | Correct rule count 75→71 throughout (§4.2, §5.1, §8.2, §9): 71 is the confirmed count from source-code analysis |
 | 1.11 | 2026-06-18 | Claude | v1.4.1 patch release — fix `variable.parameter.p_prefix` false positive on call statements (issue #273); update version identifiers, release summary, change log |
 | 1.10 | 2026-06-18 | Claude | v1.4.0 release — update all version identifiers, release summary, change log, upgrade notes |
 | 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — fix internally inconsistent test counts: §3/§5.4/§8.2/§9 now all read 1152 tests / 49 modules (previously a mix of 1143 and stale 1041) |
@@ -82,7 +83,7 @@ v1.4.0 itself added 11 new rules from issues #221–#232 (`macro.trailing_semico
 `macro.multistatement_wrapper`, `misc.function_length`, `misc.function_doc_header`,
 `misc.assert_density`, `misc.null_statement_comment`, `misc.declaration_spacing`,
 `misc.file_length`, `misc.reserved_header_name`, `naming.identifier_length`,
-`naming.no_single_char_identifiers`), bringing the total to **75 rule IDs** — unchanged
+`naming.no_single_char_identifiers`), bringing the total to **71 rule IDs** — unchanged
 in this patch. The CLI entry point, all rule IDs, and all existing output formats remain
 backward-compatible with v1.4.0.
 
@@ -101,7 +102,7 @@ backward-compatible with v1.4.0.
 | `src/cstylecheck/models.py` | Violation, CheckResult, shared constants | `src/cstylecheck/models.py` |
 | `src/cstylecheck/preprocessor.py` | Comment/string stripping, token extraction | `src/cstylecheck/preprocessor.py` |
 | `src/cstylecheck/utils.py` | Case matching helpers, module-name derivation | `src/cstylecheck/utils.py` |
-| `src/cstylecheck/checker.py` | Main Checker class — all 75 rule implementations | `src/cstylecheck/checker.py` |
+| `src/cstylecheck/checker.py` | Main Checker class — all 71 rule implementations | `src/cstylecheck/checker.py` |
 | `src/cstylecheck/sign_checker.py` | Cross-file sign-compatibility and declared_not_defined | `src/cstylecheck/sign_checker.py` |
 | `src/cstylecheck/baseline.py` | Baseline load / write | `src/cstylecheck/baseline.py` |
 | `src/cstylecheck/output.py` | Text / JSON / SARIF / HTML formatters, Tee, summary table | `src/cstylecheck/output.py` |
@@ -276,7 +277,7 @@ The following issues are open at the time of this release and deferred to a futu
 | [#160](https://github.com/dermot-murphy/CStyleCheck/issues/160) | Pre-commit hook: warn gracefully when no C files are staged | Low |
 | [#161](https://github.com/dermot-murphy/CStyleCheck/issues/161) | `misc.copyright_header` regex anchoring edge cases on Windows line endings | Low |
 
-> No open issues map to known functional defects in the 75 active rules. All issue numbers above are illustrative; see GitHub for the live issue tracker.
+> No open issues map to known functional defects in the 71 active rules. All issue numbers above are illustrative; see GitHub for the live issue tracker.
 
 ---
 
@@ -350,7 +351,7 @@ benefit from them.
 
 The `src/cstylecheck.py` entry point shim is unchanged. All rule IDs, existing
 `rules.yml` configurations, and pre-commit hook definitions are unchanged from v1.4.0
-(75 rule IDs total). Users who import the checker programmatically via
+(71 rule IDs total). Users who import the checker programmatically via
 `import cstylecheck` continue to work without modification.
 
 ---
