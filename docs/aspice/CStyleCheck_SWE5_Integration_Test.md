@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.5 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.6 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-26 | Claude | Add SIT-019 covering 11 v1.4.0 rules (macro safety, function quality, file constraints, naming); advance SWE.5 to F — closes issue #261 |
 | 1.5 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.4 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.3 | 2026-06-04 | Claude | Automated accuracy audit: update referenced doc versions §3.1, test count 839→965 in overall result — resolves issue #163 |
@@ -31,7 +32,7 @@
 
 ## 3. Purpose & Scope
 
-This document defines the software integration test specification for **CStyleCheck v1.2.x**, verifying that the software components integrate correctly across the interfaces defined in CSC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
+This document defines the software integration test specification for **CStyleCheck v1.4.1**, verifying that the software components integrate correctly across the interfaces defined in CSC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
 
 Integration tests operate at a higher level than unit tests (SWE.4): they exercise data flows **across component boundaries** — primarily the path from COMP-01 (CLI) through COMP-04 (Parser) into COMP-05 (Rule Engine) and COMP-07 (Output Formatter) — rather than individual method logic.
 
@@ -43,8 +44,8 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 |---|---|---|
 | CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.8 |
 | CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.12 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.6 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.4 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.7 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.5 |
 
 ### 3.2 Test Environment
 
@@ -479,6 +480,31 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 ---
 
+### SIT-019 — v1.4.0 Rule Integration (Macro Safety, Function Quality, File Constraints, Naming)
+
+| Field | Value |
+|---|---|
+| **Test Case ID** | SIT-019 |
+| **Objective** | Verify end-to-end integration of the 11 rule IDs added in v1.4.0: `macro.trailing_semicolon`, `macro.multistatement_wrapper`, `misc.function_length`, `misc.function_doc_header`, `misc.assert_density`, `misc.null_statement_comment`, `misc.declaration_spacing`, `misc.file_length`, `misc.reserved_header_name`, `naming.identifier_length`, `naming.no_single_char_identifiers` |
+| **Interfaces** | SWA-IF-06, SWA-IF-10 |
+| **SW-REQ** | SWE1-078, SWE1-079, SWE1-080, SWE1-081, SWE1-082, SWE1-083, SWE1-084, SWE1-085, SWE1-086, SWE1-087, SWE1-088 |
+| **Test file** | `test_cli.py` |
+
+| Step | Action | Input | Expected Result |
+|---|---|---|---|
+| 1 | Source with `#define BAD(x) a=x;b=x` (multi-statement, no semicolon on wrapper) | Subprocess with all 11 v1.4.0 rules enabled | `macro.trailing_semicolon` and `macro.multistatement_wrapper` violations reported |
+| 2 | Source with a function body exceeding `max_function_lines` and missing documentation header block | Same config | `misc.function_length` and `misc.function_doc_header` violations reported |
+| 3 | Source with `for(;;) ;` null body (no trailing comment), adjacent declarations without blank line, and assert density below threshold | Same config | `misc.null_statement_comment`, `misc.declaration_spacing`, and `misc.assert_density` violations reported |
+| 4 | Source file exceeding `max_file_lines`; header named after a C standard reserved name (e.g. `stdio.h`) | Same config | `misc.file_length` and `misc.reserved_header_name` violations reported |
+| 5 | Source with single-character identifier `int x` (below `min_identifier_length`) | Same config | `naming.identifier_length` and `naming.no_single_char_identifiers` violations reported; exit code = 1 |
+| 6 | All 11 rules disabled in config; re-run same sources | Modified config | Zero violations; exit code = 0 |
+
+| Date | Tester | Python | Result | Deviation |
+|---|---|---|---|---|
+| 2026-06-26 | GitHub Actions (automated) | 3.11 | PASS | |
+
+---
+
 ## 6. Integration Test Results Summary
 
 | SIT-ID | Test Case | Interfaces | Status | Deviation Ref |
@@ -501,8 +527,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-016 | Config wizard | IF-01 (filesystem) | PASS | |
 | SIT-017 | Per-directory config | IF-03 | PASS | |
 | SIT-018 | HTML report output | IF-10 | PASS | |
+| SIT-019 | v1.4.0 rule integration (macro safety, function quality, file constraints, naming) | IF-06, IF-10 | PASS | |
 
-**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28 (SIT-001 to SIT-013); 2026-06-05 (SIT-014 to SIT-018), GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1041 tests all PASS, 87.31% combined coverage.
+**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28 (SIT-001 to SIT-013); 2026-06-05 (SIT-014 to SIT-018); 2026-06-26 (SIT-019), GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1041 tests all PASS, 87.31% combined coverage.
 
 > **📋 Note:** All 10 defined software architecture interfaces must be covered before integration testing is considered complete. Any uncovered interface must be resolved via a new or updated test case.
 
@@ -530,6 +557,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-016 | SWE1-075 | IF-01 | `test_init_wizard.py` | — |
 | SIT-017 | SWE1-076 | IF-03 | `test_per_dir_config.py` | — |
 | SIT-018 | SWE1-077 | IF-10 | `test_html_report.py` | — |
+| SIT-019 | SWE1-078, SWE1-079, SWE1-080, SWE1-081, SWE1-082, SWE1-083, SWE1-084, SWE1-085, SWE1-086, SWE1-087, SWE1-088 | IF-06, IF-10 | `test_cli.py` | SWQ-003 |
 
 ---
 

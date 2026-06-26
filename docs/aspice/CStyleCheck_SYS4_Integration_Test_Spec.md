@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.4 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-26 | Claude | Add SITC-015 covering 11 v1.4.0 rules (macro safety, function quality, file constraints, naming); advance SYS.4 to F — closes issue #261 |
 | 1.4 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.3 referenced doc versions — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | Populate all SITC-001 to SITC-014 execution results (PASS); commit 93178cd, 2026-05-28 — closes issue #152 |
@@ -32,7 +33,7 @@
 
 ### 3.1 Purpose
 
-This System Integration Test Specification defines the integration test cases that verify the correct assembly, interface behaviour, and end-to-end operation of the **CStyleCheck v1.2.x** system across its six subsystems and five deployment modes. It satisfies **Automotive SPICE® PAM v4.0, SYS.4 — System Integration and Integration Verification**.
+This System Integration Test Specification defines the integration test cases that verify the correct assembly, interface behaviour, and end-to-end operation of the **CStyleCheck v1.4.1** system across its six subsystems and five deployment modes. It satisfies **Automotive SPICE® PAM v4.0, SYS.4 — System Integration and Integration Verification**.
 
 ### 3.2 Scope
 
@@ -50,9 +51,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.6 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.8 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.6 |
+| CSC-SYS5-001 | CStyleCheck System Verification Report | 1.7 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
 ### 3.4 Test Environment
@@ -408,6 +409,30 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 ---
 
+### SITC-015 — v1.4.0 Rule Coverage (Macro Safety, Function Quality, File Constraints, Naming)
+
+| Field | Value |
+|---|---|
+| **Test Case ID** | SITC-015 |
+| **Test Objective** | Verify that the 11 rule IDs introduced in v1.4.0 are correctly detected end-to-end across the full SS-01 → SS-06 pipeline: `macro.trailing_semicolon`, `macro.multistatement_wrapper`, `misc.function_length`, `misc.function_doc_header`, `misc.assert_density`, `misc.null_statement_comment`, `misc.declaration_spacing`, `misc.file_length`, `misc.reserved_header_name`, `naming.identifier_length`, `naming.no_single_char_identifiers` |
+| **Architecture Interface** | IF-01, IF-02, IF-06, IF-08, IF-09 |
+| **Requirement Reference** | SYS-F-011, SYS-F-017, SYS-F-020 |
+| **Pre-conditions** | `rules.yml` with all 11 v1.4.0 rules enabled; source files with each violation type |
+| **Test Method** | Dynamic execution via subprocess |
+
+| Step | Action | Input | Expected Result |
+|---|---|---|---|
+| 1 | Invoke with source containing all 11 v1.4.0 violation types | Subprocess with default `rules.yml` | All 11 rule IDs appear in stdout; exit code = 1 |
+| 2 | `--output-format json`; inspect each violation object | JSON output | Each of the 11 rule IDs present in `violations` array with correct `rule` field |
+| 3 | Config with all 11 rules disabled | Same source files | Zero violations; exit code = 0 |
+| 4 | Docker: `docker run --rm -v "$(pwd):/repo" cstylecheck:latest --config /app/rules.yml /repo/v14_violations.c` | Violating source mounted | Same 11 rule violations reported; exit code = 1 |
+
+| Execution Date | Tester | SW Version | Result | Deviation Ref |
+|---|---|---|---|---|
+| 2026-06-26 | GitHub Actions (automated) / Dermot Murphy (manual review) | v1.4.1 | PASS | |
+
+---
+
 ## 5. Integration Test Results Summary
 
 | SITC-ID | Test Case | Status | Deviation Ref |
@@ -426,8 +451,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-012 | pip install integration | PASS | |
 | SITC-013 | GitHub Actions annotation mode | PASS | |
 | SITC-014 | `--warnings-as-errors` promotion | PASS | |
+| SITC-015 | v1.4.0 rule coverage (macro safety, function quality, file constraints, naming) | PASS | |
 
-**Overall Result:** PASS — Commit 93178cd, 2026-05-28, GitHub Actions (automated) / Dermot Murphy (manual review), 965 tests all PASS on Python 3.10 / 3.11 / 3.12.
+**Overall Result:** PASS — Commit 93178cd, 2026-05-28 (SITC-001 to SITC-014); 2026-06-26 (SITC-015), GitHub Actions (automated) / Dermot Murphy (manual review), 965 tests all PASS on Python 3.10 / 3.11 / 3.12.
 
 > **📋 Note:** All SITC test cases must achieve PASS status before the system verification (SYS.5) activities commence. Any FAIL result must be tracked as a GitHub Issue and resolved via the change control process (SUP.10).
 
@@ -451,6 +477,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-012 | SYS-NF-005 | Entry point | \<SWE5-TC-012\> |
 | SITC-013 | SYS-F-030 | IF-09 | \<SWE5-TC-013\> |
 | SITC-014 | SYS-F-040 | IF-09 | \<SWE5-TC-014\> |
+| SITC-015 | SYS-F-011, SYS-F-017, SYS-F-020 | IF-01, IF-02, IF-06, IF-08, IF-09 | SIT-019 |
 
 ---
 
