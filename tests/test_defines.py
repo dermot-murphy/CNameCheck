@@ -112,5 +112,95 @@ class TestMacroPrefix(unittest.TestCase):
                              MACRO_CFG, "macro.prefix", filepath="module.c"))
 
 
+TYPEDEF_CONST_CFG = cfg_only(
+    file_prefix={"enabled": True, "severity": "error", "separator": "_",
+                 "case": "lower", "exempt_main": True, "exempt_patterns": []},
+    constants={"enabled": True, "severity": "error", "case": "upper_snake",
+               "max_length": 60, "min_length": 2, "exempt_patterns": []},
+    macros={"enabled": True, "severity": "error", "case": "upper_snake",
+            "max_length": 60, "exempt_patterns": []},
+    typedefs={"enabled": True, "severity": "error", "case": "lower_snake",
+              "suffix": {"enabled": True, "suffix": "_t"}},
+)
+
+TYPEDEF_CONST_CFG_DISABLED_SUFFIX = cfg_only(
+    file_prefix={"enabled": True, "severity": "error", "separator": "_",
+                 "case": "lower", "exempt_main": True, "exempt_patterns": []},
+    constants={"enabled": True, "severity": "error", "case": "upper_snake",
+               "max_length": 60, "min_length": 2, "exempt_patterns": []},
+    macros={"enabled": False},
+    typedefs={"enabled": True, "severity": "error", "case": "lower_snake",
+              "suffix": {"enabled": False, "suffix": "_t"}},
+)
+
+
+class TestTypedefSuffixExemption(unittest.TestCase):
+    """Issue #272/#244: #define type aliases ending with _t must not trigger
+    constant.case even though they are object-like #defines."""
+
+    def test_typedef_alias_lower_snake_no_constant_case(self):
+        """#define api_nvm_error_t uint8_t should NOT trigger constant.case."""
+        self.assertFalse(has(
+            "#define module_my_type_t uint8_t\n",
+            TYPEDEF_CONST_CFG,
+            "constant.case",
+            filepath="module.c",
+        ))
+
+    def test_typedef_alias_mixed_case_no_constant_case(self):
+        """Mixed-case typedef alias must NOT trigger constant.case."""
+        self.assertFalse(has(
+            "#define module_MyType_t uint16_t\n",
+            TYPEDEF_CONST_CFG,
+            "constant.case",
+            filepath="module.c",
+        ))
+
+    def test_regular_constant_still_flagged(self):
+        """Non-_t constant with wrong case must still be flagged."""
+        self.assertTrue(has(
+            "#define module_bad_name 1U\n",
+            TYPEDEF_CONST_CFG,
+            "constant.case",
+            filepath="module.c",
+        ))
+
+    def test_function_like_macro_still_flagged(self):
+        """Function-like macro with wrong case is still flagged even when suffix matches."""
+        self.assertTrue(has(
+            "#define module_swap_t(a,b) ((a)+(b))\n",
+            TYPEDEF_CONST_CFG,
+            "macro.case",
+            filepath="module.c",
+        ))
+
+    def test_typedef_suffix_disabled_alias_flagged(self):
+        """When suffix check is disabled, _t-suffixed name IS flagged as constant.case."""
+        self.assertTrue(has(
+            "#define module_my_type_t uint8_t\n",
+            TYPEDEF_CONST_CFG_DISABLED_SUFFIX,
+            "constant.case",
+            filepath="module.c",
+        ))
+
+    def test_typedef_alias_uppercase_t_suffix(self):
+        """Suffix matching is case-insensitive: _T suffix also exempted."""
+        cfg_upper = cfg_only(
+            file_prefix={"enabled": True, "severity": "error", "separator": "_",
+                         "case": "lower", "exempt_main": True, "exempt_patterns": []},
+            constants={"enabled": True, "severity": "error", "case": "upper_snake",
+                       "max_length": 60, "min_length": 2, "exempt_patterns": []},
+            macros={"enabled": False},
+            typedefs={"enabled": True, "severity": "error", "case": "lower_snake",
+                      "suffix": {"enabled": True, "suffix": "_T"}},
+        )
+        self.assertFalse(has(
+            "#define module_my_type_T uint8_t\n",
+            cfg_upper,
+            "constant.case",
+            filepath="module.c",
+        ))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

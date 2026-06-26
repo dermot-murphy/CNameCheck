@@ -347,6 +347,7 @@ class Checker:
         self._check_lowercase_l_suffix()   # MISRA C:2012/2023 Rule 7.3
         self._check_octal_constants()      # MISRA C:2012/2023 Rule 7.1
         self._check_trigraphs()            # MISRA C:2012/2023 Rule 4.2
+        self._check_non_ascii_source()     # MISRA C:2012/2023 Rule 4.1
         if self._spell_dict is not None:
             self._check_spelling()
         # Remove violations for rules that are disabled for this file
@@ -395,7 +396,22 @@ class Checker:
             if is_exempt(name, exempt_pats):
                 continue
 
-            if not matches_case(name, expected_case):
+            # Skip constant.case for object-like #defines whose name ends
+            # with the project's typedef suffix (e.g. _t / _T): these are
+            # type aliases, not constant values (issue #272).
+            td_suffix_cfg = self.cfg.get("typedefs", {}).get("suffix", {})
+            td_suffix = (
+                td_suffix_cfg.get("suffix", "_T")
+                if td_suffix_cfg.get("enabled")
+                else None
+            )
+            is_typedef_alias = (
+                not is_fn
+                and td_suffix is not None
+                and name.lower().endswith(td_suffix.lower())
+            )
+
+            if not is_typedef_alias and not matches_case(name, expected_case):
                 self._v(m.start(), sev, f"{rule_pfx}.case",
                         f"{label} '{name}' must be {expected_case}")
 
@@ -2071,6 +2087,54 @@ class Checker:
                 self.filepath, line, col, sev, "misc.trigraph",
                 f"Trigraph '{m.group(0)}' is forbidden "
                 f"(MISRA C:2012 Rule 4.2 Advisory; MISRA C:2023 Rule 4.2 Required)"
+            ))
+
+    # -----------------------------------------------------------------------
+    # 14. Non-ASCII source characters (misc.non_ascii_source, issue #279)
+    #
+    # Source files shall only contain printable ASCII characters and the
+    # standard whitespace characters (tab, LF, CR).  Non-ASCII Unicode code
+    # points and non-printable control characters are forbidden.
+    #
+    # We iterate over the Python str directly so that character offsets
+    # align correctly with the line_map (which is also built from the str).
+    # -----------------------------------------------------------------------
+
+    def _check_non_ascii_source(self) -> None:
+        na_cfg = self.cfg.get("misc", {}).get("non_ascii_source", {})
+        if not na_cfg.get("enabled", True):
+            return
+        sev = na_cfg.get("severity", "error")
+        exempt_strings = na_cfg.get("exempt_string_literals", False)
+
+        # When exempting string literals, collect char offsets inside
+        # double-quoted strings so we can skip violations at those positions.
+        exempt_offsets: set = set()
+        if exempt_strings:
+            in_str = False
+            prev_ch = ''
+            for idx, ch in enumerate(self.source):
+                if ch == '"' and prev_ch != '\\':
+                    in_str = not in_str
+                if in_str:
+                    exempt_offsets.add(idx)
+                prev_ch = ch
+
+        for idx, ch in enumerate(self.source):
+            cp = ord(ch)
+            # Allow: tab (0x09), LF (0x0A), CR (0x0D), printable ASCII (0x20-0x7E)
+            if cp == 0x09 or cp == 0x0A or cp == 0x0D:
+                continue
+            if 0x20 <= cp <= 0x7E:
+                continue
+            if idx in exempt_offsets:
+                continue
+            line, col = offset_to_line_col(self._line_map, idx)
+            self.result.add(Violation(
+                self.filepath, line, col, sev, "misc.non_ascii_source",
+                f"Non-ASCII or non-printable character (0x{cp:02X}) at "
+                f"line {line}, col {col}; source files must use only "
+                f"printable ASCII characters (MISRA C:2012/2023 Rule 4.1)"
             ))
 
     # -----------------------------------------------------------------------
