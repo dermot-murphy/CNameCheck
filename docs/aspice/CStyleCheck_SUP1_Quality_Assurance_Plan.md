@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP1-001 | **Version** | 1.4 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SUP1-001 | **Version** | 1.5 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.1 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.5 | 2026-06-26 | Claude | §5.4: add per-release peer-review record production as a release gate checklist item; update §3 scope to v1.4.1 — closes issue #268 |
 | 1.4 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 Purpose version text, update §3.1 referenced doc versions (all 5 stale), update QO-006 and §5.4 to v1.2.0, clarify §7 version language — resolves issue #163 |
 | 1.2 | 2026-05-28 | Dermot Murphy | §4 QO-003/QO-004: document 85% combined CI gate as enforced threshold; 90% statement as aspirational target; align §5.4 checklist — closes issue #151 |
@@ -30,7 +31,7 @@
 
 ## 3. Purpose & Scope
 
-This Quality Assurance Plan defines the QA strategy, activities, criteria, and records for **CStyleCheck v1.2.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.1 — Quality Assurance**.
+This Quality Assurance Plan defines the QA strategy, activities, criteria, and records for **CStyleCheck v1.4.1**. It satisfies **Automotive SPICE® PAM v4.0, SUP.1 — Quality Assurance**.
 
 QA activities for CStyleCheck verify that project processes are followed as planned and that work products meet their defined quality criteria. Because CStyleCheck is itself a quality tool (a naming-convention linter), the project benefits from self-hosting its own quality checks.
 
@@ -105,9 +106,10 @@ Performed by the QA role before creating the release baseline:
 - [ ] Version in `_version.py` == version in `pyproject.toml` == intended release tag
 - [ ] GitHub Release draft prepared with correct change log
 - [ ] All ASPICE documents reviewed and approval tables signed
-- [ ] Zero open GitHub Issues with `bug` label targeting v1.2.0
+- [ ] Zero open GitHub Issues with `bug` label targeting the release version
 - [ ] Docker image digest recorded in GitHub Actions log
 - [ ] CM baseline checklist in CSC-SUP8-001 §11 completed
+- [ ] **Peer-review record produced**: copy `CStyleCheck_Review_Template.md`, populate as `CStyleCheck_Review_Record_v<X.Y>.md`, commit to `docs/aspice/`, and reference from CSC-PA2-001 §5.4 (per CSC-REVIEW-TEMPLATE-001; ASPICE GP 2.2.3)
 
 ---
 
