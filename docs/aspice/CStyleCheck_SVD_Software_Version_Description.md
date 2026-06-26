@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.15 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.16 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.16 | 2026-06-26 | Claude | ASPICE audit corrections — update §3.1/§5.5/§10 doc version refs (SWE1 2.0→2.1, SWE2 1.8→1.9, SWE3 1.11→1.12, SWE4 1.13→1.14, SWE5 1.8→1.9, SWE6 1.9→1.10, SUP1 1.6→1.7, SYS2 1.6→1.9, SYS4 1.6→1.7); update test count 1182→1183 throughout — closes #302 #303 #304 #305 #306 #307 #308 #309 #310 #311 #312 |
 | 1.15 | 2026-06-26 | Claude | v1.5.0 release — update all version identifiers, release summary, change log, upgrade notes |
 | 1.14 | 2026-06-26 | Claude | Complete v1.4.1 content (PR #295) — add F-017/F-018/F-019; update rule count 71→72, test count 1157→1182, module count 49→50; sync §3.1/§5.4/§5.5/§6/§8 doc version refs; correct rule count throughout |
 | 1.13 | 2026-06-25 | Claude | Doc accuracy — sync §5.5 document version table to v1.4.1 baseline (CSC-SYS5-001/CSC-SWE6-001 → 1.7, CSC-PA2-001 → 1.13, self → 1.13) |
@@ -48,14 +49,14 @@ This document satisfies the release-identification and configuration-status-acco
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.0 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.8 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.11 |
-| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.13 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.8 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.9 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.1 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.9 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.12 |
+| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.14 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.9 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.10 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
-| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.6 |
+| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.7 |
 | CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.6 |
 
 ---
@@ -138,7 +139,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ### 5.4 Test Suite
 
-**Total: 1182 tests across 50 modules** — all passing.
+**Total: 1183 tests across 50 modules** — all passing.
 
 | Item | Test Count | Description |
 |---|---|---|
@@ -183,7 +184,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_function_length.py` | 11 | `misc.function_length` rule |
 | `tests/test_function_doc_header.py` | 12 | `misc.function_doc_header` rule |
 | `tests/test_assert_density.py` | 8 | `misc.assert_density` rule |
-| `tests/test_null_statement_comment.py` | 10 | `misc.null_statement_comment` rule |
+| `tests/test_null_statement_comment.py` | 11 | `misc.null_statement_comment` rule |
 | `tests/test_declaration_spacing.py` | 8 | `misc.declaration_spacing` rule |
 | `tests/test_file_length.py` | 8 | `misc.file_length` rule |
 | `tests/test_reserved_header_name.py` | 10 | `misc.reserved_header_name` rule |
@@ -192,26 +193,26 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_identifier_length.py` | 10 | `naming.identifier_length` rule |
 | `tests/test_no_single_char_identifiers.py` | 8 | `naming.no_single_char_identifiers` rule |
 | `tests/test_print_summary.py` | 7 | `print_summary` per-file breakdown |
-| **Total** | **1182** | |
+| **Total** | **1183** | |
 
 ### 5.5 Documentation
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SVD-001 | Software Version Description (this document) | 1.15 |
-| CSC-SWE1-001 | Software Requirements Specification | 2.0 |
-| CSC-SWE2-001 | Software Architecture Design | 1.8 |
-| CSC-SWE3-001 | Software Detailed Design | 1.11 |
-| CSC-SWE4-001 | Software Unit Verification Specification | 1.13 |
-| CSC-SWE5-001 | Software Integration Test Specification | 1.8 |
-| CSC-SWE6-001 | Software Qualification Test Specification | 1.9 |
-| CSC-SYS2-001 | System Requirements Specification | 1.6 |
+| CSC-SVD-001 | Software Version Description (this document) | 1.16 |
+| CSC-SWE1-001 | Software Requirements Specification | 2.1 |
+| CSC-SWE2-001 | Software Architecture Design | 1.9 |
+| CSC-SWE3-001 | Software Detailed Design | 1.12 |
+| CSC-SWE4-001 | Software Unit Verification Specification | 1.14 |
+| CSC-SWE5-001 | Software Integration Test Specification | 1.9 |
+| CSC-SWE6-001 | Software Qualification Test Specification | 1.10 |
+| CSC-SYS2-001 | System Requirements Specification | 1.9 |
 | CSC-SYS3-001 | System Architecture Design | 1.5 |
-| CSC-SYS4-001 | System Integration Test Specification | 1.6 |
+| CSC-SYS4-001 | System Integration Test Specification | 1.7 |
 | CSC-SYS5-001 | System Verification Specification | 1.7 |
 | CSC-MAN3-001 | Project Management Plan | 1.6 |
 | CSC-MAN5-001 | Risk Management Plan | 1.3 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.6 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.7 |
 | CSC-SUP8-001 | Configuration Management Plan | 1.7 |
 | CSC-SUP9-001 | Problem Resolution Plan | 1.2 |
 | CSC-SUP10-001 | Change Request Plan | 1.2 |
@@ -305,7 +306,7 @@ and sync to `main` via PR #297:
 
 ### 8.2 Qualification Test Status
 
-All 1182 tests pass with no failures. Test counts per module are documented in §5.4.
+All 1183 tests pass with no failures. Test counts per module are documented in §5.4.
 
 ### 8.3 Docker Build
 
@@ -358,18 +359,18 @@ to work without modification.
 
 | Work Product | Document | Version | Status |
 |---|---|---|---|
-| System Requirements | CSC-SYS2-001 | 1.6 | Released |
+| System Requirements | CSC-SYS2-001 | 1.9 | Released |
 | System Architecture | CSC-SYS3-001 | 1.5 | Released |
-| System Integration Tests | CSC-SYS4-001 | 1.6 | Released |
-| System Verification | CSC-SYS5-001 | 1.6 | Released |
-| Software Requirements | CSC-SWE1-001 | 2.0 | Released |
-| Software Architecture | CSC-SWE2-001 | 1.8 | Released |
-| Detailed Design | CSC-SWE3-001 | 1.11 | Released |
-| Unit Verification | CSC-SWE4-001 | 1.13 | Released |
-| Integration Tests | CSC-SWE5-001 | 1.8 | Released |
-| Qualification Tests | CSC-SWE6-001 | 1.9 | Released |
+| System Integration Tests | CSC-SYS4-001 | 1.7 | Released |
+| System Verification | CSC-SYS5-001 | 1.7 | Released |
+| Software Requirements | CSC-SWE1-001 | 2.1 | Released |
+| Software Architecture | CSC-SWE2-001 | 1.9 | Released |
+| Detailed Design | CSC-SWE3-001 | 1.12 | Released |
+| Unit Verification | CSC-SWE4-001 | 1.14 | Released |
+| Integration Tests | CSC-SWE5-001 | 1.9 | Released |
+| Qualification Tests | CSC-SWE6-001 | 1.10 | Released |
 | Source Code | `src/cstylecheck/` (package) | 1.5.0 | Released |
-| Test Suite | `tests/` (1182 tests) | 1.5.0 | Released |
+| Test Suite | `tests/` (1183 tests) | 1.5.0 | Released |
 | CI Automation | `.github/workflows/` + `scripts/ci/` | 1.5.0 | Released |
 | Docker Image | `Dockerfile/Dockerfile` | 1.5.0 | Released |
 | Change Log | `CHANGELOG.md` | 1.5.0 | Released |
@@ -380,13 +381,13 @@ to work without modification.
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-05-29 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-05-29 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-05-29 |
-| Approver | Dermot Murphy | Approved | 2026-05-29 |
+| Author | Claude | Approved | 2026-06-26 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-06-26 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-06-26 |
+| Approver | Dermot Murphy | Approved | 2026-06-26 |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
 
 ---
 
-*End of Software Version Description — CStyleCheck v1.4.1*
+*End of Software Version Description — CStyleCheck v1.5.0*
