@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.11 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.12 |
+| **Project** | CStyleCheck | **Date** | 2026-06-25 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | PA 2.1, PA 2.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.12 | 2026-06-25 | Claude | AUD7-F-001 doc fix — update §6 SWE.6 capability summary; update CL2 verdict note to reflect SYS-VTC-003/SWQ-003 updated to 71 rule IDs; remaining test-scope gap still pending v1.5.0 |
 | 1.11 | 2026-06-18 | Claude | Fix §6 verdict summary arithmetic (11 F, 6 L → 9 F, 8 L; table itself was already correct); bump CSC-AUD-007 §5.4 entry to v1.1 (matching erratum); reorganise Wiki publishing into Deviations/Audits sections — see issue tracker |
 | 1.10 | 2026-06-18 | Claude | CSC-AUD-007 — §6 was stale since 2026-05-28 (predated issue #152 closure and superseding audit CSC-AUD-002); resync §6 ratings/verdict to current `main` (v1.4.0); CL2 confirmed ACHIEVED; add §5.4 rows for CSC-AUD-002/CSC-AUD-007 |
 | 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — update §4.1/§5.4/§6 SWE.4 test count 965→1152; mark CI-017 released at v1.3.0 |
@@ -232,7 +233,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 | SWE.3 | 112 units with algorithmic specs | Objectives: §4.1 | CSC-SWE3-001 reviewed; in CM | **F** | — |
 | SWE.4 | 1152 unit tests; self-check CI; 85% cov. | Objectives: §4.1; coverage targets | CSC-SWE4-001 reviewed; CI evidence | **F** | — |
 | SWE.5 | 18 SIT tests; new v1.3/v1.4 rules not yet covered | Objectives: §4.1 | CSC-SWE5-001 reviewed; in CM | **L** ⚠️ | AUD7-F-001, #261 |
-| SWE.6 | 12 SWQ tests; rule-coverage test stale at 53/75 rules | Objectives: §4.1; release gate | CSC-SWE6-001 reviewed; CI evidence | **L** ⚠️ | AUD7-F-001, #261 |
+| SWE.6 | 12 SWQ tests; SWQ-003 updated to 71 rule IDs (doc fix applied); SIT scope for 11 v1.4.0 rules pending v1.5.0 | Objectives: §4.1; release gate | CSC-SWE6-001 reviewed; CI evidence | **L** ⚠️ | AUD7-F-001, #261 |
 | MAN.3 | WBS, schedule, monitoring defined | Objectives: §4.1; §4.3 monitoring | CSC-MAN3-001 reviewed; in CM | **F** | — |
 | MAN.5 | 8 risks identified and treated | Objectives: §4.1; risk monitoring | CSC-MAN5-001 reviewed; in CM | **L** | — |
 | SUP.1 | QA gates and checklist defined | Objectives: §4.1; CI evidence | CSC-SUP1-001 reviewed; in CM | **L** | — |
@@ -243,7 +244,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 > **📋 Rating scale:** N = Not achieved (0–15%), P = Partially achieved (15–50%), L = Largely achieved (50–85%), F = Fully achieved (85–100%). All processes must achieve **L or F** at PA 2.1 and PA 2.2 for CL2 to be awarded.
 >
-> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **L or F** (9 F, 8 L, 0 P/N). One corrective action remains open — **AUD7-F-001**: the 11 rules added in v1.3.0/v1.4.0 (issues #221–#232) have requirements/design/unit-test coverage (SWE.1/SWE.3/SWE.4) but no integration-, system-, or qualification-level test cases yet (SWE.5/SYS.4/SYS.5/SWE.6); `SYS-VTC-003`/`SWQ-003` still cite "53 rule IDs" instead of 75. This downgrades SWE.5 and SWE.6 from F to L but does not affect the CL2 award. Targeted for the v1.5.0 cycle. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
+> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **L or F** (9 F, 8 L, 0 P/N). One corrective action partially resolved — **AUD7-F-001**: `SYS-VTC-003` and `SWQ-003` have been updated from "53 rule IDs" to 71 (documentation fix applied 2026-06-25). The remaining gap — no integration-, system-, or qualification-level test cases for the 11 rules added in v1.3.0/v1.4.0 (issues #221–#232) — is still pending (SWE.5/SYS.4/SYS.5/SWE.6 remain at L). Targeted for the v1.5.0 cycle. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
 >
 > **Ratings assigned by internal audit CSC-AUD-007, 2026-06-18 (supersedes CSC-AUD-001 2026-05-28 and CSC-AUD-002 2026-05-29 for this table).**
 

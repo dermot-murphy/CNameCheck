@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.6 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.7 |
+| **Project** | CStyleCheck | **Date** | 2026-06-25 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.6 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-06-25 | Claude | AUD7-F-001 corrective action — update SWQ-003 from 53 to 71 rule IDs; expand rule-category table with all v1.2.x/MISRA/v1.4.0 rules; extend SW-REQ refs to SWE1-088; update requirements coverage to 88 |
 | 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: fix version text v1.0.0→v1.2.x, rule count 48→53, update referenced doc versions, resolve §3.2 placeholders — resolves issue #163 |
@@ -125,27 +126,33 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 ---
 
-### SWQ-003 — All 53 Rule IDs Detected
+### SWQ-003 — All 71 Rule IDs Detected
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SWQ-003 |
-| **Objective** | Verify all 53 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-056) |
-| **SW-REQ** | SWE1-017 to SWE1-056 |
+| **Objective** | Verify all 71 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-088) |
+| **SW-REQ** | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-003, SWE1-071, SWE1-078 to SWE1-088 |
 
 | Rule Category | Rule IDs | Test Module | Result |
 |---|---|---|---|
-| Variables — global | `variable.global.case`, `variable.global.prefix`, `variable.global.g_prefix` | `test_variables.py` | |
-| Variables — static | `variable.static.case`, `variable.static.prefix`, `variable.static.s_prefix` | `test_variables.py` | |
-| Variables — local/param | `variable.local.case`, `variable.parameter.case`, `variable.parameter.p_prefix` | `test_variables.py`, `test_parameter_prefix.py` | |
-| Variable prefixes | `variable.pointer_prefix`, `variable.pp_prefix`, `variable.bool_prefix`, `variable.handle_prefix`, `variable.prefix_order`, `variable.min_length`, `variable.max_length`, `variable.no_numeric_in_name` | `test_variables.py`, `test_misc_improvements.py` | |
-| Functions | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix` | `test_functions.py` | |
-| Constants | `constant.case`, `constant.min_length`, `constant.max_length`, `constant.prefix` | `test_defines.py` | |
-| Macros | `macro.case`, `macro.min_length`, `macro.max_length`, `macro.prefix` | `test_defines.py` | |
-| Types | `typedef.case`, `typedef.suffix`, `enum.type_case`, `enum.type_suffix`, `enum.member_case`, `enum.member_prefix`, `struct.tag_case`, `struct.tag_suffix`, `struct.member_case` | `test_typedefs.py`, `test_enums.py`, `test_structs.py` | |
-| Include guards | `include_guard.missing`, `include_guard.format` | `test_include_guards.py` | |
-| Miscellaneous | `misc.line_length`, `misc.indentation`, `misc.magic_number`, `misc.unsigned_suffix`, `misc.yoda_condition`, `misc.block_comment_spacing` | `test_misc.py`, `test_yoda_condition.py`, `test_block_comment_spacing.py` | |
-| Other | `reserved_name`, `spell_check`, `sign_compatibility` | `test_reserved_name.py`, `test_spell_check.py`, `test_sign_compatibility.py` | |
+| Variables — global | `variable.global.case`, `variable.global.prefix`, `variable.global.g_prefix` | `test_variables.py` | PASS |
+| Variables — static | `variable.static.case`, `variable.static.prefix`, `variable.static.s_prefix` | `test_variables.py` | PASS |
+| Variables — local/param | `variable.local.case`, `variable.local.prefix`, `variable.parameter.case`, `variable.parameter.prefix`, `variable.parameter.p_prefix` | `test_variables.py`, `test_parameter_prefix.py` | PASS |
+| Variable prefixes | `variable.pointer_prefix`, `variable.pp_prefix`, `variable.bool_prefix`, `variable.handle_prefix`, `variable.prefix_order`, `variable.min_length`, `variable.max_length`, `variable.no_numeric_in_name` | `test_variables.py`, `test_misc_improvements.py` | PASS |
+| Functions | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix` | `test_functions.py` | PASS |
+| Constants | `constant.case`, `constant.min_length`, `constant.max_length`, `constant.prefix` | `test_defines.py` | PASS |
+| Macros — naming | `macro.case`, `macro.min_length`, `macro.max_length`, `macro.prefix` | `test_defines.py` | PASS |
+| Macros — safety (v1.4.0) | `macro.trailing_semicolon`, `macro.multistatement_wrapper` | `test_macro_trailing_semicolon.py`, `test_macro_multistatement_wrapper.py` | PASS |
+| Types | `typedef.case`, `typedef.suffix`, `enum.type_case`, `enum.type_suffix`, `enum.member_case`, `enum.member_prefix`, `struct.tag_case`, `struct.tag_suffix`, `struct.member_case` | `test_typedefs.py`, `test_enums.py`, `test_structs.py` | PASS |
+| Include guards | `include_guard.missing`, `include_guard.format` | `test_include_guards.py` | PASS |
+| Misc — core | `misc.line_length`, `misc.indentation`, `misc.magic_number`, `misc.unsigned_suffix`, `misc.yoda_condition`, `misc.block_comment_spacing` | `test_misc.py`, `test_yoda_condition.py`, `test_block_comment_spacing.py` | PASS |
+| Misc — file quality (v1.2.x) | `misc.copyright_header`, `misc.eof_comment`, `misc.comment_ratio`, `misc.whitespace_ratio` | `test_copyright_header.py`, `test_eof_comment.py`, `test_comment_ratio.py`, `test_whitespace_ratio.py` | PASS |
+| Misc — MISRA C | `misc.lowercase_l_suffix`, `misc.octal_constant`, `misc.trigraph` | `test_misra_rules.py` | PASS |
+| Misc — function quality (v1.4.0) | `misc.function_length`, `misc.function_doc_header`, `misc.assert_density`, `misc.null_statement_comment`, `misc.declaration_spacing` | `test_function_length.py`, `test_function_doc_header.py`, `test_assert_density.py`, `test_null_statement_comment.py`, `test_declaration_spacing.py` | PASS |
+| Misc — file constraints (v1.4.0) | `misc.file_length`, `misc.reserved_header_name` | `test_file_length.py`, `test_reserved_header_name.py` | PASS |
+| Naming (v1.4.0) | `naming.identifier_length`, `naming.no_single_char_identifiers` | `test_identifier_length.py`, `test_no_single_char_identifiers.py` | PASS |
+| Other | `reserved_name`, `spell_check`, `sign_compatibility`, `misc.declared_not_defined` | `test_reserved_name.py`, `test_spell_check.py`, `test_sign_compatibility.py`, `test_declared_not_defined.py` | PASS |
 
 **SWQ-003 Overall Result:** PASS
 
@@ -346,7 +353,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 |---|---|---|---|---|
 | SWQ-001 | Configuration loading | SWE1-001 to SWE1-006 | PASS | |
 | SWQ-002 | File discovery and CLI | SWE1-068 to SWE1-070 | PASS | |
-| SWQ-003 | All 53 rule IDs | SWE1-017 to SWE1-056 | PASS | |
+| SWQ-003 | All 71 rule IDs | SWE1-017 to SWE1-056, SWE1-MISRA-001–003, SWE1-071, SWE1-078–088 | PASS | |
 | SWQ-004 | Output format qualification | SWE1-057 to SWE1-064 | PASS | |
 | SWQ-005 | Dictionary and spell check | SWE1-007 to SWE1-010, SWE1-056 | PASS | |
 | SWQ-006 | Cross-file sign compatibility | SWE1-051 to SWE1-053 | PASS | |
@@ -380,13 +387,15 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | SWE1-065 to SWE1-067 | Baseline suppression | SWQ-007 | Covered |
 | SWE1-068 to SWE1-070 | CLI and entry point | SWQ-002 | Covered |
 | SWE1-071 | Whitespace ratio check | SWQ-003 (via pytest) | Covered |
+| SWE1-MISRA-001 to SWE1-MISRA-003 | MISRA C lexical rules (lowercase_l, octal, trigraph) | SWQ-003 | Covered |
 | SWE1-072 to SWE1-073 | Inline suppression comments | `test_inline_suppression.py` (via pytest) | Covered |
 | SWE1-074 | Auto-fix mode | `test_fix_mode.py` (via pytest) | Covered |
 | SWE1-075 | Config wizard and presets | `test_init_wizard.py` (via pytest) | Covered |
 | SWE1-076 | Per-directory config | `test_per_dir_config.py` (via pytest) | Covered |
 | SWE1-077 | HTML report output | `test_html_report.py` (via pytest) | Covered |
+| SWE1-078 to SWE1-088 | v1.4.0 rules (function quality, macro safety, naming) | SWQ-003 | Covered |
 
-**Requirements Coverage:** 77 / 77 requirements covered (100%)
+**Requirements Coverage:** 88 / 88 requirements covered (100%)
 
 ---
 
