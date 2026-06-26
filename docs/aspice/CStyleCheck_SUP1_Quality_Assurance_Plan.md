@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP1-001 | **Version** | 1.5 |
+| **Document ID** | CSC-SUP1-001 | **Version** | 1.6 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.6 | 2026-06-26 | Claude | Update §3 scope to v1.5.0 (minor release: F-017 misc.non_ascii_source, F-018 per-file summary, F-019 constant.case typedef exemption, B-004 RE_FUNCTION_DECL fix) |
 | 1.5 | 2026-06-26 | Claude | §5.4: add per-release peer-review record production as a release gate checklist item; update §3 scope to v1.4.1 — closes issue #268 |
 | 1.4 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.3 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 Purpose version text, update §3.1 referenced doc versions (all 5 stale), update QO-006 and §5.4 to v1.2.0, clarify §7 version language — resolves issue #163 |
@@ -31,7 +32,7 @@
 
 ## 3. Purpose & Scope
 
-This Quality Assurance Plan defines the QA strategy, activities, criteria, and records for **CStyleCheck v1.4.1**. It satisfies **Automotive SPICE® PAM v4.0, SUP.1 — Quality Assurance**.
+This Quality Assurance Plan defines the QA strategy, activities, criteria, and records for **CStyleCheck v1.5.0**. It satisfies **Automotive SPICE® PAM v4.0, SUP.1 — Quality Assurance**.
 
 QA activities for CStyleCheck verify that project processes are followed as planned and that work products meet their defined quality criteria. Because CStyleCheck is itself a quality tool (a naming-convention linter), the project benefits from self-hosting its own quality checks.
 

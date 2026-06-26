@@ -11,6 +11,38 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.5.0] — 2026-06-26
+
+### Added
+
+- **`misc.non_ascii_source` rule** — flags characters outside the printable ASCII set
+  (code points outside 0x20–0x7E, plus TAB/LF/CR), implementing MISRA C:2012/2023 Rule 4.1.
+  Optional `exempt_string_literals: true` suppresses violations inside double-quoted string
+  literals (issue [#279](https://github.com/dermot-murphy/CStyleCheck/issues/279)).
+- **Per-file breakdown in `--summary` output** — the summary block now includes
+  "Files with errors / warnings / info / clean" counts. Invariant: all four buckets
+  sum to the total files-checked count
+  (issue [#278](https://github.com/dermot-murphy/CStyleCheck/issues/278)).
+
+### Changed
+
+- **`constant.case` typedef-alias exemption** — object-like `#define` names ending with
+  the configured `typedefs.suffix.suffix` (e.g. `_t`) are now exempt from `constant.case`
+  when `typedefs.suffix.enabled: true`. This eliminates the false positive on
+  `#define api_nvm_error_t uint8_t`-style type aliases
+  (issues [#272](https://github.com/dermot-murphy/CStyleCheck/issues/272),
+  [#244](https://github.com/dermot-murphy/CStyleCheck/issues/244)).
+
+### Fixed
+
+- **`variable.parameter.p_prefix` false positive on call statements** —
+  `RE_FUNCTION_DECL`/`RE_FUNCTION_DEF` now require a real (non-zero-width) separator
+  between the return-type token and the function-name token, preventing regex
+  backtracking from misparsing a plain call statement as a declaration/definition
+  (issue [#273](https://github.com/dermot-murphy/CStyleCheck/issues/273)).
+
+---
+
 ## [1.4.1] — 2026-06-18
 
 ### Fixed

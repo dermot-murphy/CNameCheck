@@ -524,7 +524,7 @@ Subprocess coverage now captures the CLI entry point in CI; `--cov-fail-under=85
 - **HTML report output** (`--output-format html`) — self-contained report with summary
   cards and per-file violation tables.
 
-#### Test suite: 1152 tests across 49 modules (see v1.4.1 for current totals)
+#### Test suite: 1152 tests across 49 modules (see v1.5.0 for current totals)
 
 ---
 
@@ -559,7 +559,7 @@ broken GitHub Wiki links (#251).
 
 ---
 
-### New in v1.4.1 (2026-06-26)
+### New in v1.5.0 (2026-06-26)
 
 - **`misc.non_ascii_source`** — flags source files containing characters outside the basic
   ASCII character set (code points 0x00–0x7F excluding standard whitespace), implementing
