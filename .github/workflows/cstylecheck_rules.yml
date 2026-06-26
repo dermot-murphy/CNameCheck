@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload results artifact
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: stylecheck-results-${{ github.run_number }}
           path: output/cstylecheck/cstylecheck_results.txt
