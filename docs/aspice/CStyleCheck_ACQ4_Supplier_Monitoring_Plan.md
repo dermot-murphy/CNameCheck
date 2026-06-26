@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-ACQ4-001 | **Version** | 1.2 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-ACQ4-001 | **Version** | 1.3 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | ACQ.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.3 | 2026-06-26 | Claude | Add SUP-06 Anthropic/Claude AI tool supplier entry (§3, §4, §5.6, §6); update CSC-MAN5-001 ref to 1.4; advance ACQ.4 to Full — closes issue #269 |
 | 1.2 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.1 | 2026-05-28 | Claude | Reviewed and updated for v1.1.0 release; revision history maintained per ASPICE GP 2.2.4 |
 | 1.0 | 2026-04-12 | Claude | Initial release |
@@ -37,6 +38,7 @@ CStyleCheck is a Python-only tool with minimal external dependencies. Its suppli
 3. **Docker Hub** — secondary container registry
 4. **Python Software Foundation** — Python interpreter (runtime platform)
 5. **Base Docker image provider** — `python:slim` official images from Docker Hub
+6. **Anthropic, PBC** — Claude AI assistant (AI-assisted code authoring, document generation, and ASPICE compliance analysis; see CSC-DEV-001)
 
 There are no contracted Tier-1 software suppliers or subcontractors.
 
@@ -45,7 +47,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 | Document ID | Title | Version |
 |---|---|---|
 | CSC-MAN3-001 | Project Management Plan | 1.6 |
-| CSC-MAN5-001 | Risk Management Plan | 1.3 |
+| CSC-MAN5-001 | Risk Management Plan | 1.4 |
 | CSC-SUP8-001 | Configuration Management Plan | 1.7 |
 | CSC-SUP9-001 | Problem Resolution Management Plan | 1.2 |
 
@@ -60,6 +62,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 | SUP-03 | Docker, Inc. | Docker Hub (secondary registry); base image hosting | Platform / Infrastructure | N/A (SaaS) | RISK-004 |
 | SUP-04 | Python Software Foundation | CPython interpreter | Runtime platform | 3.10, 3.11, 3.12 | RISK-002 |
 | SUP-05 | Docker, Inc. | `python:3.12-slim` base image | Container base | Pinned via `ARG PYTHON_VERSION=3.12` | RISK-008 |
+| SUP-06 | Anthropic, PBC | Claude AI assistant (code generation, document authoring, test generation, ASPICE compliance analysis) | AI/SaaS tool | N/A (SaaS; prompt-based; see CSC-DEV-001) | RISK-005 |
 
 ---
 
@@ -133,6 +136,20 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 - No critical CVEs unpatched in the deployed `python:3.12-slim` layer
 - Image digest recorded in GitHub Actions log for each production build
 
+### 5.6 Anthropic / Claude AI Assistant (SUP-06)
+
+| Activity | Method | Frequency | Owner | Evidence |
+|---|---|---|---|---|
+| Output review | All AI-generated code, tests, and documents reviewed and approved by Dermot Murphy before commit | Per usage | Dermot Murphy | GitHub PR approval record; Reviewer/Approver fields in each ASPICE document |
+| Model version change assessment | Monitor Anthropic release notes for capability or behaviour changes affecting output quality | Per Claude model release | Dermot Murphy | GitHub Issue raised if prompt compatibility or output quality degrades |
+| Reproducibility verification | Verify that key ASPICE documents and code can be regenerated from existing context when required | Per release | Dermot Murphy | Internal note in pre-release checklist (CSC-SUP1-001 §5.4) |
+| AI authorship deviation compliance | Confirm CSC-DEV-001 deviation record remains current and approved | Per document revision | Dermot Murphy | CSC-DEV-001 revision history |
+
+**Acceptance criteria for Anthropic/Claude:**
+- All AI-generated content reviewed and approved by Dermot Murphy before merge (enforced via PR review gate)
+- No unreviewed AI-generated outputs committed to the repository
+- CSC-DEV-001 AI Authorship Deviation Record remains current and approved
+
 ---
 
 ## 6. Supplier Interface Summary
@@ -144,6 +161,7 @@ There are no contracted Tier-1 software suppliers or subcontractors.
 | ACQ-IF-03 | `docker_publish.yml` | GHCR (SUP-02) | Docker image layers | Docker push; OCI registry API |
 | ACQ-IF-04 | `docker_publish.yml` | Docker Hub (SUP-03) | Docker image layers | Docker push; Docker Registry API |
 | ACQ-IF-05 | Dockerfile | `python:3.12-slim` (SUP-05) | Base OS + Python runtime | Docker `FROM` directive |
+| ACQ-IF-06 | Development workflow | Anthropic/Claude (SUP-06) | Prompts; generated code; document content | Claude Code CLI / Anthropic API |
 
 ---
 
