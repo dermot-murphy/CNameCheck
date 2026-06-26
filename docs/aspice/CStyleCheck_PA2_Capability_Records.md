@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.15 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.16 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.16 | 2026-06-26 | Claude | §6: advance SUP.1 L→F (recurring review process established; CSC-REVIEW-002 produced); verdict 11F/6L→12F/5L; §5.4: update SUP1 to 1.5, add CSC-REVIEW-001/002 rows, self to 1.16 — closes issue #268 |
 | 1.15 | 2026-06-26 | Claude | §6: advance MAN.5 L→F and ACQ.4 L→F (RISK-003/005 treatments implemented; SUP-06 added); verdict 9F/8L→11F/6L; §5.4: update MAN5 to 1.4, ACQ4 to 1.3, self to 1.15 |
 | 1.14 | 2026-06-25 | Claude | §5.4: add missing CSC-AUD-005 and CSC-AUD-006 rows; update CSC-SYS2-001 to 1.7; update self to 1.14 — closes issues #266, #270 |
 | 1.13 | 2026-06-25 | Claude | Doc accuracy — update §5.4 baseline table: all document versions synced to v1.4.1 state (CSC-AUD-007 / PR #281); fix CI-001/CI-017 versions; update §5.4 preamble |
@@ -184,7 +185,7 @@ All work products are reviewed before approval according to the following schedu
 
 ### 5.4 Work Product Baseline Status
 
-*Updated for v1.4.1 release, 2026-06-25 (CSC-AUD-007; PR #281). All document versions reflect the v1.4.1 baseline.*
+*Updated 2026-06-26 (issue #268). All document versions reflect the v1.4.1 baseline.*
 
 | Document ID | Work Product | Version | Baseline Status | CM Baseline |
 |---|---|---|---|---|
@@ -200,12 +201,14 @@ All work products are reviewed before approval according to the following schedu
 | CSC-SWE6-001 | Qualification Test Spec | 1.7 | Released | PR #280 (AUD7-F-001) |
 | CSC-MAN3-001 | Project Management Plan | 1.6 | Released | CSC-AUD-007 |
 | CSC-MAN5-001 | Risk Management Plan | 1.4 | Released | PR D (issues #267) |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.4 | Released | CSC-AUD-007 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.5 | Released | PR (issue #268) |
 | CSC-SUP8-001 | Configuration Management Plan | 1.7 | Released | CSC-AUD-007 |
 | CSC-SUP9-001 | Problem Resolution Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-SUP10-001 | Change Request Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.3 | Released | PR D (issue #269) |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.15 | Released | PR D |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.16 | Released | PR (issue #268) |
+| CSC-REVIEW-001 | ASPICE Peer Review Record (v1.2.1 baseline) | 1.0 | Released | issue #169 |
+| CSC-REVIEW-002 | ASPICE Peer Review Record (v1.4.1 baseline) | 1.0 | Released | PR (issue #268) |
 | CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
 | CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
 | CSC-SVD-001 | Software Version Description | 1.13 | Released | PR #281 (doc accuracy) |
@@ -241,7 +244,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 | SWE.6 | 12 SWQ tests; SWQ-003 updated to 71 rule IDs (doc fix applied); SIT scope for 11 v1.4.0 rules pending v1.5.0 | Objectives: §4.1; release gate | CSC-SWE6-001 reviewed; CI evidence | **L** ⚠️ | AUD7-F-001, #261 |
 | MAN.3 | WBS, schedule, monitoring defined | Objectives: §4.1; §4.3 monitoring | CSC-MAN3-001 reviewed; in CM | **F** | — |
 | MAN.5 | 8 risks identified and treated; RISK-003 (Dependabot) and RISK-005 (CONTRIBUTING.md) treatments fully implemented | Objectives: §4.1; risk monitoring | CSC-MAN5-001 reviewed; in CM | **F** | — |
-| SUP.1 | QA gates and checklist defined | Objectives: §4.1; CI evidence | CSC-SUP1-001 reviewed; in CM | **L** | — |
+| SUP.1 | QA gates, checklist, and recurring per-release peer-review record defined and produced (CSC-REVIEW-002) | Objectives: §4.1; CI evidence | CSC-SUP1-001 reviewed; in CM | **F** | — |
 | SUP.8 | 34 CIs; Git Flow; dual-registry | Objectives: §4.1; CM monitoring | CSC-SUP8-001 reviewed; in CM | **F** | — |
 | SUP.9 | Problem process with SLAs and register | Objectives: §4.1; Issue metrics | CSC-SUP9-001 reviewed; in CM | **F** | DEV-002 |
 | SUP.10 | CR process with impact levels and approval | Objectives: §4.1; CR metrics | CSC-SUP10-001 reviewed; in CM | **F** | DEV-002 |
@@ -249,7 +252,7 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 > **📋 Rating scale:** N = Not achieved (0–15%), P = Partially achieved (15–50%), L = Largely achieved (50–85%), F = Fully achieved (85–100%). All processes must achieve **L or F** at PA 2.1 and PA 2.2 for CL2 to be awarded.
 >
-> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **L or F** (11 F, 6 L, 0 P/N). MAN.5 and ACQ.4 advanced to F (2026-06-26): RISK-003/005 treatments implemented (`.github/dependabot.yml`, `CONTRIBUTING.md`); SUP-06 Anthropic/Claude added to supplier register. One corrective action partially resolved — **AUD7-F-001**: `SYS-VTC-003` and `SWQ-003` have been updated from "53 rule IDs" to 71 (documentation fix applied 2026-06-25). The remaining gap — no integration-, system-, or qualification-level test cases for the 11 rules added in v1.3.0/v1.4.0 (issues #221–#232) — is still pending (SWE.5/SYS.4/SYS.5/SWE.6 remain at L). Targeted for the v1.5.0 cycle. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
+> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **L or F** (12 F, 5 L, 0 P/N). SUP.1 advanced to F (2026-06-26): recurring per-release peer-review process established in CSC-SUP1-001 §5.4; CSC-REVIEW-002 (v1.4.1 baseline) produced. MAN.5 and ACQ.4 also advanced to F (2026-06-26): RISK-003/005 treatments implemented; SUP-06 Anthropic/Claude added. One corrective action partially resolved — **AUD7-F-001**: `SYS-VTC-003` and `SWQ-003` updated from "53 rule IDs" to 71 (documentation fix applied 2026-06-25). The remaining gap — no integration-, system-, or qualification-level test cases for the 11 rules added in v1.3.0/v1.4.0 (issues #221–#232) — is still pending (SWE.5/SYS.4/SYS.5/SWE.6 remain at L). Targeted for the v1.5.0 cycle. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
 >
 > **Ratings assigned by internal audit CSC-AUD-007, 2026-06-18 (supersedes CSC-AUD-001 2026-05-28 and CSC-AUD-002 2026-05-29 for this table).**
 
