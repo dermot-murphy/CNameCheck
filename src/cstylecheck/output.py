@@ -279,7 +279,6 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee) -> None:
     tee.print("=" * 60)
 
     # Per-file breakdown: bucket each file into errors / warnings / info / ok
-    files_by_sev: Counter = Counter()
     files_with_errors:   set = set()
     files_with_warnings: set = set()
     files_with_infos:    set = set()
