@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS5-001 | **Version** | 1.6 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.7 |
+| **Project** | CStyleCheck | **Date** | 2026-06-25 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-06-25 | Claude | AUD7-F-001 corrective action — update SYS-VTC-003 from 53 to 71 rule IDs; expand rule-category table with rules added since v1.0.0; update overall verdict to v1.4.1 |
 | 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
 | 1.4 | 2026-06-04 | Claude | Deep accuracy audit: fix §3.1 version text, update §3.2 referenced doc versions, fix VTC-003 header and §6 rule count — resolves issue #163 |
@@ -134,29 +135,36 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 ---
 
-### SYS-VTC-003 — Full Rule Coverage (53 Rule IDs)
+### SYS-VTC-003 — Full Rule Coverage (71 Rule IDs)
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SYS-VTC-003 |
-| **Requirement** | SYS-F-011 through SYS-F-024 |
-| **Objective** | Verify that all 53 rule IDs detect violations when triggered by conforming test inputs |
+| **Requirement** | SYS-F-011 through SYS-F-024, SYS-F-020 (v1.2.x–v1.4.x additions) |
+| **Objective** | Verify that all 71 rule IDs detect violations when triggered by conforming test inputs |
 | **Pass Criteria** | Each rule ID appears in at least one violation report when a known-bad input is provided |
 
 | Rule Category | Rule IDs | Evidence Source | Result |
 |---|---|---|---|
-| Constants / macros | `constant.case`, `constant.min_length`, `constant.max_length`, `constant.prefix`, `macro.case`, `macro.min_length`, `macro.max_length`, `macro.prefix` | `test_defines.py` (16 tests) | PASS |
+| Constants | `constant.case`, `constant.min_length`, `constant.max_length`, `constant.prefix` | `test_defines.py` | PASS |
+| Macros — naming | `macro.case`, `macro.min_length`, `macro.max_length`, `macro.prefix` | `test_defines.py` | PASS |
+| Macros — safety (v1.4.0) | `macro.trailing_semicolon`, `macro.multistatement_wrapper` | `test_macro_trailing_semicolon.py`, `test_macro_multistatement_wrapper.py` | PASS |
 | Variables — global | `variable.global.case`, `variable.global.prefix`, `variable.global.g_prefix` | `test_variables.py` | PASS |
 | Variables — static | `variable.static.case`, `variable.static.prefix`, `variable.static.s_prefix` | `test_variables.py` | PASS |
-| Variables — local/param | `variable.local.case`, `variable.parameter.case`, `variable.parameter.p_prefix` | `test_variables.py` | PASS |
+| Variables — local/param | `variable.local.case`, `variable.local.prefix`, `variable.parameter.case`, `variable.parameter.prefix`, `variable.parameter.p_prefix` | `test_variables.py`, `test_parameter_prefix.py` | PASS |
 | Variable prefixes | `variable.min_length`, `variable.max_length`, `variable.pointer_prefix`, `variable.pp_prefix`, `variable.bool_prefix`, `variable.handle_prefix`, `variable.no_numeric_in_name`, `variable.prefix_order` | `test_variables.py`, `test_misc_improvements.py` | PASS |
 | Functions | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix` | `test_functions.py` | PASS |
 | Types | `typedef.case`, `typedef.suffix`, `enum.type_case`, `enum.type_suffix`, `enum.member_case`, `enum.member_prefix`, `struct.tag_case`, `struct.tag_suffix`, `struct.member_case` | `test_typedefs.py`, `test_enums.py`, `test_structs.py` | PASS |
 | Include guards | `include_guard.missing`, `include_guard.format` | `test_include_guards.py` | PASS |
-| Misc | `misc.line_length`, `misc.indentation`, `misc.magic_number`, `misc.unsigned_suffix`, `misc.yoda_condition`, `misc.block_comment_spacing` | `test_misc.py`, `test_misc_improvements.py` | PASS |
-| Other | `reserved_name`, `spell_check`, `sign_compatibility` | `test_reserved_name.py`, `test_spell_check.py`, `test_sign_compatibility.py` | PASS |
+| Misc — core | `misc.line_length`, `misc.indentation`, `misc.magic_number`, `misc.unsigned_suffix`, `misc.yoda_condition`, `misc.block_comment_spacing` | `test_misc.py`, `test_misc_improvements.py` | PASS |
+| Misc — file quality (v1.2.x) | `misc.copyright_header`, `misc.eof_comment`, `misc.comment_ratio`, `misc.whitespace_ratio` | `test_copyright_header.py`, `test_eof_comment.py`, `test_comment_ratio.py`, `test_whitespace_ratio.py` | PASS |
+| Misc — MISRA C | `misc.lowercase_l_suffix`, `misc.octal_constant`, `misc.trigraph` | `test_misra_rules.py` | PASS |
+| Misc — function quality (v1.4.0) | `misc.function_length`, `misc.function_doc_header`, `misc.assert_density`, `misc.null_statement_comment`, `misc.declaration_spacing` | `test_function_length.py`, `test_function_doc_header.py`, `test_assert_density.py`, `test_null_statement_comment.py`, `test_declaration_spacing.py` | PASS |
+| Misc — file constraints (v1.4.0) | `misc.file_length`, `misc.reserved_header_name` | `test_file_length.py`, `test_reserved_header_name.py` | PASS |
+| Naming (v1.4.0) | `naming.identifier_length`, `naming.no_single_char_identifiers` | `test_identifier_length.py`, `test_no_single_char_identifiers.py` | PASS |
+| Other | `reserved_name`, `spell_check`, `sign_compatibility`, `misc.declared_not_defined` | `test_reserved_name.py`, `test_spell_check.py`, `test_sign_compatibility.py`, `test_declared_not_defined.py` | PASS |
 
-**Overall VTC-003 Result:** PASS (commit 93178cd, 2026-05-28)
+**Overall VTC-003 Result:** PASS (v1.4.1, 2026-06-25; 1157 tests all PASS)
 
 ---
 
@@ -371,7 +379,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|---|---|---|
 | SYS-VTC-001 | Input: multiple files and globs | SYS-F-001, F-004, F-005, F-033 | PASS | |
 | SYS-VTC-002 | Configuration and rule enablement | SYS-F-002, F-006, F-007, F-009, F-025, F-026, NF-007 | PASS | |
-| SYS-VTC-003 | Full rule coverage (53 rule IDs) | SYS-F-011 to F-024 | PASS | |
+| SYS-VTC-003 | Full rule coverage (71 rule IDs) | SYS-F-011 to F-024, SYS-F-020 | PASS | |
 | SYS-VTC-004 | Module prefix enforcement | SYS-F-012 | PASS | |
 | SYS-VTC-005 | Pointer and scope prefix rules | SYS-F-013, F-014 | PASS | |
 | SYS-VTC-006 | Output formats: text, JSON, SARIF | SYS-F-027, F-028, F-029, F-032 | PASS | |
@@ -383,7 +391,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-VTC-012 | Docker multi-platform build | SYS-NF-006 | PASS | |
 | SYS-VTC-013 | Self-hosting: linter passes own rules | SYS-F-011 | PASS | |
 
-**Overall System Verification Verdict:** PASS (v1.2.x — commit 93178cd — 2026-05-28; 1041 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
+**Overall System Verification Verdict:** PASS (v1.4.1 — 2026-06-25; 1157 tests all PASS on Python 3.10 / 3.11 / 3.12; coverage 87.31% combined, 89.8% statement)
 
 ---
 
@@ -401,7 +409,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-F-008 | `--exclusions` file | SITC-009 | Covered |
 | SYS-F-009 | Dictionary override flags | SYS-VTC-002 | Covered |
 | SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | Covered |
-| SYS-F-011 to F-024 | All 53 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
+| SYS-F-011 to F-024 | All 71 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
 | SYS-F-025 | Rule `enabled` toggle | SYS-VTC-002 | Covered |
 | SYS-F-026 | Per-rule severity | SYS-VTC-002 | Covered |
 | SYS-F-027 | Text output format | SYS-VTC-006 | Covered |
