@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.7 |
-| **Project** | CStyleCheck | **Date** | 2026-06-25 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-26 | Claude | §6 RTM: replace all `\<SWE.1-REQ-xxx\>` placeholders with actual SWE1-xxx IDs; add CSC-SWE1-001 to §3.3; update §3.1 scope to v1.4.1 — closes issue #292 |
+| 1.8 | 2026-06-26 | Claude | Update SYS-F-020 to include v1.4.0 misc and macro-safety rules — closes issue #261 |
 | 1.7 | 2026-06-25 | Claude | Correct rule count 53→71 in §3.1 purpose text and SYS-F-011 — closes issue #266 |
 | 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-04 | Claude | Add SYS-F-041 to SYS-F-045 for five new features (inline suppression, --fix, --init/--preset, per-dir config, HTML output); update §6 RTM — issues #188 #189 #190 #193 #192 |
@@ -35,7 +37,7 @@
 
 ### 3.1 Purpose
 
-This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.2.x** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 71 rule IDs.
+This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.4.1** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 71 rule IDs.
 
 This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2 — System Requirements Analysis**.
 
@@ -58,6 +60,7 @@ The system is deployed in four integration modes:
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Analysis | 1.9 |
 
 ### 3.4 Glossary
 
@@ -119,7 +122,7 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-F-017 | The system shall enforce min-length and max-length constraints on variable, function, constant, and macro identifiers | Mandatory | Test | STK-001 |
 | SYS-F-018 | The system shall enforce case rules (`lower_snake`, `UPPER_SNAKE`, `UpperCamelCase`) per identifier category | Mandatory | Test | STK-001 |
 | SYS-F-019 | The system shall enforce include guard presence and format rules | Mandatory | Test | STK-001 |
-| SYS-F-020 | The system shall enforce miscellaneous rules: line length, indentation, magic number detection, unsigned integer suffix (`U`/`UL`), yoda conditions, and block comment spacing | Mandatory | Test | STK-001 |
+| SYS-F-020 | The system shall enforce miscellaneous and macro-safety rules: line length, indentation, magic number detection, unsigned integer suffix (`U`/`UL`), yoda conditions, block comment spacing, function length, function documentation header, assert density, null statement commenting, declaration spacing, file length, reserved header name, macro trailing semicolon, and macro multistatement wrapper | Mandatory | Test | STK-001 |
 | SYS-F-021 | The system shall perform cross-file sign-compatibility checking between related `.c` and `.h` files | Mandatory | Test | STK-001 |
 | SYS-F-022 | The system shall perform spell-checking on identifier tokens against a configurable dictionary | Mandatory | Test | STK-001 |
 | SYS-F-023 | The system shall detect reserved C/C++ keyword and stdlib name usage as identifiers | Mandatory | Test | STK-001 |
@@ -204,14 +207,14 @@ The following table summarises the stakeholder needs from which the system requi
 
 | REQ-ID | Category | Stakeholder Need | SYS.3 Architecture Element | SWE.1 SW Requirement |
 |---|---|---|---|---|
-| SYS-F-001 to SYS-F-010 | Input handling | STK-001, STK-002 | Input parser subsystem | \<SWE.1-REQ-001 to 010\> |
-| SYS-F-011 to SYS-F-026 | Rule engine | STK-001, STK-002 | Rule engine subsystem | \<SWE.1-REQ-011 to 026\> |
-| SYS-F-027 to SYS-F-033 | Output / reporting | STK-003, STK-005, STK-007 | Output formatter subsystem | \<SWE.1-REQ-027 to 033\> |
-| SYS-F-034 to SYS-F-036 | Baseline suppression | STK-004 | Baseline manager subsystem | \<SWE.1-REQ-034 to 036\> |
-| SYS-F-037 to SYS-F-040 | Exit codes | STK-003 | Main orchestrator | \<SWE.1-REQ-037 to 040\> |
-| SYS-NF-001 to SYS-NF-002 | Performance | STK-003 | Source cache | \<SWE.1-REQ-041 to 042\> |
-| SYS-NF-003 to SYS-NF-006 | Portability | STK-001, STK-006 | Build / packaging | \<SWE.1-REQ-043 to 046\> |
-| SYS-NF-007 to SYS-NF-009 | Configurability | STK-002 | Configuration loader | \<SWE.1-REQ-047 to 049\> |
+| SYS-F-001 to SYS-F-010 | Input handling | STK-001, STK-002 | SS-01 (CLI), SS-02 (Config Loader), SS-04 (Source Parser) | SWE1-001 to SWE1-016, SWE1-068 to SWE1-070 |
+| SYS-F-011 to SYS-F-026 | Rule engine | STK-001, STK-002 | SS-05 (Rule Engine) | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-003, SWE1-071, SWE1-078 to SWE1-088 |
+| SYS-F-027 to SYS-F-033 | Output / reporting | STK-003, STK-005, STK-007 | SS-06 (Output Formatter) | SWE1-057 to SWE1-064 |
+| SYS-F-034 to SYS-F-036 | Baseline suppression | STK-004 | SS-01 (CLI), SS-05 (Rule Engine) | SWE1-065 to SWE1-067 |
+| SYS-F-037 to SYS-F-040 | Exit codes | STK-003 | SS-01 (CLI / Entry Point) | SWE1-069 |
+| SYS-NF-001 to SYS-NF-002 | Performance | STK-003 | SS-04 (Source Cache) | SWE1-015 |
+| SYS-NF-003 to SYS-NF-006 | Portability | STK-001, STK-006 | Build / packaging (`pyproject.toml`, `Dockerfile`) | Verified at system level by CI matrix (SWE1-069 entry point exercised on Python 3.10 / 3.11 / 3.12) |
+| SYS-NF-007 to SYS-NF-009 | Configurability | STK-002 | SS-02 (Config Loader) | SWE1-001, SWE1-005, SWE1-068 |
 | SYS-NF-010 | Integration (pre-commit) | STK-001 | `.pre-commit-hooks.yml` | Deferred v2.0 |
 | SYS-NF-011 | Integration (GitHub Marketplace) | STK-005 | `action.yml` | Out of Scope v1.x |
 | SYS-NF-012 | Integration (step outputs) | STK-005 | `action.yml` | Deferred v2.0 |
