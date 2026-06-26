@@ -69,6 +69,7 @@ _ALL_OFF: dict = {
         "lowercase_l_suffix":    {"enabled": False},
         "octal_constant":        {"enabled": False},
         "trigraph":              {"enabled": False},
+        "non_ascii_source":      {"enabled": False},
         "declared_not_defined":  {"enabled": False},
         # Comment ratio check (issue #68) -- disabled so existing tests
         # are not affected by the new per-file comment density check.

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.6 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.7 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-06-26 | Claude | Add SIT-020 for non_ascii_source (Rule 4.1), per-file summary breakdown, and typedef-alias constant.case exemption — issues #279 #278 #272 #244 |
 | 1.6 | 2026-06-26 | Claude | Add SIT-019 covering 11 v1.4.0 rules (macro safety, function quality, file constraints, naming); advance SWE.5 to F — closes issue #261 |
 | 1.5 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.4 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
@@ -505,6 +506,31 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 ---
 
+### SIT-020 — Non-ASCII Source, Per-File Summary Breakdown, Typedef-Alias Exemption
+
+| Field | Value |
+|---|---|
+| **Test Case ID** | SIT-020 |
+| **Objective** | Verify end-to-end integration of three new features: (1) `misc.non_ascii_source` MISRA Rule 4.1 check; (2) per-file breakdown in `print_summary()`; (3) typedef-alias exemption in `constant.case` via `_check_defines()` |
+| **Interfaces** | SWA-IF-03, SWA-IF-06, SWA-IF-10 |
+| **SW-REQ** | SWE1-MISRA-004, SWE1-089, SWE1-090 |
+| **Test file** | `test_misra_rules.py`, `test_print_summary.py`, `test_defines.py` |
+
+| Step | Action | Input | Expected Result |
+|---|---|---|---|
+| 1 | Source with non-ASCII byte (e.g. UTF-8 é) outside a string literal | Config with `misc.non_ascii_source.enabled: true` | `misc.non_ascii_source` violation reported with hex code point |
+| 2 | Source with non-ASCII byte inside a string literal | Config with `exempt_string_literals: true` | No violation reported |
+| 3 | Source with non-ASCII byte inside a string literal | Config with `exempt_string_literals: false` (default) | Violation reported |
+| 4 | Two files: one with errors, one clean | Any config | `print_summary` output includes "Per-file breakdown" with "Files with errors: 1", "Files clean: 1" |
+| 5 | Source with `#define module_my_type_t uint8_t` | Config with `constants.case: upper_snake`, `typedefs.suffix.enabled: true`, `typedefs.suffix.suffix: "_t"` | No `constant.case` violation |
+| 6 | Same source with `typedefs.suffix.enabled: false` | Same config but suffix disabled | `constant.case` violation reported |
+
+| Date | Tester | Python | Result | Deviation |
+|---|---|---|---|---|
+| 2026-06-26 | GitHub Actions (automated) | 3.11 | PASS | |
+
+---
+
 ## 6. Integration Test Results Summary
 
 | SIT-ID | Test Case | Interfaces | Status | Deviation Ref |
@@ -528,8 +554,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-017 | Per-directory config | IF-03 | PASS | |
 | SIT-018 | HTML report output | IF-10 | PASS | |
 | SIT-019 | v1.4.0 rule integration (macro safety, function quality, file constraints, naming) | IF-06, IF-10 | PASS | |
+| SIT-020 | Non-ASCII source (Rule 4.1), per-file summary breakdown, typedef-alias constant.case exemption | IF-03, IF-06, IF-10 | PASS | |
 
-**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28 (SIT-001 to SIT-013); 2026-06-05 (SIT-014 to SIT-018); 2026-06-26 (SIT-019), GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1041 tests all PASS, 87.31% combined coverage.
+**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28 (SIT-001 to SIT-013); 2026-06-05 (SIT-014 to SIT-018); 2026-06-26 (SIT-019 and SIT-020), GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1182 tests all PASS.
 
 > **📋 Note:** All 10 defined software architecture interfaces must be covered before integration testing is considered complete. Any uncovered interface must be resolved via a new or updated test case.
 
@@ -558,6 +585,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-017 | SWE1-076 | IF-03 | `test_per_dir_config.py` | — |
 | SIT-018 | SWE1-077 | IF-10 | `test_html_report.py` | — |
 | SIT-019 | SWE1-078, SWE1-079, SWE1-080, SWE1-081, SWE1-082, SWE1-083, SWE1-084, SWE1-085, SWE1-086, SWE1-087, SWE1-088 | IF-06, IF-10 | `test_cli.py` | SWQ-003 |
+| SIT-020 | SWE1-MISRA-004, SWE1-089, SWE1-090 | IF-03, IF-06, IF-10 | `test_misra_rules.py`, `test_print_summary.py`, `test_defines.py` | SWQ-003 |
 
 ---
 

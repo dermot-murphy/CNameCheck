@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.10 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.11 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.11 | 2026-06-26 | Claude | Add UNIT-113 (_check_non_ascii_source), UNIT-114 (print_summary per-file breakdown), UNIT-115 (_check_defines typedef-alias exemption); update §8 traceability — issues #279 #278 #272 #244 |
 | 1.10 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.9 | 2026-06-08 | Claude | Add UNIT-102 to UNIT-112 for 11 new rules (issues #221–#232); update §8 traceability |
 | 1.8 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
@@ -165,6 +166,9 @@ All source locations refer to the current package layout under `src/cstylecheck/
 | UNIT-110 | `_check_macro_multistatement_wrapper` | `checker.py` | COMP-01 | `checker.py` |
 | UNIT-111 | `_check_identifier_length` | `checker.py` | COMP-01 | `checker.py` |
 | UNIT-112 | `_check_no_single_char_identifiers` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-113 | `_check_non_ascii_source` | `checker.py` | COMP-01 | `checker.py` |
+| UNIT-114 | `print_summary` (per-file breakdown) | `output.py` | COMP-07 | `output.py` |
+| UNIT-115 | `_check_defines` (typedef-alias exemption) | `checker.py` | COMP-05c | `checker.py` |
 
 ---
 
@@ -997,6 +1001,41 @@ src/cstylecheck/
 
 ---
 
+### UNIT-113 — `Checker._check_non_ascii_source() → None`
+
+**Purpose:** Flag source characters outside the basic ASCII set (MISRA C:2012/2023 Rule 4.1, issue #279).
+
+**Algorithm:**
+1. Skip if `misc.non_ascii_source.enabled` is false
+2. If `exempt_string_literals: true`, build a set of character offsets that lie inside double-quoted string literals
+3. Iterate over every character in `self.source`; allow: tab (0x09), LF (0x0A), CR (0x0D), printable ASCII (0x20–0x7E)
+4. For each disallowed character not in the exempt set, emit `misc.non_ascii_source` with the Unicode code point value in hex
+
+---
+
+### UNIT-114 — `output.print_summary()` (per-file breakdown)
+
+**Purpose:** Extend `print_summary()` with a per-file breakdown section (issue #278).
+
+**Algorithm:**
+1. Collect file paths from all violations into three sets: `files_with_errors`, `files_with_warnings`, `files_with_infos`
+2. Count files in each bucket using highest-severity wins: warnings bucket excludes files already in errors; info bucket excludes files in errors or warnings
+3. Clean files = `files_checked` minus total files with any violation
+4. Emit the breakdown section only when `files_checked > 0`
+
+---
+
+### UNIT-115 — `Checker._check_defines()` (typedef-alias exemption)
+
+**Purpose:** Prevent `constant.case` false positives on object-like `#define` type aliases (issues #272, #244).
+
+**Algorithm:**
+1. Read `typedefs.suffix.suffix` and `typedefs.suffix.enabled` from config
+2. For each object-like `#define` (non-function-like): compute `is_typedef_alias` = name ends (case-insensitively) with the configured suffix when suffix is enabled
+3. Skip `constant.case` check when `is_typedef_alias` is true; continue all other checks (`max_length`, `min_length`, `prefix`)
+
+---
+
 ### UNIT-90 — `Checker._check_whitespace_ratio() → None`
 
 **Purpose:** Enforce a minimum ratio of blank lines to code lines (issue #143), measuring code "airiness".
@@ -1127,6 +1166,9 @@ Violation:
 | SWE1-086 | Macro multistatement wrapper | UNIT-110 |
 | SWE1-087 | Identifier length | UNIT-111 |
 | SWE1-088 | No single-char identifiers | UNIT-112 |
+| SWE1-MISRA-004 | Non-ASCII source characters (Rule 4.1) | UNIT-113 |
+| SWE1-089 | Per-file breakdown in print_summary | UNIT-114 |
+| SWE1-090 | Typedef-alias constant.case exemption | UNIT-115 |
 
 > **Note (UNIT-84):** `DeclaredNotDefinedChecker` (UNIT-84) is traced via the cross-file check requirement (SWE1-051 to SWE1-053 range). SWE1-071 maps exclusively to `_check_whitespace_ratio` (UNIT-90) as shown in the `SWE1-045 to SWE1-050, SWE1-071` row above; the duplicate mapping of SWE1-071 → UNIT-84 has been removed as a CSC-AUD-005 corrective action.
 

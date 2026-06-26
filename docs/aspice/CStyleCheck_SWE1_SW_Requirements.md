@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 1.9 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 2.0 |
+| **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.0 | 2026-06-26 | Claude | Add SWE1-089 (per-file summary #278), SWE1-MISRA-004 (non_ascii_source #279), SWE1-090 (typedef-alias constant.case exemption #272/#244); update RTM |
 | 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.8 | 2026-06-08 | Claude | Add SWE1-078 to SWE1-088 for 11 new rules (issues #221–#232); update RTM |
 | 1.7 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
@@ -169,6 +170,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-MISRA-001 | The `_check_lowercase_l_suffix()` method shall flag any integer or floating-point literal that uses the lowercase letter `l` as a suffix (MISRA C:2012/2023 Rule 7.3) when `misc.lowercase_l_suffix.enabled: true` | Mandatory | Test | SYS-F-020 |
 | SWE1-MISRA-002 | The `_check_octal_constants()` method shall flag any integer literal that begins with `0` followed by one or more octal digits (MISRA C:2012/2023 Rule 7.1) when `misc.octal_constant.enabled: true` | Mandatory | Test | SYS-F-020 |
 | SWE1-MISRA-003 | The `_check_trigraphs()` method shall flag any occurrence of the nine ISO C trigraph sequences (`??=`, `??(`, `??/`, `??)`, `??'`, `??<`, `??!`, `??>`, `??-`) in source or comment text (MISRA C:2012 Rule 4.2 Advisory; MISRA C:2023 Rule 4.2 Required) when `misc.trigraph.enabled: true` | Mandatory | Test | SYS-F-020 |
+| SWE1-MISRA-004 | The `_check_non_ascii_source()` method shall flag any character whose Unicode code point falls outside the set {0x09 TAB, 0x0A LF, 0x0D CR, 0x20–0x7E printable ASCII} (MISRA C:2012/2023 Rule 4.1) when `misc.non_ascii_source.enabled: true`; when `exempt_string_literals: true` characters inside double-quoted string literals shall be exempt | Mandatory | Test | SYS-F-020 |
 | SWE1-071 | The `_check_whitespace_ratio()` method shall enforce a minimum ratio of blank lines to code lines when `misc.whitespace_ratio.enabled: true`; the file header region and comment-only lines shall be excluded from both counts | Mandatory | Test | SYS-F-020 |
 
 ### 4.10 Rule Engine — Cross-File Sign Compatibility (SS-04/SS-05)
@@ -197,7 +199,7 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-060 | SARIF output via `_violations_to_sarif()` shall conform to SARIF 2.1.0 schema with `$schema`, `version`, `runs[].tool`, and `runs[].results` fields populated | Mandatory | Test | SYS-F-029 |
 | SWE1-061 | GitHub Actions annotations shall be emitted via `Violation.github_annotation()` producing `::error file=…,line=…,col=…,title=…::` format | Mandatory | Test | SYS-F-030 |
 | SWE1-062 | The `Tee` class shall mirror all output to the log file path specified by `--log` without modifying stdout content | Mandatory | Test | SYS-F-031 |
-| SWE1-063 | The `print_summary()` function shall print a tabulated summary of violation counts per severity and per file when `--summary` is specified | Mandatory | Test | SYS-F-032 |
+| SWE1-063 | The `print_summary()` function shall print a tabulated summary of violation counts per severity (errors, warnings, info, total), top-10 violated rules by count, and a per-file breakdown; see also SWE1-089 | Mandatory | Test | SYS-F-032 |
 | SWE1-064 | Verbose progress to `stderr` shall overwrite the current terminal line with the directory being scanned when `--verbose` is specified | Mandatory | Test | SYS-F-033 |
 
 ### 4.13 Baseline Suppression (SS-01/SS-05/SS-06)
@@ -237,6 +239,8 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-086 | The `_check_macro_multistatement_wrapper()` method shall report `macro.multistatement_wrapper` for any function-like `#define` whose expansion contains more than one statement and is not wrapped in `do { ... } while (0)` | Mandatory | Test | SYS-F-020 |
 | SWE1-087 | The `_check_identifier_length()` method shall report `naming.identifier_length` for any declared identifier whose name is shorter than `naming.identifier_length.min_length` or longer than `naming.identifier_length.max_length`; names matching any pattern in `exempt_patterns` shall be exempt | Mandatory | Test | SYS-F-020 |
 | SWE1-088 | The `_check_no_single_char_identifiers()` method shall report `naming.no_single_char_identifiers` for any declared identifier with a single-character name that does not appear in `naming.no_single_char_identifiers.exempt` | Mandatory | Test | SYS-F-020 |
+| SWE1-089 | The `print_summary()` function shall include a per-file breakdown section showing the count of files with errors only, files with warnings (no errors), files with info only, and files with no violations (clean); the section shall be omitted when `files_checked` is zero | Mandatory | Test | SYS-F-032 |
+| SWE1-090 | The `_check_defines()` method shall exempt object-like `#define` names from `constant.case` when the name ends (case-insensitively) with the configured `typedefs.suffix.suffix` value and `typedefs.suffix.enabled: true`; function-like `#define` names shall not be exempted | Mandatory | Test | SYS-F-011 |
 
 ### 4.15 Verification Criteria
 
@@ -266,6 +270,7 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-045 to SWE1-050 | Miscellaneous rules | SYS-F-020 | `Checker._check_misc()`, `_check_yoda()` | `test_misc.py`, `test_yoda_condition.py`, `test_block_comment_spacing.py` |
 | SWE1-071 | Whitespace ratio | SYS-F-020 | `Checker._check_whitespace_ratio()` | `test_whitespace_ratio.py` |
 | SWE1-MISRA-001 to SWE1-MISRA-003 | MISRA C:2012/2023 lexical rules (Rule 7.3, 7.1, 4.2) | SYS-F-020 | `Checker._check_lowercase_l_suffix()`, `_check_octal_constants()`, `_check_trigraphs()` | `test_misra_rules.py` |
+| SWE1-MISRA-004 | MISRA C:2012/2023 Rule 4.1 non-ASCII source characters | SYS-F-020 | `Checker._check_non_ascii_source()` | `test_misra_rules.py` |
 | SWE1-051 to SWE1-053 | Cross-file sign compatibility | SYS-F-021 | `SignChecker` class | `test_sign_compatibility.py` |
 | SWE1-054 to SWE1-056 | Reserved names and spell check | SYS-F-022, F-023 | `Checker._check_reserved_names()`, `_check_spelling()` | `test_reserved_name.py`, `test_spell_check.py` |
 | SWE1-057 to SWE1-064 | Output formatting | SYS-F-027 to F-033 | Output Formatter / `Tee` | `test_cli.py` |
@@ -287,6 +292,8 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-086 | Macro multistatement wrapper | SYS-F-020 | `Checker._check_macro_multistatement_wrapper()` | `test_macro_multistatement_wrapper.py` |
 | SWE1-087 | Identifier length | SYS-F-020 | `Checker._check_identifier_length()` | `test_identifier_length.py` |
 | SWE1-088 | No single-char identifiers | SYS-F-020 | `Checker._check_no_single_char_identifiers()` | `test_no_single_char_identifiers.py` |
+| SWE1-089 | Per-file breakdown in print_summary | SYS-F-032 | `output.print_summary()` | `test_print_summary.py` |
+| SWE1-090 | Typedef-alias constant.case exemption in _check_defines | SYS-F-011 | `Checker._check_defines()` | `test_defines.py` |
 
 ---
 
