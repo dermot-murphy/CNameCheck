@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.14 |
-| **Project** | CStyleCheck | **Date** | 2026-06-26 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.15 |
+| **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.15 | 2026-06-27 | Claude | ASPICE audit — fix §4.2 test count 1041→1183; fix §6 COMP-01→COMP-05f/h for 11 modules; update coverage ref to v1.5.0; update Review & Approval dates — closes #317 #323 |
 | 1.14 | 2026-06-26 | Claude | ASPICE audit — fix §3 scope text (v1.2.x→v1.5.0); update §3.1 refs (SWE1 1.9→2.1, SWE3 1.10→1.12, SWE5 1.5→1.9); correct §6 total 52→50 modules; update test_null_statement_comment count 10→11 and total 1182→1183 — closes #305 #306 #309 #312 |
 | 1.13 | 2026-06-26 | Claude | Add NR-004 tests (12 tests, test_misra_rules.py 52→64), typedef-alias tests (6 tests, test_defines.py 16→22), test_print_summary.py (7 tests, new); update §5 and §6 totals 1157→1182 — issues #279 #278 #272 #244 |
 | 1.12 | 2026-06-18 | Claude | v1.4.1 patch (issue #273) — add 5 regression tests to `test_parameter_prefix.py` (42→47); update §6 total 1152→1157 |
@@ -79,9 +80,9 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 Coverage is measured per CI run on all three Python matrix versions (3.10, 3.11, 3.12) and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact, Python 3.11 build).
 
-**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 1041 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
+**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 1183 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
 
-> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures (baseline reference: 1041 tests as of v1.2.x).
+> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures (baseline reference: 1183 tests as of v1.5.0).
 
 ### 4.3 Test Infrastructure
 
@@ -416,23 +417,23 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | `test_init_wizard.py` | 15 | 15 | 0 | COMP-09 (`run_wizard`, `run_preset`) |
 | `test_per_dir_config.py` | 15 | 15 | 0 | COMP-10 (`resolve_per_dir_config`) |
 | `test_html_report.py` | 20 | 20 | 0 | COMP-07 (`_violations_to_html`) |
-| `test_function_length.py` | 11 | 11 | 0 | COMP-01 (`_check_function_length`) |
-| `test_function_doc_header.py` | 12 | 12 | 0 | COMP-01 (`_check_function_doc_header`) |
-| `test_assert_density.py` | 8 | 8 | 0 | COMP-01 (`_check_assert_density`) |
-| `test_null_statement_comment.py` | 11 | 11 | 0 | COMP-01 (`_check_null_statement_comment`) |
-| `test_declaration_spacing.py` | 8 | 8 | 0 | COMP-01 (`_check_declaration_spacing`) |
-| `test_file_length.py` | 8 | 8 | 0 | COMP-01 (`_check_file_length`) |
-| `test_reserved_header_name.py` | 10 | 10 | 0 | COMP-01 (`_check_reserved_header_name`) |
-| `test_macro_trailing_semicolon.py` | 9 | 9 | 0 | COMP-01 (`_check_macro_trailing_semicolon`) |
-| `test_macro_multistatement_wrapper.py` | 9 | 9 | 0 | COMP-01 (`_check_macro_multistatement_wrapper`) |
-| `test_identifier_length.py` | 10 | 10 | 0 | COMP-01 (`_check_identifier_length`) |
-| `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-01 (`_check_no_single_char_identifiers`) |
+| `test_function_length.py` | 11 | 11 | 0 | COMP-05f (`_check_function_length`) |
+| `test_function_doc_header.py` | 12 | 12 | 0 | COMP-05f (`_check_function_doc_header`) |
+| `test_assert_density.py` | 8 | 8 | 0 | COMP-05f (`_check_assert_density`) |
+| `test_null_statement_comment.py` | 11 | 11 | 0 | COMP-05f (`_check_null_statement_comment`) |
+| `test_declaration_spacing.py` | 8 | 8 | 0 | COMP-05f (`_check_declaration_spacing`) |
+| `test_file_length.py` | 8 | 8 | 0 | COMP-05f (`_check_file_length`) |
+| `test_reserved_header_name.py` | 10 | 10 | 0 | COMP-05f (`_check_reserved_header_name`) |
+| `test_macro_trailing_semicolon.py` | 9 | 9 | 0 | COMP-05f (`_check_macro_trailing_semicolon`) |
+| `test_macro_multistatement_wrapper.py` | 9 | 9 | 0 | COMP-05f (`_check_macro_multistatement_wrapper`) |
+| `test_identifier_length.py` | 10 | 10 | 0 | COMP-05h (`_check_identifier_length`) |
+| `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-05h (`_check_no_single_char_identifiers`) |
 | `test_print_summary.py` | 7 | 7 | 0 | `output.print_summary` (per-file breakdown) |
 | **Total** | **1183** | **1183** | **0** | All rules covered — 50 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
-**Statement Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
-**Branch Coverage (v1.2.0 CI — 1041 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
+**Statement Coverage (v1.5.0 CI — 1183 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
+**Branch Coverage (v1.5.0 CI — 1183 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
 
 **Static Verification (rules.yml):** PASS
 
@@ -482,9 +483,9 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-04-15 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Approver | Dermot Murphy | Approved | 2026-04-15 |
+| Author | Claude | Approved | 2026-06-27 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
+| Approver | Dermot Murphy | Approved | 2026-06-27 |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

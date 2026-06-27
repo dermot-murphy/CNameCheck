@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 2.1 |
-| **Project** | CStyleCheck | **Date** | 2026-06-26 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 2.2 |
+| **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.2 | 2026-06-27 | Claude | ASPICE audit — fix §3.2 SWE2 ref 1.8→1.9 and SYS2 ref 1.6→1.9; update Review & Approval dates — closes #315 #323 |
 | 2.1 | 2026-06-26 | Claude | ASPICE audit — fix §3.1 scope text (v1.2.x → v1.5.0) — closes #305 |
 | 2.0 | 2026-06-26 | Claude | Add SWE1-089 (per-file summary #278), SWE1-MISRA-004 (non_ascii_source #279), SWE1-090 (typedef-alias constant.case exemption #272/#244); update RTM |
 | 1.9 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
@@ -49,9 +50,9 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.6 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.9 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.8 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.9 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
@@ -302,10 +303,10 @@ The following criteria shall be met by all software requirements above. They are
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-04-15 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Approver | Dermot Murphy | Approved | 2026-04-15 |
+| Author | Claude | Approved | 2026-06-27 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
+| Approver | Dermot Murphy | Approved | 2026-06-27 |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
 

@@ -595,9 +595,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-04-15 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Approver | Dermot Murphy | Approved | 2026-04-15 |
+| Author | Claude | Approved | 2026-06-27 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
+| Approver | Dermot Murphy | Approved | 2026-06-27 |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

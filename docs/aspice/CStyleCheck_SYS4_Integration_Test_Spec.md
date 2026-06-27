@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.7 |
-| **Project** | CStyleCheck | **Date** | 2026-06-26 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.8 |
+| **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-27 | Claude | ASPICE audit — replace §6 SWE5 traceability placeholders with actual SIT-001–SIT-014 test case IDs; update Review & Approval dates — closes #320 #323 |
 | 1.7 | 2026-06-26 | Claude | ASPICE audit — update §3.3 SYS2 ref (1.8→1.9); update §5 overall result test count (965→1183) — closes #306 #311 |
 | 1.6 | 2026-06-26 | Claude | v1.5.0 release — update product version reference in §3.1 scope |
 | 1.5 | 2026-06-26 | Claude | Add SITC-015 covering 11 v1.4.0 rules (macro safety, function quality, file constraints, naming); advance SYS.4 to F — closes issue #261 |
@@ -465,20 +466,20 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | SITC-ID | SYS REQ-ID | Architecture Interface | SWE.5 Component Test |
 |---|---|---|---|
-| SITC-001 | SYS-F-001, SYS-F-027, SYS-F-037 | IF-01, IF-02, IF-04, IF-06, IF-08, IF-09 | \<SWE5-TC-001\> |
-| SITC-002 | SYS-F-027, SYS-F-038 | IF-06, IF-08, IF-09 | \<SWE5-TC-002\> |
-| SITC-003 | SYS-F-003, SYS-NF-008 | IF-01 | \<SWE5-TC-003\> |
-| SITC-004 | SYS-F-028 | IF-08, IF-09 | \<SWE5-TC-004\> |
-| SITC-005 | SYS-F-029 | IF-08, IF-09 | \<SWE5-TC-005\> |
-| SITC-006 | SYS-F-031 | IF-09 | \<SWE5-TC-006\> |
-| SITC-007 | SYS-F-034, SYS-F-035, SYS-F-036 | IF-10, IF-08, IF-09 | \<SWE5-TC-007\> |
-| SITC-008 | SYS-F-021 | IF-07 | \<SWE5-TC-008\> |
-| SITC-009 | SYS-F-008, SYS-NF-009 | IF-04, IF-08 | \<SWE5-TC-009\> |
-| SITC-010 | SYS-F-037, SYS-F-038, SYS-F-039 | IF-09 | \<SWE5-TC-010\> |
-| SITC-011 | SYS-NF-006 | All | \<SWE5-TC-011\> |
-| SITC-012 | SYS-NF-005 | Entry point | \<SWE5-TC-012\> |
-| SITC-013 | SYS-F-030 | IF-09 | \<SWE5-TC-013\> |
-| SITC-014 | SYS-F-040 | IF-09 | \<SWE5-TC-014\> |
+| SITC-001 | SYS-F-001, SYS-F-027, SYS-F-037 | IF-01, IF-02, IF-04, IF-06, IF-08, IF-09 | SIT-001 |
+| SITC-002 | SYS-F-027, SYS-F-038 | IF-06, IF-08, IF-09 | SIT-002 |
+| SITC-003 | SYS-F-003, SYS-NF-008 | IF-01 | SIT-003 |
+| SITC-004 | SYS-F-028 | IF-08, IF-09 | SIT-004 |
+| SITC-005 | SYS-F-029 | IF-08, IF-09 | SIT-005 |
+| SITC-006 | SYS-F-031 | IF-09 | SIT-006 |
+| SITC-007 | SYS-F-034, SYS-F-035, SYS-F-036 | IF-10, IF-08, IF-09 | SIT-007 |
+| SITC-008 | SYS-F-021 | IF-07 | SIT-008 |
+| SITC-009 | SYS-F-008, SYS-NF-009 | IF-04, IF-08 | SIT-009 |
+| SITC-010 | SYS-F-037, SYS-F-038, SYS-F-039 | IF-09 | SIT-010 |
+| SITC-011 | SYS-NF-006 | All | SIT-011 |
+| SITC-012 | SYS-NF-005 | Entry point | SIT-012 |
+| SITC-013 | SYS-F-030 | IF-09 | SIT-013 |
+| SITC-014 | SYS-F-040 | IF-09 | SIT-014 |
 | SITC-015 | SYS-F-011, SYS-F-017, SYS-F-020 | IF-01, IF-02, IF-06, IF-08, IF-09 | SIT-019 |
 
 ---
@@ -487,9 +488,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-04-15 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Approver | Dermot Murphy | Approved | 2026-04-15 |
+| Author | Claude | Approved | 2026-06-27 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
+| Approver | Dermot Murphy | Approved | 2026-06-27 |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

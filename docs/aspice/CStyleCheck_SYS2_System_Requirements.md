@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 1.9 |
-| **Project** | CStyleCheck | **Date** | 2026-06-26 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 2.0 |
+| **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.0 | 2026-06-27 | Claude | ASPICE audit — §3.1 scope v1.4.1→v1.5.0 and 71→72 rule IDs; §3.3 SWE1 ref 1.9→2.2; SYS-F-011 71→72; §6 RTM add SWE1-MISRA-004/SWE1-089/SWE1-090 traceability; update Review & Approval dates — closes #319 #323 |
 | 1.9 | 2026-06-26 | Claude | §6 RTM: replace all `\<SWE.1-REQ-xxx\>` placeholders with actual SWE1-xxx IDs; add CSC-SWE1-001 to §3.3; update §3.1 scope to v1.4.1 — closes issue #292 |
 | 1.8 | 2026-06-26 | Claude | Update SYS-F-020 to include v1.4.0 misc and macro-safety rules — closes issue #261 |
 | 1.7 | 2026-06-25 | Claude | Correct rule count 53→71 in §3.1 purpose text and SYS-F-011 — closes issue #266 |
@@ -37,7 +38,7 @@
 
 ### 3.1 Purpose
 
-This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.4.1** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 71 rule IDs.
+This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.5.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 72 rule IDs.
 
 This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2 — System Requirements Analysis**.
 
@@ -60,7 +61,7 @@ The system is deployed in four integration modes:
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE1-001 | CStyleCheck Software Requirements Analysis | 1.9 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Analysis | 2.2 |
 
 ### 3.4 Glossary
 
@@ -113,7 +114,7 @@ The following table summarises the stakeholder needs from which the system requi
 
 | REQ-ID | Requirement | Priority | Verification Method | Derived From |
 |---|---|---|---|---|
-| SYS-F-011 | The system shall enforce naming rules across 71 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules | Mandatory | Test | STK-001, STK-002 |
+| SYS-F-011 | The system shall enforce naming rules across 72 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules (including MISRA C:2012/2023 Rule 4.1 non-ASCII source checking) | Mandatory | Test | STK-001, STK-002 |
 | SYS-F-012 | The system shall enforce module-prefix requirements on global variables, file-scope static variables, public functions, macros, and constants | Mandatory | Test | STK-001 |
 | SYS-F-013 | The system shall enforce scope-aware variable rules: global (`g_` prefix), file-static (`s_` prefix), local, and parameter — each independently configurable | Mandatory | Test | STK-001 |
 | SYS-F-014 | The system shall enforce pointer-prefix rules: single pointer (`p_`), double pointer (`pp_`), boolean (`b_`), and handle variables (`h_`) | Mandatory | Test | STK-001 |
@@ -208,8 +209,8 @@ The following table summarises the stakeholder needs from which the system requi
 | REQ-ID | Category | Stakeholder Need | SYS.3 Architecture Element | SWE.1 SW Requirement |
 |---|---|---|---|---|
 | SYS-F-001 to SYS-F-010 | Input handling | STK-001, STK-002 | SS-01 (CLI), SS-02 (Config Loader), SS-04 (Source Parser) | SWE1-001 to SWE1-016, SWE1-068 to SWE1-070 |
-| SYS-F-011 to SYS-F-026 | Rule engine | STK-001, STK-002 | SS-05 (Rule Engine) | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-003, SWE1-071, SWE1-078 to SWE1-088 |
-| SYS-F-027 to SYS-F-033 | Output / reporting | STK-003, STK-005, STK-007 | SS-06 (Output Formatter) | SWE1-057 to SWE1-064 |
+| SYS-F-011 to SYS-F-026 | Rule engine | STK-001, STK-002 | SS-05 (Rule Engine) | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-004, SWE1-071, SWE1-078 to SWE1-090 |
+| SYS-F-027 to SYS-F-033 | Output / reporting | STK-003, STK-005, STK-007 | SS-06 (Output Formatter) | SWE1-057 to SWE1-064, SWE1-089 |
 | SYS-F-034 to SYS-F-036 | Baseline suppression | STK-004 | SS-01 (CLI), SS-05 (Rule Engine) | SWE1-065 to SWE1-067 |
 | SYS-F-037 to SYS-F-040 | Exit codes | STK-003 | SS-01 (CLI / Entry Point) | SWE1-069 |
 | SYS-NF-001 to SYS-NF-002 | Performance | STK-003 | SS-04 (Source Cache) | SWE1-015 |
@@ -230,9 +231,9 @@ The following table summarises the stakeholder needs from which the system requi
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-04-15 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Approver | Dermot Murphy | Approved | 2026-04-15 |
+| Author | Claude | Approved | 2026-06-27 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
+| Approver | Dermot Murphy | Approved | 2026-06-27 |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.

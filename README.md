@@ -574,7 +574,7 @@ broken GitHub Wiki links (#251).
   `typedefs.suffix.enabled: true`. This eliminates the false positive on `typedef`-style
   `#define` aliases such as `#define api_nvm_error_t uint8_t`.
 
-1 new rule + 2 features; **72 rule IDs** total. 25 new tests (1182 total).
+1 new rule + 2 features; **72 rule IDs** total. 25 new tests (1183 total).
 
 Bug fix: function-call misparsed as declaration/definition when return type and name
 had no whitespace separator (issue #273); function-call detection now requires separator.
