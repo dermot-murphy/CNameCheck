@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.11 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.12 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.12 | 2026-06-27 | Fix §3.1 cross-ref: SWE1 2.1→2.3 | Dermot Murphy |
 | 1.11 | 2026-06-27 | Claude | ASPICE audit — populate SWQ-010 execution evidence; fill §7 coverage values; fix §8 issue #54 status; fix §9 branch coverage; fix §10 v1.0.0→v1.5.0; update Review & Approval dates — closes #318 #323 |
 | 1.10 | 2026-06-26 | Claude | ASPICE audit corrections: update §3.2 config under test to v1.5.0; fix §3.1/§3.3/§9/Appendix A stale references; populate execution results for SWQ-001/002/004/005/006/007 — closes #310 |
 | 1.9 | 2026-06-26 | Claude | Correct rule count 74→72 throughout (§3 SWQ-003, §7 RTM): 72 is the confirmed count from source-code analysis; macro.trailing_semicolon/multistatement_wrapper were already in the 71 base |
@@ -47,7 +48,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.1 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.3 |
 | CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.9 |
 | CSC-SYS5-001 | CStyleCheck System Verification Report | 1.6 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |

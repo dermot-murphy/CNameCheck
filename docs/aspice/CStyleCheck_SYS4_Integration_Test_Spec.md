@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.8 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.9 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-27 | Fix §3.3 cross-ref: SYS2 1.9→2.0 | Dermot Murphy |
 | 1.8 | 2026-06-27 | Claude | ASPICE audit — replace §6 SWE5 traceability placeholders with actual SIT-001–SIT-014 test case IDs; update Review & Approval dates — closes #320 #323 |
 | 1.7 | 2026-06-26 | Claude | ASPICE audit — update §3.3 SYS2 ref (1.8→1.9); update §5 overall result test count (965→1183) — closes #306 #311 |
 | 1.6 | 2026-06-26 | Claude | v1.5.0 release — update product version reference in §3.1 scope |
@@ -54,7 +55,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 1.9 |
+| CSC-SYS2-001 | CStyleCheck System Requirements Specification | 2.0 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
 | CSC-SYS5-001 | CStyleCheck System Verification Report | 1.7 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |

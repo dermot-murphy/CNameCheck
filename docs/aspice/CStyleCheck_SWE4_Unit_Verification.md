@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.15 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.16 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.16 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.1→2.3, SWE3 1.12→1.14 | Dermot Murphy |
 | 1.15 | 2026-06-27 | Claude | ASPICE audit — fix §4.2 test count 1041→1183; fix §6 COMP-01→COMP-05f/h for 11 modules; update coverage ref to v1.5.0; update Review & Approval dates — closes #317 #323 |
 | 1.14 | 2026-06-26 | Claude | ASPICE audit — fix §3 scope text (v1.2.x→v1.5.0); update §3.1 refs (SWE1 1.9→2.1, SWE3 1.10→1.12, SWE5 1.5→1.9); correct §6 total 52→50 modules; update test_null_statement_comment count 10→11 and total 1182→1183 — closes #305 #306 #309 #312 |
 | 1.13 | 2026-06-26 | Claude | Add NR-004 tests (12 tests, test_misra_rules.py 52→64), typedef-alias tests (6 tests, test_defines.py 16→22), test_print_summary.py (7 tests, new); update §5 and §6 totals 1157→1182 — issues #279 #278 #272 #244 |
@@ -50,8 +51,8 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.1 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.12 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.3 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.14 |
 | CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.9 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
 

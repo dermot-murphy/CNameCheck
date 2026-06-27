@@ -744,7 +744,7 @@ Rule ID: `misc.eof_comment` · Default severity: `warning`
 
 ---
 
-## Rule IDs (64 total)
+## Rule IDs (72 total)
 
 | Category | Rule IDs |
 |---|---|
