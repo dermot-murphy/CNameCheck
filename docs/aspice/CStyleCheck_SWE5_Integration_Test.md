@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.8 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.9 |
 | **Project** | CStyleCheck | **Date** | 2026-06-26 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-26 | Claude | ASPICE audit — update §3.1 refs (SWE2 1.8→1.9, SWE4 1.12→1.14, SWE6 1.7→1.10, SYS4 1.5→1.7); update §3.2 CM baseline to v1.5.0 tag; update §6 overall result 1182→1183 — closes #306 #309 |
 | 1.8 | 2026-06-26 | Claude | v1.5.0 release — update product version reference in §3 scope |
 | 1.7 | 2026-06-26 | Claude | Add SIT-020 for non_ascii_source (Rule 4.1), per-file summary breakdown, and typedef-alias constant.case exemption — issues #279 #278 #272 #244 |
 | 1.6 | 2026-06-26 | Claude | Add SIT-019 covering 11 v1.4.0 rules (macro safety, function quality, file constraints, naming); advance SWE.5 to F — closes issue #261 |
@@ -44,10 +45,10 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.8 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.12 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.7 |
-| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.5 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.9 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.14 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.10 |
+| CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.7 |
 
 ### 3.2 Test Environment
 
@@ -57,7 +58,7 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 | **Python Versions** | 3.10, 3.11, 3.12 |
 | **Test runner** | pytest 7+ via `cstylecheck_tests.yml` CI workflow |
 | **Invocation method** | `subprocess.run()` — full process invocation including argument parsing |
-| **CM Baseline ID** | 93178cd (develop HEAD after PR #158 merge, 2026-05-28) |
+| **CM Baseline ID** | f7c7070 (main HEAD after PR #299 merge — v1.5.0 release, 2026-06-26) |
 
 ### 3.3 Integration Verification Criteria
 
@@ -557,7 +558,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-019 | v1.4.0 rule integration (macro safety, function quality, file constraints, naming) | IF-06, IF-10 | PASS | |
 | SIT-020 | Non-ASCII source (Rule 4.1), per-file summary breakdown, typedef-alias constant.case exemption | IF-03, IF-06, IF-10 | PASS | |
 
-**Overall Integration Verification Result:** PASS — Commit 93178cd, 2026-05-28 (SIT-001 to SIT-013); 2026-06-05 (SIT-014 to SIT-018); 2026-06-26 (SIT-019 and SIT-020), GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1182 tests all PASS.
+**Overall Integration Verification Result:** PASS — Commit f7c7070 (v1.5.0), 2026-06-26, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1183 tests all PASS.
 
 > **📋 Note:** All 10 defined software architecture interfaces must be covered before integration testing is considered complete. Any uncovered interface must be resolved via a new or updated test case.
 
