@@ -133,6 +133,7 @@ jobs:
           cache-to:   type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           build-args: |
             PYTHON_VERSION=3.12
+            GITHUB_REPOSITORY=${{ github.repository }}
 
       # ── Print the image digest for audit trail ───────────────────────────────
       - name: Image digest
@@ -154,7 +155,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-          readme-filepath: README.md
+          readme-filepath: DOCKERHUB_README.md
         continue-on-error: true   # non-fatal — Hub description is nice-to-have
 
   github-release:

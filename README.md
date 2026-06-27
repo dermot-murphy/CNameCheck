@@ -68,7 +68,7 @@ tests/
     test_reserved_name.py   #  40 tests: reserved_name
     test_dictionaries.py    #  32 tests: dict file loading and CLI flags
     test_misc_improvements.py #  77 tests: unsigned_suffix, loop vars, numerics
-    test_defines.py         #  16 tests: constant.* / macro.*
+    test_defines.py         #  22 tests: constant.* / macro.*
     test_variables.py       #  43 tests: all variable.* rules
     test_functions.py       #  14 tests: function.*
     test_typedefs.py        #   8 tests: typedef.*
@@ -87,7 +87,8 @@ tests/
     test_whitespace_ratio.py #  27 tests: misc.whitespace_ratio
     test_declared_not_defined.py # 39 tests: misc.declared_not_defined
     test_misra_rules.py     #  64 tests: MISRA C rule coverage
-    test_parameter_prefix.py #  42 tests: variable.parameter.*
+    test_parameter_prefix.py #  47 tests: variable.parameter.*
+    test_print_summary.py   #   7 tests: --summary per-file breakdown
     test_exclusions.py      #  28 tests: per-file exclusions
     test_github_annotations.py # 8 tests: GitHub Actions annotations
     test_case_patterns.py   #   6 tests: case pattern helpers
@@ -101,7 +102,7 @@ tests/
     test_function_length.py #  11 tests: misc.function_length
     test_function_doc_header.py # 12 tests: misc.function_doc_header
     test_assert_density.py  #   8 tests: misc.assert_density
-    test_null_statement_comment.py # 10 tests: misc.null_statement_comment
+    test_null_statement_comment.py # 11 tests: misc.null_statement_comment
     test_declaration_spacing.py #  8 tests: misc.declaration_spacing
     test_file_length.py     #   8 tests: misc.file_length
     test_reserved_header_name.py # 10 tests: misc.reserved_header_name
@@ -116,7 +117,7 @@ Dockerfile/
     Dockerfile               # multi-platform Docker image
     .dockerignore
 .github/workflows/
-    cstylecheck_tests.yml      # runs the test suite on every commit (1152 tests)
+    cstylecheck_tests.yml      # runs the test suite on every commit (1183 tests)
     rules.yml    # runs linter + trend page on C source commits
     docker_publish.yml       # builds and pushes image to GHCR and Docker Hub
     wiki_publish.yml         # publishes GitHub Wiki from README + ASPICE docs
@@ -524,7 +525,7 @@ Subprocess coverage now captures the CLI entry point in CI; `--cov-fail-under=85
 - **HTML report output** (`--output-format html`) — self-contained report with summary
   cards and per-file violation tables.
 
-#### Test suite: 1152 tests across 49 modules (see v1.4.1 for current totals)
+#### Test suite: 1152 tests across 49 modules (see v1.5.0 for current totals)
 
 ---
 
@@ -559,7 +560,7 @@ broken GitHub Wiki links (#251).
 
 ---
 
-### New in v1.4.1 (2026-06-26)
+### New in v1.5.0 (2026-06-26)
 
 - **`misc.non_ascii_source`** — flags source files containing characters outside the basic
   ASCII character set (code points 0x00–0x7F excluding standard whitespace), implementing
