@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP1-001 | **Version** | 1.7 |
+| **Document ID** | CSC-SUP1-001 | **Version** | 1.8 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-06-27 | Fix §3.1 cross-refs: SUP8 1.7→1.9, SWE4 1.14→1.17 | Dermot Murphy |
 | 1.7 | 2026-06-26 | Claude | ASPICE audit — update §3.1 SWE4 ref (1.12→1.14) — closes #306 #329 |
 | 1.6 | 2026-06-26 | Claude | Update §3 scope to v1.5.0 (minor release: F-017 misc.non_ascii_source, F-018 per-file summary, F-019 constant.case typedef exemption, B-004 RE_FUNCTION_DECL fix) |
 | 1.5 | 2026-06-26 | Claude | §5.4: add per-release peer-review record production as a release gate checklist item; update §3 scope to v1.4.1 — closes issue #268 |
@@ -42,10 +43,10 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 | Document ID | Title | Version |
 |---|---|---|
 | CSC-MAN3-001 | Project Management Plan | 1.6 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.7 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.9 |
 | CSC-SUP9-001 | Problem Resolution Management Plan | 1.2 |
 | CSC-SUP10-001 | Change Request Management Plan | 1.2 |
-| CSC-SWE4-001 | Unit Verification Specification | 1.14 |
+| CSC-SWE4-001 | Unit Verification Specification | 1.17 |
 
 ---
 

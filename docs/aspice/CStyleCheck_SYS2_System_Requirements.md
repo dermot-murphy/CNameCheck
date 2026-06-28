@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 2.0 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 2.1 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.1 | 2026-06-27 | Fix §3.3 cross-refs: SUP8 1.7→1.9, SWE1 2.2→2.4 | Dermot Murphy |
 | 2.0 | 2026-06-27 | Claude | ASPICE audit — §3.1 scope v1.4.1→v1.5.0 and 71→72 rule IDs; §3.3 SWE1 ref 1.9→2.2; SYS-F-011 71→72; §6 RTM add SWE1-MISRA-004/SWE1-089/SWE1-090 traceability; update Review & Approval dates — closes #319 #323 |
 | 1.9 | 2026-06-26 | Claude | §6 RTM: replace all `\<SWE.1-REQ-xxx\>` placeholders with actual SWE1-xxx IDs; add CSC-SWE1-001 to §3.3; update §3.1 scope to v1.4.1 — closes issue #292 |
 | 1.8 | 2026-06-26 | Claude | Update SYS-F-020 to include v1.4.0 misc and macro-safety rules — closes issue #261 |
@@ -59,9 +60,9 @@ The system is deployed in four integration modes:
 |---|---|---|
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE1-001 | CStyleCheck Software Requirements Analysis | 2.2 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Analysis | 2.4 |
 
 ### 3.4 Glossary
 
