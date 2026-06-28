@@ -9,7 +9,7 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CSC-SUP1-001 | **Version** | 1.7 |
-| **Project** | CStyleCheck | **Date** | 2026-06-26 |
+| **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.1 |

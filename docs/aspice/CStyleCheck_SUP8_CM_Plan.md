@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP8-001 | **Version** | 1.8 |
+| **Document ID** | CSC-SUP8-001 | **Version** | 1.9 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-06-27 | Fix §3.3 cross-ref: SWE1 2.2→2.4 (+ any other stale refs fixed) | Dermot Murphy |
 | 1.8 | 2026-06-27 | Claude | ASPICE audit — §3.1 scope v1.2.0→v1.5.0; §3.3 SWE1 ref 1.9→2.2; update Review & Approval dates — closes #321 #323 |
 | 1.7 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.6 | 2026-06-04 | Claude | Deep accuracy audit: fix CI-024 workflow filename (rules.yml→cstylecheck_rules.yml), fix §7.5 reference, update SWE1-001 version in §3.3 — resolves issue #163 |
@@ -58,7 +59,7 @@ This plan applies to all configuration items produced by the CStyleCheck project
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | CSC-SUP9-001 | CStyleCheck Problem Resolution Management Plan | 1.2 |
 | CSC-SUP10-001 | CStyleCheck Change Request Management Plan | 1.2 |
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.2 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
 
 ---
 

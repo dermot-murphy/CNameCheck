@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.10 |
-| **Project** | CStyleCheck | **Date** | 2026-06-26 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.11 |
+| **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.11 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.3→2.4, SWE3 1.14→1.15; fix header date | Dermot Murphy |
 | 1.10 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.1→2.3, SWE3 1.12→1.14 | Dermot Murphy |
 | 1.9 | 2026-06-26 | Claude | v1.9 — ASPICE audit corrections: fix §3 scope text (v1.2.x→v1.5.0); update §3.1 SWE1/SWE3 version refs; add v1.4.0/v1.5.0 methods to §8.1 run_all() sequence; add SWE1-MISRA-004/SWE1-089/SWE1-090 to §10 RTM — closes #307 |
 | 1.8 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
@@ -44,10 +45,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.3 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.14 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.15 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
 
 ---
 
