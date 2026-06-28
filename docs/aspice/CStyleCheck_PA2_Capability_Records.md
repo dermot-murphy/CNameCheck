@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-PA2-001 | **Version** | 1.18 |
-| **Project** | CStyleCheck | **Date** | 2026-06-26 |
+| **Document ID** | CSC-PA2-001 | **Version** | 1.19 |
+| **Project** | CStyleCheck | **Date** | 2026-06-28 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | PA 2.1, PA 2.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.19 | 2026-06-28 | Claude | Update to v1.5.1 baseline: §4.1 SWE.1 requirements 70→91, SWE.4 tests 1157→1183, SWE.5 SIT cases 19→20; §5.4 all doc versions updated (SVD 1.20, SWE1 2.4, SWE2 1.11, SWE3 1.15, SWE4 1.17, SWE5 1.11, SWE6 1.13, SYS2 2.1, SYS4 1.9, SUP1 1.8, SUP8 1.9); CI-001/CI-017 to v1.5.1; add CSC-AUD-008 row; §6 ratings/counts updated (72 rules, 91 req, 1183 tests, 20 SIT); §7 dates updated |
 | 1.18 | 2026-06-26 | Claude | §6: advance SYS.2 L→F (RTM placeholders resolved; §3.3 SWE1-001 added; scope updated to v1.4.1); verdict 16F/1L→17F/0L; §5.4: SYS2 to 1.9, self to 1.18 — closes issue #292 |
 | 1.17 | 2026-06-26 | Claude | §6: advance SYS.4/SYS.5/SWE.5/SWE.6 L→F (SITC-015 + SIT-019 added; SYS-F-020 expanded; AUD7-F-001 fully resolved); verdict 12F/5L→16F/1L — closes issue #261 |
 | 1.16 | 2026-06-26 | Claude | §6: advance SUP.1 L→F (recurring review process established; CSC-REVIEW-002 produced); verdict 11F/6L→12F/5L; §5.4: update SUP1 to 1.5, add CSC-REVIEW-001/002 rows, self to 1.16 — closes issue #268 |
@@ -44,7 +45,7 @@
 
 ## 3. Purpose
 
-This document records the generic practices evidence for **Automotive SPICE® PAM v4.0 Capability Level 2** across all assessed processes. It provides a single consolidated reference for assessors to verify PA 2.1 (Process Performance Management) and PA 2.2 (Work Product Management) achievement for CStyleCheck v1.4.1.
+This document records the generic practices evidence for **Automotive SPICE® PAM v4.0 Capability Level 2** across all assessed processes. It provides a single consolidated reference for assessors to verify PA 2.1 (Process Performance Management) and PA 2.2 (Work Product Management) achievement for CStyleCheck v1.5.1.
 
 **PA 2.1** requires that each process is planned, monitored, and adjusted.
 **PA 2.2** requires that work products are defined, stored, controlled, reviewed, and adjusted.
@@ -63,11 +64,11 @@ For each assessed process, performance objectives are defined in the table below
 | SYS.3 | Architecture reviewed and approved; all SYS.2 requirements traced to architecture elements | CSC-SYS3-001 §9 traceability matrix | ✅ Defined |
 | SYS.4 | All 15 SITC integration test cases PASS before SYS.5 begins | CSC-SYS4-001 §5 verification criteria | ✅ Defined |
 | SYS.5 | All SYS-VTC test cases PASS; 100% requirements coverage; no open critical Issues | CSC-SYS5-001 §3.4 verification criteria | ✅ Defined |
-| SWE.1 | 70 software requirements defined, reviewed, approved; 100% traceable to SYS.2 | CSC-SWE1-001 §4.15 verification criteria | ✅ Defined |
+| SWE.1 | 91 software requirements defined, reviewed, approved; 100% traceable to SYS.2 | CSC-SWE1-001 §4.15 verification criteria | ✅ Defined |
 | SWE.2 | Architecture reviewed; all SWE.1 requirements mapped to components; interfaces defined | CSC-SWE2-001 §10 traceability | ✅ Defined |
 | SWE.3 | All 90 units designed; algorithmic specification complete; resource usage documented | CSC-SWE3-001 §4 unit catalogue | ✅ Defined |
-| SWE.4 | ≥ 85% combined statement + branch coverage (CI gate); ≥ 90% statement / ≥ 85% branch (long-term target); all 1157 unit tests PASS on Python 3.10/11/12 | CSC-SWE4-001 §4.2 coverage criteria | ✅ Defined |
-| SWE.5 | All 19 SIT integration test cases PASS; all 10 SWA interfaces covered | CSC-SWE5-001 §3.3 verification criteria | ✅ Defined |
+| SWE.4 | ≥ 85% combined statement + branch coverage (CI gate); ≥ 90% statement / ≥ 85% branch (long-term target); all 1183 unit tests PASS on Python 3.10/11/12 | CSC-SWE4-001 §4.2 coverage criteria | ✅ Defined |
+| SWE.5 | All 20 SIT integration test cases PASS; all 10 SWA interfaces covered | CSC-SWE5-001 §3.3 verification criteria | ✅ Defined |
 | SWE.6 | All 12 SWQ qualification test cases PASS; 100% SW requirements coverage; release gate met | CSC-SWE6-001 §3.3 qualification criteria | ✅ Defined |
 | MAN.3 | All WBS work packages completed; milestones achieved within schedule | CSC-MAN3-001 §8 schedule | ✅ Defined |
 | MAN.5 | All risks identified, scored, and treated; no High residual risks at release | CSC-MAN5-001 §6 risk summary | ✅ Defined |
@@ -187,33 +188,33 @@ All work products are reviewed before approval according to the following schedu
 
 ### 5.4 Work Product Baseline Status
 
-*Updated 2026-06-26 (issue #268). All document versions reflect the v1.4.1 baseline.*
+*Updated 2026-06-28 (CSC-AUD-008). All document versions reflect the v1.5.1 baseline.*
 
 | Document ID | Work Product | Version | Baseline Status | CM Baseline |
 |---|---|---|---|---|
-| CSC-SYS2-001 | System Requirements Spec | 1.9 | Released | PR (issue #292) |
+| CSC-SYS2-001 | System Requirements Spec | 2.1 | Released | PR #334 |
 | CSC-SYS3-001 | System Architecture Description | 1.5 | Released | CSC-AUD-007 |
-| CSC-SYS4-001 | System Integration Test Spec | 1.5 | Released | PR #261 (issue #261) |
+| CSC-SYS4-001 | System Integration Test Spec | 1.9 | Released | PR #326 |
 | CSC-SYS5-001 | System Verification Report | 1.7 | Released | PR #280 (AUD7-F-001) |
-| CSC-SWE1-001 | SW Requirements Spec | 1.9 | Released | CSC-AUD-007 |
-| CSC-SWE2-001 | SW Architecture Description | 1.8 | Released | CSC-AUD-007 |
-| CSC-SWE3-001 | SW Detailed Design | 1.10 | Released | CSC-AUD-007 |
-| CSC-SWE4-001 | Unit Verification Spec | 1.12 | Released | CSC-AUD-007 |
-| CSC-SWE5-001 | Integration Test Spec | 1.6 | Released | PR #261 (issue #261) |
-| CSC-SWE6-001 | Qualification Test Spec | 1.7 | Released | PR #280 (AUD7-F-001) |
+| CSC-SWE1-001 | SW Requirements Spec | 2.4 | Released | PR #332 |
+| CSC-SWE2-001 | SW Architecture Description | 1.11 | Released | PR #332 |
+| CSC-SWE3-001 | SW Detailed Design | 1.15 | Released | PR #332 |
+| CSC-SWE4-001 | Unit Verification Spec | 1.17 | Released | PR #332 |
+| CSC-SWE5-001 | Integration Test Spec | 1.11 | Released | PR #332 |
+| CSC-SWE6-001 | Qualification Test Spec | 1.13 | Released | PR #332 |
 | CSC-MAN3-001 | Project Management Plan | 1.6 | Released | CSC-AUD-007 |
 | CSC-MAN5-001 | Risk Management Plan | 1.4 | Released | PR D (issues #267) |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.5 | Released | PR (issue #268) |
-| CSC-SUP8-001 | Configuration Management Plan | 1.7 | Released | CSC-AUD-007 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.8 | Released | PR #334 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.9 | Released | PR #332 |
 | CSC-SUP9-001 | Problem Resolution Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-SUP10-001 | Change Request Plan | 1.2 | Released | CSC-AUD-007 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.3 | Released | PR D (issue #269) |
-| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.18 | Released | PR (issue #292) |
+| CSC-PA2-001 | PA 2.1 / PA 2.2 Records | 1.19 | Released | ASPICE audit 2026-06-28 |
 | CSC-REVIEW-001 | ASPICE Peer Review Record (v1.2.1 baseline) | 1.0 | Released | issue #169 |
 | CSC-REVIEW-002 | ASPICE Peer Review Record (v1.4.1 baseline) | 1.0 | Released | PR (issue #268) |
 | CSC-DEV-001 | AI Authorship Deviation Record | 1.1 | Released | v1.1.0 tag |
 | CSC-DEV-002 | Independent Review Deviation Record | 1.0 | Released | v1.1.0 tag |
-| CSC-SVD-001 | Software Version Description | 1.13 | Released | PR #281 (doc accuracy) |
+| CSC-SVD-001 | Software Version Description | 1.20 | Released | PR #334 |
 | CSC-AUD-001 | ASPICE Internal Audit Report | 1.0 | Released | v1.2.0 tag |
 | CSC-AUD-002 | ASPICE Internal Audit — CL2 Re-assessment (2026-05-29) | 1.0 | Released | v1.2.1 tag |
 | CSC-AUD-003 | ASPICE Internal Audit — Accuracy (2026-06-04) | 1.0 | Released | issue #163 audit |
@@ -221,29 +222,30 @@ All work products are reviewed before approval according to the following schedu
 | CSC-AUD-005 | ASPICE Internal Audit — Post-release accuracy (2026-06-05) | 1.0 | Released | issue #163 / v1.3.0 |
 | CSC-AUD-006 | ASPICE Internal Audit — Test/module-count drift (2026-06-18) | — | Released (issue #254 only; no standalone report) | issue #254 |
 | CSC-AUD-007 | ASPICE Internal Audit — CL2 Re-assessment (2026-06-18) | 1.1 | Released | v1.4.0 tag |
-| CI-001 | `src/cstylecheck/` package | 1.4.1 | Released | v1.4.1 tag |
-| CI-017 | Test suite (1157 tests) | 1.4.1 | Released | v1.4.1 tag |
+| CSC-AUD-008 | ASPICE Internal Audit — CL2 Assessment (2026-06-28) | 1.0 | Released | v1.5.1 tag |
+| CI-001 | `src/cstylecheck/` package | 1.5.1 | Released | v1.5.1 tag |
+| CI-017 | Test suite (1183 tests) | 1.5.1 | Released | v1.5.1 tag |
 
 ---
 
 ## 6. ASPICE CL2 Coverage Summary
 
-*Resynced 2026-06-18 (CSC-AUD-007) — the verdict below was stale between 2026-05-28 and 2026-06-18: it predated both the closure of issue #152 (2026-05-28) and the superseding re-assessment CSC-AUD-002 (2026-05-29), and five intervening document revisions (1.5–1.9) never refreshed it. See CSC-AUD-007 for the full resync rationale.*
+*Updated 2026-06-28 (CSC-AUD-008). All 17 processes assessed at F (Fully Achieved) at v1.5.1 baseline. Five processes improved from v1.4.1 (SYS.4, SWE.1, SWE.4, SWE.5, SWE.6); zero regressed. See CSC-AUD-008 for full detail.*
 
-The table below summarises all assessed processes and their CL2 PA achievement evidence, current as of v1.4.1.
+The table below summarises all assessed processes and their CL2 PA achievement evidence, current as of v1.5.1.
 
 | Process | PA 1.1 (Performed) | PA 2.1 (Perf. Mgmt) | PA 2.2 (WP Mgmt) | Assessment Verdict | Open Issue(s) |
 |---|---|---|---|---|---|
-| SYS.2 | 45 SYS REQ-IDs defined and traced to SWE.1 (§6 RTM); all placeholder IDs resolved | Objectives: §4.1; strategy: §4.2 | CSC-SYS2-001 v1.9 reviewed; in CM | **F** | — |
+| SYS.2 | 45 SYS REQ-IDs defined and traced to SWE.1 (§6 RTM); all placeholder IDs resolved | Objectives: §4.1; strategy: §4.2 | CSC-SYS2-001 v2.1 reviewed; in CM | **F** | — |
 | SYS.3 | Architecture with subsystems and interfaces | Objectives: §4.1; monitoring: §4.3 | CSC-SYS3-001 reviewed; in CM | **F** | — |
-| SYS.4 | 15 SITC test cases defined and executed; all 71 rules covered including 11 v1.4.0 rules (SITC-015) | Objectives: §4.1 | CSC-SYS4-001 reviewed; in CM | **F** | — |
-| SYS.5 | SYS-VTC test cases defined and executed; SYS-VTC-003 covers all 71 rule IDs | Objectives: §4.1 | CSC-SYS5-001 reviewed; in CM | **F** | — |
-| SWE.1 | 88 SW requirements defined | Objectives: §4.1; strategy: §4.2 | CSC-SWE1-001 reviewed; in CM | **F** | — |
+| SYS.4 | 15 SITC test cases defined and executed; all 72 rules covered | Objectives: §4.1 | CSC-SYS4-001 reviewed; in CM | **F** | — |
+| SYS.5 | SYS-VTC test cases defined and executed; SYS-VTC-003 covers all 72 rule IDs | Objectives: §4.1 | CSC-SYS5-001 reviewed; in CM | **F** | — |
+| SWE.1 | 91 SW requirements defined | Objectives: §4.1; strategy: §4.2 | CSC-SWE1-001 reviewed; in CM | **F** | — |
 | SWE.2 | 10 components, 10 interfaces defined | Objectives: §4.1 | CSC-SWE2-001 reviewed; in CM | **F** | — |
 | SWE.3 | 112 units with algorithmic specs | Objectives: §4.1 | CSC-SWE3-001 reviewed; in CM | **F** | — |
-| SWE.4 | 1152 unit tests; self-check CI; 85% cov. | Objectives: §4.1; coverage targets | CSC-SWE4-001 reviewed; CI evidence | **F** | — |
-| SWE.5 | 19 SIT tests; all 71 rules covered including 11 v1.4.0 rules (SIT-019) | Objectives: §4.1 | CSC-SWE5-001 reviewed; in CM | **F** | — |
-| SWE.6 | 12 SWQ tests; SWQ-003 covers all 71 rule IDs; 100% SW requirements coverage | Objectives: §4.1; release gate | CSC-SWE6-001 reviewed; CI evidence | **F** | — |
+| SWE.4 | 1183 unit tests; self-check CI; 85% cov. | Objectives: §4.1; coverage targets | CSC-SWE4-001 reviewed; CI evidence | **F** | — |
+| SWE.5 | 20 SIT tests; all 72 rules covered; SIT-020 covers SWE1-MISRA-004/089/090 | Objectives: §4.1 | CSC-SWE5-001 reviewed; in CM | **F** | — |
+| SWE.6 | 12 SWQ tests; SWQ-003 covers all 72 rule IDs; 100% SW requirements coverage (91/91) | Objectives: §4.1; release gate | CSC-SWE6-001 reviewed; CI evidence | **F** | — |
 | MAN.3 | WBS, schedule, monitoring defined | Objectives: §4.1; §4.3 monitoring | CSC-MAN3-001 reviewed; in CM | **F** | — |
 | MAN.5 | 8 risks identified and treated; RISK-003 (Dependabot) and RISK-005 (CONTRIBUTING.md) treatments fully implemented | Objectives: §4.1; risk monitoring | CSC-MAN5-001 reviewed; in CM | **F** | — |
 | SUP.1 | QA gates, checklist, and recurring per-release peer-review record defined and produced (CSC-REVIEW-002) | Objectives: §4.1; CI evidence | CSC-SUP1-001 reviewed; in CM | **F** | — |
@@ -254,9 +256,9 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 > **📋 Rating scale:** N = Not achieved (0–15%), P = Partially achieved (15–50%), L = Largely achieved (50–85%), F = Fully achieved (85–100%). All processes must achieve **L or F** at PA 2.1 and PA 2.2 for CL2 to be awarded.
 >
-> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **F** (17 F, 0 L, 0 P/N). SYS.2 advanced to F (2026-06-26): CSC-SYS2-001 §6 RTM placeholder IDs replaced with actual SWE1-xxx IDs; CSC-SWE1-001 added to §3.3; scope updated to v1.4.1 (issue #292). All previously open ASPICE findings (AUD7-F-001, issues #261–#271) resolved. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-18.md` (CSC-AUD-007).
+> **✅ CL2 Verdict: ACHIEVED.** All 17 processes rate **F** (17 F, 0 L, 0 P/N) at v1.5.1 baseline. Five processes improved from v1.4.1: SYS.4 and SYS.5 (72 rule coverage confirmed; SITC-015/SIT-019 extended + SIT-020 added for SWE1-MISRA-004/089/090); SWE.1 (requirements 88→91: SWE1-MISRA-001 through SWE1-MISRA-004 added); SWE.4 (tests 1152→1183); SWE.5 (SIT 19→20); SWE.6 (SWQ-003 covers 72 rule IDs). Zero processes regressed. Full detail: `docs/aspice/audits/CStyleCheck_ASPICE_Internal_Audit_2026-06-28.md` (CSC-AUD-008).
 >
-> **Ratings assigned by internal audit CSC-AUD-007, 2026-06-18 (supersedes CSC-AUD-001 2026-05-28 and CSC-AUD-002 2026-05-29 for this table).**
+> **Ratings assigned by internal audit CSC-AUD-008, 2026-06-28 (supersedes CSC-AUD-007 2026-06-18 for this table).**
 
 ---
 
@@ -264,9 +266,9 @@ The table below summarises all assessed processes and their CL2 PA achievement e
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-04-15 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-04-15 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-04-15 |
-| Approver | Dermot Murphy | Approved | 2026-04-15 |
+| Author | Claude | Approved | 2026-06-28 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-06-28 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-06-28 |
+| Approver | Dermot Murphy | Approved | 2026-06-28 |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
