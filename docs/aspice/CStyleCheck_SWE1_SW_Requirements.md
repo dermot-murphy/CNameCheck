@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 2.3 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 2.4 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.4 | 2026-06-27 | Fix §3.2 cross-refs: cascade update (SWE2 1.9→1.11 + any other stale refs fixed) | Dermot Murphy |
 | 2.3 | 2026-06-27 | Fix §3.2 cross-ref: SYS2 1.9→2.0 | Dermot Murphy |
 | 2.2 | 2026-06-27 | Claude | ASPICE audit — fix §3.2 SWE2 ref 1.8→1.9 and SYS2 ref 1.6→1.9; update Review & Approval dates — closes #315 #323 |
 | 2.1 | 2026-06-26 | Claude | ASPICE audit — fix §3.1 scope text (v1.2.x → v1.5.0) — closes #305 |
@@ -53,8 +54,8 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 |---|---|---|
 | CSC-SYS2-001 | CStyleCheck System Requirements Specification | 2.0 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.9 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.7 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.11 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
