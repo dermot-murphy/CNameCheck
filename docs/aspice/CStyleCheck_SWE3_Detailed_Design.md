@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.14 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.15 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.15 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.3→2.4, SWE2 1.9→1.11, SWE4 1.16→1.17 | Dermot Murphy |
 | 1.14 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.1→2.3, SWE4 1.14→1.16 | Dermot Murphy |
 | 1.13 | 2026-06-27 | Claude | ASPICE audit — approve §9 Review & Approval (3 roles were Pending) — closes #316 #323 |
 | 1.12 | 2026-06-26 | Claude | ASPICE audit corrections: fix §3 scope text (v1.2.x→v1.5.0); update §3.1 SWE1/SWE4 version refs; correct UNIT-102–113 Component from COMP-01 to COMP-05f/COMP-05h; add _check_non_ascii_source to UNIT-22 run_all() order — closes #308 |
@@ -45,9 +46,9 @@ This document defines the detailed design of each software unit in **CStyleCheck
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.3 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.9 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.16 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.11 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.17 |
 
 ---
 
