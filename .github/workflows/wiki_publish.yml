@@ -318,6 +318,14 @@ jobs:
           # ASPICE-Index.md
           now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
+          # Read version from pyproject.toml so the index stays current
+          _ver_match = re.search(
+              r'^version\s*=\s*"([^"]+)"',
+              Path("pyproject.toml").read_text(encoding="utf-8"),
+              re.MULTILINE,
+          )
+          project_version = _ver_match.group(1) if _ver_match else "unknown"
+
           def classify(fn):
               # Match "_<CODE><digit>" rather than a bare substring - otherwise
               # e.g. "_ACQ4_Supplier_..." misclassifies as Support (_SUP is a
@@ -353,7 +361,7 @@ jobs:
           idx_lines = [
               "# ASPICE CL2 Documentation",
               "",
-              "**CStyleCheck v1.2.0** | Automotive SPICE PAM v4.0 | Capability Level 2",
+              f"**CStyleCheck v{project_version}** | Automotive SPICE PAM v4.0 | Capability Level 2",
               "",
               f"*Auto-generated from docs/aspice/ on {now}.*",
               "",
