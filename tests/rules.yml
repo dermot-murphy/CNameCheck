@@ -489,6 +489,20 @@ misc:
     enabled: true
     severity: warning
 
+  # Constant-to-constant comparison: both sides of == or != are compile-time
+  # constants (literals, ALL_CAPS macros, true/false/NULL/nullptr).  This is
+  # almost certainly a logic error because the result never changes at runtime.
+  #
+  # Examples (violations):
+  #   if (NULL == NULL)        ← always true
+  #   if (ERROR == SUCCESS)    ← always the same value
+  #   if (true == false)       ← always false
+  # Correct: compare a constant against a runtime variable:
+  #   if (NULL == p_ptr)       ← Yoda style (handled by yoda_conditions)
+  constant_comparison:
+    enabled: true
+    severity: warning
+
   # -----------------------------------------------------------------------
   # MISRA C:2012 Rule 7.3 / MISRA C:2023 Rule 7.3 (Required)
   # -----------------------------------------------------------------------
