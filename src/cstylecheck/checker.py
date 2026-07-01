@@ -343,6 +343,7 @@ class Checker:
         self._check_comment_ratio()
         self._check_whitespace_ratio()
         self._check_yoda()
+        self._check_constant_comparison()
         self._check_reserved_names()
         self._check_lowercase_l_suffix()   # MISRA C:2012/2023 Rule 7.3
         self._check_octal_constants()      # MISRA C:2012/2023 Rule 7.1
@@ -1396,6 +1397,98 @@ class Checker:
                     _pos += 1
                 exempt_positions.update(range(_start, _pos + 1))
 
+        # Exempt integer literals that are arguments at signed-parameter
+        # positions of locally-declared/defined functions.
+        # Parse declarations and definitions in this file to build a signature
+        # map (fn_name → [True/False per param, True = signed]).  For each
+        # call site whose function appears in the map, mark all character
+        # positions inside signed-parameter arguments as exempt so that
+        # literals like '80' passed to int8_t/int16_t/etc. parameters do not
+        # trigger the unsigned_suffix or magic_number rules.
+        _RE_PARAM_US = re.compile(
+            r"((?:(?:const|volatile|signed|unsigned|long|short|int|char"
+            r"|float|double|bool|_Bool|uint\w*|int\w*|sint\w*|size_t"
+            r"|[A-Za-z_]\w*)[ \t]+)+)"
+            r"\*?[ \t]*"
+            r"([A-Za-z_]\w*)"
+            r"[ \t]*(?:,|$|\[)",
+        )
+
+        def _param_is_signed_us(type_str: str) -> bool:
+            tokens = type_str.split()
+            if "unsigned" in tokens:
+                return False
+            if "signed" in tokens:
+                return True
+            for _t in tokens:
+                if _t in _SIGNED_TYPES:
+                    return True
+            return False
+
+        def _plist_signs(plist_text: str) -> list:
+            txt = plist_text.strip()
+            if txt in ("void", ""):
+                return []
+            result = []
+            for pm in _RE_PARAM_US.finditer(txt + ","):
+                result.append(_param_is_signed_us(pm.group(1)))
+            return result
+
+        def _extract_plist(fn_start: int) -> tuple:
+            po = self.clean.find("(", fn_start)
+            if po == -1:
+                return -1, ""
+            depth = 0
+            for i in range(po, len(self.clean)):
+                if self.clean[i] == "(":
+                    depth += 1
+                elif self.clean[i] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        return po, self.clean[po + 1:i]
+            return -1, ""
+
+        _fn_signs: dict = {}
+        for _fn_m in RE_FUNCTION_DECL.finditer(self.clean):
+            _fn_name_us = _fn_m.group(1)
+            _po_us, _plist_us = _extract_plist(_fn_m.start())
+            if _po_us != -1:
+                _fn_signs[_fn_name_us] = _plist_signs(_plist_us)
+        for _fn_m in RE_FUNCTION_DEF.finditer(self.clean):
+            _fn_name_us = _fn_m.group(1)
+            if _fn_name_us not in _fn_signs:
+                _po_us, _plist_us = _extract_plist(_fn_m.start())
+                if _po_us != -1:
+                    _fn_signs[_fn_name_us] = _plist_signs(_plist_us)
+
+        _call_re_us = re.compile(r"\b([A-Za-z_]\w*)\s*\(", re.MULTILINE)
+        for _cm in _call_re_us.finditer(self.clean):
+            _fn_us = _cm.group(1)
+            if _fn_us not in _fn_signs:
+                continue
+            _signs_us = _fn_signs[_fn_us]
+            if not _signs_us:
+                continue
+            _pos_us  = _cm.end() - 1   # position of the opening "("
+            _depth_us = 0
+            _aidx_us  = 0
+            _astart_us = _pos_us + 1
+            for _i_us in range(_pos_us, len(self.clean)):
+                _ch_us = self.clean[_i_us]
+                if _ch_us in "([":
+                    _depth_us += 1
+                elif _ch_us == ")" and _depth_us == 1:
+                    if _aidx_us < len(_signs_us) and _signs_us[_aidx_us]:
+                        exempt_positions.update(range(_astart_us, _i_us))
+                    break
+                elif _ch_us in ")]":
+                    _depth_us -= 1
+                elif _ch_us == "," and _depth_us == 1:
+                    if _aidx_us < len(_signs_us) and _signs_us[_aidx_us]:
+                        exempt_positions.update(range(_astart_us, _i_us))
+                    _aidx_us += 1
+                    _astart_us = _i_us + 1
+
         # Magic numbers
         mn_cfg = misc.get("magic_numbers", {})
         if mn_cfg.get("enabled", True):
@@ -1976,6 +2069,76 @@ class Checker:
         if not t:
             return False
         return bool(re.fullmatch(r"[a-z_][a-zA-Z0-9_]*", t))
+
+    # -----------------------------------------------------------------------
+    # 10. Constant-to-constant comparisons
+    # -----------------------------------------------------------------------
+
+    def _check_constant_comparison(self) -> None:
+        """
+        Flag == and != where BOTH sides are recognisably compile-time constants.
+
+        Comparing two constants always yields the same boolean result, making
+        the comparison dead code or a copy-paste error.
+
+        Examples (violations):
+            if (NULL == NULL)       ← always true
+            if (ERROR == SUCCESS)   ← always the same value
+            if (true == false)      ← always false
+        """
+        cc_cfg = self.cfg.get("misc", {}).get("constant_comparison", {})
+        if not cc_cfg.get("enabled", True):
+            return
+        sev = cc_cfg.get("severity", "warning")
+
+        # Same exempt contexts as yoda_condition: #define RHS and return stmts
+        skip: set = set()
+        for m in re.finditer(r"^[ \t]*#[ \t]*define[^\n]*",
+                              self.clean, re.MULTILINE):
+            skip.update(range(m.start(), m.end()))
+        for m in re.finditer(r"\breturn\b[^;]*;", self.clean, re.MULTILINE):
+            skip.update(range(m.start(), m.end()))
+
+        _RE_CMP = re.compile(r"(?<![<>=!])([=!]=)(?!=)")
+
+        for m in _RE_CMP.finditer(self.clean):
+            if m.start() in skip:
+                continue
+
+            op = m.group(1)
+
+            # Extract token immediately to the LEFT of the operator
+            lhs_end = m.start()
+            while lhs_end > 0 and self.clean[lhs_end - 1] in " \t":
+                lhs_end -= 1
+            lhs_s = lhs_end
+            while lhs_s > 0 and (self.clean[lhs_s - 1].isalnum()
+                                   or self.clean[lhs_s - 1] == "_"):
+                lhs_s -= 1
+            lhs = self.clean[lhs_s:lhs_end]
+
+            # Extract token immediately to the RIGHT of the operator
+            rhs_start = m.end()
+            while rhs_start < len(self.clean) and self.clean[rhs_start] in " \t":
+                rhs_start += 1
+            rhs_display_start = rhs_start
+            if (rhs_start < len(self.clean)
+                    and self.clean[rhs_start] == "-"
+                    and rhs_start + 1 < len(self.clean)
+                    and self.clean[rhs_start + 1].isdigit()):
+                rhs_start += 1
+            rhs_end = rhs_start
+            while rhs_end < len(self.clean) and (
+                    self.clean[rhs_end].isalnum()
+                    or self.clean[rhs_end] in "_'xXuUlL"):
+                rhs_end += 1
+            rhs         = self.clean[rhs_start:rhs_end]
+            rhs_display = self.clean[rhs_display_start:rhs_end]
+
+            if self._is_constant_token(lhs) and self._is_constant_token(rhs):
+                self._v(m.start(), sev, "misc.constant_comparison",
+                        f"Both sides of '{op}' are constants: "
+                        f"'{lhs} {op} {rhs_display}'")
 
     # -----------------------------------------------------------------------
     # 11. MISRA C:2012/2023 Rule 7.3 — lowercase 'l' suffix forbidden

@@ -489,6 +489,10 @@ misc:
     enabled: true
     severity: warning
 
+  constant_comparison:
+    enabled: true
+    severity: warning
+
   # -----------------------------------------------------------------------
   # MISRA C:2012 Rule 7.3 / MISRA C:2023 Rule 7.3 (Required)
   # -----------------------------------------------------------------------

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP8-001 | **Version** | 1.9 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SUP8-001 | **Version** | 1.10 |
+| **Project** | CStyleCheck | **Date** | 2026-07-01 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.10 | 2026-07-01 | Claude | v1.6.0 release — update §3.1 scope to v1.6.0; update §3.3 SWE1 ref 2.4→2.5 |
 | 1.9 | 2026-06-27 | Fix §3.3 cross-ref: SWE1 2.2→2.4 (+ any other stale refs fixed) | Dermot Murphy |
 | 1.8 | 2026-06-27 | Claude | ASPICE audit — §3.1 scope v1.2.0→v1.5.0; §3.3 SWE1 ref 1.9→2.2; update Review & Approval dates — closes #321 #323 |
 | 1.7 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
@@ -37,7 +38,7 @@
 
 ### 3.1 Purpose
 
-This Configuration Management (CM) Plan defines the processes, tools, methods, and responsibilities used to identify, control, store, and audit all configuration items (CIs) produced during the development and maintenance of **CStyleCheck v1.5.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules.
+This Configuration Management (CM) Plan defines the processes, tools, methods, and responsibilities used to identify, control, store, and audit all configuration items (CIs) produced during the development and maintenance of **CStyleCheck v1.6.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules.
 
 This plan satisfies the requirements of **Automotive SPICE® PAM v4.0, SUP.8 — Configuration Management**.
 
@@ -59,7 +60,7 @@ This plan applies to all configuration items produced by the CStyleCheck project
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 | CSC-SUP9-001 | CStyleCheck Problem Resolution Management Plan | 1.2 |
 | CSC-SUP10-001 | CStyleCheck Change Request Management Plan | 1.2 |
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.5 |
 
 ---
 
