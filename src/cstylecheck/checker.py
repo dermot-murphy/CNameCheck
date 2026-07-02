@@ -174,15 +174,15 @@ class Checker:
         source: str,
         cfg: dict,
         spell_words=None,
-        alias_prefixes: list = None,
-        disabled_rules: frozenset = None,
-        ident_disabled_rules: dict = None,
-        inline_suppressions: dict = None,
-        defines: list = None,
-        extra_banned: frozenset = None,
+        alias_prefixes: list | None = None,
+        disabled_rules: frozenset | None = None,
+        ident_disabled_rules: dict | None = None,
+        inline_suppressions: dict | None = None,
+        defines: list | None = None,
+        extra_banned: frozenset | None = None,
         copyright_header=None,
-        c_keywords: frozenset = None,
-        c_stdlib_names: frozenset = None,
+        c_keywords: frozenset | None = None,
+        c_stdlib_names: frozenset | None = None,
     ):
         self.filepath      = filepath
         # Normalise line endings once at construction time so all check
