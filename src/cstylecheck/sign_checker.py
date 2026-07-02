@@ -68,8 +68,8 @@ _RE_SINT_CAST  = re.compile(r"^\s*\(\s*(?:signed|int\w+|sint\w+)\s*\)")
 
 
 def _classify_tokens(tokens: list,
-                     signed_types: set = None,
-                     unsigned_types: set = None) -> str:
+                     signed_types: set | None = None,
+                     unsigned_types: set | None = None) -> str:
     """Return sign classification from a list of type/qualifier tokens.
 
     *signed_types* and *unsigned_types* default to the module-level sets when
@@ -93,8 +93,8 @@ def _classify_tokens(tokens: list,
 
 
 def _signedness_of_type(type_str: str, tmap: dict,
-                        signed_types: set = None,
-                        unsigned_types: set = None) -> str:
+                        signed_types: set | None = None,
+                        unsigned_types: set | None = None) -> str:
     """Resolve a full type string (e.g. 'int8_t' or 'unsigned short') to a sign."""
     tokens = type_str.split()
     result = _classify_tokens(tokens, signed_types, unsigned_types)
@@ -379,7 +379,7 @@ class DeclaredNotDefinedChecker:
         re.MULTILINE,
     )
 
-    def __init__(self, cfg: dict, defines: list = None):
+    def __init__(self, cfg: dict, defines: list | None = None):
         self._cfg:         dict = cfg
         self._defines:     list = defines or []
         self._decls:       list = []   # (filepath, line, col, name, kind)
