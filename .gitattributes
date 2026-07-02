@@ -1,0 +1,14 @@
+# Force LF line endings for shell scripts regardless of OS checkout setting
+*.sh    text eol=lf
+
+# Windows batch files use CRLF
+*.bat   text eol=crlf
+
+# Python and YAML always LF
+*.py    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# Text files default to LF
+*.txt   text eol=lf
+*.md    text eol=lf

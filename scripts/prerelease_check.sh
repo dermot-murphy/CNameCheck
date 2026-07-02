@@ -11,9 +11,15 @@ ok()   { echo "[PASS] $*"; PASS=$((PASS+1)); }
 fail() { echo "[FAIL] $*"; FAIL=$((FAIL+1)); }
 skip() { echo "[SKIP] $*"; SKIP=$((SKIP+1)); }
 
-has_module() { python -c "import $1" 2>/dev/null; }
+# Detect python binary (python3 on Ubuntu/Debian, python on Windows/some distros)
+if   command -v python3 &>/dev/null; then PY=python3
+elif command -v python  &>/dev/null; then PY=python
+else echo "ERROR: no python or python3 found on PATH"; exit 1
+fi
 
-echo "=== CStyleCheck pre-release gate ==="
+has_module() { "$PY" -c "import $1" 2>/dev/null; }
+
+echo "=== CStyleCheck pre-release gate (${PY}) ==="
 echo
 
 # 1. YAML sync check (src/rules.yml must match tests/rules.yml except known test fixtures)
@@ -37,7 +43,7 @@ if has_module pytest; then
     if has_module pytest_cov; then
         COV_FLAGS="--cov=src --cov-branch --cov-fail-under=85"
     fi
-    if python -m pytest tests/ -q --tb=short $COV_FLAGS 2>&1; then
+    if "$PY" -m pytest tests/ -q --tb=short $COV_FLAGS 2>&1; then
         ok "pytest passed"
     else
         fail "pytest failed"
@@ -50,7 +56,7 @@ echo
 # 3. ruff lint
 echo "--- 3. ruff lint ---"
 if has_module ruff; then
-    if python -m ruff check src/ tests/ 2>&1; then
+    if "$PY" -m ruff check src/ tests/ 2>&1; then
         ok "ruff clean"
     else
         fail "ruff reported violations"
@@ -63,7 +69,7 @@ echo
 # 4. mypy type check
 echo "--- 4. mypy ---"
 if has_module mypy; then
-    if python -m mypy src/cstylecheck/ --ignore-missing-imports --no-error-summary 2>&1; then
+    if "$PY" -m mypy src/cstylecheck/ --ignore-missing-imports --no-error-summary 2>&1; then
         ok "mypy clean"
     else
         fail "mypy reported errors"
@@ -75,13 +81,13 @@ echo
 
 # 5. Self-check: tool checks its own source with zero error-level violations
 echo "--- 5. CStyleCheck self-check ---"
-ERROR_COUNT=$(python src/cstylecheck.py --config src/rules.yml src/cstylecheck/ \
+ERROR_COUNT=$("$PY" src/cstylecheck.py --config src/rules.yml src/cstylecheck/ \
               | grep -c ': ERROR ' || true)
 if [ "$ERROR_COUNT" -eq 0 ]; then
     ok "self-check: 0 error-level violations"
 else
     fail "self-check: $ERROR_COUNT error-level violations"
-    python src/cstylecheck.py --config src/rules.yml src/cstylecheck/ | grep ': ERROR '
+    "$PY" src/cstylecheck.py --config src/rules.yml src/cstylecheck/ | grep ': ERROR '
 fi
 echo
 
