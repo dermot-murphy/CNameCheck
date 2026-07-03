@@ -7,7 +7,11 @@ REM ============================================================================
 REM CONFIG — edit these paths
 REM =============================================================================
 
-REM Path to cstylecheck (use "cstylecheck" if installed via pip/pipx)
+REM Path to cstylecheck.  Options:
+REM   1. pip/pipx install  (ensure you have the latest version installed):
+REM        SET CHECKER=cstylecheck
+REM   2. Run directly from a cloned repo (always uses the current source):
+REM        SET CHECKER=python C:\path\to\CStyleCheck\src\cstylecheck.py
 SET CHECKER=cstylecheck
 
 REM Root of the C source tree to check (supports glob include below)
@@ -23,7 +27,7 @@ REM ============================================================================
 REM END CONFIG
 REM =============================================================================
 
-echo === CStyleCheck — %SRC_ROOT% ===
+echo === CStyleCheck - %SRC_ROOT% ===
 echo Config : %CONFIG%
 echo.
 
@@ -34,7 +38,7 @@ IF %ERRORLEVEL% EQU 0 (
     echo [PASS] No violations found.
 ) ELSE IF %ERRORLEVEL% EQU 1 (
     echo.
-    echo [WARN] Violations reported — see output above.
+    echo [WARN] Violations reported - see output above.
 ) ELSE (
     echo.
     echo [ERROR] CStyleCheck exited with error code %ERRORLEVEL% (config problem^?^)
