@@ -133,5 +133,46 @@ class TestConstantComparisonNotYoda(unittest.TestCase):
             "void f(void){ if (NULL == p_ptr) {} }", CC_CFG, RULE))
 
 
+class TestConstantComparisonArraySubscript(unittest.TestCase):
+    """Issue #349: ALL_CAPS[index] is a runtime value, not a constant."""
+
+    def test_caps_eq_array_element_not_flagged(self):
+        """RHS is array[index].field — runtime, must not fire."""
+        src = ("void f(uint16_t i){\n"
+               "    if (API_PARAM_IDLE == API_TABLE[i].state) {}\n"
+               "}\n")
+        self.assertFalse(has(src, CC_CFG, RULE))
+
+    def test_caps_eq_array_literal_index_not_flagged(self):
+        """RHS is array[0] — still a struct-member dereference, not constant."""
+        src = "void f(void){ if (API_CAPS == API_TABLE[0].field) {} }\n"
+        self.assertFalse(has(src, CC_CFG, RULE))
+
+    def test_caps_eq_caps_still_flagged(self):
+        """Both sides plain ALL_CAPS (no subscript) — violation still raised."""
+        self.assertTrue(has(
+            "void f(void){ if (ERROR == SUCCESS) {} }", CC_CFG, RULE))
+
+    def test_null_eq_null_still_flagged(self):
+        """Two keyword constants — violation still raised."""
+        self.assertTrue(has(
+            "void f(void){ if (NULL == NULL) {} }", CC_CFG, RULE))
+
+    def test_true_eq_false_still_flagged(self):
+        """Two boolean constants — violation still raised."""
+        self.assertTrue(has(
+            "void f(void){ if (true == false) {} }", CC_CFG, RULE))
+
+    def test_loop_index_pattern_not_flagged(self):
+        """Reproduces the exact pattern reported in issue #349."""
+        src = ("void f(void){\n"
+               "    uint16_t idx;\n"
+               "    for (idx = 0U; idx < COUNT; idx++) {\n"
+               "        if (API_HOW_IS_FROM_NVM == API_DEFN_TABLE[idx].how) {}\n"
+               "    }\n"
+               "}\n")
+        self.assertFalse(has(src, CC_CFG, RULE))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

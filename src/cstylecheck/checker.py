@@ -566,11 +566,13 @@ class Checker:
                                 p_local[len(_pp_param_pfx):].startswith(p_pfx)
                             )
                             if not (p_local.startswith(p_pfx) or ptr_after_param):
+                                _correct = self._compute_ptr_correct_name(
+                                    p_name, p_pfx, p_local, _pp_param_pfx)
                                 self._v(abs_pos, p_sev,
                                         "variable.pointer_prefix",
-                                        f"Pointer parameter '{p_name}' "
-                                        f"local part should start with '{p_pfx}' "
-                                        f"(BARR-C 7.1.k)")
+                                        f"Pointer parameter '{p_name}' local part "
+                                        f"should start with '{p_pfx}'; rename to "
+                                        f"'{_correct}' (BARR-C 7.1.k)")
                 # Handle-type and bool parameters (via typed RE)
                 for pm in _RE_PARAM_TYPED.finditer(sig_text):
                     p_type  = pm.group(1)
@@ -809,9 +811,12 @@ class Checker:
                         local_raw[len(_pp_param_pfx):].startswith(p_pfx)
                     )
                     if not ptr_ok:
+                        _correct = self._compute_ptr_correct_name(
+                            name, p_pfx, local_raw, _pp_param_pfx)
                         self._v(m.start(), p_sev, "variable.pointer_prefix",
                                 f"Pointer variable '{name}' local part should "
-                                f"start with '{p_pfx}' (BARR-C 7.1.k)")
+                                f"start with '{p_pfx}'; rename to '{_correct}' "
+                                f"(BARR-C 7.1.k)")
 
             # Boolean prefix (BARR-C 7.1.m)
             # Variables of type bool or _Bool must have local part starting
@@ -1532,6 +1537,24 @@ class Checker:
                     lit_end   = am.end(2)
                     signed_assign_positions.update(range(lit_start, lit_end))
 
+            # Also exempt literals compared against a signed variable:
+            #   if (1 < x)  or  if (x != 1)  where x is int16_t.
+            # Adding 'U' here would change comparison semantics for negatives.
+            _RE_SIGNED_CMP_L = re.compile(
+                r"\b([0-9]+)\s*(?:[<>]=?|[=!]=)\s*([a-z_]\w*)"
+            )
+            _RE_SIGNED_CMP_R = re.compile(
+                r"\b([a-z_]\w*)\s*(?:[<>]=?|[=!]=)\s*([0-9]+)\b"
+            )
+            for cm in _RE_SIGNED_CMP_L.finditer(self.clean):
+                if cm.group(2) in signed_vars:
+                    signed_assign_positions.update(
+                        range(cm.start(1), cm.end(1)))
+            for cm in _RE_SIGNED_CMP_R.finditer(self.clean):
+                if cm.group(1) in signed_vars:
+                    signed_assign_positions.update(
+                        range(cm.start(2), cm.end(2)))
+
             for m in re.finditer(r"\b([0-9]+)\b", self.clean):
                 if m.start() in exempt_positions:
                     continue
@@ -2049,6 +2072,34 @@ class Checker:
                         f"write '{rhs_display} {op} {lhs}'")
 
     @staticmethod
+    def _compute_ptr_correct_name(name: str, pfx: str, local: str,
+                                   pp_param_pfx: str) -> str:
+        """Return the correctly ordered pointer-prefixed name for --fix messages.
+
+        Ensures the pointer prefix is outermost (after any parameter prefix)
+        and applies rename rules: strip trailing _ptr, bare 'ptr' → 'data'.
+        """
+        module_part = name[:len(name) - len(local)]
+        if pp_param_pfx and local.startswith(pp_param_pfx) and pp_param_pfx != pfx:
+            inner = local[len(pp_param_pfx):]
+            if inner == "ptr":
+                inner_base = "data"
+            elif inner.endswith("_ptr"):
+                inner_base = inner[:-4]
+            else:
+                inner_base = inner
+            new_local = pp_param_pfx + pfx + inner_base
+        else:
+            if local == "ptr":
+                base = "data"
+            elif local.endswith("_ptr"):
+                base = local[:-4]
+            else:
+                base = local
+            new_local = pfx + base
+        return module_part + new_local
+
+    @staticmethod
     def _is_constant_token(tok: str) -> bool:
         """True if *tok* is recognisably a constant (literal, keyword, ALL_CAPS)."""
         t = tok.strip()
@@ -2134,6 +2185,13 @@ class Checker:
                 rhs_end += 1
             rhs         = self.clean[rhs_start:rhs_end]
             rhs_display = self.clean[rhs_display_start:rhs_end]
+
+            # Skip if RHS identifier is immediately followed by '[': the token
+            # is an array name and the element value is runtime-determined.
+            # e.g. ALL_CAPS_TABLE[param_index].field is not a constant.
+            _after_rhs = self.clean[rhs_end:rhs_end + 10].lstrip()
+            if _after_rhs.startswith('['):
+                continue
 
             if self._is_constant_token(lhs) and self._is_constant_token(rhs):
                 self._v(m.start(), sev, "misc.constant_comparison",

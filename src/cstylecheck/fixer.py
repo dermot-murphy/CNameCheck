@@ -92,100 +92,156 @@ def _fix_lowercase_l_suffix(source: str, v: Violation) -> Optional[tuple]:
 def _fix_pointer_prefix(source: str, v: Violation) -> Optional[list]:
     """Return list of (offset, old_text, new_text) for pointer prefix rename.
 
-    Renames the parameter/variable everywhere in its function scope:
-    the signature (inside the parameter list), the function body if this
-    is a definition, and any ``@param``/``\\param`` entry in the doxygen
-    block immediately preceding the function.
+    For *parameters*: renames everywhere in its function scope — the signature,
+    the function body (if a definition), and any ``@param``/``\\param`` in the
+    immediately preceding doxygen block.
+
+    For local *variables*: renames within the innermost enclosing block that is
+    preceded by ``)``.  Global and file-scope static variables (no such enclosing
+    block) are skipped.
     """
     m = re.search(
         r"Pointer (?:parameter|variable) '([^']+)' "
-        r"local part should start with '([^']+)'",
+        r"local part should start with '([^']+)'(?:; rename to '([^']+)')?",
         v.message,
     )
     if not m:
         return None
-    old_name, pfx = m.group(1), m.group(2)
-    new_name = pfx + old_name
+    old_name = m.group(1)
+    pfx      = m.group(2)
+    # Use the checker-computed correct name when present (handles prefix ordering
+    # and rename rules).  Fall back to legacy formula for older messages.
+    if m.group(3):
+        new_name = m.group(3)
+    elif old_name == "ptr":
+        new_name = pfx + "data"
+    elif old_name.endswith("_ptr"):
+        new_name = pfx + old_name[:-4]
+    else:
+        new_name = pfx + old_name
 
-    # Preprocess for scope-boundary detection (preserves char offsets)
-    clean = _preprocess(source)
+    clean  = _preprocess(source)
     offset = _line_col_to_offset(source, v.line, v.col)
 
-    # Walk backward in the clean source to find the enclosing '('
-    depth = 0
-    paren_open = -1
-    for i in range(min(offset + len(old_name), len(clean) - 1), -1, -1):
-        if clean[i] == ")":
-            depth += 1
-        elif clean[i] == "(":
-            if depth == 0:
-                paren_open = i
-                break
-            depth -= 1
-    if paren_open == -1:
-        return None
+    edits: list = []
 
-    # Find the matching ')' scanning forward
-    depth = 0
-    paren_close = -1
-    for i in range(paren_open, len(clean)):
-        if clean[i] == "(":
-            depth += 1
-        elif clean[i] == ")":
-            depth -= 1
-            if depth == 0:
-                paren_close = i
-                break
-    if paren_close == -1:
-        return None
-
-    # Find the start of the function signature (stop at the previous '}' or ';')
-    sig_start = 0
-    for i in range(paren_open - 1, -1, -1):
-        if clean[i] in ";}":
-            sig_start = i + 1
-            break
-
-    # Determine: function definition (body follows) vs declaration (ends with ;)
-    rest = clean[paren_close + 1:paren_close + 30].lstrip()
-    is_definition = rest.startswith("{")
-
-    if is_definition:
-        brace_open = paren_close + 1
-        while brace_open < len(clean) and clean[brace_open] in " \t\n":
-            brace_open += 1
+    if "Pointer parameter" in v.message:
+        # ---------------------------------------------------------------
+        # Parameter rename: scope = function signature + body
+        # ---------------------------------------------------------------
+        # Walk backward in the clean source to find the enclosing '('
         depth = 0
-        scope_end = brace_open
-        for i in range(brace_open, len(clean)):
+        paren_open = -1
+        for i in range(min(offset + len(old_name), len(clean) - 1), -1, -1):
+            if clean[i] == ")":
+                depth += 1
+            elif clean[i] == "(":
+                if depth == 0:
+                    paren_open = i
+                    break
+                depth -= 1
+        if paren_open == -1:
+            return None
+
+        # Find the matching ')' scanning forward
+        depth = 0
+        paren_close = -1
+        for i in range(paren_open, len(clean)):
+            if clean[i] == "(":
+                depth += 1
+            elif clean[i] == ")":
+                depth -= 1
+                if depth == 0:
+                    paren_close = i
+                    break
+        if paren_close == -1:
+            return None
+
+        # Find the start of the function signature (stop at previous '}' or ';')
+        sig_start = 0
+        for i in range(paren_open - 1, -1, -1):
+            if clean[i] in ";}":
+                sig_start = i + 1
+                break
+
+        # Determine: definition (body follows '{') vs declaration (ends ';')
+        rest = clean[paren_close + 1:paren_close + 30].lstrip()
+        is_definition = rest.startswith("{")
+
+        if is_definition:
+            brace_open = paren_close + 1
+            while brace_open < len(clean) and clean[brace_open] in " \t\n":
+                brace_open += 1
+            depth = 0
+            scope_end = brace_open
+            for i in range(brace_open, len(clean)):
+                if clean[i] == "{":
+                    depth += 1
+                elif clean[i] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        scope_end = i + 1
+                        break
+        else:
+            semi = clean.find(";", paren_close)
+            scope_end = (semi + 1) if semi != -1 else (paren_close + 1)
+
+        scope_text = source[sig_start:scope_end]
+        for wm in re.finditer(r"\b" + re.escape(old_name) + r"\b", scope_text):
+            edits.append((sig_start + wm.start(), old_name, new_name))
+
+        # Rename @param / \param in the nearest preceding doxygen block
+        pre = source[:sig_start]
+        dox_m = None
+        for dm in re.finditer(r"/\*\*.*?\*/", pre, re.DOTALL):
+            dox_m = dm
+        if dox_m is not None and dox_m.end() >= len(pre) - 100:
+            for dm in re.finditer(
+                    r"(?:@param|\\param)[ \t]+" + re.escape(old_name) + r"\b",
+                    dox_m.group()):
+                idx = dm.group().index(old_name)
+                edits.append((dox_m.start() + dm.start() + idx, old_name, new_name))
+
+    else:
+        # ---------------------------------------------------------------
+        # Local variable rename: scope = innermost enclosing block
+        # Walk backward to find the '{' that immediately contains the
+        # violation.  If it is preceded by ')' it is a function / control-
+        # flow body and the variable is local — safe to rename.
+        # Global and file-scope static variables have no such block.
+        # ---------------------------------------------------------------
+        depth = 0
+        body_open = -1
+        for i in range(offset - 1, -1, -1):
+            if clean[i] == "}":
+                depth += 1
+            elif clean[i] == "{":
+                if depth == 0:
+                    check = clean[:i].rstrip()
+                    if check and check[-1] == ")":
+                        body_open = i
+                    break
+                depth -= 1
+
+        if body_open == -1:
+            return None  # global or static — do not auto-fix
+
+        depth = 0
+        body_close = -1
+        for i in range(body_open, len(clean)):
             if clean[i] == "{":
                 depth += 1
             elif clean[i] == "}":
                 depth -= 1
                 if depth == 0:
-                    scope_end = i + 1
+                    body_close = i + 1
                     break
-    else:
-        semi = clean.find(";", paren_close)
-        scope_end = (semi + 1) if semi != -1 else (paren_close + 1)
+        if body_close == -1:
+            return None
 
-    edits: list = []
-
-    # Rename all word-boundary occurrences within [sig_start, scope_end)
-    scope_text = source[sig_start:scope_end]
-    for wm in re.finditer(r"\b" + re.escape(old_name) + r"\b", scope_text):
-        edits.append((sig_start + wm.start(), old_name, new_name))
-
-    # Rename @param / \param in the nearest preceding doxygen block
-    pre = source[:sig_start]
-    dox_m = None
-    for dm in re.finditer(r"/\*\*.*?\*/", pre, re.DOTALL):
-        dox_m = dm
-    if dox_m is not None and dox_m.end() >= len(pre) - 100:
-        for dm in re.finditer(
-                r"(?:@param|\\param)[ \t]+" + re.escape(old_name) + r"\b",
-                dox_m.group()):
-            idx = dm.group().index(old_name)
-            edits.append((dox_m.start() + dm.start() + idx, old_name, new_name))
+        scope_text = source[body_open:body_close]
+        for wm in re.finditer(r"\b" + re.escape(old_name) + r"\b", scope_text):
+            edits.append((body_open + wm.start(), old_name, new_name))
 
     return edits if edits else None
 
