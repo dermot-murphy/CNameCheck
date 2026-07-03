@@ -168,5 +168,158 @@ class TestApplyFixesHandlesList(unittest.TestCase):
         self.assertGreater(count, 0)
 
 
+# Config where parameter prefix (p_) and pointer prefix (ptr_) differ so
+# the order bug from issue #346 can be reproduced.
+_PTR_TRP_CFG = cfg_only(variables={
+    "enabled": True, "severity": "error",
+    "case": "lower_snake", "min_length": 2, "max_length": 40,
+    "allow_single_char_loop_vars": True,
+    "allowed_abbreviations": [],
+    "global":    {"severity": "error", "case": "lower_snake",
+                  "require_module_prefix": False,
+                  "g_prefix": {"enabled": False}},
+    "static":    {"severity": "error", "case": "lower_snake",
+                  "require_module_prefix": False,
+                  "s_prefix": {"enabled": False}},
+    "local":     {"severity": "error", "case": "lower_snake",
+                  "require_module_prefix": False},
+    "parameter": {"severity": "warning", "case": "lower_snake",
+                  "require_module_prefix": False,
+                  "p_prefix": {"enabled": True, "prefix": "p_",
+                               "severity": "warning"}},
+    "pointer_prefix": {"enabled": True, "severity": "warning", "prefix": "tr_"},
+    "pp_prefix":  {"enabled": False},
+    "bool_prefix": {"enabled": False},
+})
+
+
+class TestPtrPrefixOrderFix(unittest.TestCase):
+    """Issue #346: --fix must produce pointer-prefix OUTERMOST (p_tr_buf not tr_p_buf)."""
+
+    def _ptr_viols(self, src, cfg=None):
+        return [v for v in run(src, cfg or _PTR_TRP_CFG)
+                if v.rule == "variable.pointer_prefix"]
+
+    def test_param_with_param_prefix_gets_correct_order(self):
+        """p_buf already has param prefix; pointer prefix 'tr_' inserts after it."""
+        src = "void uart_Init(uint8_t *p_buf) { (void)p_buf; }\n"
+        viols = self._ptr_viols(src)
+        self.assertTrue(viols, "Expected pointer_prefix violation")
+        fixed, _ = apply_fixes(src, viols)
+        self.assertIn("p_tr_buf", fixed)
+        self.assertNotIn("tr_p_buf", fixed)
+
+    def test_bare_param_gets_pointer_prefix(self):
+        """No prefix at all: pointer prefix prepended directly."""
+        src = "void uart_Init(uint8_t *buf) { (void)buf; }\n"
+        viols = self._ptr_viols(src, PTR_CFG)
+        self.assertTrue(viols)
+        fixed, _ = apply_fixes(src, viols)
+        self.assertIn("p_buf", fixed)
+
+    def test_ptr_suffix_stripped_on_rename(self):
+        """data_ptr → p_data (trailing _ptr stripped before prepending prefix)."""
+        src = "void uart_Init(uint8_t *data_ptr) { (void)data_ptr; }\n"
+        viols = self._ptr_viols(src, PTR_CFG)
+        self.assertTrue(viols)
+        fixed, _ = apply_fixes(src, viols)
+        self.assertIn("p_data", fixed)
+        self.assertNotIn("p_data_ptr", fixed)
+
+    def test_bare_ptr_renamed_to_data(self):
+        """ptr alone → p_data (bare name replaced by conventional stem)."""
+        src = "void uart_Init(uint8_t *ptr) { (void)ptr; }\n"
+        viols = self._ptr_viols(src, PTR_CFG)
+        self.assertTrue(viols)
+        fixed, _ = apply_fixes(src, viols)
+        self.assertIn("p_data", fixed)
+        self.assertNotIn("p_ptr", fixed)
+
+
+class TestLocalVarPtrFix(unittest.TestCase):
+    """Issue #347: --fix renames local pointer variables within their function body."""
+
+    def _ptr_viols(self, src):
+        return [v for v in run(src, PTR_CFG)
+                if v.rule == "variable.pointer_prefix"]
+
+    def test_renames_local_var_in_body(self):
+        src = ("void uart_Process(void) {\n"
+               "    uint8_t *buffer = get_buf();\n"
+               "    buffer[0] = 0U;\n"
+               "    send(buffer, 4U);\n"
+               "}\n")
+        viols = self._ptr_viols(src)
+        self.assertTrue(viols, "Expected pointer_prefix violation for 'buffer'")
+        fixed, _ = apply_fixes(src, viols)
+        self.assertIn("p_buffer", fixed)
+        self.assertNotIn("*buffer ", fixed)
+        self.assertIn("p_buffer[0]", fixed)
+
+    def test_local_ptr_suffix_stripped(self):
+        """data_ptr local variable → p_data after fix."""
+        src = ("void f(void) {\n"
+               "    uint8_t *data_ptr = get_buf();\n"
+               "    data_ptr[0] = 0U;\n"
+               "}\n")
+        viols = self._ptr_viols(src)
+        self.assertTrue(viols)
+        fixed, _ = apply_fixes(src, viols)
+        self.assertIn("p_data", fixed)
+        self.assertNotIn("data_ptr", fixed)
+
+    def test_bare_ptr_local_renamed_to_data(self):
+        """ptr local variable → p_data after fix."""
+        src = ("void f(void) {\n"
+               "    uint8_t *ptr = get_buf();\n"
+               "    ptr[0] = 0U;\n"
+               "}\n")
+        viols = self._ptr_viols(src)
+        self.assertTrue(viols)
+        fixed, _ = apply_fixes(src, viols)
+        self.assertIn("p_data", fixed)
+
+    def test_global_var_not_renamed(self):
+        """Global pointer variable must NOT be auto-fixed."""
+        src = ("uint8_t *g_buffer;\n"
+               "void f(void) { (void)g_buffer; }\n")
+        viols = self._ptr_viols(src)
+        if not viols:
+            return  # no violation — nothing to fix
+        fixed, count = apply_fixes(src, viols)
+        # No fix should have been applied for the global
+        self.assertEqual(fixed, src,
+                         "Global pointer variable must not be renamed by --fix")
+
+    def test_static_var_not_renamed(self):
+        """Static file-scope pointer variable must NOT be auto-fixed."""
+        src = ("static uint8_t *s_buffer;\n"
+               "void f(void) { (void)s_buffer; }\n")
+        viols = self._ptr_viols(src)
+        if not viols:
+            return
+        fixed, count = apply_fixes(src, viols)
+        self.assertEqual(fixed, src,
+                         "Static file-scope pointer must not be renamed by --fix")
+
+    def test_only_renames_within_function_scope(self):
+        """Rename must not bleed into the next function."""
+        src = ("void foo(void) {\n"
+               "    uint8_t *buffer = get();\n"
+               "    (void)buffer;\n"
+               "}\n"
+               "void bar(uint8_t *buffer) {\n"
+               "    (void)buffer;\n"
+               "}\n")
+        # Only the local variable 'buffer' in foo should be renamed
+        viols = self._ptr_viols(src)
+        # bar's parameter should also have a violation; fix both separately
+        fixed, _ = apply_fixes(src, viols)
+        # After fix, p_buffer appears in foo
+        self.assertIn("uint8_t *p_buffer = get()", fixed)
+        # bar's parameter is also renamed (separate violation)
+        self.assertIn("bar(uint8_t *p_buffer)", fixed)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

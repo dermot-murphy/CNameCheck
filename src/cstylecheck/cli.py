@@ -657,14 +657,22 @@ def main() -> int:
                     import re as _re
                     _msg_m = _re.search(
                         r"Pointer (?:parameter|variable) '([^']+)' "
-                        r"local part should start with '([^']+)'",
+                        r"local part should start with '([^']+)'"
+                        r"(?:; rename to '([^']+)')?",
                         _pv.message,
                     )
                     if not _msg_m:
                         continue
                     _old_name = _msg_m.group(1)
                     _pfx_str  = _msg_m.group(2)
-                    _new_name = _pfx_str + _old_name
+                    if _msg_m.group(3):
+                        _new_name = _msg_m.group(3)
+                    elif _old_name == "ptr":
+                        _new_name = _pfx_str + "data"
+                    elif _old_name.endswith("_ptr"):
+                        _new_name = _pfx_str + _old_name[:-4]
+                    else:
+                        _new_name = _pfx_str + _old_name
                     _fn_name  = get_fn_name_for_fix(_orig_src, _pv)
                     if not _fn_name:
                         continue

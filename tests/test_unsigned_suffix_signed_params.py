@@ -83,5 +83,59 @@ class TestSignedParamArgExemptMultiFile(unittest.TestCase):
         self.assertFalse(has(src, cfg, RULE))
 
 
+class TestSignedVarComparisonExempt(unittest.TestCase):
+    """Issue #348: literals compared against signed local variables must not
+    trigger misc.unsigned_suffix — adding U would change comparison semantics."""
+
+    def test_less_than_signed_var_not_flagged(self):
+        """if (1 < x) where x is int16_t — no violation."""
+        src = ("void f(void) {\n"
+               "    int16_t x;\n"
+               "    if (1 < x) {}\n"
+               "}\n")
+        self.assertFalse(has(src, US_CFG, RULE))
+
+    def test_not_equal_signed_var_not_flagged(self):
+        """if (x != 1) where x is int32_t — no violation on 1."""
+        src = ("void f(void) {\n"
+               "    int32_t count;\n"
+               "    if (count != 1) {}\n"
+               "}\n")
+        self.assertFalse(has(src, US_CFG, RULE))
+
+    def test_greater_than_signed_var_not_flagged(self):
+        """if (0 < count) where count is int8_t — no violation."""
+        src = ("void f(void) {\n"
+               "    int8_t delta;\n"
+               "    if (0 < delta) {}\n"
+               "}\n")
+        self.assertFalse(has(src, US_CFG, RULE))
+
+    def test_geq_signed_var_not_flagged(self):
+        """if (remaining >= 1) where remaining is int16_t — no violation."""
+        src = ("void f(void) {\n"
+               "    int16_t remaining;\n"
+               "    if (remaining >= 1) {}\n"
+               "}\n")
+        self.assertFalse(has(src, US_CFG, RULE))
+
+    def test_unsigned_var_comparison_still_flagged(self):
+        """Comparison against UNSIGNED var — violation still raised."""
+        src = ("void f(void) {\n"
+               "    uint16_t u_val;\n"
+               "    if (1 < u_val) {}\n"
+               "}\n")
+        viols = [v for v in run(src, US_CFG) if v.rule == RULE]
+        self.assertTrue(viols, "Expected unsigned_suffix for comparison with uint16_t")
+
+    def test_already_suffixed_no_violation(self):
+        """1U < signed_var already has suffix — no violation regardless."""
+        src = ("void f(void) {\n"
+               "    int16_t x;\n"
+               "    if (1U < x) {}\n"
+               "}\n")
+        self.assertFalse(has(src, US_CFG, RULE))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
