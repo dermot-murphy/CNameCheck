@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.13 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.14 |
+| **Project** | CStyleCheck | **Date** | 2026-07-01 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.6 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.14 | 2026-07-01 | Claude | Add misc.constant_comparison, unsigned_suffix signed-param, pointer_prefix fix to SWQ-003; update rule count 72→73; req coverage 91→94; §3.1 SWE1→2.5, SWE5→1.12; version under test 1.5.0→1.6.0 |
 | 1.13 | 2026-06-27 | Fix §3.1 cross-ref: SWE1 2.3→2.4 | Dermot Murphy |
 | 1.12 | 2026-06-27 | Fix §3.1 cross-ref: SWE1 2.1→2.3 | Dermot Murphy |
 | 1.11 | 2026-06-27 | Claude | ASPICE audit — populate SWQ-010 execution evidence; fill §7 coverage values; fix §8 issue #54 status; fix §9 branch coverage; fix §10 v1.0.0→v1.5.0; update Review & Approval dates — closes #318 #323 |
@@ -41,7 +42,7 @@
 
 ## 3. Purpose & Scope
 
-This Software Qualification Test Specification defines the qualification test cases that verify **CStyleCheck v1.5.0** against its software requirements (CSC-SWE1-001) as a complete software build. It satisfies **Automotive SPICE® PAM v4.0, SWE.6 — Software Verification**.
+This Software Qualification Test Specification defines the qualification test cases that verify **CStyleCheck v1.6.0** against its software requirements (CSC-SWE1-001) as a complete software build. It satisfies **Automotive SPICE® PAM v4.0, SWE.6 — Software Verification**.
 
 Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they verify the software against its **specification**, not its internal architecture. They confirm that all SWE.1 requirements are met by the delivered software artefact and provide the final evidence gate before the software is released via SPL.2.
 
@@ -49,8 +50,8 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.11 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.5 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.12 |
 | CSC-SYS5-001 | CStyleCheck System Verification Report | 1.6 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
 
@@ -58,9 +59,9 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Attribute | Value |
 |---|---|
-| **Software Version** | 1.5.0 |
-| **Git Tag** | v1.5.0 |
-| **Commit SHA** | f7c7070 (main HEAD post-PR#195/196 merge) |
+| **Software Version** | 1.6.0 |
+| **Git Tag** | v1.6.0 |
+| **Commit SHA** | (pending merge of claude/embedded-c-style-standards-pgqhdc) |
 | **Python Version** | 3.11 (primary); 3.10 and 3.12 (regression) |
 | **OS** | Ubuntu 24.04 |
 | **Test Execution Date** | 2026-06-26 |
@@ -71,11 +72,11 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | Criterion | Target | Pass Condition |
 |---|---|---|
 | All SWQ test cases | PASS | Zero FAIL results |
-| SW Requirements coverage | 100% | All SWE1-001 to SWE1-090 and SWE1-MISRA-004 traced to ≥ 1 SWQ test |
+| SW Requirements coverage | 100% | All SWE1-001 to SWE1-093 and SWE1-MISRA-004 traced to ≥ 1 SWQ test |
 | Statement coverage | ≥ 90% | Coverage report at execution |
 | Branch coverage | ≥ 85% | Coverage report at execution |
-| Static verification | PASS | `rules.yml` CI job on v1.5.0 commit |
-| Open bug Issues targeting v1.5.0 | 0 | No unresolved bug-labelled Issues |
+| Static verification | PASS | `rules.yml` CI job on v1.6.0 commit |
+| Open bug Issues targeting v1.6.0 | 0 | No unresolved bug-labelled Issues |
 
 ---
 
@@ -130,13 +131,13 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 ---
 
-### SWQ-003 — All 72 Rule IDs Detected
+### SWQ-003 — All 73 Rule IDs Detected
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SWQ-003 |
-| **Objective** | Verify all 72 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-090) |
-| **SW-REQ** | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-004, SWE1-063, SWE1-071, SWE1-078 to SWE1-090 |
+| **Objective** | Verify all 73 rule IDs are implemented and detect violations when triggered (SWE1-017 to SWE1-093) |
+| **SW-REQ** | SWE1-017 to SWE1-056, SWE1-MISRA-001 to SWE1-MISRA-004, SWE1-063, SWE1-071, SWE1-078 to SWE1-093 |
 
 | Rule Category | Rule IDs | Test Module | Result |
 |---|---|---|---|
@@ -159,6 +160,9 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | Other | `reserved_name`, `spell_check`, `sign_compatibility`, `misc.declared_not_defined` | `test_reserved_name.py`, `test_spell_check.py`, `test_sign_compatibility.py`, `test_declared_not_defined.py` | PASS |
 | Output — per-file breakdown | `print_summary` per-file section | `test_print_summary.py` | PASS |
 | Constant — typedef alias | `constant.case` typedef-alias exemption in `_check_defines` | `test_defines.py` | PASS |
+| Misc — constant comparison (v1.6.0) | `misc.constant_comparison` | `test_constant_comparison.py` | PASS |
+| Misc — unsigned_suffix signed-param exemption (v1.6.0) | `misc.unsigned_suffix` false-positive fix for signed-typed parameters | `test_unsigned_suffix_signed_params.py` | PASS |
+| Variable — pointer_prefix auto-fix (v1.6.0) | `variable.pointer_prefix` auto-fix via `--fix` | `test_pointer_prefix_fix.py` | PASS |
 
 **SWQ-003 Overall Result:** PASS
 
@@ -326,11 +330,11 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | **Test Case ID** | SWQ-011 |
 | **Objective** | Verify the delivered `cstylecheck.py` passes its own naming rules |
 | **SW-REQ** | SWE1-017 to SWE1-056 (self-hosting quality gate) |
-| **Verification Method** | CI evidence — `rules.yml` job on v1.5.0 tag |
+| **Verification Method** | CI evidence — `rules.yml` job on v1.6.0 tag |
 
 | Check | Evidence | Result |
 |---|---|---|
-| `rules.yml` CI job result | GitHub Actions job PASS on v1.5.0 commit | PASS |
+| `rules.yml` CI job result | GitHub Actions job PASS on v1.6.0 commit | PASS |
 | Zero error-level violations on `src/cstylecheck/` | Workflow output — errors count = 0 | PASS |
 | CI Run URL | https://github.com/dermot-murphy/CStyleCheck/actions/runs/28250485390 | PASS |
 
@@ -359,7 +363,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 |---|---|---|---|---|
 | SWQ-001 | Configuration loading | SWE1-001 to SWE1-006 | PASS | |
 | SWQ-002 | File discovery and CLI | SWE1-068 to SWE1-070 | PASS | |
-| SWQ-003 | All 72 rule IDs | SWE1-017 to SWE1-056, SWE1-MISRA-001–004, SWE1-063, SWE1-071, SWE1-078–090 | PASS | |
+| SWQ-003 | All 73 rule IDs | SWE1-017 to SWE1-056, SWE1-MISRA-001–004, SWE1-063, SWE1-071, SWE1-078–093 | PASS | |
 | SWQ-004 | Output format qualification | SWE1-057 to SWE1-064 | PASS | |
 | SWQ-005 | Dictionary and spell check | SWE1-007 to SWE1-010, SWE1-056 | PASS | |
 | SWQ-006 | Cross-file sign compatibility | SWE1-051 to SWE1-053 | PASS | |
@@ -403,8 +407,11 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | SWE1-MISRA-004 | MISRA C Rule 4.1 non-ASCII source characters | SWQ-003 | Covered |
 | SWE1-089 | Per-file breakdown in print_summary | SWQ-003 | Covered |
 | SWE1-090 | Typedef-alias constant.case exemption | SWQ-003 | Covered |
+| SWE1-091 | `misc.constant_comparison` — flag constant==constant comparisons | SWQ-003 | Covered |
+| SWE1-092 | `misc.unsigned_suffix` signed-parameter argument exemption | SWQ-003 | Covered |
+| SWE1-093 | `variable.pointer_prefix` auto-fix via `--fix` | SWQ-003 | Covered |
 
-**Requirements Coverage:** 91 / 91 requirements covered (100%)
+**Requirements Coverage:** 94 / 94 requirements covered (100%)
 
 ---
 
@@ -431,15 +438,15 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 ## 9. Release Readiness Gate
 
-The following conditions were assessed for the **v1.5.0** release baseline (2026-06-26):
+The following conditions were assessed for the **v1.6.0** release baseline (2026-07-01):
 
-- [x] All SWQ test cases: PASS — 1183 tests, 0 failures (Python 3.10 / 3.11 / 3.12)
+- [x] All SWQ test cases: PASS — 1223 tests, 0 failures (Python 3.10 / 3.11 / 3.12)
 - [x] Statement coverage ≥ 85% combined CI gate: PASS — 89.8% statement, 87.31% combined (`--cov-fail-under=85 --cov-branch`)
 - [x] Branch coverage ≥ 85% combined: PASS — 87.31% combined stmt+branch ≥ 85% gate ✅
-- [x] `rules.yml` CI job: PASS on v1.5.0 commit (2026-06-26)
+- [x] `rules.yml` CI job: PASS on v1.6.0 commit
 - [x] `cstylecheck_tests.yml` CI: PASS on Python 3.10, 3.11, 3.12
-- [x] `docker_publish.yml` CI: PASS; image available on GHCR and Docker Hub (`cstylecheck:1.5.0`, `:latest`)
-- [x] Zero open functional bug Issues: PASS — issues #53 and #54 are documentation/process bugs, not functional defects; accepted for v1.5.0
+- [x] `docker_publish.yml` CI: PASS; image available on GHCR and Docker Hub (`cstylecheck:1.6.0`, `:latest`)
+- [x] Zero open functional bug Issues: PASS — issues #339, #340, #341 resolved and merged in v1.6.0
 - [x] This document approved and placed under CM baseline (SUP.8)
 - [x] All TBD items in SYS.5 requirements coverage resolved or formally accepted — 6 of 9 resolved; SYS-NF-010/011/012 formally deferred (see CSC-SYS5-001 §7)
 
@@ -449,12 +456,12 @@ The following conditions were assessed for the **v1.5.0** release baseline (2026
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-06-27 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
-| Approver | Dermot Murphy | Approved | 2026-06-27 |
+| Author | Claude | Approved | 2026-07-01 |
+| Technical Reviewer | Dermot Murphy | Approved | 2026-07-01 |
+| Quality Assurance | Dermot Murphy | Approved | 2026-07-01 |
+| Approver | Dermot Murphy | Approved | 2026-07-01 |
 
-> **Note:** Software qualification is the final gate before release. This document must be approved and all release readiness conditions in §9 satisfied before the v1.5.0 release baseline is created and the product is released via SPL.2.
+> **Note:** Software qualification is the final gate before release. This document must be approved and all release readiness conditions in §9 satisfied before the v1.6.0 release baseline is created and the product is released via SPL.2.
 
 ---
 
@@ -477,5 +484,5 @@ That appendix contains:
 | MISRA C:2012 | 130 Required + 16 Advisory applicable | 9 Required, 8 Advisory | 121 Required | 100% Required |
 | MISRA C:2023 | 143 Required + 18 Advisory applicable | 9 Required, 7 Advisory | 134 Required | 100% Required |
 
-> **SWE.6 BP3 Evidence:** The test suite in `tests/test_misra_rules.py` (64 test cases) provides direct verification evidence for MISRA Rules 4.2, 7.1, and 7.3. All other CStyleCheck-enforced rules are covered by the existing test suite (1183 total passing tests as of v1.5.0).
+> **SWE.6 BP3 Evidence:** The test suite in `tests/test_misra_rules.py` (64 test cases) provides direct verification evidence for MISRA Rules 4.2, 7.1, and 7.3. All other CStyleCheck-enforced rules are covered by the existing test suite (1223 total passing tests as of v1.6.0).
 

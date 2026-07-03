@@ -25,7 +25,8 @@ from .config import (
     C_KEYWORDS, C_STDLIB_NAMES,
     resolve_per_dir_config,
 )
-from .fixer import apply_fixes, unified_diff, FIXABLE_RULES, SAFE_RULES
+from .fixer import (apply_fixes, unified_diff, FIXABLE_RULES, SAFE_RULES,
+                    get_fn_name_for_fix, fix_pointer_prefix_in_header)
 from .utils import module_name, _cfg
 from .checker import Checker
 from .sign_checker import SignChecker, DeclaredNotDefinedChecker
@@ -635,6 +636,58 @@ def main() -> int:
                 tee.print(f"Total: {total_fixed} fix(es) applied.")
             elif dry_run and not total_fixed:
                 tee.print("No fixable violations found.")
+
+            # For variable.pointer_prefix fixes in .c files, also rename the
+            # parameter in the corresponding .h file (same base name).
+            if not dry_run:
+                _pfx_viols = [
+                    v for v in all_violations
+                    if v.rule == "variable.pointer_prefix"
+                    and v.filepath.endswith(".c")
+                ]
+                _fixed_hdrs: set = set()
+                for _pv in _pfx_viols:
+                    _h_path = Path(_pv.filepath).with_suffix(".h")
+                    if not _h_path.exists():
+                        continue
+                    _h_key = str(_h_path)
+                    _orig_src = source_cache.get(_pv.filepath, "")
+                    if not _orig_src:
+                        continue
+                    import re as _re
+                    _msg_m = _re.search(
+                        r"Pointer (?:parameter|variable) '([^']+)' "
+                        r"local part should start with '([^']+)'"
+                        r"(?:; rename to '([^']+)')?",
+                        _pv.message,
+                    )
+                    if not _msg_m:
+                        continue
+                    _old_name = _msg_m.group(1)
+                    _pfx_str  = _msg_m.group(2)
+                    if _msg_m.group(3):
+                        _new_name = _msg_m.group(3)
+                    elif _old_name == "ptr":
+                        _new_name = _pfx_str + "data"
+                    elif _old_name.endswith("_ptr"):
+                        _new_name = _pfx_str + _old_name[:-4]
+                    else:
+                        _new_name = _pfx_str + _old_name
+                    _fn_name  = get_fn_name_for_fix(_orig_src, _pv)
+                    if not _fn_name:
+                        continue
+                    try:
+                        _h_src   = _h_path.read_text(encoding="utf-8")
+                        _h_fixed = fix_pointer_prefix_in_header(
+                            _h_src, _fn_name, _old_name, _new_name)
+                        if _h_fixed != _h_src:
+                            _h_path.write_text(_h_fixed, encoding="utf-8")
+                            if _h_key not in _fixed_hdrs:
+                                tee.print(
+                                    f"Fixed pointer prefix rename in {_h_path}")
+                                _fixed_hdrs.add(_h_key)
+                    except OSError as _exc:
+                        tee.print(f"ERROR: Cannot fix {_h_path}: {_exc}")
 
 
         # --write-baseline: dump all violations and exit 0 (no further checks).

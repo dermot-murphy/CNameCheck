@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 2.4 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 2.5 |
+| **Project** | CStyleCheck | **Date** | 2026-07-01 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.1 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.5 | 2026-07-01 | Claude | Add SWE1-091 (misc.constant_comparison), SWE1-092 (unsigned_suffix signed-param exemption), SWE1-093 (variable.pointer_prefix auto-fix); update §3.1 scope to v1.6.0; update RTM — closes #339 #340 #341 |
 | 2.4 | 2026-06-27 | Fix §3.2 cross-refs: cascade update (SWE2 1.9→1.11 + any other stale refs fixed) | Dermot Murphy |
 | 2.3 | 2026-06-27 | Fix §3.2 cross-ref: SYS2 1.9→2.0 | Dermot Murphy |
 | 2.2 | 2026-06-27 | Claude | ASPICE audit — fix §3.2 SWE2 ref 1.8→1.9 and SYS2 ref 1.6→1.9; update Review & Approval dates — closes #315 #323 |
@@ -44,7 +45,7 @@
 
 ### 3.1 Purpose
 
-This Software Requirements Specification (SRS) refines the system-level requirements from CSC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.5.0**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
+This Software Requirements Specification (SRS) refines the system-level requirements from CSC-SYS2-001 into software-specific, implementable requirements for **CStyleCheck v1.6.0**. It provides the direct input to software architectural design (SWE.2) and defines the verification criteria used in SWE.4–SWE.6.
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requirements Analysis**.
 
@@ -245,6 +246,9 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-088 | The `_check_no_single_char_identifiers()` method shall report `naming.no_single_char_identifiers` for any declared identifier with a single-character name that does not appear in `naming.no_single_char_identifiers.exempt` | Mandatory | Test | SYS-F-020 |
 | SWE1-089 | The `print_summary()` function shall include a per-file breakdown section showing the count of files with errors only, files with warnings (no errors), files with info only, and files with no violations (clean); the section shall be omitted when `files_checked` is zero | Mandatory | Test | SYS-F-032 |
 | SWE1-090 | The `_check_defines()` method shall exempt object-like `#define` names from `constant.case` when the name ends (case-insensitively) with the configured `typedefs.suffix.suffix` value and `typedefs.suffix.enabled: true`; function-like `#define` names shall not be exempted | Mandatory | Test | SYS-F-011 |
+| SWE1-091 | The `_check_constant_comparison()` method shall report `misc.constant_comparison` for any `==` or `!=` operator where both the left-hand token and the right-hand token are recognised as compile-time constants (decimal/hex literals, char literals, `true`/`false`/`TRUE`/`FALSE`/`NULL`/`nullptr`, or ALL\_CAPS identifiers) when `misc.constant_comparison.enabled: true`; comparisons inside `#define` RHS and `return` statements shall be exempt | Mandatory | Test | SYS-F-020 |
+| SWE1-092 | The `_check_misc()` method shall exempt integer literals from `misc.unsigned_suffix` when they appear as arguments at positions corresponding to signed-type parameters (`int8_t`, `int16_t`, `int32_t`, `int64_t`, `int`, `short`, `long`, `char`, and `signed` variants) of functions declared or defined within the same translation unit | Mandatory | Test | SYS-F-020 |
+| SWE1-093 | The `_fix_pointer_prefix()` function in `fixer.py` shall rename a non-compliant pointer parameter or variable to its prefixed form by replacing all word-boundary occurrences of the old name within the enclosing function's signature and body; it shall also rename the parameter in any doxygen `@param`/`\param` comment block immediately preceding the function; the `fix_pointer_prefix_in_header()` function shall apply the same rename to function declarations in the corresponding `.h` file when invoked by the `--fix` CLI mode | Mandatory | Test | SYS-F-020 |
 
 ### 4.15 Verification Criteria
 
@@ -298,6 +302,9 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-088 | No single-char identifiers | SYS-F-020 | `Checker._check_no_single_char_identifiers()` | `test_no_single_char_identifiers.py` |
 | SWE1-089 | Per-file breakdown in print_summary | SYS-F-032 | `output.print_summary()` | `test_print_summary.py` |
 | SWE1-090 | Typedef-alias constant.case exemption in _check_defines | SYS-F-011 | `Checker._check_defines()` | `test_defines.py` |
+| SWE1-091 | misc.constant_comparison — flag constant-to-constant == / != | SYS-F-020 | `Checker._check_constant_comparison()` | `test_constant_comparison.py` |
+| SWE1-092 | misc.unsigned_suffix signed-parameter argument exemption | SYS-F-020 | `Checker._check_misc()` | `test_unsigned_suffix_signed_params.py` |
+| SWE1-093 | variable.pointer_prefix auto-fix: rename in signature, body, doxygen, header | SYS-F-020 | `fixer._fix_pointer_prefix()`, `fixer.fix_pointer_prefix_in_header()` | `test_pointer_prefix_fix.py` |
 
 ---
 
@@ -305,10 +312,10 @@ The following criteria shall be met by all software requirements above. They are
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-06-27 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
-| Approver | Dermot Murphy | Approved | 2026-06-27 |
+| Author | Claude | Approved | 2026-07-01 |
+| Technical Reviewer | Dermot Murphy | — | *pending* |
+| Quality Assurance | Dermot Murphy | — | *pending* |
+| Approver | Dermot Murphy | — | *pending* |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
 

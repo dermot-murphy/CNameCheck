@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.17 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.18 |
+| **Project** | CStyleCheck | **Date** | 2026-07-01 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.18 | 2026-07-01 | Claude | v1.6.0 — add test_constant_comparison.py (21 tests), test_unsigned_suffix_signed_params.py (9 tests), test_pointer_prefix_fix.py (10 tests); update §3.1 refs (SWE1 2.4→2.5, SWE5 1.11→1.12); update test total 1183→1223, modules 50→53; update coverage comment — closes #339 #340 #341 |
 | 1.17 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.3→2.4, SWE3 1.14→1.15, SWE5 1.9→1.11 | Dermot Murphy |
 | 1.16 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.1→2.3, SWE3 1.12→1.14 | Dermot Murphy |
 | 1.15 | 2026-06-27 | Claude | ASPICE audit — fix §4.2 test count 1041→1183; fix §6 COMP-01→COMP-05f/h for 11 modules; update coverage ref to v1.5.0; update Review & Approval dates — closes #317 #323 |
@@ -82,9 +83,9 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 Coverage is measured per CI run on all three Python matrix versions (3.10, 3.11, 3.12) and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact, Python 3.11 build).
 
-**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 1183 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
+**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 1223 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
 
-> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures (baseline reference: 1183 tests as of v1.5.0).
+> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures (baseline reference: 1223 tests as of v1.6.0).
 
 ### 4.3 Test Infrastructure
 
@@ -431,11 +432,15 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | `test_identifier_length.py` | 10 | 10 | 0 | COMP-05h (`_check_identifier_length`) |
 | `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-05h (`_check_no_single_char_identifiers`) |
 | `test_print_summary.py` | 7 | 7 | 0 | `output.print_summary` (per-file breakdown) |
-| **Total** | **1183** | **1183** | **0** | All rules covered — 50 modules |
+| `test_constant_comparison.py` | 21 | 21 | 0 | COMP-05f (`_check_constant_comparison`) |
+| `test_unsigned_suffix_signed_params.py` | 9 | 9 | 0 | COMP-05f (`_check_misc` signed-param exemption) |
+| `test_pointer_prefix_fix.py` | 10 | 10 | 0 | `fixer._fix_pointer_prefix`, `fixer.fix_pointer_prefix_in_header` |
+| **Total** | **1223** | **1223** | **0** | All rules covered — 53 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.5.0 CI — 1183 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
 **Branch Coverage (v1.5.0 CI — 1183 tests incl. subprocess):** 874 branch points, 96 partial → **87.31% combined statement + branch** ≥ 85% gate ✅ (issue #54 resolved)
+**v1.6.0 CI coverage:** to be measured after first CI run (expected ≥ 85% combined gate).
 
 **Static Verification (rules.yml):** PASS
 

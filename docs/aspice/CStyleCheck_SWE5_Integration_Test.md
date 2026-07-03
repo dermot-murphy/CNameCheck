@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.11 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.12 |
+| **Project** | CStyleCheck | **Date** | 2026-07-01 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.12 | 2026-07-01 | Claude | Add SIT-021/022/023 (constant_comparison, unsigned_suffix signed-param, pointer_prefix fix); update §3 scope to v1.6.0; §6 overall result 1183→1223; §3.1 SWE1→2.5, SWE4→1.18, SWE6→1.14 |
 | 1.11 | 2026-06-27 | Fix §3.1 cross-refs: SWE4 1.16→1.17, SWE6 1.12→1.13, SYS4 1.7→1.9; fix header date | Dermot Murphy |
 | 1.10 | 2026-06-27 | Fix §3.1 cross-refs: SWE4 1.14→1.16, SWE6 1.10→1.12 | Dermot Murphy |
 | 1.9 | 2026-06-26 | Claude | ASPICE audit — update §3.1 refs (SWE2 1.8→1.9, SWE4 1.12→1.14, SWE6 1.7→1.10, SYS4 1.5→1.7); update §3.2 CM baseline to v1.5.0 tag; update §6 overall result 1182→1183 — closes #306 #309 |
@@ -37,7 +38,7 @@
 
 ## 3. Purpose & Scope
 
-This document defines the software integration test specification for **CStyleCheck v1.5.0**, verifying that the software components integrate correctly across the interfaces defined in CSC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
+This document defines the software integration test specification for **CStyleCheck v1.6.0**, verifying that the software components integrate correctly across the interfaces defined in CSC-SWE2-001. It satisfies **Automotive SPICE® PAM v4.0, SWE.5 — Software Integration and Integration Verification**.
 
 Integration tests operate at a higher level than unit tests (SWE.4): they exercise data flows **across component boundaries** — primarily the path from COMP-01 (CLI) through COMP-04 (Parser) into COMP-05 (Rule Engine) and COMP-07 (Output Formatter) — rather than individual method logic.
 
@@ -48,8 +49,9 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 | Document ID | Title | Version |
 |---|---|---|
 | CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.11 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.17 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.13 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.5 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.18 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.14 |
 | CSC-SYS4-001 | CStyleCheck System Integration Test Specification | 1.9 |
 
 ### 3.2 Test Environment
@@ -60,7 +62,7 @@ The primary integration test suite is `tests/test_cli.py`, which invokes `cstyle
 | **Python Versions** | 3.10, 3.11, 3.12 |
 | **Test runner** | pytest 7+ via `cstylecheck_tests.yml` CI workflow |
 | **Invocation method** | `subprocess.run()` — full process invocation including argument parsing |
-| **CM Baseline ID** | f7c7070 (main HEAD after PR #299 merge — v1.5.0 release, 2026-06-26) |
+| **CM Baseline ID** | v1.6.0 (pending merge of claude/embedded-c-style-standards-pgqhdc to develop/main) |
 
 ### 3.3 Integration Verification Criteria
 
@@ -535,6 +537,81 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 
 ---
 
+### SIT-021 — `misc.constant_comparison` Rule Integration
+
+| Field | Value |
+|---|---|
+| **Test Case ID** | SIT-021 |
+| **Objective** | Verify end-to-end integration of the new `misc.constant_comparison` rule: both sides of `==`/`!=` are compile-time constants |
+| **Interfaces** | SWA-IF-03, SWA-IF-06, SWA-IF-10 |
+| **SW-REQ** | SWE1-091 |
+| **Test file** | `test_constant_comparison.py` |
+
+| Step | Action | Input | Expected Result |
+|---|---|---|---|
+| 1 | Source with `if (true == false)` | Config with `misc.constant_comparison.enabled: true` | `misc.constant_comparison` warning reported |
+| 2 | Source with `if (NULL == NULL)` | Same config | `misc.constant_comparison` warning reported |
+| 3 | Source with `if (0 == CAPS_CONSTANT)` | Same config | `misc.constant_comparison` warning reported |
+| 4 | Source with `if (x == 0)` | Same config | No `misc.constant_comparison` violation (x is a variable) |
+| 5 | Source inside `#define` body | Same config | No violation (define RHS is exempt) |
+| 6 | Rule disabled via config | `constant_comparison.enabled: false` | Zero violations; exit code = 0 |
+
+| Date | Tester | Python | Result | Deviation |
+|---|---|---|---|---|
+| 2026-07-01 | GitHub Actions (automated) | 3.11 | PASS | |
+
+---
+
+### SIT-022 — `misc.unsigned_suffix` Signed-Parameter Argument Exemption
+
+| Field | Value |
+|---|---|
+| **Test Case ID** | SIT-022 |
+| **Objective** | Verify that `misc.unsigned_suffix` does not raise a false positive when an integer literal is passed to a function parameter declared as a signed type in the same translation unit |
+| **Interfaces** | SWA-IF-03, SWA-IF-06, SWA-IF-10 |
+| **SW-REQ** | SWE1-092 |
+| **Test file** | `test_unsigned_suffix_signed_params.py` |
+
+| Step | Action | Input | Expected Result |
+|---|---|---|---|
+| 1 | `int8_t` param; call with literal `80` | Config with `misc.unsigned_suffix.enabled: true`; function declared in same file | No `misc.unsigned_suffix` violation for `80` |
+| 2 | `int16_t` param; call with literal `1000` | Same config, same-file declaration | No violation |
+| 3 | `uint8_t` param; call with literal `80` | Same config | `misc.unsigned_suffix` violation (unsigned param, no suffix) |
+| 4 | Second positional signed param | Same config | Literal at second argument position exempt |
+| 5 | Function declared in separate header (not in same file) | Same config | Violation still raised (cross-file case requires `exempt_function_args`) |
+| 6 | Existing `exempt_function_args` config still works | Config with `exempt_function_args: [my_fn]` | Literal in call to `my_fn` exempt |
+
+| Date | Tester | Python | Result | Deviation |
+|---|---|---|---|---|
+| 2026-07-01 | GitHub Actions (automated) | 3.11 | PASS | |
+
+---
+
+### SIT-023 — `variable.pointer_prefix` Auto-Fix Mode
+
+| Field | Value |
+|---|---|
+| **Test Case ID** | SIT-023 |
+| **Objective** | Verify end-to-end integration of the `--fix` auto-fix mode for `variable.pointer_prefix` violations: rename pointer parameter in function signature, body, Doxygen `@param`, and corresponding `.h` declaration |
+| **Interfaces** | SWA-IF-06, SWA-IF-10 |
+| **SW-REQ** | SWE1-093 |
+| **Test file** | `test_pointer_prefix_fix.py` |
+
+| Step | Action | Input | Expected Result |
+|---|---|---|---|
+| 1 | `void fn(uint8_t *buf)` | `--fix` mode; `variable.pointer_prefix.enabled: true, prefix: p_` | `buf` renamed to `p_buf` in signature |
+| 2 | Function body uses `buf[0]` | `--fix` mode | `buf[0]` → `p_buf[0]` in body |
+| 3 | Doxygen `@param buf` comment above function | `--fix` mode | `@param buf` → `@param p_buf` |
+| 4 | Corresponding `.h` file with declaration | `--fix` mode; `.h` file same base name | `buf` renamed to `p_buf` in `.h` declaration |
+| 5 | Parameter already prefixed `*p_buf` | `--fix` mode | No rename; no violation |
+| 6 | `--safe-only` flag | Source with pointer param violation | No rename applied (pointer_prefix fix is non-safe) |
+
+| Date | Tester | Python | Result | Deviation |
+|---|---|---|---|---|
+| 2026-07-01 | GitHub Actions (automated) | 3.11 | PASS | |
+
+---
+
 ## 6. Integration Test Results Summary
 
 | SIT-ID | Test Case | Interfaces | Status | Deviation Ref |
@@ -559,8 +636,11 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-018 | HTML report output | IF-10 | PASS | |
 | SIT-019 | v1.4.0 rule integration (macro safety, function quality, file constraints, naming) | IF-06, IF-10 | PASS | |
 | SIT-020 | Non-ASCII source (Rule 4.1), per-file summary breakdown, typedef-alias constant.case exemption | IF-03, IF-06, IF-10 | PASS | |
+| SIT-021 | `misc.constant_comparison` rule (constant==constant detection) | IF-03, IF-06, IF-10 | PASS | |
+| SIT-022 | `misc.unsigned_suffix` signed-parameter argument exemption | IF-03, IF-06, IF-10 | PASS | |
+| SIT-023 | `variable.pointer_prefix` auto-fix mode (signature, body, doxygen, .h file) | IF-06, IF-10 | PASS | |
 
-**Overall Integration Verification Result:** PASS — Commit f7c7070 (v1.5.0), 2026-06-26, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1183 tests all PASS.
+**Overall Integration Verification Result:** PASS — v1.6.0, 2026-07-01, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1223 tests all PASS.
 
 > **📋 Note:** All 10 defined software architecture interfaces must be covered before integration testing is considered complete. Any uncovered interface must be resolved via a new or updated test case.
 
@@ -590,6 +670,9 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-018 | SWE1-077 | IF-10 | `test_html_report.py` | — |
 | SIT-019 | SWE1-078, SWE1-079, SWE1-080, SWE1-081, SWE1-082, SWE1-083, SWE1-084, SWE1-085, SWE1-086, SWE1-087, SWE1-088 | IF-06, IF-10 | `test_cli.py` | SWQ-003 |
 | SIT-020 | SWE1-MISRA-004, SWE1-089, SWE1-090 | IF-03, IF-06, IF-10 | `test_misra_rules.py`, `test_print_summary.py`, `test_defines.py` | SWQ-003 |
+| SIT-021 | SWE1-091 | IF-03, IF-06, IF-10 | `test_constant_comparison.py` | SWQ-003 |
+| SIT-022 | SWE1-092 | IF-03, IF-06, IF-10 | `test_unsigned_suffix_signed_params.py` | SWQ-003 |
+| SIT-023 | SWE1-093 | IF-06, IF-10 | `test_pointer_prefix_fix.py` | SWQ-003 |
 
 ---
 
