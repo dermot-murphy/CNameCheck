@@ -97,7 +97,7 @@ class TestOptionsFile(unittest.TestCase):
             opts = _write(td, "options.txt", "--summary\n")
             src  = _write(td, "main.c", "int main(void){ return 0; }\n")
             _, out = _run("--options-file", str(opts), files=[src])
-        self.assertIn("Files checked", out)
+        self.assertIn("Files checked", out)  # appears in the Files: section
 
     def test_comment_lines_in_options_file_ignored(self):
         with tempfile.TemporaryDirectory() as td:
@@ -105,7 +105,7 @@ class TestOptionsFile(unittest.TestCase):
             src  = _write(td, "main.c", "int main(void){ return 0; }\n")
             rc, out = _run("--options-file", str(opts), files=[src])
         self.assertEqual(rc, 0)
-        self.assertIn("Files checked", out)
+        self.assertIn("Files checked", out)  # appears in the Files: section
 
     def test_log_file_created(self):
         with tempfile.TemporaryDirectory() as td:
