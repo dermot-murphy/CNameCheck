@@ -2066,6 +2066,20 @@ class Checker:
             rhs         = self.clean[rhs_start:rhs_end]        # digit-only for classify
             rhs_display = self.clean[rhs_display_start:rhs_end]  # includes '-' for message
 
+            # Skip if RHS identifier is immediately followed by '[': it is an
+            # array element access (runtime value), not a constant.
+            # e.g.  API_TABLE[idx].field  — same guard as _check_constant_comparison.
+            _after_rhs = self.clean[rhs_end:rhs_end + 10].lstrip()
+            if _after_rhs.startswith('['):
+                continue
+
+            # Skip if LHS is already a constant — the expression is already in
+            # constant-first (Yoda) form.  Swapping would merely exchange one
+            # constant for another; misc.constant_comparison owns that report.
+            # e.g.  true == API_STACK_GROWS_UP  or  NULL == API_TABLE[i].field
+            if self._is_constant_token(lhs):
+                continue
+
             if self._is_variable_token(lhs) and self._is_constant_token(rhs):
                 self._v(m.start(), sev, "misc.yoda_condition",
                         f"Constant '{rhs_display}' should be on the left of '{op}': "

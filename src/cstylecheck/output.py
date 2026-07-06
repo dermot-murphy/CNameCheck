@@ -264,7 +264,7 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee) -> None:
     warnings = sum(1 for v in all_violations if v.severity == "warning")
     infos    = sum(1 for v in all_violations if v.severity == "info")
     tee.print("\n" + "=" * 60)
-    tee.print(f"  Files checked : {files_checked}")
+    tee.print("  Errors & Warnings:")
     tee.print(f"  Errors        : {errors}")
     tee.print(f"  Warnings      : {warnings}")
     tee.print(f"  Info          : {infos}")
@@ -298,7 +298,8 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee) -> None:
     files_info_only    = len(files_with_infos - files_with_errors - files_with_warnings)
     files_clean        = files_checked - len(files_with_issues)
     if files_checked > 0:
-        tee.print("  Per-file breakdown:")
+        tee.print("  Files:")
+        tee.print(f"    Files checked       : {files_checked}")
         tee.print(f"    Files with errors   : {files_error_only}")
         tee.print(f"    Files with warnings : {files_warning_only}")
         tee.print(f"    Files with info     : {files_info_only}")
