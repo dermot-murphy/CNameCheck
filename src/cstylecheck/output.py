@@ -7,6 +7,7 @@ Imports from: models.
 """
 from __future__ import annotations
 
+import datetime
 from collections import Counter
 
 
@@ -259,20 +260,25 @@ def _violations_to_html(violations: list, files_checked: int,
 # Summary
 # ---------------------------------------------------------------------------
 
-def print_summary(all_violations: list, files_checked: int, tee: Tee) -> None:
+def print_summary(all_violations: list, files_checked: int, tee: Tee,
+                  version_string: str = "") -> None:
     errors   = sum(1 for v in all_violations if v.severity == "error")
     warnings = sum(1 for v in all_violations if v.severity == "warning")
     infos    = sum(1 for v in all_violations if v.severity == "info")
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     tee.print("\n" + "=" * 60)
+    if version_string:
+        tee.print(f"  {version_string} | {now}")
+        tee.print("=" * 60)
     tee.print("  Errors & Warnings:")
-    tee.print(f"  Errors        : {errors}")
-    tee.print(f"  Warnings      : {warnings}")
-    tee.print(f"  Info          : {infos}")
-    tee.print(f"  {chr(8211) * 36}")
-    tee.print(f"  Total         : {errors + warnings + infos}")
-    tee.print("=" * 60)
+    tee.print(f"    Errors        : {errors}")
+    tee.print(f"    Warnings      : {warnings}")
+    tee.print(f"    Info          : {infos}")
+    tee.print(f"    {'-' * 36}")
+    tee.print(f"    Total         : {errors + warnings + infos}")
     rule_counts: Counter = Counter(v.rule for v in all_violations)
     if rule_counts:
+        tee.print("=" * 60)
         tee.print("  Top violated rules:")
         for rule, count in rule_counts.most_common(10):
             tee.print(f"    {rule:<45} {count}")

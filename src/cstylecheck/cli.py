@@ -209,7 +209,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "  misc.eof_comment       Last non-blank line must be '/* EOF: filename */'\n"
             "                         followed by exactly one blank line.\n\n"
             "Exit codes:\n"
-            "  0  Clean — no violations (or --version/--help)\n"
+            "  0  Clean - no violations (or --version/--help)\n"
             "  1  One or more errors found\n"
             "  2  Configuration or invocation error"
         ),
@@ -443,7 +443,7 @@ def main() -> int:
         # than silently discarding the file (issue #90).
         print(
             f"WARNING: --spell-words '{args.spell_words}' supplied but "
-            "spell_check.enabled is false in config — words file ignored.",
+            "spell_check.enabled is false in config; words file ignored.",
             file=sys.stderr,
         )
 
@@ -762,7 +762,7 @@ def main() -> int:
             tee.print(html_text)
 
         if args.summary and output_format == "text":
-            print_summary(all_violations, len(files), tee)
+            print_summary(all_violations, len(files), tee, _VERSION_STRING)
 
         if args.exit_zero:
             return 0
