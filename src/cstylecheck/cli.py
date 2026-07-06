@@ -12,6 +12,7 @@ import argparse
 import fnmatch
 import glob as glob_mod
 import os
+import shutil
 import sys
 from pathlib import Path
 from typing import Generator
@@ -33,7 +34,7 @@ from .sign_checker import SignChecker, DeclaredNotDefinedChecker
 from .baseline import load_baseline, write_baseline, _baseline_key
 from .output import Tee, _violations_to_json, _violations_to_sarif, _violations_to_html, print_summary
 from .wizard import run_wizard, run_preset, PRESETS
-from . import _TOOL_NAME, _VERSION, _VERSION_STRING
+from . import _TOOL_NAME, _VERSION, _VERSION_STRING, _COPYRIGHT
 
 
 # ---------------------------------------------------------------------------
@@ -147,7 +148,7 @@ def discover_files(
         abs_p = os.path.abspath(p)
         if abs_p not in seen and not is_ignored(p):
             seen.add(abs_p)
-            yield p
+            yield os.path.normpath(p)
 
     for f in explicit:
         yield from emit(f)
@@ -208,7 +209,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "  misc.eof_comment       Last non-blank line must be '/* EOF: filename */'\n"
             "                         followed by exactly one blank line.\n\n"
             "Exit codes:\n"
-            "  0  Clean — no violations (or --version/--help)\n"
+            "  0  Clean - no violations (or --version/--help)\n"
             "  1  One or more errors found\n"
             "  2  Configuration or invocation error"
         ),
@@ -369,6 +370,7 @@ def main() -> int:
     raw_argv = sys.argv[1:]
     if "--version" in raw_argv:
         print(_VERSION_STRING)
+        print(_COPYRIGHT)
         return 0
     if "-h" in raw_argv or "--help" in raw_argv:
         # Re-parse with a temporary parser just to print help, then exit 0
@@ -394,6 +396,7 @@ def main() -> int:
         return 0
     if getattr(args, "version", False):
         print(_VERSION_STRING)
+        print(_COPYRIGHT)
         return 0
 
     # --update-config: merge new defaults into the config file and exit.
@@ -442,7 +445,7 @@ def main() -> int:
         # than silently discarding the file (issue #90).
         print(
             f"WARNING: --spell-words '{args.spell_words}' supplied but "
-            "spell_check.enabled is false in config — words file ignored.",
+            "spell_check.enabled is false in config; words file ignored.",
             file=sys.stderr,
         )
 
@@ -478,9 +481,32 @@ def main() -> int:
             sys.exit(f"Cannot open log file '{args.log}': {e}")
 
     tee = Tee(log_fh)
+    # Always announce version/copyright to stderr (visible in terminal but not
+    # in stdout output) and to the log file only (not stdout).
+    _banner = f"{_VERSION_STRING}\n{_COPYRIGHT}"
+    print(_banner, file=sys.stderr)
+    tee.log_print(_banner)
     try:
         # Discover files lazily — emit progress immediately rather than
         # blocking until the entire glob tree is walked.
+        # Terminal width used for all verbose progress lines.  Capped at one
+        # less than the physical width so a full-width message never wraps —
+        # a wrapped line places the cursor on the next row, which breaks \r
+        # positioning for every subsequent progress write.
+        _verbose_tty = getattr(args, "verbose", False) and sys.stderr.isatty()
+        _tty_cols = (shutil.get_terminal_size((80, 24)).columns - 1
+                     if _verbose_tty else 79)
+
+        def _progress(msg: str) -> None:
+            """Write a \r-terminated progress line capped to the terminal width."""
+            if len(msg) > _tty_cols:
+                msg = msg[:_tty_cols - 3] + "..."
+            print(f"{msg:<{_tty_cols}}", end="\r", file=sys.stderr, flush=True)
+
+        def _clear_progress() -> None:
+            """Erase the current progress line and advance the cursor."""
+            print("\r" + " " * _tty_cols, file=sys.stderr)
+
         files: list = []
         for _fp in discover_files(
             args.files,
@@ -489,10 +515,8 @@ def main() -> int:
             cfg.get("ignore", {}),
         ):
             files.append(_fp)
-            if getattr(args, "verbose", False) and sys.stderr.isatty():
-                _msg = f"Discovering: {_fp}"
-                print(f"{_msg:<79}", end="\r",
-                      file=sys.stderr, flush=True)
+            if _verbose_tty:
+                _progress(f"Discovering: {_fp}")
 
         if not files:
             print("No C files to check.", file=sys.stderr)
@@ -501,7 +525,10 @@ def main() -> int:
         if getattr(args, "verbose", False):
             _n = len(files)
             _msg = f"Found {_n} file(s) - starting analysis..."
-            print(f"{_msg:<79}", file=sys.stderr, flush=True)
+            if _verbose_tty:
+                # Erase any leftover from long discovery messages before printing
+                _clear_progress()
+            print(f"{_msg:<{_tty_cols}}", file=sys.stderr, flush=True)
 
         output_format  = getattr(args, "output_format", "text")
         all_violations: list = []
@@ -513,11 +540,10 @@ def main() -> int:
 
         for filepath in files:
             if getattr(args, "verbose", False):
-                _msg = f"Scanning: {filepath}"
-                if sys.stderr.isatty():
-                    print(f"{_msg:<79}", end="\r", file=sys.stderr, flush=True)
+                if _verbose_tty:
+                    _progress(f"Scanning: {filepath}")
                 else:
-                    print(_msg, file=sys.stderr, flush=True)
+                    print(f"Scanning: {filepath}", file=sys.stderr, flush=True)
             try:
                 source = Path(filepath).read_text(encoding="utf-8", errors="replace")
                 source_cache[filepath] = source
@@ -560,16 +586,29 @@ def main() -> int:
             result  = checker.run_all()
             all_violations.extend(result.violations)
 
-            if output_format == "text":
+            # In verbose+TTY mode defer violation printing: the cursor is at col 0
+            # of the progress line (left there by \r), so printing to stdout here
+            # would corrupt it.  Violations are flushed after the progress line
+            # is cleared below.
+            if output_format == "text" and not _verbose_tty:
                 for v in sorted(result.violations, key=lambda x: (x.line, x.col)):
                     if args.github_actions:
                         tee.print(v.github_annotation())
                     else:
                         tee.print(v)
 
-        if getattr(args, "verbose", False) and sys.stderr.isatty():
-            print(" " * 80, end="\r",
-                  file=sys.stderr)  # erase last progress line
+        if _verbose_tty:
+            _clear_progress()  # erase scanning progress line, advance cursor
+
+        # Flush deferred violations (verbose+TTY mode) now that the progress line
+        # has been cleared and the cursor is on a clean line.
+        if output_format == "text" and _verbose_tty:
+            for v in sorted(all_violations,
+                            key=lambda x: (x.filepath, x.line, x.col)):
+                if args.github_actions:
+                    tee.print(v.github_annotation())
+                else:
+                    tee.print(v)
         # Cross-file sign-compatibility check (needs all files ingested first).
         # Uses the source cache so no file is read from disk a second time.
         sign_cfg = cfg.get("sign_compatibility", {})
@@ -730,7 +769,7 @@ def main() -> int:
             tee.print(html_text)
 
         if args.summary and output_format == "text":
-            print_summary(all_violations, len(files), tee)
+            print_summary(all_violations, len(files), tee, _VERSION_STRING, _COPYRIGHT)
 
         if args.exit_zero:
             return 0

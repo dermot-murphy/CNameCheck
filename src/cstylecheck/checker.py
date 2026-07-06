@@ -77,9 +77,11 @@ _STANDARD_C_HEADERS: frozenset = frozenset({
 
 
 # Control-flow keywords that must never be mistaken for a return type.
+# typedef is included so that function-pointer typedefs are not parsed as
+# function declarations/definitions (issue #359).
 _CFKW = (
     r"if|else|while|for|do|switch|case|return|goto|break|continue"
-    r"|sizeof|typeof|__typeof__|__attribute__|defined|assert"
+    r"|sizeof|typeof|__typeof__|__attribute__|defined|assert|typedef"
 )
 
 RE_FUNCTION_DEF = re.compile(
@@ -412,7 +414,23 @@ class Checker:
                 and name.lower().endswith(td_suffix.lower())
             )
 
-            if not is_typedef_alias and not matches_case(name, expected_case):
+            # Skip constant.case when the RHS is a single bare identifier that
+            # is NOT itself an ALL_CAPS constant or boolean/null keyword: the
+            # define is a function/type/symbol alias, not a constant value.
+            # e.g. #define MW_KX134_HAL_PowerOnInit  HAL_Acc_PowerOnInit
+            #      #define module_my_type_t          uint8_t
+            # ALL_CAPS RHS (e.g. SOME_OTHER_CONST) is still a constant alias
+            # so the LHS case check still applies.  issue #355
+            _BOOL_NULL = {"true", "false", "TRUE", "FALSE", "NULL", "nullptr"}
+            is_fn_alias = (
+                not is_fn
+                and bool(re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]*', rest))
+                and not re.fullmatch(r'[A-Z][A-Z0-9_]*', rest)
+                and rest not in _BOOL_NULL
+            )
+
+            if not is_typedef_alias and not is_fn_alias \
+                    and not matches_case(name, expected_case):
                 self._v(m.start(), sev, f"{rule_pfx}.case",
                         f"{label} '{name}' must be {expected_case}")
 
@@ -976,6 +994,14 @@ class Checker:
             if is_exempt(name, _fp_cfg.get("exempt_patterns", [])):
                 continue
 
+            # RE_FUNCTION_DEF starts with (?:^|\n), so m.start() may point to
+            # the '\n' ending the previous line. Advance past it so violations
+            # are reported on the function's own line (important for inline
+            # suppression matching).
+            fn_start = (m.start() + 1
+                        if m.start() < len(self.clean) and self.clean[m.start()] == '\n'
+                        else m.start())
+
             # Detect whether this is a static function definition by inspecting
             # the text immediately before the match (up to 120 chars back).
             window_start = max(0, m.start())
@@ -991,21 +1017,21 @@ class Checker:
                 sp_pfx = sp_cfg.get("prefix", "prv_")
                 sp_sev = sp_cfg.get("severity", "warning")
                 if not name.startswith(sp_pfx):
-                    self._v(m.start(), sp_sev, "function.static_prefix",
+                    self._v(fn_start, sp_sev, "function.static_prefix",
                             f"Static function '{name}' must start with "
                             f"'{sp_pfx}' (static function prefix)")
 
-            self._require_module_prefix(name, m.start(), "function.prefix")
+            self._require_module_prefix(name, fn_start, "function.prefix")
 
             fn_max = fn_cfg.get("max_length")
             if fn_max and len(name) > fn_max:
-                self._v(m.start(), sev, "function.max_length",
+                self._v(fn_start, sev, "function.max_length",
                         f"Function '{name}' length {len(name)} exceeds "
                         f"maximum {fn_max} characters")
 
             fn_min = fn_cfg.get("min_length")
             if fn_min and len(name) < fn_min:
-                self._v(m.start(), sev, "function.min_length",
+                self._v(fn_start, sev, "function.min_length",
                         f"Function '{name}' length {len(name)} is below "
                         f"minimum {fn_min} characters")
 
@@ -1016,13 +1042,13 @@ class Checker:
 
             if style in ("object_verb", "verb_object"):
                 if not self._body_is_object_verb(body, object_exclusions, abbrevs):
-                    self._v(m.start(), sev, "function.style",
+                    self._v(fn_start, sev, "function.style",
                             f"Function '{name}' body '{body}' should be "
                             f"ObjectVerb segments separated by '_' "
                             f"(e.g. {pfx}BufferRead or {pfx}LiveData_Read)")
             elif style == "lower_snake":
                 if not matches_case(body, "lower_snake"):
-                    self._v(m.start(), sev, "function.style",
+                    self._v(fn_start, sev, "function.style",
                             f"Function '{name}' body '{body}' should be "
                             f"lower_snake")
 
@@ -2065,6 +2091,20 @@ class Checker:
                 rhs_end += 1
             rhs         = self.clean[rhs_start:rhs_end]        # digit-only for classify
             rhs_display = self.clean[rhs_display_start:rhs_end]  # includes '-' for message
+
+            # Skip if RHS identifier is immediately followed by '[': it is an
+            # array element access (runtime value), not a constant.
+            # e.g.  API_TABLE[idx].field  — same guard as _check_constant_comparison.
+            _after_rhs = self.clean[rhs_end:rhs_end + 10].lstrip()
+            if _after_rhs.startswith('['):
+                continue
+
+            # Skip if LHS is already a constant — the expression is already in
+            # constant-first (Yoda) form.  Swapping would merely exchange one
+            # constant for another; misc.constant_comparison owns that report.
+            # e.g.  true == API_STACK_GROWS_UP  or  NULL == API_TABLE[i].field
+            if self._is_constant_token(lhs):
+                continue
 
             if self._is_variable_token(lhs) and self._is_constant_token(rhs):
                 self._v(m.start(), sev, "misc.yoda_condition",

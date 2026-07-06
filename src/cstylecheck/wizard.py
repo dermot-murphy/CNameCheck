@@ -168,10 +168,10 @@ def run_wizard(
             prompt_fn=prompt_fn,
         )
         if not answer:
-            print_fn("Aborted — existing config preserved.")
+            print_fn("Aborted - existing config preserved.")
             return 1
 
-    print_fn("\nCStyleCheck config wizard — press Enter to accept defaults.\n")
+    print_fn("\nCStyleCheck config wizard - press Enter to accept defaults.\n")
 
     # ---- Naming convention ----
     var_case = _ask_choice(

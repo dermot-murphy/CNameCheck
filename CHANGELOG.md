@@ -11,6 +11,113 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.6.0] — 2026-07-06
+
+### Added
+
+- **`misc.constant_comparison` rule** — flags `==`/`!=` comparisons where **both** operands
+  are compile-time constants (literals, `true`/`false`/`NULL`, ALL_CAPS identifiers).
+  Distinguishes from `misc.yoda_condition` (which fires when one side is a variable).
+  Exempt contexts: `#define` RHS, `return` statements
+  (issue [#339](https://github.com/dermot-murphy/CStyleCheck/issues/339)).
+- **`--fix` auto-fix support for `variable.pointer_prefix`** — renames a non-prefixed
+  pointer parameter throughout the function scope (signature, body, and Doxygen
+  `@param` block). For `.c` files also patches the matching `.h` declaration via
+  `fix_pointer_prefix_in_header()`. Classified as a non-safe fix; only applied with
+  `--fix`, not `--safe-only`
+  (issue [#341](https://github.com/dermot-murphy/CStyleCheck/issues/341)).
+- **Startup banner** — tool name, version, and copyright notice printed to `stderr`
+  whenever CStyleCheck starts, regardless of other flags; also written to the log
+  file when `--log` is used. Does not appear in stdout/pipeline output
+  (issue [#369](https://github.com/dermot-murphy/CStyleCheck/issues/369)).
+- **Copyright notice** — `(C) 2026 Dermot Murphy` appended after the version string in
+  `--version` output and in the log file header
+  (issue [#368](https://github.com/dermot-murphy/CStyleCheck/issues/368)).
+- **`prerelease_check.sh` and `check_my_project.bat`** — helper scripts for running a
+  pre-release validation sweep and a project self-check on Windows/Linux
+  (issue [#343](https://github.com/dermot-murphy/CStyleCheck/issues/343)).
+- **Block-comment inline suppression syntax** — `/* cstylecheck: disable=rule.id */`
+  now accepted as an alternative to the `//` line-comment form for all inline
+  suppression directives (`disable=`, `disable-next-line=`, `enable=`)
+  (issue [#360](https://github.com/dermot-murphy/CStyleCheck/issues/360)).
+
+### Changed
+
+- **`--summary` output restructured** — `Files:` section now appears before `Results:`;
+  header line shows tool version and run timestamp (`Run at: YYYY-MM-DD HH:MM:SS`);
+  `Results:` separator line width now tracks the digit count of the largest count;
+  section labels renamed from `Errors & Warnings:` to `Results:`
+  (issues [#352](https://github.com/dermot-murphy/CStyleCheck/issues/352),
+  [#365](https://github.com/dermot-murphy/CStyleCheck/issues/365),
+  [#366](https://github.com/dermot-murphy/CStyleCheck/issues/366)).
+- **Verbose progress output** — progress line now uses the terminal width to prevent
+  violation lines from being overwritten
+  (issue [#357](https://github.com/dermot-murphy/CStyleCheck/issues/357)).
+
+### Fixed
+
+- **`misc.unsigned_suffix` false positive on signed-parameter arguments** — integer
+  literals passed at a call site to a function parameter declared as `int8_t`,
+  `int16_t`, `int32_t`, `int64_t`, `int`, `short`, `long`, or `char` are now exempt
+  from the unsigned-suffix requirement when the function is declared/defined in the
+  same translation unit
+  (issue [#340](https://github.com/dermot-murphy/CStyleCheck/issues/340)).
+- **Function violations reported on wrong line** — `RE_FUNCTION_DEF` starts with
+  `(?:^|\n)`, causing `m.start()` to point to the `\n` ending the preceding line.
+  Fixed with `fn_start` correction so all function-rule violations are reported on
+  the function's own line
+  (issue [#362](https://github.com/dermot-murphy/CStyleCheck/issues/362)).
+- **`function.prefix` not suppressed by inline block directive** — the line-offset
+  bug above also caused `// cstylecheck: disable=function.prefix` blocks to miss the
+  function declaration line; now resolved by the same `fn_start` correction
+  (issue [#362](https://github.com/dermot-murphy/CStyleCheck/issues/362)).
+- **Function-pointer `typedef` false positive** — `typedef void (*callback_fn_t)(int x)`
+  was parsed as a function declaration, raising a spurious `variable.parameter.p_prefix`
+  violation on parameter `x`. Function-pointer typedef patterns are now recognised and
+  skipped by the parameter-prefix check
+  (issues [#359](https://github.com/dermot-murphy/CStyleCheck/issues/359),
+  [#361](https://github.com/dermot-murphy/CStyleCheck/issues/361)).
+- **`misc.yoda_condition` false positives** — no longer fires when the LHS is an
+  array-element expression (`arr[i] == val`) or when both operands are constants
+  (the latter case is now handled by `misc.constant_comparison`)
+  (issue [#354](https://github.com/dermot-murphy/CStyleCheck/issues/354)).
+- **`constant.case` false positives on function/alias `#define`s** — names that
+  resemble function calls or typedef-style aliases (e.g.
+  `#define api_error_t uint8_t`) are now exempt from `constant.case`
+  (issue [#355](https://github.com/dermot-murphy/CStyleCheck/issues/355)).
+- **Non-ASCII characters in output** — em-dash and curly quotes removed from all
+  terminal, log, and verbose-progress output; all strings are now 7-bit ASCII
+  (issues [#363](https://github.com/dermot-murphy/CStyleCheck/issues/363),
+  [#364](https://github.com/dermot-murphy/CStyleCheck/issues/364)).
+- **Mixed path separators in verbose output** — file paths now use the OS-native
+  separator (backslash on Windows, forward slash on POSIX) consistently throughout
+  verbose progress and violation reports
+  (issue [#367](https://github.com/dermot-murphy/CStyleCheck/issues/367)).
+
+---
+
+## [1.5.1] — 2026-06-28
+
+### Added
+
+- **`DOCKERHUB_README.md`** — dedicated Docker Hub README automatically pushed by
+  `docker_publish.yml` to keep the Docker Hub listing in sync with the GitHub README
+  (issue [#300](https://github.com/dermot-murphy/CStyleCheck/issues/300)).
+
+### Fixed
+
+- **Docker `ARG GITHUB_REPOSITORY` placement** — `ARG` declaration moved after the
+  `FROM` line to satisfy Docker BuildKit's scope rules; previously caused a build
+  warning on multi-stage builds
+  (issue [#300](https://github.com/dermot-murphy/CStyleCheck/issues/300)).
+- **ASPICE document cross-reference drift** — stale version citations corrected in
+  all 22 work products following the v1.5.0 release: SYS2 §3.3, SUP1 §3.1, and
+  cascading SVD cross-refs updated to reflect the post-audit baseline
+  (issues [#302](https://github.com/dermot-murphy/CStyleCheck/issues/302)–[#312](https://github.com/dermot-murphy/CStyleCheck/issues/312),
+  [#315](https://github.com/dermot-murphy/CStyleCheck/issues/315)–[#335](https://github.com/dermot-murphy/CStyleCheck/issues/335)).
+
+---
+
 ## [1.5.0] — 2026-06-26
 
 ### Added
@@ -334,7 +441,9 @@ Initial public release.
 
 ---
 
-[Unreleased]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.5.1...v1.6.0
+[1.5.1]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/dermot-murphy/CStyleCheck/compare/v1.3.0...v1.4.0

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE4-001 | **Version** | 1.18 |
-| **Project** | CStyleCheck | **Date** | 2026-07-01 |
+| **Document ID** | CSC-SWE4-001 | **Version** | 1.20 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.4 |
@@ -22,6 +22,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.20 | 2026-07-06 | Claude | ASPICE audit — update §6 per-row test counts for 8 modules (+56 total): test_defines.py 22→30, test_yoda_condition.py 37→46, test_inline_suppression.py 15→24, test_constant_comparison.py 21→27, test_parameter_prefix.py 47→51, test_pointer_prefix_fix.py 10→20, test_print_summary.py 7→11, test_unsigned_suffix_signed_params.py 9→15; update §3.1 refs (SWE1 2.4→2.6, SWE3 1.15→1.16, SWE5 1.11→1.14); add SWE1-091/092/093 to §7 traceability — closes #374 |
+| 1.19 | 2026-07-06 | Claude | v1.6.0 RC — update test total 1223→1279 (+56 across 8 modules: yoda_condition 37→46, inline_suppression 15→24, constant_comparison 21→27, defines 22→30, parameter_prefix 47→51, pointer_prefix_fix 10→20, print_summary 7→11, unsigned_suffix_signed_params 9→15); update coverage comment; update §5.5 SVD→1.22 |
 | 1.18 | 2026-07-01 | Claude | v1.6.0 — add test_constant_comparison.py (21 tests), test_unsigned_suffix_signed_params.py (9 tests), test_pointer_prefix_fix.py (10 tests); update §3.1 refs (SWE1 2.4→2.5, SWE5 1.11→1.12); update test total 1183→1223, modules 50→53; update coverage comment — closes #339 #340 #341 |
 | 1.17 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.3→2.4, SWE3 1.14→1.15, SWE5 1.9→1.11 | Dermot Murphy |
 | 1.16 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.1→2.3, SWE3 1.12→1.14 | Dermot Murphy |
@@ -53,9 +55,9 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.15 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.11 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.6 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.16 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.14 |
 | CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
 
 ---
@@ -83,9 +85,9 @@ Unit verification covers both dynamic testing (pytest test suite) and static ver
 
 Coverage is measured per CI run on all three Python matrix versions (3.10, 3.11, 3.12) and reported via `coverage.xml` artefact (uploaded as a GitHub Actions artefact, Python 3.11 build).
 
-**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 1223 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
+**CI gate (from v1.2.0+):** `--cov-fail-under=85 --cov-branch` applied across all 1279 tests including `test_cli.py` subprocess calls. Combined coverage 87.31% ≥ 85% gate ✅
 
-> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures (baseline reference: 1223 tests as of v1.6.0).
+> **Subprocess coverage implementation (issue #54 — resolved):** From v1.2.0 CI onwards, `COVERAGE_PROCESS_START` and `sitecustomize.py` subprocess instrumentation are enabled in `cstylecheck_tests.yml`. This allows `test_cli.py` to contribute coverage of `main()` and the CLI output helpers (`_violations_to_json`, `_violations_to_sarif`, `write_baseline`, `load_baseline`, `print_summary`), which previously accounted for ~14% of unmeasured statements (the v1.1.0 measured baseline was 86% statement-only, excluding subprocess invocations). The CI gate has been raised from 72% statement-only to 85% combined statement + branch. The long-term targets of ≥ 90% statement and ≥ 85% branch remain; the 85% combined gate will be reviewed once the first post-instrumentation CI run reports actual figures (baseline reference: 1279 tests as of v1.6.0).
 
 ### 4.3 Test Infrastructure
 
@@ -163,7 +165,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.3 Constant and Macro Rules — `test_defines.py` (22 tests)
+### 5.3 Constant and Macro Rules — `test_defines.py` (30 tests)
 
 | TC-ID | Test Name | Rule Verified | Pass Condition |
 |---|---|---|---|
@@ -223,7 +225,7 @@ Tests are organised by test module. Each module maps to one or more COMP-05 sub-
 
 ---
 
-### 5.7 Yoda Conditions — `test_yoda_condition.py` (37 tests)
+### 5.7 Yoda Conditions — `test_yoda_condition.py` (46 tests)
 
 | TC-ID | Test Name | Rule Verified | Pass Condition |
 |---|---|---|---|
@@ -359,7 +361,7 @@ ASPICE traceability: SWE1-MISRA-001 (Rule 7.3), SWE1-MISRA-002 (Rule 7.1), SWE1-
 
 Each test class verifies: positive detection, negative non-detection, disabled-rule suppression, configurable severity, and violation message content.
 
-### 5.15 Print Summary Per-File Breakdown — `test_print_summary.py` (7 tests)
+### 5.15 Print Summary Per-File Breakdown — `test_print_summary.py` (11 tests)
 
 Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SWE1-089, issue #278).
 
@@ -384,14 +386,14 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 |---|---|---|---|---|
 | `test_variables.py` | 43 | 43 | 0 | `_check_variables` |
 | `test_functions.py` | 14 | 14 | 0 | `_check_functions` |
-| `test_defines.py` | 22 | 22 | 0 | `_check_defines` (incl. typedef-alias exemption) |
+| `test_defines.py` | 30 | 30 | 0 | `_check_defines` (incl. typedef-alias exemption) |
 | `test_typedefs.py` | 8 | 8 | 0 | `_check_typedefs` |
 | `test_enums.py` | 11 | 11 | 0 | `_check_enums` |
 | `test_structs.py` | 12 | 12 | 0 | `_check_structs` |
 | `test_include_guards.py` | 8 | 8 | 0 | `_check_include_guard` |
 | `test_misc.py` | 28 | 28 | 0 | `_check_misc` |
 | `test_misc_improvements.py` | 77 | 77 | 0 | `_check_misc`, improvements |
-| `test_yoda_condition.py` | 37 | 37 | 0 | `_check_yoda` |
+| `test_yoda_condition.py` | 46 | 46 | 0 | `_check_yoda` |
 | `test_whitespace_ratio.py` | 27 | 27 | 0 | `_check_whitespace_ratio` |
 | `test_reserved_name.py` | 40 | 40 | 0 | `_check_reserved_names` |
 | `test_spell_check.py` | 9 | 9 | 0 | `_check_spelling` |
@@ -403,7 +405,7 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | `test_exclusions.py` | 28 | 28 | 0 | COMP-02 |
 | `test_eof_comment.py` | 33 | 33 | 0 | `_check_eof_comment` |
 | `test_copyright_header.py` | 55 | 55 | 0 | `_check_copyright_header` |
-| `test_parameter_prefix.py` | 47 | 47 | 0 | `_check_variables` |
+| `test_parameter_prefix.py` | 51 | 51 | 0 | `_check_variables` |
 | `test_misra_rules.py` | 64 | 64 | 0 | `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_non_ascii_source`, `_check_yoda` |
 | `test_block_comment_spacing.py` | 29 | 29 | 0 | `_check_block_comment_spacing` |
 | `test_workflow_config.py` | 16 | 16 | 0 | CI workflow configuration regression |
@@ -415,7 +417,7 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | `test_declared_not_defined.py` | 39 | 39 | 0 | `DeclaredNotDefinedChecker` |
 | `test_config_loading.py` | 13 | 13 | 0 | COMP-02 (`load_config` — UTF-8, missing file, YAML errors) |
 | `test_update_config.py` | 27 | 27 | 0 | COMP-02 (`_deep_merge`) |
-| `test_inline_suppression.py` | 15 | 15 | 0 | COMP-04 (`parse_inline_suppressions`) |
+| `test_inline_suppression.py` | 24 | 24 | 0 | COMP-04 (`parse_inline_suppressions`) |
 | `test_fix_mode.py` | 11 | 11 | 0 | COMP-08 (`apply_fixes`, `unified_diff`) |
 | `test_init_wizard.py` | 15 | 15 | 0 | COMP-09 (`run_wizard`, `run_preset`) |
 | `test_per_dir_config.py` | 15 | 15 | 0 | COMP-10 (`resolve_per_dir_config`) |
@@ -431,11 +433,11 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | `test_macro_multistatement_wrapper.py` | 9 | 9 | 0 | COMP-05f (`_check_macro_multistatement_wrapper`) |
 | `test_identifier_length.py` | 10 | 10 | 0 | COMP-05h (`_check_identifier_length`) |
 | `test_no_single_char_identifiers.py` | 8 | 8 | 0 | COMP-05h (`_check_no_single_char_identifiers`) |
-| `test_print_summary.py` | 7 | 7 | 0 | `output.print_summary` (per-file breakdown) |
-| `test_constant_comparison.py` | 21 | 21 | 0 | COMP-05f (`_check_constant_comparison`) |
-| `test_unsigned_suffix_signed_params.py` | 9 | 9 | 0 | COMP-05f (`_check_misc` signed-param exemption) |
-| `test_pointer_prefix_fix.py` | 10 | 10 | 0 | `fixer._fix_pointer_prefix`, `fixer.fix_pointer_prefix_in_header` |
-| **Total** | **1223** | **1223** | **0** | All rules covered — 53 modules |
+| `test_print_summary.py` | 11 | 11 | 0 | `output.print_summary` (per-file breakdown) |
+| `test_constant_comparison.py` | 27 | 27 | 0 | COMP-05f (`_check_constant_comparison`) |
+| `test_unsigned_suffix_signed_params.py` | 15 | 15 | 0 | COMP-05f (`_check_misc` signed-param exemption) |
+| `test_pointer_prefix_fix.py` | 20 | 20 | 0 | `fixer._fix_pointer_prefix`, `fixer.fix_pointer_prefix_in_header` |
+| **Total** | **1279** | **1279** | **0** | All rules covered — 53 modules |
 
 **Statement Coverage (v1.1.0 CI — unit tests excl. subprocess):** 86% (1,694 statements, 243 missed)
 **Statement Coverage (v1.5.0 CI — 1183 tests incl. subprocess):** 89.8% (1,694 statements, 172 missed)
@@ -483,6 +485,9 @@ Added in v1.13. Covers the per-file breakdown extension to `print_summary()` (SW
 | SWE1-MISRA-004 | Non-ASCII source characters (`_check_non_ascii_source`) | `test_misra_rules.py` — SWE4-TC-4.1-001 to 4.1-012 |
 | SWE1-089 | Per-file breakdown in `print_summary` | `test_print_summary.py` — UV-SUM-001 to UV-SUM-007 |
 | SWE1-090 | Typedef-alias `constant.case` exemption in `_check_defines` | `test_defines.py` — UV-DEF-008 to UV-DEF-013 |
+| SWE1-091 | misc.constant_comparison (`_check_constant_comparison`) | `test_constant_comparison.py` |
+| SWE1-092 | misc.unsigned_suffix signed-parameter argument exemption | `test_unsigned_suffix_signed_params.py` |
+| SWE1-093 | variable.pointer_prefix auto-fix | `test_pointer_prefix_fix.py` |
 
 ---
 

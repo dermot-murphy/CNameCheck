@@ -1,7 +1,7 @@
 # CStyleCheck
 
 Embedded C Style Compliance Checker for GitHub Actions, pre-commit hooks, and Docker.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **72 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **73 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
@@ -70,7 +70,7 @@ docker run --rm -v "C:/MyProject:/repo" dermot-murphy/cstylecheck:latest ^
 # .pre-commit-config.yml
 repos:
   - repo: https://github.com/dermot-murphy/CStyleCheck
-    rev: v1.5.0
+    rev: v1.6.0
     hooks:
       - id: cstylecheck
         args:
@@ -105,17 +105,17 @@ repos:
 
 ---
 
-## Rule categories (72 rule IDs)
+## Rule categories (73 rule IDs)
 
 | Category | Rule IDs |
 |---|---|
 | Constants / macros | `constant.case` `constant.min_length` `constant.max_length` `constant.prefix` `macro.case` `macro.min_length` `macro.max_length` `macro.prefix` `macro.trailing_semicolon` `macro.multistatement_wrapper` |
-| Variables | `variable.global.case` `variable.global.prefix` `variable.global.g_prefix` `variable.static.case` `variable.static.prefix` `variable.static.s_prefix` `variable.local.case` `variable.parameter.case` `variable.parameter.p_prefix` `variable.min_length` `variable.max_length` `variable.pointer_prefix` `variable.pp_prefix` `variable.bool_prefix` `variable.handle_prefix` `variable.no_numeric_in_name` `variable.prefix_order` |
+| Variables | `variable.global.case` `variable.global.prefix` `variable.global.g_prefix` `variable.static.case` `variable.static.prefix` `variable.static.s_prefix` `variable.local.case` `variable.local.prefix` `variable.parameter.case` `variable.parameter.prefix` `variable.parameter.p_prefix` `variable.min_length` `variable.max_length` `variable.pointer_prefix` `variable.pp_prefix` `variable.bool_prefix` `variable.handle_prefix` `variable.no_numeric_in_name` `variable.prefix_order` |
 | Functions | `function.prefix` `function.style` `function.min_length` `function.max_length` `function.static_prefix` |
 | Types | `typedef.case` `typedef.suffix` `enum.type_case` `enum.type_suffix` `enum.member_case` `enum.member_prefix` `struct.tag_case` `struct.tag_suffix` `struct.member_case` |
 | Include guards | `include_guard.missing` `include_guard.format` |
 | Naming | `naming.identifier_length` `naming.no_single_char_identifiers` |
-| Misc | `misc.copyright_header` `misc.eof_comment` `misc.line_length` `misc.indentation` `misc.magic_number` `misc.unsigned_suffix` `misc.lowercase_l_suffix` `misc.yoda_condition` `misc.block_comment_spacing` `misc.comment_ratio` `misc.whitespace_ratio` `misc.declared_not_defined` `misc.function_length` `misc.function_doc_header` `misc.assert_density` `misc.null_statement_comment` `misc.declaration_spacing` `misc.file_length` `misc.reserved_header_name` `misc.non_ascii_source` |
+| Misc | `misc.copyright_header` `misc.eof_comment` `misc.line_length` `misc.indentation` `misc.magic_number` `misc.unsigned_suffix` `misc.lowercase_l_suffix` `misc.yoda_condition` `misc.block_comment_spacing` `misc.comment_ratio` `misc.whitespace_ratio` `misc.declared_not_defined` `misc.function_length` `misc.function_doc_header` `misc.assert_density` `misc.null_statement_comment` `misc.declaration_spacing` `misc.file_length` `misc.reserved_header_name` `misc.non_ascii_source` `misc.octal_constant` `misc.trigraph` `misc.constant_comparison` |
 | Other | `reserved_name` `spell_check` `sign_compatibility` |
 
 ---
@@ -180,7 +180,7 @@ docker run --rm -v "$(pwd):/repo" dermot-murphy/cstylecheck:latest \
 | Tag | Description |
 |---|---|
 | `latest` | Latest `main` branch build |
-| `1.5.0` / `1.5` / `1` | Specific semantic version |
+| `1.6.0` / `1.6` / `1` | Specific semantic version |
 | `sha-<short>` | Exact commit SHA |
 
 Images are available for `linux/amd64` and `linux/arm64`.

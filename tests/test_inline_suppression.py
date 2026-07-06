@@ -162,5 +162,147 @@ class TestCheckerInlineSuppression(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+class TestBlockCommentSuppression(unittest.TestCase):
+    """Issue #360: /* cstylecheck: disable=... */ block-comment syntax must
+    be recognised in addition to // comments."""
+
+    def test_block_comment_same_line_single_rule(self):
+        src = 'int x = 1234;  /* cstylecheck: disable=misc.magic_number */\n'
+        s = parse_inline_suppressions(src)
+        self.assertIn("misc.magic_number", s.get(1, frozenset()))
+
+    def test_block_comment_block_disable_enable(self):
+        src = textwrap.dedent("""\
+            /* cstylecheck: disable=misc.magic_number */
+            int uart_a = 42;
+            int uart_b = 99;
+            /* cstylecheck: enable=misc.magic_number */
+            int uart_c = 77;
+        """)
+        s = parse_inline_suppressions(src)
+        self.assertIn("misc.magic_number", s.get(2, frozenset()))
+        self.assertIn("misc.magic_number", s.get(3, frozenset()))
+        self.assertNotIn(5, s)
+
+    def test_block_comment_disable_multiple_rules(self):
+        src = textwrap.dedent("""\
+            /* cstylecheck: disable=misc.magic_number, variables.case */
+            int BadName = 42;
+            /* cstylecheck: enable=misc.magic_number, variables.case */
+        """)
+        s = parse_inline_suppressions(src)
+        self.assertIn("misc.magic_number", s.get(2, frozenset()))
+        self.assertIn("variables.case", s.get(2, frozenset()))
+
+    def test_block_comment_suppress_end_to_end(self):
+        src = textwrap.dedent("""\
+            uint8_t uart_Init(void) {
+                /* cstylecheck: disable=misc.magic_number */
+                int uart_a = 42;
+                int uart_b = 99;
+                /* cstylecheck: enable=misc.magic_number */
+                int uart_c = 77;
+                return uart_a;
+            }
+        """)
+        violations = _violations(src)
+        magic_by_line = {ln for ln, r in violations if r == "misc.magic_number"}
+        self.assertNotIn(3, magic_by_line)
+        self.assertNotIn(4, magic_by_line)
+        self.assertIn(6, magic_by_line)
+
+    def test_slashslash_comment_still_works(self):
+        """Existing // syntax must continue to work after adding /* support."""
+        src = textwrap.dedent("""\
+            uint8_t uart_Init(void) {
+                // cstylecheck: disable=misc.magic_number
+                int uart_a = 42;
+                // cstylecheck: enable=misc.magic_number
+                int uart_b = 77;
+                return uart_a;
+            }
+        """)
+        violations = _violations(src)
+        magic_by_line = {ln for ln, r in violations if r == "misc.magic_number"}
+        self.assertNotIn(3, magic_by_line)
+        self.assertIn(5, magic_by_line)
+
+
+# ---------------------------------------------------------------------------
+_FP_CFG = cfg_only(
+    file_prefix={"enabled": True, "severity": "error"},
+    functions={"enabled": True, "severity": "error"},
+)
+
+
+class TestFunctionPrefixBlockCommentSuppression(unittest.TestCase):
+    """Inline suppression of function.prefix via /* */ block-comment syntax.
+
+    RE_FUNCTION_DEF starts with (?:^|\\n) so m.start() used to point to the
+    '\\n' ending the *previous* line, placing the violation one line before the
+    function itself and outside the suppression block.  The fn_start correction
+    in _check_functions() must ensure the violation lands on the function's own
+    line so the suppression map can match it.
+    """
+
+    def _run(self, src: str) -> set:
+        c = Checker("hal_ble.c", src, _FP_CFG)
+        return {(v.line, v.rule) for v in c.run_all().violations}
+
+    def test_function_prefix_fires_without_suppression(self):
+        src = textwrap.dedent("""\
+            void assert_nrf_callback(uint16_t line_num, const uint8_t* file_name)
+            {
+                (void)line_num; (void)file_name;
+            }
+        """)
+        viols = self._run(src)
+        self.assertTrue(any(r == "function.prefix" for _, r in viols))
+
+    def test_function_prefix_suppressed_by_block_comment_disable(self):
+        src = textwrap.dedent("""\
+            /* cstylecheck: disable=function.prefix */
+            void assert_nrf_callback(uint16_t line_num, const uint8_t* file_name)
+            {
+                (void)line_num; (void)file_name;
+            }
+            /* cstylecheck: enable=function.prefix */
+        """)
+        viols = self._run(src)
+        self.assertFalse(any(r == "function.prefix" for _, r in viols),
+                         f"Expected no function.prefix violation; got {viols}")
+
+    def test_function_prefix_suppressed_by_slashslash_disable(self):
+        src = textwrap.dedent("""\
+            // cstylecheck: disable=function.prefix
+            void assert_nrf_callback(uint16_t line_num, const uint8_t* file_name)
+            {
+                (void)line_num; (void)file_name;
+            }
+            // cstylecheck: enable=function.prefix
+        """)
+        viols = self._run(src)
+        self.assertFalse(any(r == "function.prefix" for _, r in viols),
+                         f"Expected no function.prefix violation; got {viols}")
+
+    def test_function_after_enable_is_still_checked(self):
+        src = textwrap.dedent("""\
+            /* cstylecheck: disable=function.prefix */
+            void assert_nrf_callback(uint16_t line_num, const uint8_t* file_name)
+            {
+                (void)line_num; (void)file_name;
+            }
+            /* cstylecheck: enable=function.prefix */
+            void another_bad_name(void)
+            {
+            }
+        """)
+        viols = self._run(src)
+        prefix_lines = {ln for ln, r in viols if r == "function.prefix"}
+        self.assertNotIn(2, prefix_lines)
+        self.assertIn(7, prefix_lines)
+
+
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     unittest.main()

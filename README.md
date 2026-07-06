@@ -10,14 +10,14 @@ Contributions are very welcome.
 ![Logo](logo/cstylecheck.jpg)
 
 Embedded C Style Compliance Checker for GitHub Actions / pre-commit hooks.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **72 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **73 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Naming Convention](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/cstylecheck/badge.json)](https://dermot-murphy.github.io/CStyleCheck/cstylecheck/)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
 
 📖 **[Rules and Configuration Reference](Rules-and-Configuration.md)** — full
-documentation for all 72 rules with YAML configuration and annotated C examples.
+documentation for all 73 rules with YAML configuration and annotated C examples.
 
 Draft companion documents (pending rule population, not yet authoritative):
 [Embedded C Style Guide](embedded_c_style_guide.md) ·
@@ -31,7 +31,7 @@ Draft companion documents (pending rule population, not yet authoritative):
 ```
 .pre-commit-hooks.yml   # pre-commit hook definition (id: cstylecheck)
 pyproject.toml           # pip / pipx / pre-commit packaging metadata
-Rules-and-Configuration.md  # wiki: all 72 rules with config and examples
+Rules-and-Configuration.md  # wiki: all 73 rules with config and examples
 src/
     cstylecheck.py          # thin CLI shim (backward-compatible entry point)
     cstylecheck/            # checker package (12 sub-modules)
@@ -41,7 +41,7 @@ src/
         models.py           # Violation, CheckResult, shared constants
         preprocessor.py     # comment/string stripping, token extraction
         utils.py            # case matching, module name helpers
-        checker.py          # main Checker class — all 72 rule implementations
+        checker.py          # main Checker class — all 73 rule implementations
         sign_checker.py     # cross-file sign-compatibility and declared_not_defined
         baseline.py         # baseline load/write
         output.py           # text / JSON / SARIF / HTML formatters, Tee, summary
@@ -64,11 +64,11 @@ tests/
     c_spell_dict.txt        # test-suite spell dictionary
     harness.py              # shared helpers: cfg_only / run / has / clean
     test_barr_c.py          #  42 tests: Barr-C rules
-    test_yoda_condition.py  #  37 tests: misc.yoda_condition
+    test_yoda_condition.py  #  46 tests: misc.yoda_condition
     test_reserved_name.py   #  40 tests: reserved_name
     test_dictionaries.py    #  32 tests: dict file loading and CLI flags
     test_misc_improvements.py #  77 tests: unsigned_suffix, loop vars, numerics
-    test_defines.py         #  22 tests: constant.* / macro.*
+    test_defines.py         #  30 tests: constant.* / macro.*
     test_variables.py       #  43 tests: all variable.* rules
     test_functions.py       #  14 tests: function.*
     test_typedefs.py        #   8 tests: typedef.*
@@ -87,14 +87,14 @@ tests/
     test_whitespace_ratio.py #  27 tests: misc.whitespace_ratio
     test_declared_not_defined.py # 39 tests: misc.declared_not_defined
     test_misra_rules.py     #  64 tests: MISRA C rule coverage
-    test_parameter_prefix.py #  47 tests: variable.parameter.*
-    test_print_summary.py   #   7 tests: --summary per-file breakdown
+    test_parameter_prefix.py #  51 tests: variable.parameter.*
+    test_print_summary.py   #  11 tests: --summary per-file breakdown
     test_exclusions.py      #  28 tests: per-file exclusions
-    test_github_annotations.py # 8 tests: GitHub Actions annotations
+    test_github_annotations.py #  8 tests: GitHub Actions annotations
     test_case_patterns.py   #   6 tests: case pattern helpers
     test_thread_safe_globals.py # 4 tests: thread-safety of globals
     test_workflow_config.py #  16 tests: CI workflow regression tests
-    test_inline_suppression.py # 15 tests: inline suppression comments
+    test_inline_suppression.py # 24 tests: inline suppression comments
     test_fix_mode.py        #  11 tests: auto-fix engine (apply_fixes, unified_diff)
     test_init_wizard.py     #  15 tests: config wizard and presets (run_wizard, run_preset)
     test_per_dir_config.py  #  15 tests: per-directory config resolution
@@ -113,11 +113,14 @@ tests/
     test_config_loading.py  #  13 tests: rules.yml / config loading edge cases
     test_preprocessor.py    #  76 tests: comment/string stripping, token extraction
     test_update_config.py   #  27 tests: per-directory and config merge updates
+    test_constant_comparison.py # 27 tests: misc.constant_comparison
+    test_unsigned_suffix_signed_params.py # 15 tests: misc.unsigned_suffix signed-param exemption
+    test_pointer_prefix_fix.py # 20 tests: variable.pointer_prefix auto-fix
 Dockerfile/
     Dockerfile               # multi-platform Docker image
     .dockerignore
 .github/workflows/
-    cstylecheck_tests.yml      # runs the test suite on every commit (1183 tests)
+    cstylecheck_tests.yml      # runs the test suite on every commit (1279 tests)
     rules.yml    # runs linter + trend page on C source commits
     docker_publish.yml       # builds and pushes image to GHCR and Docker Hub
     wiki_publish.yml         # publishes GitHub Wiki from README + ASPICE docs
@@ -581,6 +584,33 @@ had no whitespace separator (issue #273); function-call detection now requires s
 
 ---
 
+### New in v1.6.0 (2026-07-06)
+
+- **`misc.constant_comparison`** — flags `==`/`!=` comparisons where both operands are
+  compile-time constants (literals, `true`/`false`/`NULL`, ALL_CAPS identifiers).
+  Distinct from `misc.yoda_condition` (which fires when one side is a variable).
+- **`variable.pointer_prefix` auto-fix** — `--fix` now renames a non-prefixed pointer
+  parameter throughout the function scope (signature, body, Doxygen block) and patches
+  the matching `.h` declaration; non-safe (not applied by `--safe-only`).
+- **Startup banner** — `CStyleCheck <version> / (C) 2026 Dermot Murphy` printed to
+  `stderr` at startup; also written to the log file.
+- **Copyright in `--version`** — copyright notice appended after version string.
+- **Block-comment inline suppression** — `/* cstylecheck: disable=rule.id */` now
+  accepted alongside the existing `//` form.
+- **`prerelease_check.sh` / `check_my_project.bat`** — helper scripts for release
+  validation and project self-check.
+
+**Bug fixes:** `misc.unsigned_suffix` false positive on literals passed to signed
+parameters; function violations reported on wrong line (fn_start correction);
+`function.prefix` inline suppression missed function line; function-pointer typedef
+raised spurious `variable.parameter.p_prefix`; `misc.yoda_condition` false positives
+on array subscripts and constant-only comparisons; non-ASCII characters removed from
+all output; OS-native path separators used consistently throughout.
+
+1 new rule + 5 features; **73 rule IDs** total. 56 new tests (1279 total).
+
+---
+
 ### New in v1.1.0 (2026-05-28)
 
 #### CI quality gates
@@ -744,16 +774,17 @@ Rule ID: `misc.eof_comment` · Default severity: `warning`
 
 ---
 
-## Rule IDs (72 total)
+## Rule IDs (73 total)
 
 | Category | Rule IDs |
 |---|---|
-| Constants / macros | `constant.case` `constant.min_length` `constant.max_length` `constant.prefix` `macro.case` `macro.min_length` `macro.max_length` `macro.prefix` |
-| Variables | `variable.global.case` `variable.global.prefix` `variable.global.g_prefix` `variable.static.case` `variable.static.prefix` `variable.static.s_prefix` `variable.local.case` `variable.parameter.case` `variable.parameter.p_prefix` `variable.min_length` `variable.max_length` `variable.pointer_prefix` `variable.pp_prefix` `variable.bool_prefix` `variable.handle_prefix` `variable.no_numeric_in_name` `variable.prefix_order` |
+| Constants / macros | `constant.case` `constant.min_length` `constant.max_length` `constant.prefix` `macro.case` `macro.min_length` `macro.max_length` `macro.prefix` `macro.trailing_semicolon` `macro.multistatement_wrapper` |
+| Variables | `variable.global.case` `variable.global.prefix` `variable.global.g_prefix` `variable.static.case` `variable.static.prefix` `variable.static.s_prefix` `variable.local.case` `variable.local.prefix` `variable.parameter.case` `variable.parameter.prefix` `variable.parameter.p_prefix` `variable.min_length` `variable.max_length` `variable.pointer_prefix` `variable.pp_prefix` `variable.bool_prefix` `variable.handle_prefix` `variable.no_numeric_in_name` `variable.prefix_order` |
 | Functions | `function.prefix` `function.style` `function.min_length` `function.max_length` `function.static_prefix` |
+| Naming | `naming.identifier_length` `naming.no_single_char_identifiers` |
 | Types | `typedef.case` `typedef.suffix` `enum.type_case` `enum.type_suffix` `enum.member_case` `enum.member_prefix` `struct.tag_case` `struct.tag_suffix` `struct.member_case` |
 | Include guards | `include_guard.missing` `include_guard.format` |
-| Misc | `misc.copyright_header` `misc.eof_comment` `misc.line_length` `misc.indentation` `misc.magic_number` `misc.unsigned_suffix` `misc.yoda_condition` `misc.block_comment_spacing` `misc.comment_ratio` `misc.whitespace_ratio` `misc.declared_not_defined` |
+| Misc | `misc.copyright_header` `misc.eof_comment` `misc.line_length` `misc.indentation` `misc.magic_number` `misc.unsigned_suffix` `misc.lowercase_l_suffix` `misc.yoda_condition` `misc.block_comment_spacing` `misc.comment_ratio` `misc.whitespace_ratio` `misc.declared_not_defined` `misc.function_length` `misc.function_doc_header` `misc.assert_density` `misc.null_statement_comment` `misc.declaration_spacing` `misc.file_length` `misc.reserved_header_name` `misc.non_ascii_source` `misc.octal_constant` `misc.trigraph` `misc.constant_comparison` |
 | Other | `reserved_name` `spell_check` `sign_compatibility` |
 
 ---

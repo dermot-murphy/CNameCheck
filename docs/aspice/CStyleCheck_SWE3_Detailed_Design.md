@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE3-001 | **Version** | 1.15 |
+| **Document ID** | CSC-SWE3-001 | **Version** | 1.16 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.16 | 2026-07-06 | Claude | ASPICE audit — update scope to v1.6.0; §3.1 refs (SWE1 2.4→2.6, SWE2 1.11→1.12, SWE4 1.17→1.20); add UNIT-116 (_check_constant_comparison), UNIT-117 (_fix_pointer_prefix), UNIT-118 (fix_pointer_prefix_in_header); update UNIT-95 for block-comment form, UNIT-22 run_all order, UNIT-86 Tee; update §8 RTM — closes #373 |
 | 1.15 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.3→2.4, SWE2 1.9→1.11, SWE4 1.16→1.17 | Dermot Murphy |
 | 1.14 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.1→2.3, SWE4 1.14→1.16 | Dermot Murphy |
 | 1.13 | 2026-06-27 | Claude | ASPICE audit — approve §9 Review & Approval (3 roles were Pending) — closes #316 #323 |
@@ -40,15 +41,15 @@
 
 ## 3. Purpose & Scope
 
-This document defines the detailed design of each software unit in **CStyleCheck v1.5.0**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
+This document defines the detailed design of each software unit in **CStyleCheck v1.6.0**, providing the algorithmic specification, interface contracts, and data design required for unit construction and verification. It satisfies **Automotive SPICE® PAM v4.0, SWE.3 — Software Detailed Design and Unit Construction**.
 
 ### 3.1 Referenced Documents
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.11 |
-| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.17 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.6 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.12 |
+| CSC-SWE4-001 | CStyleCheck Unit Verification Specification | 1.20 |
 
 ---
 
@@ -173,6 +174,9 @@ All source locations refer to the current package layout under `src/cstylecheck/
 | UNIT-113 | `_check_non_ascii_source` | `checker.py` | COMP-05f | `checker.py` |
 | UNIT-114 | `print_summary` (per-file breakdown) | `output.py` | COMP-07 | `output.py` |
 | UNIT-115 | `_check_defines` (typedef-alias exemption) | `checker.py` | COMP-05c | `checker.py` |
+| UNIT-116 | `Checker._check_constant_comparison` | `checker.py` | COMP-05f | `checker.py` |
+| UNIT-117 | `_fix_pointer_prefix` | `fixer.py` | COMP-08 | `fixer.py` |
+| UNIT-118 | `fix_pointer_prefix_in_header` | `fixer.py` | COMP-08 | `fixer.py` |
 
 ---
 
@@ -374,7 +378,7 @@ src/cstylecheck/
 
 **Algorithm:** Call each enabled `_check_*` method in fixed order; each appends to `self.result.violations`. Return `self.result`.
 
-**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_comment_ratio`, `_check_whitespace_ratio`, `_check_yoda`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_reserved_header_name`, `_check_non_ascii_source`, `_check_spelling` (when dictionary configured)
+**Order:** `_check_copyright_header`, `_check_defines`, `_check_variables`, `_check_functions`, `_check_typedefs`, `_check_enums`, `_check_structs`, `_check_include_guard` (headers only), `_check_misc`, `_check_comment_ratio`, `_check_whitespace_ratio`, `_check_yoda`, `_check_constant_comparison`, `_check_reserved_names`, `_check_lowercase_l_suffix`, `_check_octal_constants`, `_check_trigraphs`, `_check_reserved_header_name`, `_check_non_ascii_source`, `_check_spelling` (when dictionary configured)
 
 ---
 
@@ -762,6 +766,7 @@ src/cstylecheck/
 **Methods:**
 - `__init__(log_fh=None)` — store optional file handle
 - `print(*args, **kwargs)` — call built-in `print` to stdout, and to `log_fh` if set
+- `log_print(*args, **kwargs)` — write only to `log_fh` (not stdout); used for content that must appear in the log file but not on the terminal
 - `close()` — close and release `log_fh`
 
 ---
@@ -793,7 +798,7 @@ src/cstylecheck/
 **Purpose:** Parse `// cstylecheck: disable=…` / `enable=…` / `disable-next-line=…` directives from raw C source and return a mapping of line numbers to the set of suppressed rule IDs at that line.
 
 **Algorithm:**
-1. Scan `source` line by line; detect `cstylecheck:` directives in comments (case-insensitive)
+1. Scan `source` line by line; detect `cstylecheck:` directives in both line comments (`// cstylecheck: …`) and block-comment form (`/* cstylecheck: … */`) on the same source line (case-insensitive)
 2. For `disable=rule.a,rule.b` on the same line as code: add the rule IDs to that line's suppressed set only
 3. For `disable-next-line=rule.id`: add rule IDs to the next non-blank, non-comment line's suppressed set
 4. For a standalone `disable=rule.id` line: open a block suppression; accumulate affected rule IDs per line until a matching `enable=rule.id` is found; unpaired `disable=` suppresses to end of file
@@ -1040,6 +1045,47 @@ src/cstylecheck/
 
 ---
 
+---
+
+### UNIT-116 — `Checker._check_constant_comparison() → None`
+
+**Purpose:** Detect comparisons where both operands are compile-time constants (`misc.constant_comparison`, SWE1-091).
+
+**Algorithm:**
+1. Skip if `misc.constant_comparison.enabled` is false
+2. Scan `self.clean` for `==` and `!=` operators using a token-based regex
+3. For each match: extract the left-hand and right-hand tokens
+4. Call `_is_constant_token()` on both tokens
+5. Skip if comparison is inside a `#define` RHS or a `return` statement
+6. If both tokens are constants, emit `misc.constant_comparison` warning
+
+---
+
+### UNIT-117 — `_fix_pointer_prefix(source, fn_name, old_param, new_param) → str`
+
+**Purpose:** Rename a pointer parameter from `old_param` to `new_param` within a function's signature and body (SWE1-093).
+
+**Algorithm:**
+1. Locate the function definition for `fn_name` in `source`
+2. Find the extent of the function signature (up to opening `{`) and body (up to matching `}`)
+3. In the signature: replace `old_param` at word boundaries
+4. In the body: replace `old_param` at word boundaries
+5. Search for a Doxygen block comment immediately preceding the function; replace `@param old_param` and `\param old_param` occurrences
+6. Return the modified `source` string
+
+---
+
+### UNIT-118 — `fix_pointer_prefix_in_header(header_source, fn_name, old_param, new_param) → str`
+
+**Purpose:** Apply the same rename to a function declaration in the corresponding `.h` file (SWE1-093).
+
+**Algorithm:**
+1. Locate the function declaration for `fn_name` in `header_source` (declaration ends with `;`)
+2. Replace `old_param` at word boundaries within the declaration
+3. Return the modified header source
+
+---
+
 ### UNIT-90 — `Checker._check_whitespace_ratio() → None`
 
 **Purpose:** Enforce a minimum ratio of blank lines to code lines (issue #143), measuring code "airiness".
@@ -1173,6 +1219,15 @@ Violation:
 | SWE1-MISRA-004 | Non-ASCII source characters (Rule 4.1) | UNIT-113 |
 | SWE1-089 | Per-file breakdown in print_summary | UNIT-114 |
 | SWE1-090 | Typedef-alias constant.case exemption | UNIT-115 |
+| SWE1-091 | `misc.constant_comparison` | UNIT-116 |
+| SWE1-092 | `misc.unsigned_suffix` signed-param exemption | UNIT-30 (extended) |
+| SWE1-093 | `variable.pointer_prefix` auto-fix | UNIT-117, UNIT-118 |
+| SWE1-094 | Startup banner to stderr | UNIT-46 (extended) |
+| SWE1-095 | Copyright in `--version` output | UNIT-88 (extended) |
+| SWE1-096 | OS-native path separator | UNIT-41 (extended) |
+| SWE1-097 | `print_summary()` restructure | UNIT-40 (extended) |
+| SWE1-098 | `fn_start` line correction | UNIT-24 (extended) |
+| SWE1-099 | Function-pointer typedef exemption | UNIT-23 (extended) |
 
 > **Note (UNIT-84):** `DeclaredNotDefinedChecker` (UNIT-84) is traced via the cross-file check requirement (SWE1-051 to SWE1-053 range). SWE1-071 maps exclusively to `_check_whitespace_ratio` (UNIT-90) as shown in the `SWE1-045 to SWE1-050, SWE1-071` row above; the duplicate mapping of SWE1-071 → UNIT-84 has been removed as a CSC-AUD-005 corrective action.
 

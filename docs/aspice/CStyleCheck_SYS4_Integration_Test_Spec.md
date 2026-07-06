@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.9 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.11 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.11 | 2026-07-06 | Claude | ASPICE audit — add SITC-016 for v1.6.0 block-comment inline suppression — closes #379 |
+| 1.10 | 2026-07-06 | Claude | v1.6.0 RC — update §5 overall result 1183→1279; update §3.3 SWE5→1.13, SVD→1.22 |
 | 1.9 | 2026-06-27 | Fix §3.3 cross-ref: SYS2 1.9→2.0 | Dermot Murphy |
 | 1.8 | 2026-06-27 | Claude | ASPICE audit — replace §6 SWE5 traceability placeholders with actual SIT-001–SIT-014 test case IDs; update Review & Approval dates — closes #320 #323 |
 | 1.7 | 2026-06-26 | Claude | ASPICE audit — update §3.3 SYS2 ref (1.8→1.9); update §5 overall result test count (965→1183) — closes #306 #311 |
@@ -437,6 +439,31 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 
 ---
 
+### SITC-016 — v1.6.0 Inline Suppression: Block-Comment Form
+
+| Field | Value |
+|---|---|
+| **Test Case ID** | SITC-016 |
+| **Test Objective** | Verify that the block-comment inline suppression form `/* cstylecheck: disable=rule.id */` suppresses violations on the annotated line end-to-end, and that all four directive forms (same-line `//`, next-line `// disable-next-line=`, paired block `// disable=`/`// enable=`, and block-comment `/* disable= */`) are accepted at the system integration level |
+| **Architecture Interface** | IF-01, IF-06, IF-08, IF-09 |
+| **Requirement Reference** | SYS-F-041 |
+
+| Step | Action | Expected Result |
+|---|---|---|
+| 1 | Run cstylecheck on a C file where a violation line carries `/* cstylecheck: disable=rule.id */` | No violation reported for that line |
+| 2 | Run cstylecheck on a C file using `// cstylecheck: disable-next-line=rule.id` before a violation | Violation on the next line suppressed |
+| 3 | Run cstylecheck on a C file with a paired `// disable=` / `// enable=` block wrapping multiple violations | All violations inside the block suppressed; violations outside the block still reported |
+| 4 | Run cstylecheck on a C file with comma-separated rule IDs in any directive form | Each named rule suppressed on the annotated scope; other rules still fire |
+
+| Execution Details | Value |
+|---|---|
+| **Result** | PASS |
+| **Date** | 2026-07-06 |
+| **Environment** | Python 3.11 |
+| **Evidence** | `tests/test_inline_suppression.py` (existing passing tests cover all four forms) |
+
+---
+
 ## 5. Integration Test Results Summary
 
 | SITC-ID | Test Case | Status | Deviation Ref |
@@ -456,8 +483,9 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-013 | GitHub Actions annotation mode | PASS | |
 | SITC-014 | `--warnings-as-errors` promotion | PASS | |
 | SITC-015 | v1.4.0 rule coverage (macro safety, function quality, file constraints, naming) | PASS | |
+| SITC-016 | v1.6.0 inline suppression — block-comment form and all directive variants | PASS | |
 
-**Overall Result:** PASS — Commit 93178cd, 2026-05-28 (SITC-001 to SITC-014); 2026-06-26 (SITC-015), GitHub Actions (automated) / Dermot Murphy (manual review), 1183 tests all PASS on Python 3.10 / 3.11 / 3.12.
+**Overall Result:** PASS — Commit 93178cd, 2026-05-28 (SITC-001 to SITC-014); 2026-06-26 (SITC-015); 2026-07-06 (v1.6.0 RC, SITC-016), GitHub Actions (automated) / Dermot Murphy (manual review), 1279 tests all PASS on Python 3.10 / 3.11 / 3.12.
 
 > **📋 Note:** All SITC test cases must achieve PASS status before the system verification (SYS.5) activities commence. Any FAIL result must be tracked as a GitHub Issue and resolved via the change control process (SUP.10).
 
@@ -482,6 +510,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-013 | SYS-F-030 | IF-09 | SIT-013 |
 | SITC-014 | SYS-F-040 | IF-09 | SIT-014 |
 | SITC-015 | SYS-F-011, SYS-F-017, SYS-F-020 | IF-01, IF-02, IF-06, IF-08, IF-09 | SIT-019 |
+| SITC-016 | SYS-F-041 | IF-01, IF-06, IF-08, IF-09 | SIT-025 |
 
 ---
 

@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS5-001 | **Version** | 1.7 |
-| **Project** | CStyleCheck | **Date** | 2026-06-25 |
+| **Document ID** | CSC-SYS5-001 | **Version** | 1.8 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.8 | 2026-07-06 | Claude | ASPICE audit — SYS-VTC-003 71→73 rule IDs; update rule category table — closes #379 |
 | 1.7 | 2026-06-25 | Claude | AUD7-F-001 corrective action — update SYS-VTC-003 from 53 to 71 rule IDs; expand rule-category table with rules added since v1.0.0; update overall verdict to v1.4.1 |
 | 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-05 | Claude | CSC-AUD-005 corrective action — fix factual errors identified in audit |
@@ -135,13 +136,13 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 
 ---
 
-### SYS-VTC-003 — Full Rule Coverage (71 Rule IDs)
+### SYS-VTC-003 — Full Rule Coverage (73 Rule IDs)
 
 | Field | Value |
 |---|---|
 | **Test Case ID** | SYS-VTC-003 |
 | **Requirement** | SYS-F-011 through SYS-F-024, SYS-F-020 (v1.2.x–v1.4.x additions) |
-| **Objective** | Verify that all 71 rule IDs detect violations when triggered by conforming test inputs |
+| **Objective** | Verify that all 73 rule IDs detect violations when triggered by conforming test inputs |
 | **Pass Criteria** | Each rule ID appears in at least one violation report when a known-bad input is provided |
 
 | Rule Category | Rule IDs | Evidence Source | Result |
@@ -379,7 +380,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 |---|---|---|---|---|
 | SYS-VTC-001 | Input: multiple files and globs | SYS-F-001, F-004, F-005, F-033 | PASS | |
 | SYS-VTC-002 | Configuration and rule enablement | SYS-F-002, F-006, F-007, F-009, F-025, F-026, NF-007 | PASS | |
-| SYS-VTC-003 | Full rule coverage (71 rule IDs) | SYS-F-011 to F-024, SYS-F-020 | PASS | |
+| SYS-VTC-003 | Full rule coverage (73 rule IDs) | SYS-F-011 to F-024, SYS-F-020 | PASS | |
 | SYS-VTC-004 | Module prefix enforcement | SYS-F-012 | PASS | |
 | SYS-VTC-005 | Pointer and scope prefix rules | SYS-F-013, F-014 | PASS | |
 | SYS-VTC-006 | Output formats: text, JSON, SARIF | SYS-F-027, F-028, F-029, F-032 | PASS | |
@@ -409,7 +410,7 @@ System verification (SYS.5) differs from system integration testing (SYS.4) in t
 | SYS-F-008 | `--exclusions` file | SITC-009 | Covered |
 | SYS-F-009 | Dictionary override flags | SYS-VTC-002 | Covered |
 | SYS-F-010 | Single file read per invocation | SYS-VTC-003 (via cache), SITC-008 | Covered |
-| SYS-F-011 to F-024 | All 71 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
+| SYS-F-011 to F-024 | All 73 rule IDs | SYS-VTC-003, VTC-004, VTC-005 | Covered |
 | SYS-F-025 | Rule `enabled` toggle | SYS-VTC-002 | Covered |
 | SYS-F-026 | Per-rule severity | SYS-VTC-002 | Covered |
 | SYS-F-027 | Text output format | SYS-VTC-006 | Covered |

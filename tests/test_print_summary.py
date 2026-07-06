@@ -40,9 +40,9 @@ class TestPrintSummaryPerFileBreakdown(unittest.TestCase):
     """Issue #278: print_summary must show a per-file breakdown section."""
 
     def test_per_file_section_present(self):
-        """Output must contain a 'Per-file breakdown' header."""
+        """Output must contain a 'Files:' header."""
         out = _capture([_v("a.c", "error")], 1)
-        self.assertIn("Per-file breakdown", out)
+        self.assertIn("Files:", out)
 
     def test_files_with_errors_count(self):
         """Files with errors must be counted correctly."""
@@ -68,7 +68,7 @@ class TestPrintSummaryPerFileBreakdown(unittest.TestCase):
     def test_all_clean(self):
         """Zero violations: all files shown as clean."""
         out = _capture([], 5)
-        self.assertIn("Per-file breakdown", out)
+        self.assertIn("Files:", out)
         lines = [l for l in out.splitlines() if "Files clean" in l]
         self.assertTrue(any("5" in l for l in lines))
 
@@ -84,7 +84,38 @@ class TestPrintSummaryPerFileBreakdown(unittest.TestCase):
     def test_no_files_checked_no_breakdown(self):
         """With 0 files checked, no breakdown section is emitted."""
         out = _capture([], 0)
-        self.assertNotIn("Per-file breakdown", out)
+        self.assertNotIn("Files:", out)
+
+
+class TestPrintSummaryLabels(unittest.TestCase):
+    """Issue #352: section labels and Files checked placement."""
+
+    def test_results_label_present(self):
+        """Results section must be labelled 'Results:'."""
+        out = _capture([_v("a.c", "error")], 1)
+        self.assertIn("Results:", out)
+
+    def test_files_checked_in_files_section(self):
+        """'Files checked' must appear in the Files: section, not above it."""
+        out = _capture([_v("a.c", "error")], 3)
+        lines = out.splitlines()
+        files_label_idx   = next(i for i, l in enumerate(lines) if "Files:" in l)
+        files_checked_idx = next(i for i, l in enumerate(lines) if "Files checked" in l)
+        self.assertGreater(files_checked_idx, files_label_idx)
+
+    def test_files_checked_before_results_section(self):
+        """'Files checked' must appear in the Files: section, before the Results: label."""
+        out = _capture([_v("a.c", "warning")], 2)
+        lines = out.splitlines()
+        results_idx = next(i for i, l in enumerate(lines) if "Results:" in l)
+        fc_idx = next(i for i, l in enumerate(lines) if "Files checked" in l)
+        self.assertLess(fc_idx, results_idx)
+
+    def test_files_checked_count_correct(self):
+        """Files checked count in the Files: section matches argument."""
+        out = _capture([], 7)
+        lines = [l for l in out.splitlines() if "Files checked" in l]
+        self.assertTrue(any("7" in l for l in lines))
 
 
 if __name__ == "__main__":

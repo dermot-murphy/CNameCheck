@@ -580,5 +580,44 @@ class TestCallStatementNotMisparsedAsDeclaration(unittest.TestCase):
         self.assertFalse(has(src, ON, RULE))
 
 
+# ===========================================================================
+# Regression: function-pointer typedef names must not be mistaken for
+# parameter names (issue #359).
+# ===========================================================================
+
+class TestFunctionPointerTypedefNotFlagged(unittest.TestCase):
+    """Issue #359: typedef void (*fn_t)(void* arg) must not raise p_prefix on
+    the function-pointer name or on substrings of it."""
+
+    def test_fn_ptr_typedef_no_p_prefix_violation(self):
+        """The function-pointer name hal_rtos_thread_entry_t must not be
+        parsed as a parameter."""
+        src = "typedef void (*hal_rtos_thread_entry_t) (void* arg1, void* arg2, void* arg3);\n"
+        self.assertFalse(has(src, ON, RULE),
+            "typedef function-pointer name must not trigger variable.parameter.p_prefix")
+
+    def test_fn_ptr_typedef_no_hread_entry_t_substring(self):
+        """Specifically: 'hread_entry_t' (a substring produced by the old
+        regex backtracking) must not be reported."""
+        src = "typedef void (*hal_rtos_thread_entry_t) (void* arg1);\n"
+        viols = [v for v in run(src, ON) if v.rule == RULE]
+        names = {v.message.split("'")[1] for v in viols}
+        self.assertNotIn("hread_entry_t", names)
+
+    def test_multiple_fn_ptr_typedefs_no_violations(self):
+        """Multiple function-pointer typedefs in one translation unit."""
+        src = (
+            "typedef void (*hal_rtos_thread_entry_t) (void* p_arg1, void* p_arg2);\n"
+            "typedef int  (*hal_callback_t) (uint8_t p_event, uint32_t p_data);\n"
+        )
+        self.assertFalse(has(src, ON, RULE))
+
+    def test_regular_function_declaration_still_checked(self):
+        """A regular function declaration (not typedef) must still be checked."""
+        src = "void hal_init(uint8_t arg1, uint32_t arg2);\n"
+        self.assertTrue(has(src, ON, RULE),
+            "Regular function prototype parameters must still be checked")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

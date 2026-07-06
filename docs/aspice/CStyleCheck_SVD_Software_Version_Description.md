@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SVD-001 | **Version** | 1.21 |
-| **Project** | CStyleCheck | **Date** | 2026-07-01 |
+| **Document ID** | CSC-SVD-001 | **Version** | 1.23 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,8 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.23 | 2026-07-06 | Claude | ASPICE audit — cascade version updates: SWE1→2.6, SWE2→1.12, SWE3→1.16, SWE4→1.20, SWE5→1.14, SWE6→1.16, SYS2→2.2, SYS3→1.6, SYS4→1.11, SYS5→1.8, SUP8→1.11, SUP1→1.9, MAN3→1.7, PA2→1.22 — closes #379 |
+| 1.22 | 2026-07-06 | Claude | v1.6.0 RC doc update — test count 1223→1279 (56 new tests across 8 modules); add D-012–D-016 for startup banner, copyright, path-sep fix, non-ASCII fix, fn_start fix, inline suppression fixes, yoda/constant-case fixes; update CHANGELOG.md ref to v1.6.0 |
 | 1.21 | 2026-07-01 | Claude | v1.6.0 release — update version, rule count 72→73, test count 1183→1223, add F-020/F-021/F-022; update §3.1/§5.5/§10 doc version refs |
 | 1.20 | 2026-06-27 | Cascade: SYS2→2.1, SUP1→1.8 | Dermot Murphy |
 | 1.19 | 2026-06-27 | Cascade cross-ref update: SWE1→2.4, SWE2→1.11, SWE3→1.15, SWE4→1.17, SWE5→1.11, SWE6→1.13, SUP8→1.9 | Dermot Murphy |
@@ -54,15 +56,15 @@ This document satisfies the release-identification and configuration-status-acco
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.5 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.11 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.15 |
-| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.18 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.12 |
-| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.14 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.10 |
-| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.8 |
-| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.6 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.6 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Design | 1.12 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.16 |
+| CSC-SWE4-001 | CStyleCheck Software Unit Verification Specification | 1.20 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.14 |
+| CSC-SWE6-001 | CStyleCheck Software Qualification Test Specification | 1.16 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.11 |
+| CSC-SUP1-001 | CStyleCheck Quality Assurance Plan | 1.9 |
+| CSC-MAN3-001 | CStyleCheck Project Management Plan | 1.7 |
 
 ---
 
@@ -74,7 +76,7 @@ This document satisfies the release-identification and configuration-status-acco
 |---|---|
 | **Product Name** | CStyleCheck |
 | **Version** | 1.6.0 |
-| **Release Date** | 2026-07-01 |
+| **Release Date** | 2026-07-06 |
 | **Release Type** | Minor Release |
 | **Git Tag** | `v1.6.0` |
 | **Branch** | `main` |
@@ -145,16 +147,16 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ### 5.4 Test Suite
 
-**Total: 1223 tests across 53 modules** — all passing.
+**Total: 1279 tests across 53 modules** — all passing.
 
 | Item | Test Count | Description |
 |---|---|---|
 | `tests/test_barr_c.py` | 42 | Barr-C naming rules |
-| `tests/test_yoda_condition.py` | 37 | misc.yoda_condition |
+| `tests/test_yoda_condition.py` | 46 | misc.yoda_condition |
 | `tests/test_reserved_name.py` | 40 | reserved_name |
 | `tests/test_dictionaries.py` | 32 | dict file loading and CLI flags |
 | `tests/test_misc_improvements.py` | 77 | unsigned_suffix, loop vars, numerics |
-| `tests/test_defines.py` | 22 | constant.* / macro.* |
+| `tests/test_defines.py` | 30 | constant.* / macro.* |
 | `tests/test_variables.py` | 43 | all variable.* rules |
 | `tests/test_functions.py` | 14 | function.* |
 | `tests/test_typedefs.py` | 8 | typedef.* |
@@ -173,7 +175,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_whitespace_ratio.py` | 27 | misc.whitespace_ratio (new in v1.2.0) |
 | `tests/test_declared_not_defined.py` | 39 | misc.declared_not_defined (new in v1.2.0) |
 | `tests/test_misra_rules.py` | 64 | MISRA C rule coverage |
-| `tests/test_parameter_prefix.py` | 47 | variable.parameter.* rules |
+| `tests/test_parameter_prefix.py` | 51 | variable.parameter.* rules |
 | `tests/test_exclusions.py` | 28 | per-file rule suppression |
 | `tests/test_github_annotations.py` | 8 | GitHub Actions annotation output |
 | `tests/test_case_patterns.py` | 6 | case-pattern helper functions |
@@ -182,7 +184,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_config_loading.py` | 13 | config.py — load_config UTF-8 handling, missing file, YAML errors |
 | `tests/test_update_config.py` | 27 | config.py — _deep_merge function |
 | `tests/test_workflow_config.py` | 16 | CI workflow configuration regression tests |
-| `tests/test_inline_suppression.py` | 15 | Inline suppression comments (`parse_inline_suppressions`) |
+| `tests/test_inline_suppression.py` | 24 | Inline suppression comments — `//` and `/* */` syntax (`parse_inline_suppressions`) |
 | `tests/test_fix_mode.py` | 11 | Auto-fix engine (`apply_fixes`, `unified_diff`) |
 | `tests/test_init_wizard.py` | 15 | Config wizard and presets (`run_wizard`, `run_preset`) |
 | `tests/test_per_dir_config.py` | 15 | Per-directory config resolution (`resolve_per_dir_config`) |
@@ -198,35 +200,35 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | `tests/test_macro_multistatement_wrapper.py` | 9 | `macro.multistatement_wrapper` rule |
 | `tests/test_identifier_length.py` | 10 | `naming.identifier_length` rule |
 | `tests/test_no_single_char_identifiers.py` | 8 | `naming.no_single_char_identifiers` rule |
-| `tests/test_print_summary.py` | 7 | `print_summary` per-file breakdown |
-| `tests/test_constant_comparison.py` | 21 | `misc.constant_comparison` rule (new in v1.6.0) |
-| `tests/test_unsigned_suffix_signed_params.py` | 9 | `misc.unsigned_suffix` signed-param exemption (new in v1.6.0) |
-| `tests/test_pointer_prefix_fix.py` | 10 | `variable.pointer_prefix` auto-fix mode (new in v1.6.0) |
-| **Total** | **1223** | |
+| `tests/test_print_summary.py` | 11 | `print_summary` per-file breakdown and section labels |
+| `tests/test_constant_comparison.py` | 27 | `misc.constant_comparison` rule (new in v1.6.0) |
+| `tests/test_unsigned_suffix_signed_params.py` | 15 | `misc.unsigned_suffix` signed-param exemption (new in v1.6.0) |
+| `tests/test_pointer_prefix_fix.py` | 20 | `variable.pointer_prefix` auto-fix mode (new in v1.6.0) |
+| **Total** | **1279** | |
 
 ### 5.5 Documentation
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SVD-001 | Software Version Description (this document) | 1.21 |
-| CSC-SWE1-001 | Software Requirements Specification | 2.5 |
-| CSC-SWE2-001 | Software Architecture Design | 1.11 |
-| CSC-SWE3-001 | Software Detailed Design | 1.15 |
-| CSC-SWE4-001 | Software Unit Verification Specification | 1.18 |
-| CSC-SWE5-001 | Software Integration Test Specification | 1.12 |
-| CSC-SWE6-001 | Software Qualification Test Specification | 1.14 |
-| CSC-SYS2-001 | System Requirements Specification | 2.1 |
-| CSC-SYS3-001 | System Architecture Design | 1.5 |
-| CSC-SYS4-001 | System Integration Test Specification | 1.9 |
-| CSC-SYS5-001 | System Verification Specification | 1.7 |
-| CSC-MAN3-001 | Project Management Plan | 1.6 |
+| CSC-SVD-001 | Software Version Description (this document) | 1.23 |
+| CSC-SWE1-001 | Software Requirements Specification | 2.6 |
+| CSC-SWE2-001 | Software Architecture Design | 1.12 |
+| CSC-SWE3-001 | Software Detailed Design | 1.16 |
+| CSC-SWE4-001 | Software Unit Verification Specification | 1.20 |
+| CSC-SWE5-001 | Software Integration Test Specification | 1.14 |
+| CSC-SWE6-001 | Software Qualification Test Specification | 1.16 |
+| CSC-SYS2-001 | System Requirements Specification | 2.2 |
+| CSC-SYS3-001 | System Architecture Design | 1.6 |
+| CSC-SYS4-001 | System Integration Test Specification | 1.11 |
+| CSC-SYS5-001 | System Verification Specification | 1.8 |
+| CSC-MAN3-001 | Project Management Plan | 1.7 |
 | CSC-MAN5-001 | Risk Management Plan | 1.3 |
-| CSC-SUP1-001 | Quality Assurance Plan | 1.8 |
-| CSC-SUP8-001 | Configuration Management Plan | 1.10 |
+| CSC-SUP1-001 | Quality Assurance Plan | 1.9 |
+| CSC-SUP8-001 | Configuration Management Plan | 1.11 |
 | CSC-SUP9-001 | Problem Resolution Plan | 1.2 |
 | CSC-SUP10-001 | Change Request Plan | 1.2 |
 | CSC-ACQ4-001 | Supplier Monitoring Plan | 1.2 |
-| CSC-PA2-001 | Capability Level 2 Records | 1.13 |
+| CSC-PA2-001 | Capability Level 2 Records | 1.22 |
 | CSC-DEV001 | AI Authorship Deviation Record | 1.0 |
 | CSC-DEV002 | Independent Review Deviation Record | 1.0 |
 
@@ -280,14 +282,25 @@ Platforms: `linux/amd64`, `linux/arm64`.
 | D-009 | `docker_publish.yml` `github-release` job's checkout step was missing `token: secrets.GITHUB_TOKEN`, inconsistent with the `build-and-push` job | — |
 | D-010 | 25 new tests (1182 total): 12 in `test_misra_rules.py` (NR-004), 6 in `test_defines.py` (typedef-alias), 7 in `test_print_summary.py` (per-file breakdown) | — |
 
-### 6.5 v1.6.0 New Features and Fixes (2026-07-01)
+### 6.5 v1.6.0 New Features and Fixes (2026-07-01 → 2026-07-06)
 
 | ID | Description | Issue |
 |---|---|---|
 | F-020 | New rule `misc.constant_comparison` — flags `==`/`!=` comparisons where **both** sides are compile-time constants (literals, `true`/`false`/`NULL`, ALL_CAPS identifiers). Distinguishes from `misc.yoda_condition` (which fires when one side is a variable). Exempt contexts: `#define` RHS, `return` statements | [#339](https://github.com/dermot-murphy/CStyleCheck/issues/339) |
 | F-021 | `--fix` auto-fix mode for `variable.pointer_prefix` — renames a non-prefixed pointer parameter throughout the function scope: signature, body, and `@param`/`\param` in the preceding Doxygen block. For `.c` files, also renames the corresponding parameter in the matching `.h` file declaration via `fix_pointer_prefix_in_header()`. Non-safe fix (only applied with `--fix`, not `--safe-only`) | [#341](https://github.com/dermot-murphy/CStyleCheck/issues/341) |
+| F-022 | Startup banner — tool name, version, and copyright notice printed to `stderr` at startup; also written to log file via `tee.log_print()`. Does not appear on stdout/pipeline output | [#369](https://github.com/dermot-murphy/CStyleCheck/issues/369) |
+| F-023 | Copyright notice in `--version` output — `(C) 2026 Dermot Murphy` appended after the version string | [#368](https://github.com/dermot-murphy/CStyleCheck/issues/368) |
+| F-024 | Block-comment inline suppression — `/* cstylecheck: disable=rule.id */` now accepted as an alternative to `//` for all inline suppression directives | [#360](https://github.com/dermot-murphy/CStyleCheck/issues/360) |
+| F-025 | `prerelease_check.sh` and `check_my_project.bat` helper scripts added to repository root for pre-release validation and project self-check | [#343](https://github.com/dermot-murphy/CStyleCheck/issues/343) |
 | B-005 | `misc.unsigned_suffix` false positive on literals passed to signed-type parameters — when a function is declared or defined in the same translation unit with an `int8_t`, `int16_t`, `int32_t`, `int64_t`, `int`, `short`, `long`, or `char` typed parameter, integer literals at the matching argument position are exempt from the unsigned-suffix requirement. Cross-file cases still require `exempt_function_args` | [#340](https://github.com/dermot-murphy/CStyleCheck/issues/340) |
-| D-011 | 40 new tests (1223 total): 21 in `test_constant_comparison.py`, 9 in `test_unsigned_suffix_signed_params.py`, 10 in `test_pointer_prefix_fix.py` | — |
+| B-006 | Function violations reported on wrong line — `RE_FUNCTION_DEF` starts with `(?:^|\n)`, causing `m.start()` to reference the `\n` ending the preceding line. Fixed with `fn_start` correction (`fn_start = m.start()+1 if clean[m.start()] == '\n' else m.start()`); all function-rule violations now reported on the function's own line | [#362](https://github.com/dermot-murphy/CStyleCheck/issues/362), [#363](https://github.com/dermot-murphy/CStyleCheck/issues/363) |
+| B-007 | Function-pointer typedef raised spurious `variable.parameter.p_prefix` — `typedef void (*callback_fn_t)(int x)` was misparsed as a function declaration. Function-pointer typedef patterns now skipped by parameter-prefix check | [#359](https://github.com/dermot-murphy/CStyleCheck/issues/359), [#361](https://github.com/dermot-murphy/CStyleCheck/issues/361) |
+| B-008 | `misc.yoda_condition` false positives — no longer fires on array-element LHS (`arr[i] == val`) or when both operands are constants (deferred to `misc.constant_comparison`) | [#354](https://github.com/dermot-murphy/CStyleCheck/issues/354) |
+| B-009 | `constant.case` false positives on function-call-like or alias-style `#define`s (e.g. `#define api_error_t uint8_t`) | [#355](https://github.com/dermot-murphy/CStyleCheck/issues/355) |
+| B-010 | Non-ASCII characters (em-dash, curly quotes) removed from all terminal, log, and verbose-progress output; all strings now 7-bit ASCII | [#363](https://github.com/dermot-murphy/CStyleCheck/issues/363), [#364](https://github.com/dermot-murphy/CStyleCheck/issues/364) |
+| B-011 | File paths now use OS-native separator (`\` on Windows, `/` on POSIX) throughout verbose output and violation reports via `os.path.normpath()` in `emit()` | [#367](https://github.com/dermot-murphy/CStyleCheck/issues/367) |
+| D-011 | 40 new tests (1223 from v1.5.0 baseline): 21 in `test_constant_comparison.py`, 9 in `test_unsigned_suffix_signed_params.py`, 10 in `test_pointer_prefix_fix.py` | — |
+| D-012 | 56 additional tests (1279 total): +9 in `test_yoda_condition.py` (B-008), +9 in `test_inline_suppression.py` (F-024), +6 in `test_constant_comparison.py` (B-009 edge cases), +8 in `test_defines.py`, +4 in `test_parameter_prefix.py` (B-007), +10 in `test_pointer_prefix_fix.py`, +4 in `test_print_summary.py`, +6 in `test_unsigned_suffix_signed_params.py` | — |
 
 ---
 
@@ -323,7 +336,7 @@ All of the following CI checks must pass before merge to `develop` and sync to `
 
 ### 8.2 Qualification Test Status
 
-All 1223 tests pass with no failures. Test counts per module are documented in §5.4.
+All 1279 tests pass with no failures. Test counts per module are documented in §5.4.
 
 ### 8.3 Docker Build
 
@@ -378,19 +391,19 @@ The `src/cstylecheck.py` entry point shim is unchanged. The 72 rule IDs present 
 |---|---|---|---|
 | System Requirements | CSC-SYS2-001 | 2.1 | Released |
 | System Architecture | CSC-SYS3-001 | 1.5 | Released |
-| System Integration Tests | CSC-SYS4-001 | 1.9 | Released |
+| System Integration Tests | CSC-SYS4-001 | 1.10 | Released |
 | System Verification | CSC-SYS5-001 | 1.7 | Released |
 | Software Requirements | CSC-SWE1-001 | 2.5 | Released |
 | Software Architecture | CSC-SWE2-001 | 1.11 | Released |
 | Detailed Design | CSC-SWE3-001 | 1.15 | Released |
-| Unit Verification | CSC-SWE4-001 | 1.18 | Released |
-| Integration Tests | CSC-SWE5-001 | 1.12 | Released |
-| Qualification Tests | CSC-SWE6-001 | 1.14 | Released |
+| Unit Verification | CSC-SWE4-001 | 1.19 | Released |
+| Integration Tests | CSC-SWE5-001 | 1.13 | Released |
+| Qualification Tests | CSC-SWE6-001 | 1.15 | Released |
 | Source Code | `src/cstylecheck/` (package) | 1.6.0 | Released |
-| Test Suite | `tests/` (1223 tests) | 1.6.0 | Released |
+| Test Suite | `tests/` (1279 tests) | 1.6.0 | Released |
 | CI Automation | `.github/workflows/` + `scripts/ci/` | 1.6.0 | Released |
 | Docker Image | `Dockerfile/Dockerfile` | 1.6.0 | Released |
-| Change Log | `CHANGELOG.md` | 1.5.0 | Released |
+| Change Log | `CHANGELOG.md` | 1.6.0 | Released |
 
 ---
 
@@ -398,13 +411,13 @@ The `src/cstylecheck.py` entry point shim is unchanged. The 72 rule IDs present 
 
 | Role | Name | Signature / Electronic Approval | Date |
 |---|---|---|---|
-| Author | Claude | Approved | 2026-06-27 |
-| Technical Reviewer | Dermot Murphy | Approved | 2026-06-27 |
-| Quality Assurance | Dermot Murphy | Approved | 2026-06-27 |
-| Approver | Dermot Murphy | Approved | 2026-06-27 |
+| Author | Claude | Approved | 2026-07-06 |
+| Technical Reviewer | Dermot Murphy | Pending | — |
+| Quality Assurance | Dermot Murphy | Pending | — |
+| Approver | Dermot Murphy | Pending | — |
 
 > **Note:** This document is under configuration management (SUP.8). Post-approval changes require a change request (SUP.10) and a new document version.
 
 ---
 
-*End of Software Version Description — CStyleCheck v1.5.0*
+*End of Software Version Description — CStyleCheck v1.6.0*
