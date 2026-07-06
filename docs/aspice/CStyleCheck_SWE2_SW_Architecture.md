@@ -9,7 +9,7 @@
 | Field | Value | Field | Value |
 |---|---|---|---|
 | **Document ID** | CSC-SWE2-001 | **Version** | 1.12 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.2 |
