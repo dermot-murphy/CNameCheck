@@ -501,9 +501,10 @@ def main() -> int:
         if getattr(args, "verbose", False):
             _n = len(files)
             _msg = f"Found {_n} file(s) - starting analysis..."
-            print(f"{_msg:<79}", file=sys.stderr, flush=True)
             if sys.stderr.isatty():
-                print(file=sys.stderr, flush=True)  # blank line — \r progress lands below "Found…"
+                # Clear any leftover chars beyond col 79 from long discovery paths
+                print("\r" + " " * 120, end="\r", file=sys.stderr, flush=True)
+            print(f"{_msg:<79}", file=sys.stderr, flush=True)
 
         output_format  = getattr(args, "output_format", "text")
         all_violations: list = []
@@ -562,7 +563,12 @@ def main() -> int:
             result  = checker.run_all()
             all_violations.extend(result.violations)
 
-            if output_format == "text":
+            # In verbose+TTY mode defer violation printing: the cursor is at col 0
+            # of the progress line (left there by \r), so printing to stdout here
+            # would corrupt it.  Violations are flushed after the progress line
+            # is cleared below.
+            _verbose_tty = getattr(args, "verbose", False) and sys.stderr.isatty()
+            if output_format == "text" and not _verbose_tty:
                 for v in sorted(result.violations, key=lambda x: (x.line, x.col)):
                     if args.github_actions:
                         tee.print(v.github_annotation())
@@ -570,7 +576,17 @@ def main() -> int:
                         tee.print(v)
 
         if getattr(args, "verbose", False) and sys.stderr.isatty():
-            print("\r" + " " * 79, file=sys.stderr)  # erase progress line, advance cursor
+            print("\r" + " " * 120, file=sys.stderr)  # erase progress line (wide), advance cursor
+
+        # Flush deferred violations (verbose+TTY mode) now that the progress line
+        # has been cleared and the cursor is on a clean line.
+        if output_format == "text" and getattr(args, "verbose", False) and sys.stderr.isatty():
+            for v in sorted(all_violations,
+                            key=lambda x: (x.filepath, x.line, x.col)):
+                if args.github_actions:
+                    tee.print(v.github_annotation())
+                else:
+                    tee.print(v)
         # Cross-file sign-compatibility check (needs all files ingested first).
         # Uses the source cache so no file is read from disk a second time.
         sign_cfg = cfg.get("sign_compatibility", {})
