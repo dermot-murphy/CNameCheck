@@ -148,7 +148,7 @@ def discover_files(
         abs_p = os.path.abspath(p)
         if abs_p not in seen and not is_ignored(p):
             seen.add(abs_p)
-            yield p
+            yield os.path.normpath(p)
 
     for f in explicit:
         yield from emit(f)
