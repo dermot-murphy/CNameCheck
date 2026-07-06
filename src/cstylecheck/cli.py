@@ -34,7 +34,7 @@ from .sign_checker import SignChecker, DeclaredNotDefinedChecker
 from .baseline import load_baseline, write_baseline, _baseline_key
 from .output import Tee, _violations_to_json, _violations_to_sarif, _violations_to_html, print_summary
 from .wizard import run_wizard, run_preset, PRESETS
-from . import _TOOL_NAME, _VERSION, _VERSION_STRING
+from . import _TOOL_NAME, _VERSION, _VERSION_STRING, _COPYRIGHT
 
 
 # ---------------------------------------------------------------------------
@@ -370,6 +370,7 @@ def main() -> int:
     raw_argv = sys.argv[1:]
     if "--version" in raw_argv:
         print(_VERSION_STRING)
+        print(_COPYRIGHT)
         return 0
     if "-h" in raw_argv or "--help" in raw_argv:
         # Re-parse with a temporary parser just to print help, then exit 0
@@ -395,6 +396,7 @@ def main() -> int:
         return 0
     if getattr(args, "version", False):
         print(_VERSION_STRING)
+        print(_COPYRIGHT)
         return 0
 
     # --update-config: merge new defaults into the config file and exit.
@@ -762,7 +764,7 @@ def main() -> int:
             tee.print(html_text)
 
         if args.summary and output_format == "text":
-            print_summary(all_violations, len(files), tee, _VERSION_STRING)
+            print_summary(all_violations, len(files), tee, _VERSION_STRING, _COPYRIGHT)
 
         if args.exit_zero:
             return 0

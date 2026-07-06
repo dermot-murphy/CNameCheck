@@ -261,7 +261,7 @@ def _violations_to_html(violations: list, files_checked: int,
 # ---------------------------------------------------------------------------
 
 def print_summary(all_violations: list, files_checked: int, tee: Tee,
-                  version_string: str = "") -> None:
+                  version_string: str = "", copyright_string: str = "") -> None:
     errors   = sum(1 for v in all_violations if v.severity == "error")
     warnings = sum(1 for v in all_violations if v.severity == "warning")
     infos    = sum(1 for v in all_violations if v.severity == "info")
@@ -269,6 +269,8 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee,
     tee.print("=" * 60)
     if version_string:
         tee.print(f"  {version_string}")
+        if copyright_string:
+            tee.print(f"  {copyright_string}")
         tee.print(f"  Run at: {now}")
         tee.print("=" * 60)
     # Per-file breakdown: bucket each file into errors / warnings / info / ok

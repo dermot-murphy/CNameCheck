@@ -38,6 +38,7 @@ except ImportError:
             _VERSION = "0.0.0.dev"
 
 _VERSION_STRING = f"{_TOOL_NAME} {_VERSION}"
+_COPYRIGHT = "(C) 2026 Dermot Murphy"
 
 # ---------------------------------------------------------------------------
 # Re-export everything from sub-modules (public API)
