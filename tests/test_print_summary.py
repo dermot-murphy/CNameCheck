@@ -90,10 +90,10 @@ class TestPrintSummaryPerFileBreakdown(unittest.TestCase):
 class TestPrintSummaryLabels(unittest.TestCase):
     """Issue #352: section labels and Files checked placement."""
 
-    def test_errors_and_warnings_label_present(self):
-        """Top section must be labelled 'Errors & Warnings:'."""
+    def test_results_label_present(self):
+        """Results section must be labelled 'Results:'."""
         out = _capture([_v("a.c", "error")], 1)
-        self.assertIn("Errors & Warnings:", out)
+        self.assertIn("Results:", out)
 
     def test_files_checked_in_files_section(self):
         """'Files checked' must appear in the Files: section, not above it."""
@@ -103,13 +103,13 @@ class TestPrintSummaryLabels(unittest.TestCase):
         files_checked_idx = next(i for i, l in enumerate(lines) if "Files checked" in l)
         self.assertGreater(files_checked_idx, files_label_idx)
 
-    def test_files_checked_not_in_errors_section(self):
-        """'Files checked' must NOT appear before the Errors & Warnings label."""
+    def test_files_checked_before_results_section(self):
+        """'Files checked' must appear in the Files: section, before the Results: label."""
         out = _capture([_v("a.c", "warning")], 2)
         lines = out.splitlines()
-        ew_idx = next(i for i, l in enumerate(lines) if "Errors & Warnings:" in l)
+        results_idx = next(i for i, l in enumerate(lines) if "Results:" in l)
         fc_idx = next(i for i, l in enumerate(lines) if "Files checked" in l)
-        self.assertGreater(fc_idx, ew_idx)
+        self.assertLess(fc_idx, results_idx)
 
     def test_files_checked_count_correct(self):
         """Files checked count in the Files: section matches argument."""
