@@ -299,12 +299,14 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee,
         tee.print(f"    Files clean         : {files_clean}")
         tee.print("=" * 60)
 
+    _total = errors + warnings + infos
+    _val_w = len(str(max(errors, warnings, infos, _total, 1)))
     tee.print("  Results:")
     tee.print(f"    {'Errors':<20}: {errors}")
     tee.print(f"    {'Warnings':<20}: {warnings}")
     tee.print(f"    {'Info':<20}: {infos}")
-    tee.print(f"    {'-' * 22}")
-    tee.print(f"    {'Total':<20}: {errors + warnings + infos}")
+    tee.print(f"    {'-' * (22 + _val_w)}")
+    tee.print(f"    {'Total':<20}: {_total}")
     rule_counts: Counter = Counter(v.rule for v in all_violations)
     if rule_counts:
         tee.print("=" * 60)
