@@ -412,7 +412,23 @@ class Checker:
                 and name.lower().endswith(td_suffix.lower())
             )
 
-            if not is_typedef_alias and not matches_case(name, expected_case):
+            # Skip constant.case when the RHS is a single bare identifier that
+            # is NOT itself an ALL_CAPS constant or boolean/null keyword: the
+            # define is a function/type/symbol alias, not a constant value.
+            # e.g. #define MW_KX134_HAL_PowerOnInit  HAL_Acc_PowerOnInit
+            #      #define module_my_type_t          uint8_t
+            # ALL_CAPS RHS (e.g. SOME_OTHER_CONST) is still a constant alias
+            # so the LHS case check still applies.  issue #355
+            _BOOL_NULL = {"true", "false", "TRUE", "FALSE", "NULL", "nullptr"}
+            is_fn_alias = (
+                not is_fn
+                and bool(re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]*', rest))
+                and not re.fullmatch(r'[A-Z][A-Z0-9_]*', rest)
+                and rest not in _BOOL_NULL
+            )
+
+            if not is_typedef_alias and not is_fn_alias \
+                    and not matches_case(name, expected_case):
                 self._v(m.start(), sev, f"{rule_pfx}.case",
                         f"{label} '{name}' must be {expected_case}")
 
