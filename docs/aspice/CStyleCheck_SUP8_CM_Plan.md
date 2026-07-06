@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP8-001 | **Version** | 1.10 |
-| **Project** | CStyleCheck | **Date** | 2026-07-01 |
+| **Document ID** | CSC-SUP8-001 | **Version** | 1.11 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.8 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.11 | 2026-07-06 | Claude | ASPICE audit — add prerelease_check.sh, check_my_project.bat, DOCKERHUB_README.md to CI list — closes #379 |
 | 1.10 | 2026-07-01 | Claude | v1.6.0 release — update §3.1 scope to v1.6.0; update §3.3 SWE1 ref 2.4→2.5 |
 | 1.9 | 2026-06-27 | Fix §3.3 cross-ref: SWE1 2.2→2.4 (+ any other stale refs fixed) | Dermot Murphy |
 | 1.8 | 2026-06-27 | Claude | ASPICE audit — §3.1 scope v1.2.0→v1.5.0; §3.3 SWE1 ref 1.9→2.2; update Review & Approval dates — closes #321 #323 |
@@ -152,6 +153,9 @@ All items in the following table are placed under configuration control.
 | CI-032 | Independent Review Deviation Record | `docs/aspice/CStyleCheck_DEV002_Independent_Review_Deviation.md` | Documentation |
 | CI-033 | Software Version Description | `docs/aspice/CStyleCheck_SVD_Software_Version_Description.md` | Documentation |
 | CI-034 | CI — wiki publish workflow | `.github/workflows/wiki_publish.yml` | CI/CD |
+| CI-035 | Pre-release validation script | `scripts/prerelease_check.sh` | CI/CD script |
+| CI-036 | Pre-release validation script (Windows) | `scripts/check_my_project.bat` | CI/CD script |
+| CI-037 | DockerHub repository description | `DOCKERHUB_README.md` | Documentation |
 
 ### 6.2 Identification Scheme
 
@@ -293,7 +297,7 @@ Configuration status shall be accessible at any time via:
 
 Performed prior to each release baseline to verify:
 
-- [ ] All CI-001 to CI-034 items are present and committed
+- [ ] All CI-001 to CI-037 items are present and committed
 - [ ] Version in `_version.py` (CI-002) matches the intended tag
 - [ ] All unit tests pass on Python 3.10, 3.11, 3.12
 - [ ] Naming convention workflow passes on current source

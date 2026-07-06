@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-MAN3-001 | **Version** | 1.6 |
-| **Project** | CStyleCheck | **Date** | 2026-06-18 |
+| **Document ID** | CSC-MAN3-001 | **Version** | 1.7 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | MAN.3 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.7 | 2026-07-06 | Claude | ASPICE audit — update WBS-07 and WBS-10 stale test counts — closes #379 |
 | 1.6 | 2026-06-18 | Claude | ASPICE audit #254 — sync referenced-document version citations to current versions |
 | 1.5 | 2026-06-04 | Claude | Deep accuracy audit: fix §3 Purpose version text v1.0.0→v1.2.0, update SWE1-001 version in §3.2 (1.3→1.5) — resolves issue #163 |
 | 1.4 | 2026-06-04 | Claude | Automated accuracy audit: fix §3.1 version, §4.1 rule count 48→53 and package reference, update test count and module count, update referenced doc versions, update WBS-10 status — resolves issue #163 |
@@ -63,7 +64,7 @@ This Project Management Plan (PMP) defines the project scope, lifecycle, work br
 ### 4.1 In Scope
 
 - Design, implementation, and testing of `src/cstylecheck/` package (10 sub-modules) implementing 53 rule IDs
-- Test suite (965 pytest tests across 33 test modules)
+- Test suite (1279 pytest tests across 53 test modules)
 - Docker image build and multi-platform publication to GHCR and Docker Hub
 - GitHub Action integration (`action.yml`)
 - pre-commit hook integration (`.pre-commit-hooks.yml`)
@@ -125,10 +126,10 @@ Requirements  →  Architecture  →  Detailed Design  →  Implementation
 | WBS-04 | Software architecture (SWE.2) | 6h | Claude | Complete |
 | WBS-05 | Detailed design (SWE.3) | 8h | Claude | Complete |
 | WBS-06 | Core linter implementation | 80h | Claude | Complete |
-| WBS-07 | Test suite (500+ tests) | 40h | Claude | Complete |
+| WBS-07 | Test suite (1279 tests) | 40h | Claude | Complete |
 | WBS-08 | Docker packaging and CI | 8h | Claude | Complete |
 | WBS-09 | GitHub Action and pre-commit | 6h | Claude | Complete |
-| WBS-10 | Unit verification (SWE.4) | 4h | Claude | Complete — 965 tests across 33 modules; SWE4 catalogue updated (issues #148, #163 resolved) |
+| WBS-10 | Unit verification (SWE.4) | 4h | Claude | Complete — 1279 tests across 53 modules; SWE4 catalogue updated (issues #148, #163 resolved) |
 | WBS-11 | Integration testing (SWE.5) | 4h | Claude | In Progress — blocked by #152 (results recording); test execution complete |
 | WBS-12 | Qualification testing (SWE.6) | 4h | Claude | Largely Complete — CI pipeline constitutes qualification execution; result recording open (issue #152) |
 | WBS-13 | System integration testing (SYS.4) | 4h | Claude | In Progress — blocked by #152 (results recording); test execution complete |

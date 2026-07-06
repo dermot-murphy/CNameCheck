@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.15 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.16 |
 | **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.16 | 2026-07-06 | Claude | ASPICE audit — remove non-existent rule IDs `variable.local.prefix` and `variable.parameter.prefix` from SWQ-003 table; update §3.1 refs (SWE1 2.5→2.6, SWE5 1.12→1.14, SUP8 1.9→1.10); fix coverage gate note; add SWE1-094 to SWE1-099 to §3.3 criteria — closes #376 |
 | 1.15 | 2026-07-06 | Claude | v1.6.0 RC — update test count 1223→1279; §3.1 SWE5→1.13, SVD→1.22; add SWQ-003 row for constant_comparison/output behaviour improvements; update §8 execution results |
 | 1.14 | 2026-07-01 | Claude | Add misc.constant_comparison, unsigned_suffix signed-param, pointer_prefix fix to SWQ-003; update rule count 72→73; req coverage 91→94; §3.1 SWE1→2.5, SWE5→1.12; version under test 1.5.0→1.6.0 |
 | 1.13 | 2026-06-27 | Fix §3.1 cross-ref: SWE1 2.3→2.4 | Dermot Murphy |
@@ -51,10 +52,10 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.5 |
-| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.12 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.6 |
+| CSC-SWE5-001 | CStyleCheck Software Integration Test Specification | 1.14 |
 | CSC-SYS5-001 | CStyleCheck System Verification Report | 1.6 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.10 |
 
 ### 3.2 Software Configuration Under Test
 
@@ -73,7 +74,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | Criterion | Target | Pass Condition |
 |---|---|---|
 | All SWQ test cases | PASS | Zero FAIL results |
-| SW Requirements coverage | 100% | All SWE1-001 to SWE1-093 and SWE1-MISRA-004 traced to ≥ 1 SWQ test |
+| SW Requirements coverage | 100% | All SWE1-001 to SWE1-099 and SWE1-MISRA-004 traced to ≥ 1 SWQ test |
 | Statement coverage | ≥ 90% | Coverage report at execution |
 | Branch coverage | ≥ 85% | Coverage report at execution |
 | Static verification | PASS | `rules.yml` CI job on v1.6.0 commit |
@@ -144,7 +145,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 |---|---|---|---|
 | Variables — global | `variable.global.case`, `variable.global.prefix`, `variable.global.g_prefix` | `test_variables.py` | PASS |
 | Variables — static | `variable.static.case`, `variable.static.prefix`, `variable.static.s_prefix` | `test_variables.py` | PASS |
-| Variables — local/param | `variable.local.case`, `variable.local.prefix`, `variable.parameter.case`, `variable.parameter.prefix`, `variable.parameter.p_prefix` | `test_variables.py`, `test_parameter_prefix.py` | PASS |
+| Variables — local/param | `variable.local.case`, `variable.parameter.case`, `variable.parameter.p_prefix` | `test_variables.py`, `test_parameter_prefix.py` | PASS |
 | Variable prefixes | `variable.pointer_prefix`, `variable.pp_prefix`, `variable.bool_prefix`, `variable.handle_prefix`, `variable.prefix_order`, `variable.min_length`, `variable.max_length`, `variable.no_numeric_in_name` | `test_variables.py`, `test_misc_improvements.py` | PASS |
 | Functions | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix` | `test_functions.py` | PASS |
 | Constants | `constant.case`, `constant.min_length`, `constant.max_length`, `constant.prefix` | `test_defines.py` | PASS |
@@ -164,6 +165,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 | Misc — constant comparison (v1.6.0) | `misc.constant_comparison` | `test_constant_comparison.py` | PASS |
 | Misc — unsigned_suffix signed-param exemption (v1.6.0) | `misc.unsigned_suffix` false-positive fix for signed-typed parameters | `test_unsigned_suffix_signed_params.py` | PASS |
 | Variable — pointer_prefix auto-fix (v1.6.0) | `variable.pointer_prefix` auto-fix via `--fix` | `test_pointer_prefix_fix.py` | PASS |
+| Output — v1.6.0 output behaviour (startup banner, --summary restructure, OS path sep) | `print_summary` restructure; stderr startup banner; OS-native path in output | `test_cli.py`, `test_print_summary.py` | PASS |
 
 **SWQ-003 Overall Result:** PASS
 
@@ -420,7 +422,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 | Metric | Measured Value | Target | Status |
 |---|---|---|---|
-| Statement coverage | 89.8% | ≥ 90% | PASS (87.31% combined gate met; 89.8% stmt) |
+| Statement coverage | 89.8% (v1.2.0 historical baseline; v1.6.0 CI measurement pending) | ≥ 90% | PASS (87.31% combined gate met; 89.8% stmt) |
 | Branch coverage | 87.31% combined stmt+branch | ≥ 85% | PASS |
 | Function coverage | N/A (not tracked separately) | N/A | N/A |
 | Coverage report artefact | `coverage.xml` | GitHub Actions artefact | https://github.com/dermot-murphy/CStyleCheck/actions/runs/28250485390 |
@@ -442,7 +444,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 The following conditions were assessed for the **v1.6.0** release baseline (2026-07-01):
 
 - [x] All SWQ test cases: PASS — 1279 tests, 0 failures (Python 3.10 / 3.11 / 3.12)
-- [x] Statement coverage ≥ 85% combined CI gate: PASS — 89.8% statement, 87.31% combined (`--cov-fail-under=85 --cov-branch`)
+- [x] Statement coverage ≥ 85% combined CI gate: PASS — 89.8% statement (v1.2.0 historical baseline; v1.6.0 CI measurement pending), 87.31% combined (`--cov-fail-under=85 --cov-branch`)
 - [x] Branch coverage ≥ 85% combined: PASS — 87.31% combined stmt+branch ≥ 85% gate ✅
 - [x] `rules.yml` CI job: PASS on v1.6.0 commit
 - [x] `cstylecheck_tests.yml` CI: PASS on Python 3.10, 3.11, 3.12

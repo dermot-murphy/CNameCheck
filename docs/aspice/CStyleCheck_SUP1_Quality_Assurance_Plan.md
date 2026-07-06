@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SUP1-001 | **Version** | 1.8 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SUP1-001 | **Version** | 1.9 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SUP.1 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.9 | 2026-07-06 | Claude | ASPICE audit — update quality objectives to v1.6.0 actuals — closes #379 |
 | 1.8 | 2026-06-27 | Fix §3.1 cross-refs: SUP8 1.7→1.9, SWE4 1.14→1.17 | Dermot Murphy |
 | 1.7 | 2026-06-26 | Claude | ASPICE audit — update §3.1 SWE4 ref (1.12→1.14) — closes #306 #329 |
 | 1.6 | 2026-06-26 | Claude | Update §3 scope to v1.5.0 (minor release: F-017 misc.non_ascii_source, F-018 per-file summary, F-019 constant.case typedef exemption, B-004 RE_FUNCTION_DECL fix) |
@@ -56,10 +57,10 @@ QA activities for CStyleCheck verify that project processes are followed as plan
 |---|---|---|---|
 | QO-001 | All unit tests pass on all supported Python versions | 100% PASS on 3.10, 3.11, 3.12 | `cstylecheck_tests.yml` CI result |
 | QO-002 | Source code naming conventions self-compliant | Zero error-level violations on `cstylecheck.py` | `rules.yml` CI result |
-| QO-003 | Statement code coverage | ≥ 85% combined statement + branch (CI gate; `--cov-fail-under=85`); aspirational long-term target ≥ 90% statement (issue #54 — closed; actual v1.2.0: 89.8% statement, 87.31% combined) | `pytest-cov` coverage report |
-| QO-004 | Branch code coverage | ≥ 85% (combined with statement via `--cov-branch`; v1.2.0 actual: 87.31% combined) | `pytest-cov` coverage report |
+| QO-003 | Statement code coverage | ≥ 85% combined statement + branch (CI gate; `--cov-fail-under=85`); aspirational long-term target ≥ 90% statement (issue #54 — closed; v1.2.0 historical baseline: 89.8% statement, 87.31% combined; v1.6.0 CI measurement pending) | `pytest-cov` coverage report |
+| QO-004 | Branch code coverage | ≥ 85% (combined with statement via `--cov-branch`; v1.2.0 historical baseline: 87.31% combined; v1.6.0 CI measurement pending) | `pytest-cov` coverage report |
 | QO-005 | All ASPICE CL2 work products documented and reviewed | 100% of required WPs approved | Document review records |
-| QO-006 | All GitHub Issues resolved before release | Zero open bug-labelled Issues at v1.2.0 tag | GitHub Issues board |
+| QO-006 | All GitHub Issues resolved before release | Zero open bug-labelled Issues at v1.6.0 tag | GitHub Issues board |
 | QO-007 | All releases reproducible from baseline | Docker image digest recorded per release | GitHub Actions run log |
 
 ---

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE2-001 | **Version** | 1.11 |
+| **Document ID** | CSC-SWE2-001 | **Version** | 1.12 |
 | **Project** | CStyleCheck | **Date** | 2026-06-27 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.12 | 2026-07-06 | Claude | ASPICE audit — v1.6.0: update scope to v1.6.0; §3.1 refs (SWE1 2.4→2.6, SWE3 1.15→1.16, SUP8 1.9→1.10); add models.py/utils.py as COMP-11/COMP-12; update COMP-01 (startup banner), COMP-05b (fn_start), COMP-07 (Tee.log_print), COMP-08 (pointer_prefix fix); update §10 RTM with SWE1-091–099 — closes #372 |
 | 1.11 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.3→2.4, SWE3 1.14→1.15; fix header date | Dermot Murphy |
 | 1.10 | 2026-06-27 | Fix §3.1 cross-refs: SWE1 2.1→2.3, SWE3 1.12→1.14 | Dermot Murphy |
 | 1.9 | 2026-06-26 | Claude | v1.9 — ASPICE audit corrections: fix §3 scope text (v1.2.x→v1.5.0); update §3.1 SWE1/SWE3 version refs; add v1.4.0/v1.5.0 methods to §8.1 run_all() sequence; add SWE1-MISRA-004/SWE1-089/SWE1-090 to §10 RTM — closes #307 |
@@ -37,7 +38,7 @@
 
 ## 3. Purpose & Scope
 
-This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.5.0**. It refines the system architecture (CSC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
+This Software Architecture Description defines the internal structure, component decomposition, interfaces, and dynamic behaviour of **CStyleCheck v1.6.0**. It refines the system architecture (CSC-SYS3-001) to the software component level, providing the design basis for detailed design (SWE.3) and integration testing (SWE.5).
 
 This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Architectural Design**.
 
@@ -45,10 +46,10 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.2 — Software Archit
 
 | Document ID | Title | Version |
 |---|---|---|
-| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.4 |
+| CSC-SWE1-001 | CStyleCheck Software Requirements Specification | 2.6 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.15 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
+| CSC-SWE3-001 | CStyleCheck Software Detailed Design | 1.16 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.10 |
 
 ---
 
@@ -108,7 +109,7 @@ src/cstylecheck/   (package — 12 sub-modules)
 | **Responsibility** | Parse command-line arguments; expand `--options-file` tokens before direct CLI args; resolve source file lists from globs; validate invocation |
 | **Inputs** | `sys.argv`; options file on disk |
 | **Outputs** | `argparse.Namespace` object; resolved `[filepath]` list |
-| **Key behaviour** | Options-file tokens are injected before direct argv tokens so direct args always take precedence |
+| **Key behaviour** | Options-file tokens are injected before direct argv tokens so direct args always take precedence; `main()` writes a one-line startup banner (tool name, version, copyright) to `stderr` before processing |
 
 ### COMP-02 — Configuration Loader
 
@@ -158,7 +159,7 @@ The `Checker` class is the central analysis component. It is instantiated once p
 
 | Method | Key Regex | Rules Enforced |
 |---|---|---|
-| `_check_functions()` | `RE_FUNC_DEF` | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix` |
+| `_check_functions()` | `RE_FUNC_DEF` | `function.prefix`, `function.style`, `function.min_length`, `function.max_length`, `function.static_prefix`; corrects `fn_start` line to the function-name line when signature spans multiple lines |
 
 #### COMP-05c — Define Checker
 
@@ -223,7 +224,7 @@ The `Checker` class is the central analysis component. It is instantiated once p
 
 | Attribute | Value |
 |---|---|
-| **Source functions** | `_violations_to_json()`, `_violations_to_sarif()`, `_violations_to_html()`, `print_summary()`, `class Tee` |
+| **Source functions** | `_violations_to_json()`, `_violations_to_sarif()`, `_violations_to_html()`, `print_summary()`, `class Tee`; `Tee.log_print()` mirrors output to log file; `print_summary()` emits Files section before Results with version header and dynamic separator |
 | **Source method** | `Violation.__str__()`, `Violation.github_annotation()` |
 | **Responsibility** | Render violations in text/JSON/SARIF/HTML; emit GitHub annotations; duplicate stdout to log file via `Tee`; print summary table |
 
@@ -232,7 +233,7 @@ The `Checker` class is the central analysis component. It is instantiated once p
 | Attribute | Value |
 |---|---|
 | **Source module** | `fixer.py` |
-| **Responsibility** | Apply safe mechanical fixes in-place (`--fix`); show unified diff without writing (`--dry-run`); restrict to zero-risk fixes (`--safe-only`); currently fixable: `misc.unsigned_suffix` and `misc.lowercase_l_suffix` |
+| **Responsibility** | Apply safe mechanical fixes in-place (`--fix`); show unified diff without writing (`--dry-run`); restrict to zero-risk fixes (`--safe-only`); currently fixable: `misc.unsigned_suffix`, `misc.lowercase_l_suffix`, and `variable.pointer_prefix` (via `_fix_pointer_prefix` and `fix_pointer_prefix_in_header`) |
 | **Inputs** | Source file list, violation list, CLI flags (`--fix`, `--dry-run`, `--safe-only`) |
 | **Outputs** | Modified source files on disk, or unified diff to stdout |
 
@@ -253,6 +254,22 @@ The `Checker` class is the central analysis component. It is instantiated once p
 | **Responsibility** | Walk upward from each source file's directory looking for `.cstylecheck.yml`; deep-merge found configs on top of the root config; the nearest (deepest) config wins; stop upward search at `root: true` or filesystem root; cache results per directory |
 | **Inputs** | Source file path, root config dict |
 | **Outputs** | Merged config dict for that file |
+
+### COMP-11 — Data Models (`models.py`)
+
+| Attribute | Value |
+|---|---|
+| **Source module** | `models.py` |
+| **Responsibility** | Define shared data structures used across all components: `Violation`, `CheckResult`, `_ParamSig`, `_FuncSig`; provide `Violation.__str__()` (plain-text rendering with OS-native path separator) and `Violation.github_annotation()` |
+| **Used by** | All COMP-05 sub-checkers, COMP-06, COMP-07 |
+
+### COMP-12 — Shared Utilities (`utils.py`)
+
+| Attribute | Value |
+|---|---|
+| **Source module** | `utils.py` |
+| **Responsibility** | Provide shared stateless helper functions: `matches_case()`, `matches_case_abbrev()`, `to_case()`, `module_name()`, `is_exempt()`, `_cfg()`, `_strip_module_prefix()`, `_github_annotation_category()`; used by the Rule Engine to avoid duplication across sub-checkers |
+| **Used by** | COMP-05 (all sub-checkers), COMP-07 |
 
 ---
 
@@ -392,6 +409,15 @@ main()
 | SWE1-MISRA-004 | `misc.non_ascii_source` — MISRA C:2012/2023 Rule 4.1 (non-ASCII characters in source files) | COMP-05f |
 | SWE1-089 | per-file breakdown in `--summary` output | COMP-07 |
 | SWE1-090 | `constant.case` typedef-alias exemption | COMP-05c |
+| SWE1-091 | `misc.constant_comparison` rule | COMP-05f |
+| SWE1-092 | `misc.unsigned_suffix` signed-param exemption | COMP-05f |
+| SWE1-093 | `variable.pointer_prefix` auto-fix | COMP-08 |
+| SWE1-094 | Startup banner to stderr | COMP-01 |
+| SWE1-095 | Copyright in `--version` output | COMP-01 |
+| SWE1-096 | OS-native path separator | COMP-11 (COMP-07) |
+| SWE1-097 | `print_summary()` restructure | COMP-07 |
+| SWE1-098 | `fn_start` line correction | COMP-05b |
+| SWE1-099 | Function-pointer typedef exemption from `variable.pointer_prefix` | COMP-05a |
 
 ---
 

@@ -8,7 +8,7 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE1-001 | **Version** | 2.5 |
+| **Document ID** | CSC-SWE1-001 | **Version** | 2.6 |
 | **Project** | CStyleCheck | **Date** | 2026-07-01 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.6 | 2026-07-06 | Claude | ASPICE audit — add SWE1-094 to SWE1-099 for v1.6.0 features (startup banner, copyright in --version, block-comment suppression, OS path sep, --summary restructure, fn_start correction, fn-ptr typedef exemption); update SWE1-072 for /* */ form; update SWE1-074 for pointer_prefix fix; update §3.2 cross-refs (SWE2 1.11→1.12, SUP8 1.9→1.10); update RTM — closes #371 |
 | 2.5 | 2026-07-01 | Claude | Add SWE1-091 (misc.constant_comparison), SWE1-092 (unsigned_suffix signed-param exemption), SWE1-093 (variable.pointer_prefix auto-fix); update §3.1 scope to v1.6.0; update RTM — closes #339 #340 #341 |
 | 2.4 | 2026-06-27 | Fix §3.2 cross-refs: cascade update (SWE2 1.9→1.11 + any other stale refs fixed) | Dermot Murphy |
 | 2.3 | 2026-06-27 | Fix §3.2 cross-ref: SYS2 1.9→2.0 | Dermot Murphy |
@@ -55,8 +56,8 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 |---|---|---|
 | CSC-SYS2-001 | CStyleCheck System Requirements Specification | 2.0 |
 | CSC-SYS3-001 | CStyleCheck System Architecture Description | 1.5 |
-| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.11 |
-| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.9 |
+| CSC-SWE2-001 | CStyleCheck Software Architecture Description | 1.12 |
+| CSC-SUP8-001 | CStyleCheck Configuration Management Plan | 1.10 |
 | Barr-C:2018 | Barr Group Embedded C Coding Standard | 2018 |
 | ASPICE PAM v4.0 | Automotive SPICE Process Assessment Model | 4.0 |
 
@@ -227,9 +228,9 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 
 | SW-REQ-ID | Requirement | Priority | Verification | Parent |
 |---|---|---|---|---|
-| SWE1-072 | The `preprocessor.parse_inline_suppressions()` function shall parse `// cstylecheck: disable=rule.id` and `// cstylecheck: enable=rule.id` directives in C source; directives shall be case-insensitive and shall support comma-separated lists of rule IDs | Mandatory | Test | SYS-F-008 |
+| SWE1-072 | The `preprocessor.parse_inline_suppressions()` function shall parse `// cstylecheck: disable=rule.id` and `// cstylecheck: enable=rule.id` directives in C source, and equivalently `/* cstylecheck: disable=rule.id */` block-comment form on the same line; directives shall be case-insensitive and shall support comma-separated lists of rule IDs | Mandatory | Test | SYS-F-008 |
 | SWE1-073 | The `parse_inline_suppressions()` function shall support `disable-next-line=rule.id` to suppress the immediately following non-blank, non-comment line; a `disable=rule.id` on the same line as code shall suppress that line only; an unpaired `disable=` shall suppress from that point to end of file | Mandatory | Test | SYS-F-008 |
-| SWE1-074 | The `fixer.py` module shall apply safe mechanical in-place fixes when `--fix` is specified; `--dry-run` shall display a unified diff without writing; `--safe-only` shall restrict fixes to zero-risk substitutions; currently fixable rules: `misc.unsigned_suffix` (`42u` → `42U`) and `misc.lowercase_l_suffix` (`100l` → `100L`) | Mandatory | Test | SYS-F-020 |
+| SWE1-074 | The `fixer.py` module shall apply safe mechanical in-place fixes when `--fix` is specified; `--dry-run` shall display a unified diff without writing; `--safe-only` shall restrict fixes to zero-risk substitutions; currently fixable rules: `misc.unsigned_suffix` (`42u` → `42U`), `misc.lowercase_l_suffix` (`100l` → `100L`), and `variable.pointer_prefix` (rename via `_fix_pointer_prefix` — see SWE1-093) | Mandatory | Test | SYS-F-020 |
 | SWE1-075 | The `wizard.py` module shall implement `--init` (interactive Q&A wizard writing `.cstylecheck.yml`) and `--preset barr-c\|minimal\|misra` (write pre-built config without wizard); `--init-output FILE` shall set the output path; `--overwrite` shall allow overwriting an existing file | Mandatory | Test | SYS-F-002 |
 | SWE1-076 | The `config.py resolve_per_dir_config()` function shall walk upward from each source file's directory when `--per-dir-config` is active, deep-merging any `.cstylecheck.yml` found on top of the root config; the nearest config wins; `root: true` in any `.cstylecheck.yml` stops the upward search; results shall be cached per directory | Mandatory | Test | SYS-F-002 |
 | SWE1-077 | The `output.py _violations_to_html()` function shall produce a self-contained HTML report when `--output-format html` is specified; the report shall include inline CSS, summary cards (errors/warnings/info/total/files), and per-file violation tables; when `--log FILE` is provided the HTML shall be written to that file, otherwise to stdout | Mandatory | Test | SYS-F-027 |
@@ -249,6 +250,17 @@ This document satisfies **Automotive SPICE® PAM v4.0, SWE.1 — Software Requir
 | SWE1-091 | The `_check_constant_comparison()` method shall report `misc.constant_comparison` for any `==` or `!=` operator where both the left-hand token and the right-hand token are recognised as compile-time constants (decimal/hex literals, char literals, `true`/`false`/`TRUE`/`FALSE`/`NULL`/`nullptr`, or ALL\_CAPS identifiers) when `misc.constant_comparison.enabled: true`; comparisons inside `#define` RHS and `return` statements shall be exempt | Mandatory | Test | SYS-F-020 |
 | SWE1-092 | The `_check_misc()` method shall exempt integer literals from `misc.unsigned_suffix` when they appear as arguments at positions corresponding to signed-type parameters (`int8_t`, `int16_t`, `int32_t`, `int64_t`, `int`, `short`, `long`, `char`, and `signed` variants) of functions declared or defined within the same translation unit | Mandatory | Test | SYS-F-020 |
 | SWE1-093 | The `_fix_pointer_prefix()` function in `fixer.py` shall rename a non-compliant pointer parameter or variable to its prefixed form by replacing all word-boundary occurrences of the old name within the enclosing function's signature and body; it shall also rename the parameter in any doxygen `@param`/`\param` comment block immediately preceding the function; the `fix_pointer_prefix_in_header()` function shall apply the same rename to function declarations in the corresponding `.h` file when invoked by the `--fix` CLI mode | Mandatory | Test | SYS-F-020 |
+
+### 4.17 New Features — v1.6.0 Output, Suppression, and Rule Improvements
+
+| SW-REQ-ID | Requirement | Priority | Verification | Parent |
+|---|---|---|---|---|
+| SWE1-094 | The `main()` entry point shall write a one-line startup banner containing the tool name, version string, and copyright notice to `stderr` before processing begins; the banner shall not be written when `--quiet` is set | Mandatory | Test | SYS-F-032 |
+| SWE1-095 | The `--version` flag output shall include both the version string and the copyright notice on separate lines; the copyright notice shall conform to the format `Copyright (C) YYYY Dermot Murphy` | Mandatory | Test | SYS-F-032 |
+| SWE1-096 | The output formatter shall render file paths in violation messages using the OS-native path separator (`os.sep`) so that paths on Windows use backslash and paths on POSIX systems use forward-slash | Mandatory | Test | SYS-F-027 |
+| SWE1-097 | The `print_summary()` function shall print a "Files" section (listing per-file violation counts) **before** the "Results" section (listing per-rule counts); the summary header shall include the tool name, version, and a UTC timestamp; the horizontal separator line shall be dynamically sized to match the longest output line | Mandatory | Test | SYS-F-032 |
+| SWE1-098 | The `_check_functions()` method shall correct the reported line number for a function definition when the opening brace appears on a line later than the function name line (multi-line signature); the violation shall be reported at the line containing the function return type and name, not at the opening brace | Mandatory | Test | SYS-F-015 |
+| SWE1-099 | The `_check_variables()` method shall exempt function-pointer `typedef` names from the `variable.pointer_prefix` rule; a typedef whose base type contains a function-pointer signature (e.g. `typedef void (*UART_CB_T)(void)`) shall not trigger the `variable.pointer_prefix` violation | Mandatory | Test | SYS-F-014 |
 
 ### 4.15 Verification Criteria
 
@@ -305,6 +317,12 @@ The following criteria shall be met by all software requirements above. They are
 | SWE1-091 | misc.constant_comparison — flag constant-to-constant == / != | SYS-F-020 | `Checker._check_constant_comparison()` | `test_constant_comparison.py` |
 | SWE1-092 | misc.unsigned_suffix signed-parameter argument exemption | SYS-F-020 | `Checker._check_misc()` | `test_unsigned_suffix_signed_params.py` |
 | SWE1-093 | variable.pointer_prefix auto-fix: rename in signature, body, doxygen, header | SYS-F-020 | `fixer._fix_pointer_prefix()`, `fixer.fix_pointer_prefix_in_header()` | `test_pointer_prefix_fix.py` |
+| SWE1-094 | Startup banner to stderr at tool entry | SYS-F-032 | `main()` in `cli.py` | `test_cli.py` |
+| SWE1-095 | Copyright notice in `--version` output | SYS-F-032 | `main()`, `_build_parser()` | `test_cli.py` |
+| SWE1-096 | OS-native path separator in violation output | SYS-F-027 | `Violation.__str__()` / `emit()` | `test_cli.py` |
+| SWE1-097 | `print_summary()` restructure: Files before Results, header, dynamic separator | SYS-F-032 | `output.print_summary()` | `test_print_summary.py` |
+| SWE1-098 | `fn_start` line-number correction for multi-line signatures | SYS-F-015 | `Checker._check_functions()` | `test_functions.py` |
+| SWE1-099 | Function-pointer typedef exemption from `variable.pointer_prefix` | SYS-F-014 | `Checker._check_variables()` | `test_variables.py` |
 
 ---
 

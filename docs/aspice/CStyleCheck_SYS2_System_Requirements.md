@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS2-001 | **Version** | 2.1 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SYS2-001 | **Version** | 2.2 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.2 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 2.2 | 2026-07-06 | Claude | ASPICE audit — SYS-F-011 73 rule IDs; scope v1.5.0→v1.6.0; add SYS-F-046 startup banner requirement — closes #379 |
 | 2.1 | 2026-06-27 | Fix §3.3 cross-refs: SUP8 1.7→1.9, SWE1 2.2→2.4 | Dermot Murphy |
 | 2.0 | 2026-06-27 | Claude | ASPICE audit — §3.1 scope v1.4.1→v1.5.0 and 71→72 rule IDs; §3.3 SWE1 ref 1.9→2.2; SYS-F-011 71→72; §6 RTM add SWE1-MISRA-004/SWE1-089/SWE1-090 traceability; update Review & Approval dates — closes #319 #323 |
 | 1.9 | 2026-06-26 | Claude | §6 RTM: replace all `\<SWE.1-REQ-xxx\>` placeholders with actual SWE1-xxx IDs; add CSC-SWE1-001 to §3.3; update §3.1 scope to v1.4.1 — closes issue #292 |
@@ -39,7 +40,7 @@
 
 ### 3.1 Purpose
 
-This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.5.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 72 rule IDs.
+This System Requirements Specification (SRS) defines the complete, structured set of system-level requirements for **CStyleCheck v1.6.0** — an embedded C naming-convention linter implementing Barr-C:2018 and MISRA-C complementary rules across 73 rule IDs.
 
 This document satisfies the requirements of **Automotive SPICE® PAM v4.0, SYS.2 — System Requirements Analysis**.
 
@@ -115,7 +116,7 @@ The following table summarises the stakeholder needs from which the system requi
 
 | REQ-ID | Requirement | Priority | Verification Method | Derived From |
 |---|---|---|---|---|
-| SYS-F-011 | The system shall enforce naming rules across 72 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules (including MISRA C:2012/2023 Rule 4.1 non-ASCII source checking) | Mandatory | Test | STK-001, STK-002 |
+| SYS-F-011 | The system shall enforce naming rules across 73 rule IDs covering: constants/macros, variables (by scope), functions, types (typedef/enum/struct), include guards, and miscellaneous rules (including MISRA C:2012/2023 Rule 4.1 non-ASCII source checking) | Mandatory | Test | STK-001, STK-002 |
 | SYS-F-012 | The system shall enforce module-prefix requirements on global variables, file-scope static variables, public functions, macros, and constants | Mandatory | Test | STK-001 |
 | SYS-F-013 | The system shall enforce scope-aware variable rules: global (`g_` prefix), file-static (`s_` prefix), local, and parameter — each independently configurable | Mandatory | Test | STK-001 |
 | SYS-F-014 | The system shall enforce pointer-prefix rules: single pointer (`p_`), double pointer (`pp_`), boolean (`b_`), and handle variables (`h_`) | Mandatory | Test | STK-001 |
@@ -194,6 +195,7 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-F-043 | The system shall provide an interactive configuration wizard (`--init`) that generates `.cstylecheck.yml` through a Q&A session; `--preset barr-c\|minimal\|misra` shall write a pre-built config without wizard interaction; `--init-output FILE` shall set the output path; `--overwrite` shall allow replacing an existing config file | Mandatory | Test | STK-002 |
 | SYS-F-044 | The system shall support per-directory configuration overrides when `--per-dir-config` is specified; the system shall walk upward from each source file's directory, deep-merging any `.cstylecheck.yml` found along the path; the nearest config wins; a `root: true` entry shall stop the upward search; per-directory resolution results shall be cached | Mandatory | Test | STK-002 |
 | SYS-F-045 | The system shall produce a self-contained HTML report when `--output-format html` is specified; the report shall include inline CSS, summary cards (errors/warnings/info/total/files checked), and per-file violation tables; the HTML shall be written to `--log FILE` if provided, otherwise to stdout | Mandatory | Test | STK-007 |
+| SYS-F-046 | The system shall print a startup banner to stderr listing the tool name, version, date-time, and the number of source files to be checked; the banner shall be suppressed when stdout is not a terminal (i.e., piped or redirected) | Mandatory | Test | STK-001 |
 
 ### 5.9 Non-Functional Requirements — Integration
 
@@ -225,6 +227,7 @@ The following table summarises the stakeholder needs from which the system requi
 | SYS-F-043 | Config wizard and presets | STK-002 | `wizard.py` Wizard module | SWE1-075 |
 | SYS-F-044 | Per-directory config | STK-002 | `config.resolve_per_dir_config()` | SWE1-076 |
 | SYS-F-045 | HTML report output | STK-007 | `output._violations_to_html()` | SWE1-077 |
+| SYS-F-046 | Startup banner | STK-001 | `cli.py` — startup banner output to stderr | SWE1-091 |
 
 ---
 
