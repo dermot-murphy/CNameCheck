@@ -994,6 +994,14 @@ class Checker:
             if is_exempt(name, _fp_cfg.get("exempt_patterns", [])):
                 continue
 
+            # RE_FUNCTION_DEF starts with (?:^|\n), so m.start() may point to
+            # the '\n' ending the previous line. Advance past it so violations
+            # are reported on the function's own line (important for inline
+            # suppression matching).
+            fn_start = (m.start() + 1
+                        if m.start() < len(self.clean) and self.clean[m.start()] == '\n'
+                        else m.start())
+
             # Detect whether this is a static function definition by inspecting
             # the text immediately before the match (up to 120 chars back).
             window_start = max(0, m.start())
@@ -1009,21 +1017,21 @@ class Checker:
                 sp_pfx = sp_cfg.get("prefix", "prv_")
                 sp_sev = sp_cfg.get("severity", "warning")
                 if not name.startswith(sp_pfx):
-                    self._v(m.start(), sp_sev, "function.static_prefix",
+                    self._v(fn_start, sp_sev, "function.static_prefix",
                             f"Static function '{name}' must start with "
                             f"'{sp_pfx}' (static function prefix)")
 
-            self._require_module_prefix(name, m.start(), "function.prefix")
+            self._require_module_prefix(name, fn_start, "function.prefix")
 
             fn_max = fn_cfg.get("max_length")
             if fn_max and len(name) > fn_max:
-                self._v(m.start(), sev, "function.max_length",
+                self._v(fn_start, sev, "function.max_length",
                         f"Function '{name}' length {len(name)} exceeds "
                         f"maximum {fn_max} characters")
 
             fn_min = fn_cfg.get("min_length")
             if fn_min and len(name) < fn_min:
-                self._v(m.start(), sev, "function.min_length",
+                self._v(fn_start, sev, "function.min_length",
                         f"Function '{name}' length {len(name)} is below "
                         f"minimum {fn_min} characters")
 
@@ -1034,13 +1042,13 @@ class Checker:
 
             if style in ("object_verb", "verb_object"):
                 if not self._body_is_object_verb(body, object_exclusions, abbrevs):
-                    self._v(m.start(), sev, "function.style",
+                    self._v(fn_start, sev, "function.style",
                             f"Function '{name}' body '{body}' should be "
                             f"ObjectVerb segments separated by '_' "
                             f"(e.g. {pfx}BufferRead or {pfx}LiveData_Read)")
             elif style == "lower_snake":
                 if not matches_case(body, "lower_snake"):
-                    self._v(m.start(), sev, "function.style",
+                    self._v(fn_start, sev, "function.style",
                             f"Function '{name}' body '{body}' should be "
                             f"lower_snake")
 

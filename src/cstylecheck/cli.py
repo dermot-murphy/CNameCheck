@@ -12,6 +12,7 @@ import argparse
 import fnmatch
 import glob as glob_mod
 import os
+import shutil
 import sys
 from pathlib import Path
 from typing import Generator
@@ -481,6 +482,24 @@ def main() -> int:
     try:
         # Discover files lazily — emit progress immediately rather than
         # blocking until the entire glob tree is walked.
+        # Terminal width used for all verbose progress lines.  Capped at one
+        # less than the physical width so a full-width message never wraps —
+        # a wrapped line places the cursor on the next row, which breaks \r
+        # positioning for every subsequent progress write.
+        _verbose_tty = getattr(args, "verbose", False) and sys.stderr.isatty()
+        _tty_cols = (shutil.get_terminal_size((80, 24)).columns - 1
+                     if _verbose_tty else 79)
+
+        def _progress(msg: str) -> None:
+            """Write a \r-terminated progress line capped to the terminal width."""
+            if len(msg) > _tty_cols:
+                msg = msg[:_tty_cols - 3] + "..."
+            print(f"{msg:<{_tty_cols}}", end="\r", file=sys.stderr, flush=True)
+
+        def _clear_progress() -> None:
+            """Erase the current progress line and advance the cursor."""
+            print("\r" + " " * _tty_cols, file=sys.stderr)
+
         files: list = []
         for _fp in discover_files(
             args.files,
@@ -489,10 +508,8 @@ def main() -> int:
             cfg.get("ignore", {}),
         ):
             files.append(_fp)
-            if getattr(args, "verbose", False) and sys.stderr.isatty():
-                _msg = f"Discovering: {_fp}"
-                print(f"{_msg:<79}", end="\r",
-                      file=sys.stderr, flush=True)
+            if _verbose_tty:
+                _progress(f"Discovering: {_fp}")
 
         if not files:
             print("No C files to check.", file=sys.stderr)
@@ -501,10 +518,10 @@ def main() -> int:
         if getattr(args, "verbose", False):
             _n = len(files)
             _msg = f"Found {_n} file(s) - starting analysis..."
-            if sys.stderr.isatty():
-                # Clear any leftover chars beyond col 79 from long discovery paths
-                print("\r" + " " * 120, end="\r", file=sys.stderr, flush=True)
-            print(f"{_msg:<79}", file=sys.stderr, flush=True)
+            if _verbose_tty:
+                # Erase any leftover from long discovery messages before printing
+                _clear_progress()
+            print(f"{_msg:<{_tty_cols}}", file=sys.stderr, flush=True)
 
         output_format  = getattr(args, "output_format", "text")
         all_violations: list = []
@@ -516,11 +533,10 @@ def main() -> int:
 
         for filepath in files:
             if getattr(args, "verbose", False):
-                _msg = f"Scanning: {filepath}"
-                if sys.stderr.isatty():
-                    print(f"{_msg:<79}", end="\r", file=sys.stderr, flush=True)
+                if _verbose_tty:
+                    _progress(f"Scanning: {filepath}")
                 else:
-                    print(_msg, file=sys.stderr, flush=True)
+                    print(f"Scanning: {filepath}", file=sys.stderr, flush=True)
             try:
                 source = Path(filepath).read_text(encoding="utf-8", errors="replace")
                 source_cache[filepath] = source
@@ -567,7 +583,6 @@ def main() -> int:
             # of the progress line (left there by \r), so printing to stdout here
             # would corrupt it.  Violations are flushed after the progress line
             # is cleared below.
-            _verbose_tty = getattr(args, "verbose", False) and sys.stderr.isatty()
             if output_format == "text" and not _verbose_tty:
                 for v in sorted(result.violations, key=lambda x: (x.line, x.col)):
                     if args.github_actions:
@@ -575,12 +590,12 @@ def main() -> int:
                     else:
                         tee.print(v)
 
-        if getattr(args, "verbose", False) and sys.stderr.isatty():
-            print("\r" + " " * 120, file=sys.stderr)  # erase progress line (wide), advance cursor
+        if _verbose_tty:
+            _clear_progress()  # erase scanning progress line, advance cursor
 
         # Flush deferred violations (verbose+TTY mode) now that the progress line
         # has been cleared and the cursor is on a clean line.
-        if output_format == "text" and getattr(args, "verbose", False) and sys.stderr.isatty():
+        if output_format == "text" and _verbose_tty:
             for v in sorted(all_violations,
                             key=lambda x: (x.filepath, x.line, x.col)):
                 if args.github_actions:
