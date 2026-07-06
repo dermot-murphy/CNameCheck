@@ -176,5 +176,59 @@ class TestYodaSeverityAndControl(unittest.TestCase):
         self.assertGreater(viols[0].col, 0)
 
 
+class TestYodaFalsePositivesIssue354(unittest.TestCase):
+    """Issue #354: no false positive when LHS is already a constant, or when
+    the RHS identifier is followed by '[' (array element = runtime value)."""
+
+    def test_true_eq_all_caps_macro_not_flagged(self):
+        """true == API_STACK_GROWS_UP — true is already a constant on the left."""
+        self.assertFalse(has(
+            "void f(void){ if (true == API_STACK_GROWS_UP) {} }", YODA_CFG, RULE))
+
+    def test_false_eq_all_caps_macro_not_flagged(self):
+        """false == FLAG — false is already a constant on the left."""
+        self.assertFalse(has(
+            "void f(void){ if (false == SOME_FLAG) {} }", YODA_CFG, RULE))
+
+    def test_null_eq_all_caps_macro_not_flagged(self):
+        """NULL == SENTINEL_VALUE — NULL is already a constant on the left."""
+        self.assertFalse(has(
+            "void f(void){ if (NULL == SENTINEL_VALUE) {} }", YODA_CFG, RULE))
+
+    def test_literal_eq_all_caps_macro_not_flagged(self):
+        """0U == MAX_COUNT — numeric literal is already a constant on the left."""
+        self.assertFalse(has(
+            "void f(void){ if (0U == MAX_COUNT) {} }", YODA_CFG, RULE))
+
+    def test_true_eq_array_element_field_not_flagged(self):
+        """true == API_TABLE[index].field — true on left, RHS is runtime array element."""
+        src = ("void f(uint16_t index) {\n"
+               "    if (true == API_RADIO_TRANSPORT_CYCLIC_TABLE[index].frame_count_enabled) {}\n"
+               "}\n")
+        self.assertFalse(has(src, YODA_CFG, RULE))
+
+    def test_var_eq_array_element_not_flagged(self):
+        """var == TABLE[i].field — RHS ALL_CAPS followed by '[' is a runtime value, not constant."""
+        src = ("void f(uint16_t i) {\n"
+               "    if (state == API_TABLE[i].status) {}\n"
+               "}\n")
+        self.assertFalse(has(src, YODA_CFG, RULE))
+
+    def test_preprocessor_true_eq_caps_not_flagged(self):
+        """#if (true == API_STACK_GROWS_UP) — preprocessor context, true already on left."""
+        src = "#if (true == API_STACK_GROWS_UP)\n#endif\n"
+        self.assertFalse(has(src, YODA_CFG, RULE))
+
+    def test_var_eq_plain_caps_still_flagged(self):
+        """var == ALL_CAPS_MACRO (no subscript) must still be flagged."""
+        self.assertTrue(has(
+            "void f(void){ if (state == ERROR_CODE) {} }", YODA_CFG, RULE))
+
+    def test_true_eq_var_still_flagged(self):
+        """var == true (true on RIGHT) must still be flagged."""
+        self.assertTrue(has(
+            "void f(void){ if (flag == true) {} }", YODA_CFG, RULE))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
