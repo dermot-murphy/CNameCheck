@@ -19,10 +19,23 @@ try:
     from _version import __version__ as _VERSION
 except ImportError:
     try:
-        from importlib.metadata import version as _pkg_version
-        _VERSION = _pkg_version("cstylecheck")
+        # Read directly from pyproject.toml when running from source so that
+        # stale .egg-info directories don't report an outdated version.
+        import re as _re
+        from pathlib import Path as _Path
+        _pyproj = _Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
+        _m = _re.search(r'^version\s*=\s*"([^"]+)"', _pyproj.read_text(), _re.MULTILINE)
+        if _m:
+            _VERSION = _m.group(1)
+        else:
+            raise ValueError("version not found")
+        del _re, _Path, _pyproj, _m
     except Exception:
-        _VERSION = "0.0.0.dev"
+        try:
+            from importlib.metadata import version as _pkg_version
+            _VERSION = _pkg_version("cstylecheck")
+        except Exception:
+            _VERSION = "0.0.0.dev"
 
 _VERSION_STRING = f"{_TOOL_NAME} {_VERSION}"
 

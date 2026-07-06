@@ -268,22 +268,9 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee,
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     tee.print("\n" + "=" * 60)
     if version_string:
-        tee.print(f"  {version_string} | {now}")
+        tee.print(f"  {version_string}")
+        tee.print(f"  Run at: {now}")
         tee.print("=" * 60)
-    tee.print("  Errors & Warnings:")
-    tee.print(f"    Errors        : {errors}")
-    tee.print(f"    Warnings      : {warnings}")
-    tee.print(f"    Info          : {infos}")
-    tee.print(f"    {'-' * 36}")
-    tee.print(f"    Total         : {errors + warnings + infos}")
-    rule_counts: Counter = Counter(v.rule for v in all_violations)
-    if rule_counts:
-        tee.print("=" * 60)
-        tee.print("  Top violated rules:")
-        for rule, count in rule_counts.most_common(10):
-            tee.print(f"    {rule:<45} {count}")
-    tee.print("=" * 60)
-
     # Per-file breakdown: bucket each file into errors / warnings / info / ok
     files_with_errors:   set = set()
     files_with_warnings: set = set()
@@ -311,3 +298,17 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee,
         tee.print(f"    Files with info     : {files_info_only}")
         tee.print(f"    Files clean         : {files_clean}")
         tee.print("=" * 60)
+
+    tee.print("  Results:")
+    tee.print(f"    {'Errors':<20}: {errors}")
+    tee.print(f"    {'Warnings':<20}: {warnings}")
+    tee.print(f"    {'Info':<20}: {infos}")
+    tee.print(f"    {'-' * 22}")
+    tee.print(f"    {'Total':<20}: {errors + warnings + infos}")
+    rule_counts: Counter = Counter(v.rule for v in all_violations)
+    if rule_counts:
+        tee.print("=" * 60)
+        tee.print("  Top violated rules:")
+        for rule, count in rule_counts.most_common(10):
+            tee.print(f"    {rule:<45} {count}")
+    tee.print("=" * 60)
