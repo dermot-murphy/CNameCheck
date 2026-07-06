@@ -67,7 +67,7 @@ def _comment_only_lines(source: str) -> set:
 
 
 _RE_SUPPRESS = re.compile(
-    r"//\s*cstylecheck\s*:\s*"
+    r"(?://|/\*)\s*cstylecheck\s*:\s*"
     r"(disable-next-line|disable|enable)"
     r"(?:=([^\n*/]+))?",
     re.IGNORECASE,
