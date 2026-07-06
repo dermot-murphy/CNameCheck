@@ -77,9 +77,11 @@ _STANDARD_C_HEADERS: frozenset = frozenset({
 
 
 # Control-flow keywords that must never be mistaken for a return type.
+# typedef is included so that function-pointer typedefs are not parsed as
+# function declarations/definitions (issue #359).
 _CFKW = (
     r"if|else|while|for|do|switch|case|return|goto|break|continue"
-    r"|sizeof|typeof|__typeof__|__attribute__|defined|assert"
+    r"|sizeof|typeof|__typeof__|__attribute__|defined|assert|typedef"
 )
 
 RE_FUNCTION_DEF = re.compile(

@@ -162,5 +162,72 @@ class TestCheckerInlineSuppression(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+class TestBlockCommentSuppression(unittest.TestCase):
+    """Issue #360: /* cstylecheck: disable=... */ block-comment syntax must
+    be recognised in addition to // comments."""
+
+    def test_block_comment_same_line_single_rule(self):
+        src = 'int x = 1234;  /* cstylecheck: disable=misc.magic_number */\n'
+        s = parse_inline_suppressions(src)
+        self.assertIn("misc.magic_number", s.get(1, frozenset()))
+
+    def test_block_comment_block_disable_enable(self):
+        src = textwrap.dedent("""\
+            /* cstylecheck: disable=misc.magic_number */
+            int uart_a = 42;
+            int uart_b = 99;
+            /* cstylecheck: enable=misc.magic_number */
+            int uart_c = 77;
+        """)
+        s = parse_inline_suppressions(src)
+        self.assertIn("misc.magic_number", s.get(2, frozenset()))
+        self.assertIn("misc.magic_number", s.get(3, frozenset()))
+        self.assertNotIn(5, s)
+
+    def test_block_comment_disable_multiple_rules(self):
+        src = textwrap.dedent("""\
+            /* cstylecheck: disable=misc.magic_number, variables.case */
+            int BadName = 42;
+            /* cstylecheck: enable=misc.magic_number, variables.case */
+        """)
+        s = parse_inline_suppressions(src)
+        self.assertIn("misc.magic_number", s.get(2, frozenset()))
+        self.assertIn("variables.case", s.get(2, frozenset()))
+
+    def test_block_comment_suppress_end_to_end(self):
+        src = textwrap.dedent("""\
+            uint8_t uart_Init(void) {
+                /* cstylecheck: disable=misc.magic_number */
+                int uart_a = 42;
+                int uart_b = 99;
+                /* cstylecheck: enable=misc.magic_number */
+                int uart_c = 77;
+                return uart_a;
+            }
+        """)
+        violations = _violations(src)
+        magic_by_line = {ln for ln, r in violations if r == "misc.magic_number"}
+        self.assertNotIn(3, magic_by_line)
+        self.assertNotIn(4, magic_by_line)
+        self.assertIn(6, magic_by_line)
+
+    def test_slashslash_comment_still_works(self):
+        """Existing // syntax must continue to work after adding /* support."""
+        src = textwrap.dedent("""\
+            uint8_t uart_Init(void) {
+                // cstylecheck: disable=misc.magic_number
+                int uart_a = 42;
+                // cstylecheck: enable=misc.magic_number
+                int uart_b = 77;
+                return uart_a;
+            }
+        """)
+        violations = _violations(src)
+        magic_by_line = {ln for ln, r in violations if r == "misc.magic_number"}
+        self.assertNotIn(3, magic_by_line)
+        self.assertIn(5, magic_by_line)
+
+
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     unittest.main()
