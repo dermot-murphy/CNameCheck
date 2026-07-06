@@ -28,6 +28,12 @@ class Tee:
         if self._log:
             print(*args, file=self._log, **kwargs)
 
+    def log_print(self, *args, **kwargs) -> None:
+        """Write only to the log file (not stdout)."""
+        if self._log:
+            kwargs.pop("file", None)
+            print(*args, file=self._log, **kwargs)
+
     def close(self) -> None:
         if self._log:
             self._log.close()
@@ -267,12 +273,8 @@ def print_summary(all_violations: list, files_checked: int, tee: Tee,
     infos    = sum(1 for v in all_violations if v.severity == "info")
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     tee.print("=" * 60)
-    if version_string:
-        tee.print(f"  {version_string}")
-        if copyright_string:
-            tee.print(f"  {copyright_string}")
-        tee.print(f"  Run at: {now}")
-        tee.print("=" * 60)
+    tee.print(f"  Run at: {now}")
+    tee.print("=" * 60)
     # Per-file breakdown: bucket each file into errors / warnings / info / ok
     files_with_errors:   set = set()
     files_with_warnings: set = set()
