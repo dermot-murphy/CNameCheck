@@ -502,6 +502,8 @@ def main() -> int:
             _n = len(files)
             _msg = f"Found {_n} file(s) - starting analysis..."
             print(f"{_msg:<79}", file=sys.stderr, flush=True)
+            if sys.stderr.isatty():
+                print(file=sys.stderr, flush=True)  # blank line — \r progress lands below "Found…"
 
         output_format  = getattr(args, "output_format", "text")
         all_violations: list = []
@@ -568,8 +570,7 @@ def main() -> int:
                         tee.print(v)
 
         if getattr(args, "verbose", False) and sys.stderr.isatty():
-            print(" " * 80, end="\r",
-                  file=sys.stderr)  # erase last progress line
+            print("\r" + " " * 79, file=sys.stderr)  # erase progress line, advance cursor
         # Cross-file sign-compatibility check (needs all files ingested first).
         # Uses the source cache so no file is read from disk a second time.
         sign_cfg = cfg.get("sign_compatibility", {})
