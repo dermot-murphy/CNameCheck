@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SYS4-001 | **Version** | 1.9 |
-| **Project** | CStyleCheck | **Date** | 2026-06-27 |
+| **Document ID** | CSC-SYS4-001 | **Version** | 1.10 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SYS.4 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.10 | 2026-07-06 | Claude | v1.6.0 RC — update §5 overall result 1183→1279; update §3.3 SWE5→1.13, SVD→1.22 |
 | 1.9 | 2026-06-27 | Fix §3.3 cross-ref: SYS2 1.9→2.0 | Dermot Murphy |
 | 1.8 | 2026-06-27 | Claude | ASPICE audit — replace §6 SWE5 traceability placeholders with actual SIT-001–SIT-014 test case IDs; update Review & Approval dates — closes #320 #323 |
 | 1.7 | 2026-06-26 | Claude | ASPICE audit — update §3.3 SYS2 ref (1.8→1.9); update §5 overall result test count (965→1183) — closes #306 #311 |
@@ -457,7 +458,7 @@ SWE.4/SWE.5 unit and component-level tests are documented in the software test s
 | SITC-014 | `--warnings-as-errors` promotion | PASS | |
 | SITC-015 | v1.4.0 rule coverage (macro safety, function quality, file constraints, naming) | PASS | |
 
-**Overall Result:** PASS — Commit 93178cd, 2026-05-28 (SITC-001 to SITC-014); 2026-06-26 (SITC-015), GitHub Actions (automated) / Dermot Murphy (manual review), 1183 tests all PASS on Python 3.10 / 3.11 / 3.12.
+**Overall Result:** PASS — Commit 93178cd, 2026-05-28 (SITC-001 to SITC-014); 2026-06-26 (SITC-015); 2026-07-06 (v1.6.0 RC), GitHub Actions (automated) / Dermot Murphy (manual review), 1279 tests all PASS on Python 3.10 / 3.11 / 3.12.
 
 > **📋 Note:** All SITC test cases must achieve PASS status before the system verification (SYS.5) activities commence. Any FAIL result must be tracked as a GitHub Issue and resolved via the change control process (SUP.10).
 
