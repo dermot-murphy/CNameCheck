@@ -66,8 +66,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
   `(?:^|\n)`, causing `m.start()` to point to the `\n` ending the preceding line.
   Fixed with `fn_start` correction so all function-rule violations are reported on
   the function's own line
-  (issues [#362](https://github.com/dermot-murphy/CStyleCheck/issues/362),
-  [#363](https://github.com/dermot-murphy/CStyleCheck/issues/363)).
+  (issue [#362](https://github.com/dermot-murphy/CStyleCheck/issues/362)).
 - **`function.prefix` not suppressed by inline block directive** — the line-offset
   bug above also caused `// cstylecheck: disable=function.prefix` blocks to miss the
   function declaration line; now resolved by the same `fn_start` correction
