@@ -1,7 +1,7 @@
 # CStyleCheck
 
 Embedded C Style Compliance Checker for GitHub Actions, pre-commit hooks, and Docker.
-Implements **Barr-C:2018** and MISRA-C complementary rules across **72 rule IDs**.
+Implements **Barr-C:2018** and MISRA-C complementary rules across **73 rule IDs**.
 
 [![Tests](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/cstylecheck_tests.yml)
 [![Docker](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml/badge.svg)](https://github.com/dermot-murphy/CStyleCheck/actions/workflows/docker_publish.yml)
@@ -105,7 +105,7 @@ repos:
 
 ---
 
-## Rule categories (72 rule IDs)
+## Rule categories (73 rule IDs)
 
 | Category | Rule IDs |
 |---|---|

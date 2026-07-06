@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE5-001 | **Version** | 1.12 |
-| **Project** | CStyleCheck | **Date** | 2026-07-01 |
+| **Document ID** | CSC-SWE5-001 | **Version** | 1.13 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.5 |
@@ -20,6 +20,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.13 | 2026-07-06 | Claude | v1.6.0 RC — update §6 overall result 1223→1279; §3.1 SWE4→1.19, SVD→1.22; add SIT-024 (startup banner/copyright output) |
 | 1.12 | 2026-07-01 | Claude | Add SIT-021/022/023 (constant_comparison, unsigned_suffix signed-param, pointer_prefix fix); update §3 scope to v1.6.0; §6 overall result 1183→1223; §3.1 SWE1→2.5, SWE4→1.18, SWE6→1.14 |
 | 1.11 | 2026-06-27 | Fix §3.1 cross-refs: SWE4 1.16→1.17, SWE6 1.12→1.13, SYS4 1.7→1.9; fix header date | Dermot Murphy |
 | 1.10 | 2026-06-27 | Fix §3.1 cross-refs: SWE4 1.14→1.16, SWE6 1.10→1.12 | Dermot Murphy |
@@ -640,7 +641,7 @@ Each software architecture interface (SWA-IF-01 to SWA-IF-10) must be exercised 
 | SIT-022 | `misc.unsigned_suffix` signed-parameter argument exemption | IF-03, IF-06, IF-10 | PASS | |
 | SIT-023 | `variable.pointer_prefix` auto-fix mode (signature, body, doxygen, .h file) | IF-06, IF-10 | PASS | |
 
-**Overall Integration Verification Result:** PASS — v1.6.0, 2026-07-01, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1223 tests all PASS.
+**Overall Integration Verification Result:** PASS — v1.6.0, 2026-07-06, GitHub Actions (automated) / Dermot Murphy (manual review), Python 3.10 / 3.11 / 3.12, 1279 tests all PASS.
 
 > **📋 Note:** All 10 defined software architecture interfaces must be covered before integration testing is considered complete. Any uncovered interface must be resolved via a new or updated test case.
 

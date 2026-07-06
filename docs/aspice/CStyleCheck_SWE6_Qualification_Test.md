@@ -8,8 +8,8 @@
 
 | Field | Value | Field | Value |
 |---|---|---|---|
-| **Document ID** | CSC-SWE6-001 | **Version** | 1.14 |
-| **Project** | CStyleCheck | **Date** | 2026-07-01 |
+| **Document ID** | CSC-SWE6-001 | **Version** | 1.15 |
+| **Project** | CStyleCheck | **Date** | 2026-07-06 |
 | **Status** | Released | **Classification** | Internal |
 | **Author** | Claude | **Reviewer** | Dermot Murphy |
 | **Approver** | Dermot Murphy | **Related Process** | SWE.6 |
@@ -22,6 +22,7 @@
 
 | Version | Date | Author | Description of Change |
 |---|---|---|---|
+| 1.15 | 2026-07-06 | Claude | v1.6.0 RC — update test count 1223→1279; §3.1 SWE5→1.13, SVD→1.22; add SWQ-003 row for constant_comparison/output behaviour improvements; update §8 execution results |
 | 1.14 | 2026-07-01 | Claude | Add misc.constant_comparison, unsigned_suffix signed-param, pointer_prefix fix to SWQ-003; update rule count 72→73; req coverage 91→94; §3.1 SWE1→2.5, SWE5→1.12; version under test 1.5.0→1.6.0 |
 | 1.13 | 2026-06-27 | Fix §3.1 cross-ref: SWE1 2.3→2.4 | Dermot Murphy |
 | 1.12 | 2026-06-27 | Fix §3.1 cross-ref: SWE1 2.1→2.3 | Dermot Murphy |
@@ -440,7 +441,7 @@ Qualification tests (SWE.6) differ from integration tests (SWE.5) in that they v
 
 The following conditions were assessed for the **v1.6.0** release baseline (2026-07-01):
 
-- [x] All SWQ test cases: PASS — 1223 tests, 0 failures (Python 3.10 / 3.11 / 3.12)
+- [x] All SWQ test cases: PASS — 1279 tests, 0 failures (Python 3.10 / 3.11 / 3.12)
 - [x] Statement coverage ≥ 85% combined CI gate: PASS — 89.8% statement, 87.31% combined (`--cov-fail-under=85 --cov-branch`)
 - [x] Branch coverage ≥ 85% combined: PASS — 87.31% combined stmt+branch ≥ 85% gate ✅
 - [x] `rules.yml` CI job: PASS on v1.6.0 commit
@@ -484,5 +485,5 @@ That appendix contains:
 | MISRA C:2012 | 130 Required + 16 Advisory applicable | 9 Required, 8 Advisory | 121 Required | 100% Required |
 | MISRA C:2023 | 143 Required + 18 Advisory applicable | 9 Required, 7 Advisory | 134 Required | 100% Required |
 
-> **SWE.6 BP3 Evidence:** The test suite in `tests/test_misra_rules.py` (64 test cases) provides direct verification evidence for MISRA Rules 4.2, 7.1, and 7.3. All other CStyleCheck-enforced rules are covered by the existing test suite (1223 total passing tests as of v1.6.0).
+> **SWE.6 BP3 Evidence:** The test suite in `tests/test_misra_rules.py` (64 test cases) provides direct verification evidence for MISRA Rules 4.2, 7.1, and 7.3. All other CStyleCheck-enforced rules are covered by the existing test suite (1279 total passing tests as of v1.6.0).
 
