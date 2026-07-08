@@ -1,0 +1,189 @@
+# ============================================================
+# CStyleCheck rules for trend-analysis metrics scan
+# Applied to examples/*.c and examples/*.h
+# ============================================================
+# Project-specific prefix rules are DISABLED so that the
+# example files (which use generic naming) are not penalised.
+# Structural / style rules remain enabled to produce
+# meaningful warning/error counts over time.
+# ============================================================
+
+file_prefix:
+  enabled: false          # disabled: examples have no project prefix
+
+variables:
+  enabled: true
+  severity: warning
+  case: lower_snake
+  min_length: 2
+  max_length: 40
+  allow_single_char_loop_vars: true
+  allow_loop_vars_short: true
+  allowed_abbreviations:
+    - ADC
+    - DAC
+    - SPI
+    - I2C
+    - UART
+    - CAN
+    - DMA
+    - IRQ
+    - ISR
+    - GPIO
+    - PWM
+    - USB
+    - CRC
+    - RTC
+    - MCU
+    - ECU
+    - CPU
+    - FIFO
+    - HAL
+    - API
+  global:
+    severity: warning
+    case: lower_snake
+    require_module_prefix: false
+    g_prefix:
+      enabled: false
+  static:
+    severity: warning
+    case: lower_snake
+    require_module_prefix: false
+    s_prefix:
+      enabled: false
+  local:
+    severity: info
+    case: lower_snake
+  parameter:
+    severity: info
+    case: lower_snake
+    p_prefix:
+      enabled: false
+  pointer_prefix:
+    enabled: false
+  pp_prefix:
+    enabled: false
+  bool_prefix:
+    enabled: false
+  handle_prefix:
+    enabled: false
+  no_numeric_in_name:
+    enabled: false
+  prefix_order:
+    enabled: false
+
+functions:
+  enabled: true
+  severity: warning
+  case: lower_snake
+  require_module_prefix: false
+  style: "any"
+  max_parameters: 8
+  max_lines: 60
+  function_doc_header:
+    enabled: false
+  assert_density:
+    enabled: false
+  null_statement_comment:
+    enabled: false
+  declaration_spacing:
+    enabled: false
+
+constants:
+  enabled: true
+  severity: info
+  case: upper_snake
+  require_prefix: false
+
+typedefs:
+  enabled: true
+  severity: info
+  case: "any"
+
+enums:
+  enabled: true
+  severity: info
+  members:
+    case: upper_snake
+    require_prefix: false
+
+structs:
+  enabled: true
+  severity: info
+
+include_guards:
+  enabled: true
+  severity: warning
+
+misc:
+  copyright_header:
+    enabled: false
+  eof_comment:
+    enabled: false
+  line_length:
+    enabled: true
+    severity: info
+    max_length: 100
+  indentation:
+    enabled: true
+    severity: info
+    style: spaces
+    spaces: 4
+  magic_number:
+    enabled: false
+  unsigned_suffix:
+    enabled: true
+    severity: info
+  lowercase_l_suffix:
+    enabled: true
+    severity: warning
+  yoda_condition:
+    enabled: true
+    severity: info
+  block_comment_spacing:
+    enabled: false
+  comment_ratio:
+    enabled: true
+    severity: info
+    min_ratio: 0.05
+    max_ratio: 0.80
+    exclude_doxygen: true
+  whitespace_ratio:
+    enabled: true
+    severity: info
+    min_ratio: 0.05
+    max_ratio: 0.50
+  declared_not_defined:
+    enabled: false
+  function_length:
+    enabled: true
+    severity: info
+    max_lines: 60
+  function_doc_header:
+    enabled: false
+  assert_density:
+    enabled: false
+  null_statement_comment:
+    enabled: false
+  declaration_spacing:
+    enabled: false
+  file_length:
+    enabled: true
+    severity: info
+    max_lines: 500
+  reserved_header_name:
+    enabled: true
+    severity: warning
+  non_ascii_source:
+    enabled: true
+    severity: error
+  octal_constant:
+    enabled: true
+    severity: warning
+  trigraph:
+    enabled: true
+    severity: warning
+  constant_comparison:
+    enabled: true
+    severity: info

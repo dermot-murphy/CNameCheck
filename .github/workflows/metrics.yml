@@ -1,0 +1,121 @@
+name: Trend Metrics
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      branch_override:
+        description: "Branch to record metrics for (leave blank = auto)"
+        required: false
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  collect:
+    name: Collect & publish metrics
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2        # need HEAD~1 for diff stats
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml pytest
+
+      - name: Collect metrics
+        id: collect
+        run: |
+          BRANCH="${{ github.event.inputs.branch_override || github.ref_name }}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          mkdir -p metrics/charts
+          python3 scripts/collect_metrics.py --branch "$BRANCH" --output-dir metrics
+
+      - name: Generate SVG charts
+        run: |
+          BRANCH="${{ steps.collect.outputs.branch }}"
+          python3 scripts/generate_charts.py \
+            --data-dir metrics \
+            --output-dir metrics/charts \
+            --branch "$BRANCH"
+          # Also generate charts for the other branch if its data exists
+          OTHER=$([ "$BRANCH" = "main" ] && echo "develop" || echo "main")
+          if [ -f "metrics/${OTHER}.json" ]; then
+            python3 scripts/generate_charts.py \
+              --data-dir metrics \
+              --output-dir metrics/charts \
+              --branch "$OTHER"
+          fi
+
+      - name: Commit metrics to gh-pages
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stash current metrics so we can switch branches
+          cp -r metrics /tmp/metrics-out
+
+          # Check out gh-pages (create if it doesn't exist)
+          git fetch origin gh-pages 2>/dev/null || true
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . 2>/dev/null || true
+          fi
+
+          # Merge in the new data
+          mkdir -p metrics/charts
+          cp -r /tmp/metrics-out/. metrics/
+
+          # Stage and commit if anything changed
+          git add metrics/
+          if ! git diff --cached --quiet; then
+            BRANCH="${{ steps.collect.outputs.branch }}"
+            COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "?")
+            git commit -m "chore(metrics): update trend data for ${BRANCH} @ ${COMMIT}"
+            git push origin gh-pages
+          else
+            echo "No metrics changes to commit."
+          fi
+
+      - name: Update wiki
+        run: |
+          # Return to the source commit
+          git checkout "${{ github.sha }}" -- . 2>/dev/null || \
+            git checkout "${{ github.ref_name }}" -- . 2>/dev/null || true
+
+          # Clone the wiki
+          git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git" wiki || {
+            echo "Wiki clone failed (wiki may not yet exist). Skipping wiki update."
+            exit 0
+          }
+
+          BASE_URL="https://raw.githubusercontent.com/${{ github.repository }}/gh-pages/metrics/charts"
+
+          python3 scripts/update_wiki_metrics.py \
+            --data-dir metrics \
+            --charts-url-base "$BASE_URL" \
+            --output wiki/Trend-Analysis.md
+
+          cd wiki
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Trend-Analysis.md
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(wiki): update Trend-Analysis metrics"
+            git push
+          else
+            echo "No wiki changes."
+          fi

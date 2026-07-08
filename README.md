@@ -26,6 +26,19 @@ Draft companion documents (pending rule population, not yet authoritative):
 
 ---
 
+## Trend analysis
+
+Code quality metrics tracked after every PR merge to `main` and `develop`.
+Full charts and history on the **[Trend Analysis](https://github.com/dermot-murphy/CStyleCheck/wiki/Trend-Analysis)** wiki page.
+
+| Chart | main | develop |
+|---|---|---|
+| Violations | [![violations-main](https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/metrics/charts/main_errors_warnings.svg)](https://github.com/dermot-murphy/CStyleCheck/wiki/Trend-Analysis) | [![violations-develop](https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/metrics/charts/develop_errors_warnings.svg)](https://github.com/dermot-murphy/CStyleCheck/wiki/Trend-Analysis) |
+| File stats | [![files-main](https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/metrics/charts/main_file_stats.svg)](https://github.com/dermot-murphy/CStyleCheck/wiki/Trend-Analysis) | [![files-develop](https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/metrics/charts/develop_file_stats.svg)](https://github.com/dermot-murphy/CStyleCheck/wiki/Trend-Analysis) |
+| Ratios | [![ratios-main](https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/metrics/charts/main_ratios.svg)](https://github.com/dermot-murphy/CStyleCheck/wiki/Trend-Analysis) | [![ratios-develop](https://raw.githubusercontent.com/dermot-murphy/CStyleCheck/gh-pages/metrics/charts/develop_ratios.svg)](https://github.com/dermot-murphy/CStyleCheck/wiki/Trend-Analysis) |
+
+---
+
 ## Repository layout
 
 ```
